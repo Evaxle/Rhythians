@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Search, Discord } from "lucide-react";
+import { MessageSquare, Search } from "lucide-react";
 
 export function SiteHeader() {
   return (
