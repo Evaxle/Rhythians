@@ -1,0 +1,34 @@
+import Link from "next/link";
+
+export default function AdminDashboardPage() {
+  return (
+    <div className="space-y-8">
+      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+        <div className="grid gap-6 lg:grid-cols-4">
+          {[
+            { title: "Users", value: "—" },
+            { title: "Clips", value: "—" },
+            { title: "Pending", value: "—" },
+            { title: "Articles", value: "—" },
+          ].map((card) => (
+            <div key={card.title} className="rounded-3xl border border-border bg-background/70 p-6">
+              <p className="text-sm text-muted">{card.title}</p>
+              <p className="mt-3 text-3xl font-semibold text-white">{card.value}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+      <div className="grid gap-6 lg:grid-cols-3">
+        <Link href="/admin/articles" className="rounded-3xl border border-border bg-surface/95 p-6 text-sm text-white transition hover:border-accent/40">
+          Manage articles
+        </Link>
+        <Link href="/admin/clips" className="rounded-3xl border border-border bg-surface/95 p-6 text-sm text-white transition hover:border-accent/40">
+          Review clips
+        </Link>
+        <Link href="/admin/rules" className="rounded-3xl border border-border bg-surface/95 p-6 text-sm text-white transition hover:border-accent/40">
+          Manage rules
+        </Link>
+      </div>
+    </div>
+  );
+}

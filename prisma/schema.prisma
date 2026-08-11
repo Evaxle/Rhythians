@@ -1,0 +1,359 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ClipStatus {
+  pending
+  approved
+  rejected
+  hidden
+  deleted
+}
+
+enum ReportStatus {
+  open
+  reviewing
+  resolved
+  dismissed
+}
+
+enum NotificationType {
+  clip_approved
+  clip_rejected
+  comment_reply
+  clip_like
+  article_published
+  announcement
+  moderation
+}
+
+enum PermissionName {
+  knowledge_read
+  knowledge_create
+  knowledge_edit
+  knowledge_publish
+  knowledge_delete
+  clips_submit
+  clips_comment
+  clips_moderate
+  clips_delete
+  users_view
+  users_moderate
+  settings_manage
+  announcements_create
+  announcements_delete
+  admin_access
+}
+
+model User {
+  id              String             @id @default(uuid())
+  discordId       String             @unique
+  username        String
+  discriminator   String
+  avatar          String?
+  locale          String?
+  email           String?            @unique
+  displayName     String?
+  profileHandle   String             @unique
+  discordRoles    String[]           @default([])
+  playerRank      PlayerRank?        @relation(fields: [playerRankId], references: [id])
+  playerRankId    String?
+  joinedAt        DateTime           @default(now())
+  bio             String?
+  website         String?
+  isSuspended     Boolean            @default(false)
+  roles           UserRole[]
+  sessions        Session[]
+  clips           Clip[]             @relation("uploadedClips")
+  comments        Comment[]
+  clipLikes       ClipLike[]
+  announcements   Announcement[]     @relation("announcementAuthor")
+  notifications   Notification[]
+  articleRevisions ArticleRevision[]
+  reports         Report[]           @relation("reporter")
+  moderationActions ModerationAction[]
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+}
+
+model Session {
+  id         String   @id @default(uuid())
+  token      String   @unique
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+}
+
+model Role {
+  id            String            @id @default(uuid())
+  name          String            @unique
+  description   String?
+  isDefault     Boolean           @default(false)
+  users         UserRole[]
+  permissions   RolePermission[]
+  discordMappings DiscordRoleMapping[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+model Permission {
+  id          String            @id @default(uuid())
+  name        PermissionName    @unique
+  description String?
+  rolePermissions RolePermission[]
+}
+
+model RolePermission {
+  id           String      @id @default(uuid())
+  role         Role        @relation(fields: [roleId], references: [id])
+  roleId       String
+  permission   Permission  @relation(fields: [permissionId], references: [id])
+  permissionId String
+}
+
+model UserRole {
+  id     String  @id @default(uuid())
+  user   User    @relation(fields: [userId], references: [id])
+  userId String
+  role   Role    @relation(fields: [roleId], references: [id])
+  roleId String
+}
+
+model DiscordRoleMapping {
+  id            String   @id @default(uuid())
+  discordRoleId String   @unique
+  role          Role     @relation(fields: [roleId], references: [id])
+  roleId        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model PlayerRank {
+  id          String         @id @default(uuid())
+  name        String         @unique
+  slug        String         @unique
+  description String?
+  icon        String?
+  color       String?        @default("#7289da")
+  displayOrder Int           @default(0)
+  enabled     Boolean        @default(true)
+  users       User[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model DiscordRoleRankMapping {
+  id            String     @id @default(uuid())
+  discordRoleId String     @unique
+  playerRank    PlayerRank @relation(fields: [playerRankId], references: [id])
+  playerRankId  String
+  priority      Int        @default(0)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Rule {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  description String?
+  content     String
+  order       Int      @default(0)
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model KnowledgeCategory {
+  id          String            @id @default(uuid())
+  name        String            @unique
+  slug        String            @unique
+  description String?
+  order       Int               @default(0)
+  articles    KnowledgeArticle[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+model KnowledgeArticle {
+  id           String            @id @default(uuid())
+  title        String
+  slug         String            @unique
+  description  String
+  content      String
+  published    Boolean           @default(false)
+  featured     Boolean           @default(false)
+  viewCount    Int               @default(0)
+  author       User              @relation(fields: [authorId], references: [id])
+  authorId     String
+  category     KnowledgeCategory @relation(fields: [categoryId], references: [id])
+  categoryId   String
+  tags         ArticleTag[]
+  revisions    ArticleRevision[]
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+}
+
+model Tag {
+  id        String       @id @default(uuid())
+  name      String       @unique
+  slug      String       @unique
+  clips     ClipTag[]
+  articles  ArticleTag[]
+  createdAt DateTime     @default(now())
+}
+
+model ArticleTag {
+  id         String           @id @default(uuid())
+  article    KnowledgeArticle @relation(fields: [articleId], references: [id])
+  articleId  String
+  tag        Tag              @relation(fields: [tagId], references: [id])
+  tagId      String
+}
+
+model ArticleRevision {
+  id         String           @id @default(uuid())
+  article    KnowledgeArticle @relation(fields: [articleId], references: [id])
+  articleId  String
+  author     User             @relation(fields: [authorId], references: [id])
+  authorId   String
+  title      String
+  content    String
+  createdAt  DateTime         @default(now())
+}
+
+model ClipCategory {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  order       Int      @default(0)
+  clips       Clip[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Clip {
+  id             String        @id @default(uuid())
+  title          String
+  description    String
+  status         ClipStatus    @default(pending)
+  storagePath    String
+  thumbnailPath  String?
+  rejectionReason String?
+  uploader       User          @relation("uploadedClips", fields: [uploaderId], references: [id])
+  uploaderId     String
+  category       ClipCategory  @relation(fields: [categoryId], references: [id])
+  categoryId     String
+  tags           ClipTag[]
+  likes          ClipLike[]
+  views          ClipView[]
+  comments       Comment[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model ClipTag {
+  id      String  @id @default(uuid())
+  clip    Clip    @relation(fields: [clipId], references: [id])
+  clipId  String
+  tag     Tag     @relation(fields: [tagId], references: [id])
+  tagId   String
+}
+
+model ClipLike {
+  id        String @id @default(uuid())
+  clip      Clip   @relation(fields: [clipId], references: [id])
+  clipId    String
+  user      User   @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+  @@unique([clipId, userId])
+}
+
+model ClipView {
+  id        String   @id @default(uuid())
+  clip      Clip     @relation(fields: [clipId], references: [id])
+  clipId    String
+  recordedAt DateTime @default(now())
+  session   String?
+}
+
+model Comment {
+  id         String   @id @default(uuid())
+  text       String
+  clip       Clip     @relation(fields: [clipId], references: [id])
+  clipId     String
+  author     User     @relation(fields: [authorId], references: [id])
+  authorId   String
+  isEdited   Boolean  @default(false)
+  isDeleted  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Report {
+  id           String       @id @default(uuid())
+  reason       String
+  description  String?
+  targetType   String
+  targetId     String
+  status       ReportStatus @default(open)
+  reporter     User         @relation("reporter", fields: [reporterId], references: [id])
+  reporterId   String
+  resolver     User?        @relation("resolver", fields: [resolverId], references: [id])
+  resolverId   String?
+  createdAt    DateTime     @default(now())
+  resolvedAt   DateTime?
+}
+
+model Announcement {
+  id         String   @id @default(uuid())
+  title      String
+  slug       String   @unique
+  content    String
+  published  Boolean  @default(false)
+  pinned     Boolean  @default(false)
+  author     User     @relation("announcementAuthor", fields: [authorId], references: [id])
+  authorId   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Notification {
+  id        String            @id @default(uuid())
+  user      User              @relation(fields: [userId], references: [id])
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  url       String?
+  read      Boolean           @default(false)
+  createdAt DateTime          @default(now())
+}
+
+model ModerationAction {
+  id         String   @id @default(uuid())
+  actor      User     @relation(fields: [actorId], references: [id])
+  actorId    String
+  action     String
+  targetType String
+  targetId   String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+}
+
+model SiteSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

@@ -1,0 +1,47 @@
+{
+  "name": "rhythians",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "prisma migrate deploy",
+    "db:push": "prisma db push",
+    "db:seed": "ts-node --transpile-only prisma/seed.ts",
+    "bot:start": "ts-node --transpile-only discord-bot/index.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "4.20.1",
+    "@supabase/supabase-js": "2.27.0",
+    "clsx": "^2.1.1",
+    "dayjs": "^1.11.9",
+    "discord.js": "^14.17.0",
+    "lucide-react": "^0.460.0",
+    "next": "14.2.5",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-markdown": "^8.0.7",
+    "remark-gfm": "^5.0.2",
+    "zod": "^3.23.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.5",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@types/uuid": "^9.0.8",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "14.2.5",
+    "postcss": "^8.4.38",
+    "prisma": "4.20.1",
+    "prettier": "^3.0.0",
+    "tailwindcss": "^3.4.4",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.6.2"
+  }
+}
