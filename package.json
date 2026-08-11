@@ -14,7 +14,7 @@
     "bot:start": "ts-node --transpile-only discord-bot/index.ts"
   },
   "dependencies": {
-    "@prisma/client": "4.20.1",
+    "@prisma/client": "4.16.2",
     "@supabase/supabase-js": "2.27.0",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.9",
@@ -38,7 +38,7 @@
     "eslint": "^8.57.0",
     "eslint-config-next": "14.2.5",
     "postcss": "^8.4.38",
-    "prisma": "4.20.1",
+    "prisma": "4.16.2",
     "prettier": "^3.0.0",
     "tailwindcss": "^3.4.4",
     "ts-node": "^10.9.1",
