@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { fileName, contentType, folder, fileSize } = body as { fileName: string; contentType: string; folder: string; fileSize?: number };
+  const { fileName, contentType, folder } = body as { fileName: string; contentType: string; folder: string; fileSize?: number };
 
   if (!fileName || !contentType || !folder) {
     return NextResponse.json({ error: "Invalid upload request" }, { status: 400 });
@@ -29,14 +29,18 @@ export async function POST(request: Request) {
   }
 
   const path = getStoragePath(process.env.STORAGE_BUCKET ?? "media", folder, fileName);
-  const expiresIn = 60;
-  const { data, error } = await supabaseAdmin.storage.from(process.env.STORAGE_BUCKET ?? "media").createSignedUploadUrl(path, expiresIn, {
-    contentType,
-  });
+  
+  try {
+    const { data, error } = await supabaseAdmin.storage
+      .from(process.env.STORAGE_BUCKET ?? "media")
+      .createSignedUploadUrl(path);
 
-  if (error || !data) {
-    return NextResponse.json({ error: error?.message ?? "Could not create upload url" }, { status: 500 });
+    if (error || !data) {
+      return NextResponse.json({ error: error?.message ?? "Could not create upload url" }, { status: 500 });
+    }
+
+    return NextResponse.json({ uploadUrl: data.signedUrl, path });
+  } catch (err) {
+    return NextResponse.json({ error: "Upload service error" }, { status: 500 });
   }
-
-  return NextResponse.json({ uploadUrl: data.signedUrl, path });
 }

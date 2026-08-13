@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export default async function RulesPage() {
   const rules = await prisma.rule.findMany({ orderBy: { order: "asc" }, where: { enabled: true } });
 

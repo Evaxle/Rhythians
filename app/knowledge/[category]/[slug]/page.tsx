@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { prisma } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
 import { extractHeadings } from "@/lib/markdown";
 
 type Props = {
@@ -12,7 +14,18 @@ type Props = {
 export default async function KnowledgeArticlePage({ params }: Props) {
   const article = await prisma.knowledgeArticle.findUnique({
     where: { slug: params.slug },
-    include: { author: true, category: true },
+    include: { 
+      author: {
+        include: {
+          roles: {
+            include: {
+              role: true
+            }
+          }
+        }
+      }, 
+      category: true 
+    },
   });
 
   if (!article || article.category.slug !== params.category || !article.published) {
@@ -21,6 +34,7 @@ export default async function KnowledgeArticlePage({ params }: Props) {
 
   const related = await prisma.knowledgeArticle.findMany({
     where: { categoryId: article.categoryId, published: true, id: { not: article.id } },
+    include: { category: true },
     orderBy: { updatedAt: "desc" },
     take: 4,
   });

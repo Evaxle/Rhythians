@@ -2,13 +2,15 @@ import Link from "next/link";
 import { ArrowRight, Sparkles, MessageCircle, BookOpen, Video, Globe } from "lucide-react";
 import { prisma } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 async function getStats() {
   const [members, articles, clips] = await Promise.all([
     prisma.user.count(),
     prisma.knowledgeArticle.count({ where: { published: true } }),
     prisma.clip.count({ where: { status: "approved" } }),
   ]);
-  return { members, articles, clips };
+  return { members, articles, clips, online: undefined };
 }
 
 export default async function HomePage() {

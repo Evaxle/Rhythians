@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 enum ClipStatus {
@@ -75,7 +74,9 @@ model User {
   announcements   Announcement[]     @relation("announcementAuthor")
   notifications   Notification[]
   articleRevisions ArticleRevision[]
+  knowledgeArticles KnowledgeArticle[] @relation("articleAuthor")
   reports         Report[]           @relation("reporter")
+  reportedResolvedBy Report[]         @relation("resolver")
   moderationActions ModerationAction[]
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
@@ -144,6 +145,7 @@ model PlayerRank {
   displayOrder Int           @default(0)
   enabled     Boolean        @default(true)
   users       User[]
+  discordRoleRankMappings DiscordRoleRankMapping[]
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
 }
@@ -190,7 +192,7 @@ model KnowledgeArticle {
   published    Boolean           @default(false)
   featured     Boolean           @default(false)
   viewCount    Int               @default(0)
-  author       User              @relation(fields: [authorId], references: [id])
+  author       User              @relation("articleAuthor", fields: [authorId], references: [id])
   authorId     String
   category     KnowledgeCategory @relation(fields: [categoryId], references: [id])
   categoryId   String

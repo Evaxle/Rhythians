@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MessageSquare, Search } from "lucide-react";
+import { MessageSquare, Search, MessageCircle } from "lucide-react";
 
 export function SiteHeader() {
   return (
@@ -25,7 +25,7 @@ export function SiteHeader() {
             <Search size={16} /> Search
           </Link>
           <Link href="/login" className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent2">
-            <Discord size={16} /> Login
+            <MessageCircle size={16} /> Login
           </Link>
         </div>
       </div>

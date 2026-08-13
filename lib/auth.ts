@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 const SESSION_COOKIE_NAME = process.env.SESSION_COOKIE_NAME ?? "rhythians_session";
 
 export async function getSessionUser() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
   if (!sessionToken) return null;
   const session = await prisma.session.findUnique({

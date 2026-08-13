@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import ClipSubmitForm from "@/components/clip-submit-form";
 
+export const dynamic = "force-dynamic";
+
 export default async function ClipSubmitPage() {
   const user = await getSessionUser();
   const categories = await prisma.clipCategory.findMany({ orderBy: { order: "asc" } });

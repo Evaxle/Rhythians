@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+.next/
+dist/
+build/
+
+# Environment
+.env*
+.env.*.local
+
+# Development
+.git/
+.gitignore
+.eslintrc.json
+prettier.config.js
+postcss.config.js
+tailwind.config.ts
+tsconfig.json
+
+# Documentation
+README.md
+PRODUCTION_SETUP.md
+LICENSE
+
+# Discord Bot (not deployed)
+discord-bot/
+
+# Database
+prisma/migrate.sh

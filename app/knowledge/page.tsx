@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 async function getCategories() {
   return prisma.knowledgeCategory.findMany({ orderBy: { order: "asc" } });
 }
