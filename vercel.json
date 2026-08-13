@@ -3,5 +3,5 @@
   "devCommand": "npm run dev",
   "installCommand": "npm ci",
   "framework": "nextjs",
-  "nodejs": "20"
+  "nodejs": "26"
 }
