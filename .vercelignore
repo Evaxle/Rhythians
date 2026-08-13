@@ -13,16 +13,13 @@ build/
 .gitignore
 .eslintrc.json
 prettier.config.js
-postcss.config.js
-tailwind.config.ts
-tsconfig.json
 
 # Documentation
 README.md
 PRODUCTION_SETUP.md
 LICENSE
 
-# Discord Bot (not deployed)
+# Discord Bot
 discord-bot/
 
 # Database
