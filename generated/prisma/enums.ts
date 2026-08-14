@@ -37,8 +37,7 @@ export const NotificationType = {
   clip_like: 'clip_like',
   article_published: 'article_published',
   announcement: 'announcement',
-  moderation: 'moderation',
-  new_message: 'new_message'
+  moderation: 'moderation'
 } as const
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]

@@ -1,8 +1,5 @@
 -- Direct messaging and group chat support.
 
--- AlterEnum
-ALTER TYPE "NotificationType" ADD VALUE 'new_message';
-
 -- CreateEnum
 CREATE TYPE "ConversationType" AS ENUM ('direct', 'group');
 

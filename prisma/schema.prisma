@@ -30,7 +30,6 @@ enum NotificationType {
   article_published
   announcement
   moderation
-  new_message
 }
 
 enum ConversationType {

@@ -39,23 +39,6 @@ export async function POST(request: Request, { params }: Props) {
     data: { updatedAt: new Date() },
   });
 
-  const otherMembers = await prisma.conversationMember.findMany({
-    where: { conversationId, userId: { not: user.id } },
-    select: { userId: true },
-  });
-
-  if (otherMembers.length > 0) {
-    await prisma.notification.createMany({
-      data: otherMembers.map((member) => ({
-        userId: member.userId,
-        type: "new_message",
-        title: "New message",
-        message: content.slice(0, 120),
-        url: `/messages?conversation=${conversationId}`,
-      })),
-    });
-  }
-
   return NextResponse.json(
     {
       message: {
