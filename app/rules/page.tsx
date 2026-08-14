@@ -1,10 +1,13 @@
 import { prisma } from "@/lib/db";
+import { getSessionUser, isOwner } from "@/lib/auth";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
 export default async function RulesPage() {
   const rules = await prisma.rule.findMany({ orderBy: { order: "asc" }, where: { enabled: true } });
+  const sessionUser = await getSessionUser();
+  const canManage = isOwner(sessionUser);
 
   return (
     <div className="space-y-8">
@@ -14,7 +17,9 @@ export default async function RulesPage() {
             <p className="text-sm uppercase tracking-[0.3em] text-accent">Community Guidelines</p>
             <h1 className="mt-3 text-3xl font-semibold text-white">Server rules and expectations</h1>
           </div>
-          <Link href="/admin/rules" className="inline-flex items-center rounded-full border border-border bg-white/5 px-4 py-2 text-sm text-muted transition hover:border-accent/40 hover:text-white">Manage rules</Link>
+          {canManage ? (
+            <Link href="/admin/rules" className="inline-flex items-center rounded-full border border-border bg-white/5 px-4 py-2 text-sm text-muted transition hover:border-accent/40 hover:text-white">Manage rules</Link>
+          ) : null}
         </div>
       </section>
       <div className="grid gap-5">

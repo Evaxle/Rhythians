@@ -20,8 +20,18 @@ export type ClipModel = runtime.Types.Result.DefaultSelection<Prisma.$ClipPayloa
 
 export type AggregateClip = {
   _count: ClipCountAggregateOutputType | null
+  _avg: ClipAvgAggregateOutputType | null
+  _sum: ClipSumAggregateOutputType | null
   _min: ClipMinAggregateOutputType | null
   _max: ClipMaxAggregateOutputType | null
+}
+
+export type ClipAvgAggregateOutputType = {
+  featuredOrder: number | null
+}
+
+export type ClipSumAggregateOutputType = {
+  featuredOrder: number | null
 }
 
 export type ClipMinAggregateOutputType = {
@@ -29,6 +39,7 @@ export type ClipMinAggregateOutputType = {
   title: string | null
   description: string | null
   status: $Enums.ClipStatus | null
+  featuredOrder: number | null
   storagePath: string | null
   thumbnailPath: string | null
   rejectionReason: string | null
@@ -43,6 +54,7 @@ export type ClipMaxAggregateOutputType = {
   title: string | null
   description: string | null
   status: $Enums.ClipStatus | null
+  featuredOrder: number | null
   storagePath: string | null
   thumbnailPath: string | null
   rejectionReason: string | null
@@ -57,6 +69,7 @@ export type ClipCountAggregateOutputType = {
   title: number
   description: number
   status: number
+  featuredOrder: number
   storagePath: number
   thumbnailPath: number
   rejectionReason: number
@@ -68,11 +81,20 @@ export type ClipCountAggregateOutputType = {
 }
 
 
+export type ClipAvgAggregateInputType = {
+  featuredOrder?: true
+}
+
+export type ClipSumAggregateInputType = {
+  featuredOrder?: true
+}
+
 export type ClipMinAggregateInputType = {
   id?: true
   title?: true
   description?: true
   status?: true
+  featuredOrder?: true
   storagePath?: true
   thumbnailPath?: true
   rejectionReason?: true
@@ -87,6 +109,7 @@ export type ClipMaxAggregateInputType = {
   title?: true
   description?: true
   status?: true
+  featuredOrder?: true
   storagePath?: true
   thumbnailPath?: true
   rejectionReason?: true
@@ -101,6 +124,7 @@ export type ClipCountAggregateInputType = {
   title?: true
   description?: true
   status?: true
+  featuredOrder?: true
   storagePath?: true
   thumbnailPath?: true
   rejectionReason?: true
@@ -149,6 +173,18 @@ export type ClipAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: ClipAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: ClipSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: ClipMinAggregateInputType
@@ -179,6 +215,8 @@ export type ClipGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: ClipCountAggregateInputType | true
+  _avg?: ClipAvgAggregateInputType
+  _sum?: ClipSumAggregateInputType
   _min?: ClipMinAggregateInputType
   _max?: ClipMaxAggregateInputType
 }
@@ -188,6 +226,7 @@ export type ClipGroupByOutputType = {
   title: string
   description: string
   status: $Enums.ClipStatus
+  featuredOrder: number | null
   storagePath: string
   thumbnailPath: string | null
   rejectionReason: string | null
@@ -196,6 +235,8 @@ export type ClipGroupByOutputType = {
   createdAt: Date
   updatedAt: Date
   _count: ClipCountAggregateOutputType | null
+  _avg: ClipAvgAggregateOutputType | null
+  _sum: ClipSumAggregateOutputType | null
   _min: ClipMinAggregateOutputType | null
   _max: ClipMaxAggregateOutputType | null
 }
@@ -223,6 +264,7 @@ export type ClipWhereInput = {
   title?: Prisma.StringFilter<"Clip"> | string
   description?: Prisma.StringFilter<"Clip"> | string
   status?: Prisma.EnumClipStatusFilter<"Clip"> | $Enums.ClipStatus
+  featuredOrder?: Prisma.IntNullableFilter<"Clip"> | number | null
   storagePath?: Prisma.StringFilter<"Clip"> | string
   thumbnailPath?: Prisma.StringNullableFilter<"Clip"> | string | null
   rejectionReason?: Prisma.StringNullableFilter<"Clip"> | string | null
@@ -244,6 +286,7 @@ export type ClipOrderByWithRelationInput = {
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  featuredOrder?: Prisma.SortOrderInput | Prisma.SortOrder
   storagePath?: Prisma.SortOrder
   thumbnailPath?: Prisma.SortOrderInput | Prisma.SortOrder
   rejectionReason?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -268,6 +311,7 @@ export type ClipWhereUniqueInput = Prisma.AtLeast<{
   title?: Prisma.StringFilter<"Clip"> | string
   description?: Prisma.StringFilter<"Clip"> | string
   status?: Prisma.EnumClipStatusFilter<"Clip"> | $Enums.ClipStatus
+  featuredOrder?: Prisma.IntNullableFilter<"Clip"> | number | null
   storagePath?: Prisma.StringFilter<"Clip"> | string
   thumbnailPath?: Prisma.StringNullableFilter<"Clip"> | string | null
   rejectionReason?: Prisma.StringNullableFilter<"Clip"> | string | null
@@ -289,6 +333,7 @@ export type ClipOrderByWithAggregationInput = {
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  featuredOrder?: Prisma.SortOrderInput | Prisma.SortOrder
   storagePath?: Prisma.SortOrder
   thumbnailPath?: Prisma.SortOrderInput | Prisma.SortOrder
   rejectionReason?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -297,8 +342,10 @@ export type ClipOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ClipCountOrderByAggregateInput
+  _avg?: Prisma.ClipAvgOrderByAggregateInput
   _max?: Prisma.ClipMaxOrderByAggregateInput
   _min?: Prisma.ClipMinOrderByAggregateInput
+  _sum?: Prisma.ClipSumOrderByAggregateInput
 }
 
 export type ClipScalarWhereWithAggregatesInput = {
@@ -309,6 +356,7 @@ export type ClipScalarWhereWithAggregatesInput = {
   title?: Prisma.StringWithAggregatesFilter<"Clip"> | string
   description?: Prisma.StringWithAggregatesFilter<"Clip"> | string
   status?: Prisma.EnumClipStatusWithAggregatesFilter<"Clip"> | $Enums.ClipStatus
+  featuredOrder?: Prisma.IntNullableWithAggregatesFilter<"Clip"> | number | null
   storagePath?: Prisma.StringWithAggregatesFilter<"Clip"> | string
   thumbnailPath?: Prisma.StringNullableWithAggregatesFilter<"Clip"> | string | null
   rejectionReason?: Prisma.StringNullableWithAggregatesFilter<"Clip"> | string | null
@@ -323,6 +371,7 @@ export type ClipCreateInput = {
   title: string
   description: string
   status?: $Enums.ClipStatus
+  featuredOrder?: number | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -342,6 +391,7 @@ export type ClipUncheckedCreateInput = {
   title: string
   description: string
   status?: $Enums.ClipStatus
+  featuredOrder?: number | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -361,6 +411,7 @@ export type ClipUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
+  featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -380,6 +431,7 @@ export type ClipUncheckedUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
+  featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -399,6 +451,7 @@ export type ClipCreateManyInput = {
   title: string
   description: string
   status?: $Enums.ClipStatus
+  featuredOrder?: number | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -413,6 +466,7 @@ export type ClipUpdateManyMutationInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
+  featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -425,6 +479,7 @@ export type ClipUncheckedUpdateManyInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
+  featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -454,6 +509,7 @@ export type ClipCountOrderByAggregateInput = {
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  featuredOrder?: Prisma.SortOrder
   storagePath?: Prisma.SortOrder
   thumbnailPath?: Prisma.SortOrder
   rejectionReason?: Prisma.SortOrder
@@ -463,11 +519,16 @@ export type ClipCountOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
+export type ClipAvgOrderByAggregateInput = {
+  featuredOrder?: Prisma.SortOrder
+}
+
 export type ClipMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  featuredOrder?: Prisma.SortOrder
   storagePath?: Prisma.SortOrder
   thumbnailPath?: Prisma.SortOrder
   rejectionReason?: Prisma.SortOrder
@@ -482,6 +543,7 @@ export type ClipMinOrderByAggregateInput = {
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  featuredOrder?: Prisma.SortOrder
   storagePath?: Prisma.SortOrder
   thumbnailPath?: Prisma.SortOrder
   rejectionReason?: Prisma.SortOrder
@@ -489,6 +551,10 @@ export type ClipMinOrderByAggregateInput = {
   categoryId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type ClipSumOrderByAggregateInput = {
+  featuredOrder?: Prisma.SortOrder
 }
 
 export type ClipCreateNestedManyWithoutUploaderInput = {
@@ -593,6 +659,14 @@ export type EnumClipStatusFieldUpdateOperationsInput = {
   set?: $Enums.ClipStatus
 }
 
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type ClipCreateNestedOneWithoutTagsInput = {
   create?: Prisma.XOR<Prisma.ClipCreateWithoutTagsInput, Prisma.ClipUncheckedCreateWithoutTagsInput>
   connectOrCreate?: Prisma.ClipCreateOrConnectWithoutTagsInput
@@ -654,6 +728,7 @@ export type ClipCreateWithoutUploaderInput = {
   title: string
   description: string
   status?: $Enums.ClipStatus
+  featuredOrder?: number | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -672,6 +747,7 @@ export type ClipUncheckedCreateWithoutUploaderInput = {
   title: string
   description: string
   status?: $Enums.ClipStatus
+  featuredOrder?: number | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -719,6 +795,7 @@ export type ClipScalarWhereInput = {
   title?: Prisma.StringFilter<"Clip"> | string
   description?: Prisma.StringFilter<"Clip"> | string
   status?: Prisma.EnumClipStatusFilter<"Clip"> | $Enums.ClipStatus
+  featuredOrder?: Prisma.IntNullableFilter<"Clip"> | number | null
   storagePath?: Prisma.StringFilter<"Clip"> | string
   thumbnailPath?: Prisma.StringNullableFilter<"Clip"> | string | null
   rejectionReason?: Prisma.StringNullableFilter<"Clip"> | string | null
@@ -733,6 +810,7 @@ export type ClipCreateWithoutCoachCommentsInput = {
   title: string
   description: string
   status?: $Enums.ClipStatus
+  featuredOrder?: number | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -751,6 +829,7 @@ export type ClipUncheckedCreateWithoutCoachCommentsInput = {
   title: string
   description: string
   status?: $Enums.ClipStatus
+  featuredOrder?: number | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -785,6 +864,7 @@ export type ClipUpdateWithoutCoachCommentsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
+  featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -803,6 +883,7 @@ export type ClipUncheckedUpdateWithoutCoachCommentsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
+  featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -821,6 +902,7 @@ export type ClipCreateWithoutCategoryInput = {
   title: string
   description: string
   status?: $Enums.ClipStatus
+  featuredOrder?: number | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -839,6 +921,7 @@ export type ClipUncheckedCreateWithoutCategoryInput = {
   title: string
   description: string
   status?: $Enums.ClipStatus
+  featuredOrder?: number | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -883,6 +966,7 @@ export type ClipCreateWithoutTagsInput = {
   title: string
   description: string
   status?: $Enums.ClipStatus
+  featuredOrder?: number | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -901,6 +985,7 @@ export type ClipUncheckedCreateWithoutTagsInput = {
   title: string
   description: string
   status?: $Enums.ClipStatus
+  featuredOrder?: number | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -935,6 +1020,7 @@ export type ClipUpdateWithoutTagsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
+  featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -953,6 +1039,7 @@ export type ClipUncheckedUpdateWithoutTagsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
+  featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -971,6 +1058,7 @@ export type ClipCreateWithoutLikesInput = {
   title: string
   description: string
   status?: $Enums.ClipStatus
+  featuredOrder?: number | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -989,6 +1077,7 @@ export type ClipUncheckedCreateWithoutLikesInput = {
   title: string
   description: string
   status?: $Enums.ClipStatus
+  featuredOrder?: number | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -1023,6 +1112,7 @@ export type ClipUpdateWithoutLikesInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
+  featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1041,6 +1131,7 @@ export type ClipUncheckedUpdateWithoutLikesInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
+  featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1059,6 +1150,7 @@ export type ClipCreateWithoutViewsInput = {
   title: string
   description: string
   status?: $Enums.ClipStatus
+  featuredOrder?: number | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -1077,6 +1169,7 @@ export type ClipUncheckedCreateWithoutViewsInput = {
   title: string
   description: string
   status?: $Enums.ClipStatus
+  featuredOrder?: number | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -1111,6 +1204,7 @@ export type ClipUpdateWithoutViewsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
+  featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1129,6 +1223,7 @@ export type ClipUncheckedUpdateWithoutViewsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
+  featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1147,6 +1242,7 @@ export type ClipCreateWithoutCommentsInput = {
   title: string
   description: string
   status?: $Enums.ClipStatus
+  featuredOrder?: number | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -1165,6 +1261,7 @@ export type ClipUncheckedCreateWithoutCommentsInput = {
   title: string
   description: string
   status?: $Enums.ClipStatus
+  featuredOrder?: number | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -1199,6 +1296,7 @@ export type ClipUpdateWithoutCommentsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
+  featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1217,6 +1315,7 @@ export type ClipUncheckedUpdateWithoutCommentsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
+  featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1235,6 +1334,7 @@ export type ClipCreateManyUploaderInput = {
   title: string
   description: string
   status?: $Enums.ClipStatus
+  featuredOrder?: number | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -1248,6 +1348,7 @@ export type ClipUpdateWithoutUploaderInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
+  featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1266,6 +1367,7 @@ export type ClipUncheckedUpdateWithoutUploaderInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
+  featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1284,6 +1386,7 @@ export type ClipUncheckedUpdateManyWithoutUploaderInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
+  featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1297,6 +1400,7 @@ export type ClipCreateManyCategoryInput = {
   title: string
   description: string
   status?: $Enums.ClipStatus
+  featuredOrder?: number | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -1310,6 +1414,7 @@ export type ClipUpdateWithoutCategoryInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
+  featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1328,6 +1433,7 @@ export type ClipUncheckedUpdateWithoutCategoryInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
+  featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1346,6 +1452,7 @@ export type ClipUncheckedUpdateManyWithoutCategoryInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
+  featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1426,6 +1533,7 @@ export type ClipSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   title?: boolean
   description?: boolean
   status?: boolean
+  featuredOrder?: boolean
   storagePath?: boolean
   thumbnailPath?: boolean
   rejectionReason?: boolean
@@ -1448,6 +1556,7 @@ export type ClipSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   title?: boolean
   description?: boolean
   status?: boolean
+  featuredOrder?: boolean
   storagePath?: boolean
   thumbnailPath?: boolean
   rejectionReason?: boolean
@@ -1464,6 +1573,7 @@ export type ClipSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   title?: boolean
   description?: boolean
   status?: boolean
+  featuredOrder?: boolean
   storagePath?: boolean
   thumbnailPath?: boolean
   rejectionReason?: boolean
@@ -1480,6 +1590,7 @@ export type ClipSelectScalar = {
   title?: boolean
   description?: boolean
   status?: boolean
+  featuredOrder?: boolean
   storagePath?: boolean
   thumbnailPath?: boolean
   rejectionReason?: boolean
@@ -1489,7 +1600,7 @@ export type ClipSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ClipOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "status" | "storagePath" | "thumbnailPath" | "rejectionReason" | "uploaderId" | "categoryId" | "createdAt" | "updatedAt", ExtArgs["result"]["clip"]>
+export type ClipOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "status" | "featuredOrder" | "storagePath" | "thumbnailPath" | "rejectionReason" | "uploaderId" | "categoryId" | "createdAt" | "updatedAt", ExtArgs["result"]["clip"]>
 export type ClipInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   uploader?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   category?: boolean | Prisma.Clip$categoryArgs<ExtArgs>
@@ -1525,6 +1636,7 @@ export type $ClipPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     title: string
     description: string
     status: $Enums.ClipStatus
+    featuredOrder: number | null
     storagePath: string
     thumbnailPath: string | null
     rejectionReason: string | null
@@ -1966,6 +2078,7 @@ export interface ClipFieldRefs {
   readonly title: Prisma.FieldRef<"Clip", 'String'>
   readonly description: Prisma.FieldRef<"Clip", 'String'>
   readonly status: Prisma.FieldRef<"Clip", 'ClipStatus'>
+  readonly featuredOrder: Prisma.FieldRef<"Clip", 'Int'>
   readonly storagePath: Prisma.FieldRef<"Clip", 'String'>
   readonly thumbnailPath: Prisma.FieldRef<"Clip", 'String'>
   readonly rejectionReason: Prisma.FieldRef<"Clip", 'String'>

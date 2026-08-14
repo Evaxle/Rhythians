@@ -13,8 +13,27 @@ async function getStats() {
   return { members, articles, clips, online: undefined };
 }
 
+async function getFeaturedClips() {
+  return prisma.clip.findMany({
+    where: { status: "approved", featuredOrder: { not: null } },
+    orderBy: { featuredOrder: "asc" },
+    include: { uploader: { select: { username: true } }, category: { select: { name: true } } },
+  });
+}
+
+async function getLatestAnnouncements() {
+  return prisma.announcement.findMany({
+    where: { published: true },
+    orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
+    take: 3,
+    select: { id: true, title: true, slug: true, createdAt: true },
+  });
+}
+
 export default async function HomePage() {
   const stats = await getStats();
+  const featuredClips = await getFeaturedClips();
+  const announcements = await getLatestAnnouncements();
 
   return (
     <div className="space-y-10">
@@ -98,15 +117,26 @@ export default async function HomePage() {
             <Sparkles /> Featured Clips
           </div>
           <div className="mt-6 grid gap-4 md:grid-cols-2">
-            {[1, 2].map((item) => (
-              <article key={item} className="group overflow-hidden rounded-3xl border border-border bg-background/90 transition hover:-translate-y-0.5 hover:shadow-glow">
-                <div className="aspect-video bg-white/5" />
-                <div className="p-5">
-                  <h3 className="text-lg font-semibold text-white">Community highlight clip</h3>
-                  <p className="mt-2 text-sm text-muted">A polished clip entry that belongs to the community spotlight.</p>
-                </div>
-              </article>
-            ))}
+            {featuredClips.length > 0 ? (
+              featuredClips.map((clip) => (
+                <Link
+                  key={clip.id}
+                  href={`/clips/${clip.id}`}
+                  className="group overflow-hidden rounded-3xl border border-border bg-background/90 transition hover:-translate-y-0.5 hover:shadow-glow"
+                >
+                  <div className="aspect-video bg-white/5" />
+                  <div className="p-5">
+                    <p className="text-xs uppercase tracking-[0.24em] text-accent">{clip.category?.name ?? "Clip"}</p>
+                    <h3 className="mt-2 text-lg font-semibold text-white">{clip.title}</h3>
+                    <p className="mt-2 text-sm text-muted">By {clip.uploader.username}</p>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <p className="rounded-3xl border border-border bg-background/90 p-6 text-sm text-muted">
+                No featured clips have been selected yet.
+              </p>
+            )}
           </div>
         </div>
         <div className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
@@ -114,12 +144,22 @@ export default async function HomePage() {
             <MessageCircle /> Latest announcements
           </div>
           <div className="mt-6 space-y-4">
-            {["New event posted", "Moderator update"].map((announcement) => (
-              <article key={announcement} className="rounded-3xl border border-border bg-background/80 p-5">
-                <p className="text-sm font-semibold text-white">{announcement}</p>
-                <p className="mt-2 text-sm text-muted">Stay informed with community announcements and pinned updates.</p>
-              </article>
-            ))}
+            {announcements.length > 0 ? (
+              announcements.map((announcement) => (
+                <Link
+                  key={announcement.id}
+                  href={`/announcements/${announcement.slug}`}
+                  className="block rounded-3xl border border-border bg-background/80 p-5 transition hover:border-accent/40"
+                >
+                  <p className="text-sm font-semibold text-white">{announcement.title}</p>
+                  <p className="mt-2 text-sm text-muted">{new Date(announcement.createdAt).toLocaleDateString()}</p>
+                </Link>
+              ))
+            ) : (
+              <p className="rounded-3xl border border-border bg-background/80 p-5 text-sm text-muted">
+                No announcements yet.
+              </p>
+            )}
           </div>
         </div>
       </section>

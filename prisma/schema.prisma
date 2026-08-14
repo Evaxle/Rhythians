@@ -274,6 +274,7 @@ model Clip {
   title          String
   description    String
   status         ClipStatus     @default(pending)
+  featuredOrder  Int?
   storagePath    String
   thumbnailPath  String?
   rejectionReason String?

@@ -329,6 +329,7 @@ export const ClipScalarFieldEnum = {
   title: 'title',
   description: 'description',
   status: 'status',
+  featuredOrder: 'featuredOrder',
   storagePath: 'storagePath',
   thumbnailPath: 'thumbnailPath',
   rejectionReason: 'rejectionReason',

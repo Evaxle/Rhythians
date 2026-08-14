@@ -57,9 +57,12 @@
 
 ### 4. Vercel Deployment
 1. Push the repository to GitHub.
-2. Create a Vercel project and import this repository.
+2. Create a Vercel project and import this repository. The project **must be named `rhythians`** so the production URL is `https://rhythians.vercel.app`.
+   - Every deployment also gets a unique deployment URL (e.g. `rhythians-<hash>-evans-projects-<id>.vercel.app`). That is normal Vercel behavior — the canonical production URL `https://rhythians.vercel.app` always points to the latest production deployment.
+   - To deploy from the CLI instead: `vercel link --project rhythians --scope evans-projects-edff1a37` (this repo is already linked in `.vercel/project.json`), then `vercel --prod`.
 3. Add production env vars in Vercel exactly as below:
-   - `NEXT_PUBLIC_SITE_URL=https://YOUR-DOMAIN.com`
+   - `NEXT_PUBLIC_SITE_URL=https://rhythians.vercel.app`
+   - `OWNER_DISCORD_ID=<your Discord user ID>` (required — the admin panel and owner-only buttons use this)
    - `NEXT_PUBLIC_SUPABASE_URL=...`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY=...`
    - `SUPABASE_SERVICE_ROLE_KEY=...`

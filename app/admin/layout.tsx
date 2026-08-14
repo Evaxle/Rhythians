@@ -27,6 +27,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
             <div className="mt-4 border-t border-border pt-4">
               <p className="mb-2 uppercase tracking-[0.24em] text-[11px] text-accent">Clips</p>
               <Link href="/admin/clips" className="block rounded-2xl px-3 py-2 transition hover:bg-white/5">Pending</Link>
+              <Link href="/admin/featured-clips" className="block rounded-2xl px-3 py-2 transition hover:bg-white/5">Featured</Link>
             </div>
             <div className="mt-4 border-t border-border pt-4">
               <p className="mb-2 uppercase tracking-[0.24em] text-[11px] text-accent">Community</p>

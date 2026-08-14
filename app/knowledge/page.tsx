@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
+import { getSessionUser, isOwner } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +10,8 @@ async function getCategories() {
 
 export default async function KnowledgePage() {
   const categories = await getCategories();
+  const sessionUser = await getSessionUser();
+  const canManage = isOwner(sessionUser);
 
   return (
     <div className="space-y-8">
@@ -18,7 +21,9 @@ export default async function KnowledgePage() {
             <p className="text-sm uppercase tracking-[0.3em] text-accent">Knowledge hub</p>
             <h1 className="mt-3 text-3xl font-semibold text-white">Discover community guides and documentation</h1>
           </div>
-          <Link href="/admin/articles" className="inline-flex items-center rounded-full border border-border bg-white/5 px-4 py-2 text-sm text-muted transition hover:border-accent/40 hover:text-white">Manage knowledge</Link>
+          {canManage ? (
+            <Link href="/admin/articles" className="inline-flex items-center rounded-full border border-border bg-white/5 px-4 py-2 text-sm text-muted transition hover:border-accent/40 hover:text-white">Manage knowledge</Link>
+          ) : null}
         </div>
       </section>
       <div className="grid gap-5 lg:grid-cols-3">
