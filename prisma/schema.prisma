@@ -61,6 +61,7 @@ model User {
   displayName     String?
   profileHandle   String             @unique
   discordRoles    String[]           @default([])
+  inGuild         Boolean            @default(false)
   playerRank      PlayerRank?        @relation(fields: [playerRankId], references: [id])
   playerRankId    String?
   joinedAt        DateTime           @default(now())
@@ -71,13 +72,15 @@ model User {
   sessions        Session[]
   clips           Clip[]             @relation("uploadedClips")
   comments        Comment[]
+  coachComments   CoachComment[]
   clipLikes       ClipLike[]
+  userTags        UserTag[]
   announcements   Announcement[]     @relation("announcementAuthor")
   notifications   Notification[]
   articleRevisions ArticleRevision[]
   knowledgeArticles KnowledgeArticle[] @relation("articleAuthor")
   reports         Report[]           @relation("reporter")
-  reportedResolvedBy Report[]         @relation("resolver")
+  reportedResolvedBy Report[]        @relation("resolver")
   moderationActions ModerationAction[]
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
@@ -209,7 +212,31 @@ model Tag {
   slug      String       @unique
   clips     ClipTag[]
   articles  ArticleTag[]
+  users     UserTag[]
   createdAt DateTime     @default(now())
+}
+
+model UserTag {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  tag       Tag      @relation(fields: [tagId], references: [id])
+  tagId     String
+  createdAt DateTime @default(now())
+  @@unique([userId, tagId])
+}
+
+model CoachComment {
+  id         String   @id @default(uuid())
+  text       String
+  clip       Clip     @relation(fields: [clipId], references: [id])
+  clipId     String
+  author     User     @relation(fields: [authorId], references: [id])
+  authorId   String
+  isEdited   Boolean  @default(false)
+  isDeleted  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model ArticleTag {
@@ -258,6 +285,7 @@ model Clip {
   likes          ClipLike[]
   views          ClipView[]
   comments       Comment[]
+  coachComments  CoachComment[]
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 }

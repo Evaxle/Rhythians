@@ -410,6 +410,8 @@ export const ModelName = {
   KnowledgeCategory: 'KnowledgeCategory',
   KnowledgeArticle: 'KnowledgeArticle',
   Tag: 'Tag',
+  UserTag: 'UserTag',
+  CoachComment: 'CoachComment',
   ArticleTag: 'ArticleTag',
   ArticleRevision: 'ArticleRevision',
   ClipCategory: 'ClipCategory',
@@ -438,7 +440,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "role" | "permission" | "rolePermission" | "userRole" | "discordRoleMapping" | "playerRank" | "discordRoleRankMapping" | "rule" | "knowledgeCategory" | "knowledgeArticle" | "tag" | "articleTag" | "articleRevision" | "clipCategory" | "clip" | "clipTag" | "clipLike" | "clipView" | "comment" | "report" | "announcement" | "notification" | "moderationAction" | "siteSetting"
+    modelProps: "user" | "session" | "role" | "permission" | "rolePermission" | "userRole" | "discordRoleMapping" | "playerRank" | "discordRoleRankMapping" | "rule" | "knowledgeCategory" | "knowledgeArticle" | "tag" | "userTag" | "coachComment" | "articleTag" | "articleRevision" | "clipCategory" | "clip" | "clipTag" | "clipLike" | "clipView" | "comment" | "report" | "announcement" | "notification" | "moderationAction" | "siteSetting"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1401,6 +1403,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.TagCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.TagCountAggregateOutputType> | number
+        }
+      }
+    }
+    UserTag: {
+      payload: Prisma.$UserTagPayload<ExtArgs>
+      fields: Prisma.UserTagFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserTagFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTagPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserTagFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTagPayload>
+        }
+        findFirst: {
+          args: Prisma.UserTagFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTagPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserTagFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTagPayload>
+        }
+        findMany: {
+          args: Prisma.UserTagFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTagPayload>[]
+        }
+        create: {
+          args: Prisma.UserTagCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTagPayload>
+        }
+        createMany: {
+          args: Prisma.UserTagCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserTagCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTagPayload>[]
+        }
+        delete: {
+          args: Prisma.UserTagDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTagPayload>
+        }
+        update: {
+          args: Prisma.UserTagUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTagPayload>
+        }
+        deleteMany: {
+          args: Prisma.UserTagDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserTagUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserTagUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTagPayload>[]
+        }
+        upsert: {
+          args: Prisma.UserTagUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTagPayload>
+        }
+        aggregate: {
+          args: Prisma.UserTagAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserTag>
+        }
+        groupBy: {
+          args: Prisma.UserTagGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserTagGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserTagCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserTagCountAggregateOutputType> | number
+        }
+      }
+    }
+    CoachComment: {
+      payload: Prisma.$CoachCommentPayload<ExtArgs>
+      fields: Prisma.CoachCommentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CoachCommentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoachCommentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CoachCommentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoachCommentPayload>
+        }
+        findFirst: {
+          args: Prisma.CoachCommentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoachCommentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CoachCommentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoachCommentPayload>
+        }
+        findMany: {
+          args: Prisma.CoachCommentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoachCommentPayload>[]
+        }
+        create: {
+          args: Prisma.CoachCommentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoachCommentPayload>
+        }
+        createMany: {
+          args: Prisma.CoachCommentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CoachCommentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoachCommentPayload>[]
+        }
+        delete: {
+          args: Prisma.CoachCommentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoachCommentPayload>
+        }
+        update: {
+          args: Prisma.CoachCommentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoachCommentPayload>
+        }
+        deleteMany: {
+          args: Prisma.CoachCommentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CoachCommentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CoachCommentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoachCommentPayload>[]
+        }
+        upsert: {
+          args: Prisma.CoachCommentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoachCommentPayload>
+        }
+        aggregate: {
+          args: Prisma.CoachCommentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCoachComment>
+        }
+        groupBy: {
+          args: Prisma.CoachCommentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CoachCommentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CoachCommentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CoachCommentCountAggregateOutputType> | number
         }
       }
     }
@@ -2416,6 +2566,7 @@ export const UserScalarFieldEnum = {
   displayName: 'displayName',
   profileHandle: 'profileHandle',
   discordRoles: 'discordRoles',
+  inGuild: 'inGuild',
   playerRankId: 'playerRankId',
   joinedAt: 'joinedAt',
   bio: 'bio',
@@ -2571,6 +2722,30 @@ export const TagScalarFieldEnum = {
 } as const
 
 export type TagScalarFieldEnum = (typeof TagScalarFieldEnum)[keyof typeof TagScalarFieldEnum]
+
+
+export const UserTagScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  tagId: 'tagId',
+  createdAt: 'createdAt'
+} as const
+
+export type UserTagScalarFieldEnum = (typeof UserTagScalarFieldEnum)[keyof typeof UserTagScalarFieldEnum]
+
+
+export const CoachCommentScalarFieldEnum = {
+  id: 'id',
+  text: 'text',
+  clipId: 'clipId',
+  authorId: 'authorId',
+  isEdited: 'isEdited',
+  isDeleted: 'isDeleted',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CoachCommentScalarFieldEnum = (typeof CoachCommentScalarFieldEnum)[keyof typeof CoachCommentScalarFieldEnum]
 
 
 export const ArticleTagScalarFieldEnum = {
@@ -2799,6 +2974,13 @@ export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMod
 
 
 /**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
  * Reference to a field of type 'DateTime'
  */
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -2809,13 +2991,6 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
-    
-
-
-/**
- * Reference to a field of type 'Boolean'
- */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -3080,6 +3255,8 @@ export type GlobalOmitConfig = {
   knowledgeCategory?: Prisma.KnowledgeCategoryOmit
   knowledgeArticle?: Prisma.KnowledgeArticleOmit
   tag?: Prisma.TagOmit
+  userTag?: Prisma.UserTagOmit
+  coachComment?: Prisma.CoachCommentOmit
   articleTag?: Prisma.ArticleTagOmit
   articleRevision?: Prisma.ArticleRevisionOmit
   clipCategory?: Prisma.ClipCategoryOmit

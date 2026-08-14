@@ -34,6 +34,7 @@ export type UserMinAggregateOutputType = {
   email: string | null
   displayName: string | null
   profileHandle: string | null
+  inGuild: boolean | null
   playerRankId: string | null
   joinedAt: Date | null
   bio: string | null
@@ -53,6 +54,7 @@ export type UserMaxAggregateOutputType = {
   email: string | null
   displayName: string | null
   profileHandle: string | null
+  inGuild: boolean | null
   playerRankId: string | null
   joinedAt: Date | null
   bio: string | null
@@ -73,6 +75,7 @@ export type UserCountAggregateOutputType = {
   displayName: number
   profileHandle: number
   discordRoles: number
+  inGuild: number
   playerRankId: number
   joinedAt: number
   bio: number
@@ -94,6 +97,7 @@ export type UserMinAggregateInputType = {
   email?: true
   displayName?: true
   profileHandle?: true
+  inGuild?: true
   playerRankId?: true
   joinedAt?: true
   bio?: true
@@ -113,6 +117,7 @@ export type UserMaxAggregateInputType = {
   email?: true
   displayName?: true
   profileHandle?: true
+  inGuild?: true
   playerRankId?: true
   joinedAt?: true
   bio?: true
@@ -133,6 +138,7 @@ export type UserCountAggregateInputType = {
   displayName?: true
   profileHandle?: true
   discordRoles?: true
+  inGuild?: true
   playerRankId?: true
   joinedAt?: true
   bio?: true
@@ -226,6 +232,7 @@ export type UserGroupByOutputType = {
   displayName: string | null
   profileHandle: string
   discordRoles: string[]
+  inGuild: boolean
   playerRankId: string | null
   joinedAt: Date
   bio: string | null
@@ -267,6 +274,7 @@ export type UserWhereInput = {
   displayName?: Prisma.StringNullableFilter<"User"> | string | null
   profileHandle?: Prisma.StringFilter<"User"> | string
   discordRoles?: Prisma.StringNullableListFilter<"User">
+  inGuild?: Prisma.BoolFilter<"User"> | boolean
   playerRankId?: Prisma.StringNullableFilter<"User"> | string | null
   joinedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   bio?: Prisma.StringNullableFilter<"User"> | string | null
@@ -279,7 +287,9 @@ export type UserWhereInput = {
   sessions?: Prisma.SessionListRelationFilter
   clips?: Prisma.ClipListRelationFilter
   comments?: Prisma.CommentListRelationFilter
+  coachComments?: Prisma.CoachCommentListRelationFilter
   clipLikes?: Prisma.ClipLikeListRelationFilter
+  userTags?: Prisma.UserTagListRelationFilter
   announcements?: Prisma.AnnouncementListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   articleRevisions?: Prisma.ArticleRevisionListRelationFilter
@@ -300,6 +310,7 @@ export type UserOrderByWithRelationInput = {
   displayName?: Prisma.SortOrderInput | Prisma.SortOrder
   profileHandle?: Prisma.SortOrder
   discordRoles?: Prisma.SortOrder
+  inGuild?: Prisma.SortOrder
   playerRankId?: Prisma.SortOrderInput | Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
   bio?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -312,7 +323,9 @@ export type UserOrderByWithRelationInput = {
   sessions?: Prisma.SessionOrderByRelationAggregateInput
   clips?: Prisma.ClipOrderByRelationAggregateInput
   comments?: Prisma.CommentOrderByRelationAggregateInput
+  coachComments?: Prisma.CoachCommentOrderByRelationAggregateInput
   clipLikes?: Prisma.ClipLikeOrderByRelationAggregateInput
+  userTags?: Prisma.UserTagOrderByRelationAggregateInput
   announcements?: Prisma.AnnouncementOrderByRelationAggregateInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
   articleRevisions?: Prisma.ArticleRevisionOrderByRelationAggregateInput
@@ -336,6 +349,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   locale?: Prisma.StringNullableFilter<"User"> | string | null
   displayName?: Prisma.StringNullableFilter<"User"> | string | null
   discordRoles?: Prisma.StringNullableListFilter<"User">
+  inGuild?: Prisma.BoolFilter<"User"> | boolean
   playerRankId?: Prisma.StringNullableFilter<"User"> | string | null
   joinedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   bio?: Prisma.StringNullableFilter<"User"> | string | null
@@ -348,7 +362,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   sessions?: Prisma.SessionListRelationFilter
   clips?: Prisma.ClipListRelationFilter
   comments?: Prisma.CommentListRelationFilter
+  coachComments?: Prisma.CoachCommentListRelationFilter
   clipLikes?: Prisma.ClipLikeListRelationFilter
+  userTags?: Prisma.UserTagListRelationFilter
   announcements?: Prisma.AnnouncementListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   articleRevisions?: Prisma.ArticleRevisionListRelationFilter
@@ -369,6 +385,7 @@ export type UserOrderByWithAggregationInput = {
   displayName?: Prisma.SortOrderInput | Prisma.SortOrder
   profileHandle?: Prisma.SortOrder
   discordRoles?: Prisma.SortOrder
+  inGuild?: Prisma.SortOrder
   playerRankId?: Prisma.SortOrderInput | Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
   bio?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -395,6 +412,7 @@ export type UserScalarWhereWithAggregatesInput = {
   displayName?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   profileHandle?: Prisma.StringWithAggregatesFilter<"User"> | string
   discordRoles?: Prisma.StringNullableListFilter<"User">
+  inGuild?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   playerRankId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   joinedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   bio?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
@@ -415,6 +433,7 @@ export type UserCreateInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -426,7 +445,9 @@ export type UserCreateInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
@@ -447,6 +468,7 @@ export type UserUncheckedCreateInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -458,7 +480,9 @@ export type UserUncheckedCreateInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
@@ -479,6 +503,7 @@ export type UserUpdateInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -490,7 +515,9 @@ export type UserUpdateInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
@@ -511,6 +538,7 @@ export type UserUncheckedUpdateInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -522,7 +550,9 @@ export type UserUncheckedUpdateInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
@@ -543,6 +573,7 @@ export type UserCreateManyInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -563,6 +594,7 @@ export type UserUpdateManyMutationInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -582,6 +614,7 @@ export type UserUncheckedUpdateManyInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -610,6 +643,7 @@ export type UserCountOrderByAggregateInput = {
   displayName?: Prisma.SortOrder
   profileHandle?: Prisma.SortOrder
   discordRoles?: Prisma.SortOrder
+  inGuild?: Prisma.SortOrder
   playerRankId?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
   bio?: Prisma.SortOrder
@@ -629,6 +663,7 @@ export type UserMaxOrderByAggregateInput = {
   email?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
   profileHandle?: Prisma.SortOrder
+  inGuild?: Prisma.SortOrder
   playerRankId?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
   bio?: Prisma.SortOrder
@@ -648,6 +683,7 @@ export type UserMinOrderByAggregateInput = {
   email?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
   profileHandle?: Prisma.SortOrder
+  inGuild?: Prisma.SortOrder
   playerRankId?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
   bio?: Prisma.SortOrder
@@ -694,12 +730,12 @@ export type UserUpdatediscordRolesInput = {
   push?: string | string[]
 }
 
-export type DateTimeFieldUpdateOperationsInput = {
-  set?: Date | string
-}
-
 export type BoolFieldUpdateOperationsInput = {
   set?: boolean
+}
+
+export type DateTimeFieldUpdateOperationsInput = {
+  set?: Date | string
 }
 
 export type UserCreateNestedOneWithoutSessionsInput = {
@@ -784,6 +820,34 @@ export type UserUpdateOneRequiredWithoutKnowledgeArticlesNestedInput = {
   upsert?: Prisma.UserUpsertWithoutKnowledgeArticlesInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutKnowledgeArticlesInput, Prisma.UserUpdateWithoutKnowledgeArticlesInput>, Prisma.UserUncheckedUpdateWithoutKnowledgeArticlesInput>
+}
+
+export type UserCreateNestedOneWithoutUserTagsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUserTagsInput, Prisma.UserUncheckedCreateWithoutUserTagsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUserTagsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutUserTagsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUserTagsInput, Prisma.UserUncheckedCreateWithoutUserTagsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUserTagsInput
+  upsert?: Prisma.UserUpsertWithoutUserTagsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUserTagsInput, Prisma.UserUpdateWithoutUserTagsInput>, Prisma.UserUncheckedUpdateWithoutUserTagsInput>
+}
+
+export type UserCreateNestedOneWithoutCoachCommentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCoachCommentsInput, Prisma.UserUncheckedCreateWithoutCoachCommentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCoachCommentsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutCoachCommentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCoachCommentsInput, Prisma.UserUncheckedCreateWithoutCoachCommentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCoachCommentsInput
+  upsert?: Prisma.UserUpsertWithoutCoachCommentsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCoachCommentsInput, Prisma.UserUpdateWithoutCoachCommentsInput>, Prisma.UserUncheckedUpdateWithoutCoachCommentsInput>
 }
 
 export type UserCreateNestedOneWithoutArticleRevisionsInput = {
@@ -925,6 +989,7 @@ export type UserCreateWithoutSessionsInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -935,7 +1000,9 @@ export type UserCreateWithoutSessionsInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
@@ -956,6 +1023,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -966,7 +1034,9 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
@@ -1003,6 +1073,7 @@ export type UserUpdateWithoutSessionsInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1013,7 +1084,9 @@ export type UserUpdateWithoutSessionsInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
@@ -1034,6 +1107,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1044,7 +1118,9 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
@@ -1065,6 +1141,7 @@ export type UserCreateWithoutRolesInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -1075,7 +1152,9 @@ export type UserCreateWithoutRolesInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
@@ -1096,6 +1175,7 @@ export type UserUncheckedCreateWithoutRolesInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -1106,7 +1186,9 @@ export type UserUncheckedCreateWithoutRolesInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
@@ -1143,6 +1225,7 @@ export type UserUpdateWithoutRolesInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1153,7 +1236,9 @@ export type UserUpdateWithoutRolesInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
@@ -1174,6 +1259,7 @@ export type UserUncheckedUpdateWithoutRolesInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1184,7 +1270,9 @@ export type UserUncheckedUpdateWithoutRolesInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
@@ -1205,6 +1293,7 @@ export type UserCreateWithoutPlayerRankInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -1215,7 +1304,9 @@ export type UserCreateWithoutPlayerRankInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
@@ -1236,6 +1327,7 @@ export type UserUncheckedCreateWithoutPlayerRankInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -1246,7 +1338,9 @@ export type UserUncheckedCreateWithoutPlayerRankInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
@@ -1296,6 +1390,7 @@ export type UserScalarWhereInput = {
   displayName?: Prisma.StringNullableFilter<"User"> | string | null
   profileHandle?: Prisma.StringFilter<"User"> | string
   discordRoles?: Prisma.StringNullableListFilter<"User">
+  inGuild?: Prisma.BoolFilter<"User"> | boolean
   playerRankId?: Prisma.StringNullableFilter<"User"> | string | null
   joinedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   bio?: Prisma.StringNullableFilter<"User"> | string | null
@@ -1316,6 +1411,7 @@ export type UserCreateWithoutKnowledgeArticlesInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -1327,7 +1423,9 @@ export type UserCreateWithoutKnowledgeArticlesInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
@@ -1347,6 +1445,7 @@ export type UserUncheckedCreateWithoutKnowledgeArticlesInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -1358,7 +1457,9 @@ export type UserUncheckedCreateWithoutKnowledgeArticlesInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
@@ -1394,6 +1495,7 @@ export type UserUpdateWithoutKnowledgeArticlesInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1405,7 +1507,9 @@ export type UserUpdateWithoutKnowledgeArticlesInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
@@ -1425,6 +1529,311 @@ export type UserUncheckedUpdateWithoutKnowledgeArticlesInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUncheckedUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserCreateWithoutUserTagsInput = {
+  id?: string
+  discordId: string
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
+  roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionCreateNestedManyWithoutActorInput
+}
+
+export type UserUncheckedCreateWithoutUserTagsInput = {
+  id?: string
+  discordId: string
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  playerRankId?: string | null
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportUncheckedCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type UserCreateOrConnectWithoutUserTagsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutUserTagsInput, Prisma.UserUncheckedCreateWithoutUserTagsInput>
+}
+
+export type UserUpsertWithoutUserTagsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutUserTagsInput, Prisma.UserUncheckedUpdateWithoutUserTagsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutUserTagsInput, Prisma.UserUncheckedCreateWithoutUserTagsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutUserTagsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutUserTagsInput, Prisma.UserUncheckedUpdateWithoutUserTagsInput>
+}
+
+export type UserUpdateWithoutUserTagsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
+  roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutUserTagsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUncheckedUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserCreateWithoutCoachCommentsInput = {
+  id?: string
+  discordId: string
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
+  roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionCreateNestedManyWithoutActorInput
+}
+
+export type UserUncheckedCreateWithoutCoachCommentsInput = {
+  id?: string
+  discordId: string
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  playerRankId?: string | null
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportUncheckedCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type UserCreateOrConnectWithoutCoachCommentsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCoachCommentsInput, Prisma.UserUncheckedCreateWithoutCoachCommentsInput>
+}
+
+export type UserUpsertWithoutCoachCommentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCoachCommentsInput, Prisma.UserUncheckedUpdateWithoutCoachCommentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCoachCommentsInput, Prisma.UserUncheckedCreateWithoutCoachCommentsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCoachCommentsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCoachCommentsInput, Prisma.UserUncheckedUpdateWithoutCoachCommentsInput>
+}
+
+export type UserUpdateWithoutCoachCommentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
+  roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCoachCommentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1437,9 +1846,11 @@ export type UserUncheckedUpdateWithoutKnowledgeArticlesInput = {
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedUpdateManyWithoutAuthorNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportedResolvedBy?: Prisma.ReportUncheckedUpdateManyWithoutResolverNestedInput
   moderationActions?: Prisma.ModerationActionUncheckedUpdateManyWithoutActorNestedInput
@@ -1456,6 +1867,7 @@ export type UserCreateWithoutArticleRevisionsInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -1467,7 +1879,9 @@ export type UserCreateWithoutArticleRevisionsInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   knowledgeArticles?: Prisma.KnowledgeArticleCreateNestedManyWithoutAuthorInput
@@ -1487,6 +1901,7 @@ export type UserUncheckedCreateWithoutArticleRevisionsInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -1498,7 +1913,9 @@ export type UserUncheckedCreateWithoutArticleRevisionsInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   knowledgeArticles?: Prisma.KnowledgeArticleUncheckedCreateNestedManyWithoutAuthorInput
@@ -1534,6 +1951,7 @@ export type UserUpdateWithoutArticleRevisionsInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1545,7 +1963,9 @@ export type UserUpdateWithoutArticleRevisionsInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   knowledgeArticles?: Prisma.KnowledgeArticleUpdateManyWithoutAuthorNestedInput
@@ -1565,6 +1985,7 @@ export type UserUncheckedUpdateWithoutArticleRevisionsInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1576,7 +1997,9 @@ export type UserUncheckedUpdateWithoutArticleRevisionsInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   knowledgeArticles?: Prisma.KnowledgeArticleUncheckedUpdateManyWithoutAuthorNestedInput
@@ -1596,6 +2019,7 @@ export type UserCreateWithoutClipsInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -1606,7 +2030,9 @@ export type UserCreateWithoutClipsInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
@@ -1627,6 +2053,7 @@ export type UserUncheckedCreateWithoutClipsInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -1637,7 +2064,9 @@ export type UserUncheckedCreateWithoutClipsInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
@@ -1674,6 +2103,7 @@ export type UserUpdateWithoutClipsInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1684,7 +2114,9 @@ export type UserUpdateWithoutClipsInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
@@ -1705,6 +2137,7 @@ export type UserUncheckedUpdateWithoutClipsInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1715,7 +2148,9 @@ export type UserUncheckedUpdateWithoutClipsInput = {
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
@@ -1736,6 +2171,7 @@ export type UserCreateWithoutClipLikesInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -1747,6 +2183,8 @@ export type UserCreateWithoutClipLikesInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
@@ -1767,6 +2205,7 @@ export type UserUncheckedCreateWithoutClipLikesInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -1778,6 +2217,8 @@ export type UserUncheckedCreateWithoutClipLikesInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
@@ -1814,6 +2255,7 @@ export type UserUpdateWithoutClipLikesInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1825,6 +2267,8 @@ export type UserUpdateWithoutClipLikesInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
@@ -1845,6 +2289,7 @@ export type UserUncheckedUpdateWithoutClipLikesInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1856,6 +2301,8 @@ export type UserUncheckedUpdateWithoutClipLikesInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
@@ -1876,6 +2323,7 @@ export type UserCreateWithoutCommentsInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -1886,7 +2334,9 @@ export type UserCreateWithoutCommentsInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
@@ -1907,6 +2357,7 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -1917,7 +2368,9 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
@@ -1954,6 +2407,7 @@ export type UserUpdateWithoutCommentsInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1964,7 +2418,9 @@ export type UserUpdateWithoutCommentsInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
@@ -1985,6 +2441,7 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1995,7 +2452,9 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2016,6 +2475,7 @@ export type UserCreateWithoutReportsInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -2027,7 +2487,9 @@ export type UserCreateWithoutReportsInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
@@ -2047,6 +2509,7 @@ export type UserUncheckedCreateWithoutReportsInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -2058,7 +2521,9 @@ export type UserUncheckedCreateWithoutReportsInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
@@ -2083,6 +2548,7 @@ export type UserCreateWithoutReportedResolvedByInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -2094,7 +2560,9 @@ export type UserCreateWithoutReportedResolvedByInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
@@ -2114,6 +2582,7 @@ export type UserUncheckedCreateWithoutReportedResolvedByInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -2125,7 +2594,9 @@ export type UserUncheckedCreateWithoutReportedResolvedByInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
@@ -2161,6 +2632,7 @@ export type UserUpdateWithoutReportsInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2172,7 +2644,9 @@ export type UserUpdateWithoutReportsInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
@@ -2192,6 +2666,7 @@ export type UserUncheckedUpdateWithoutReportsInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2203,7 +2678,9 @@ export type UserUncheckedUpdateWithoutReportsInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2234,6 +2711,7 @@ export type UserUpdateWithoutReportedResolvedByInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2245,7 +2723,9 @@ export type UserUpdateWithoutReportedResolvedByInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
@@ -2265,6 +2745,7 @@ export type UserUncheckedUpdateWithoutReportedResolvedByInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2276,7 +2757,9 @@ export type UserUncheckedUpdateWithoutReportedResolvedByInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2296,6 +2779,7 @@ export type UserCreateWithoutAnnouncementsInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -2307,7 +2791,9 @@ export type UserCreateWithoutAnnouncementsInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
   knowledgeArticles?: Prisma.KnowledgeArticleCreateNestedManyWithoutAuthorInput
@@ -2327,6 +2813,7 @@ export type UserUncheckedCreateWithoutAnnouncementsInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -2338,7 +2825,9 @@ export type UserUncheckedCreateWithoutAnnouncementsInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
   knowledgeArticles?: Prisma.KnowledgeArticleUncheckedCreateNestedManyWithoutAuthorInput
@@ -2374,6 +2863,7 @@ export type UserUpdateWithoutAnnouncementsInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2385,7 +2875,9 @@ export type UserUpdateWithoutAnnouncementsInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
   knowledgeArticles?: Prisma.KnowledgeArticleUpdateManyWithoutAuthorNestedInput
@@ -2405,6 +2897,7 @@ export type UserUncheckedUpdateWithoutAnnouncementsInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2416,7 +2909,9 @@ export type UserUncheckedUpdateWithoutAnnouncementsInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
   knowledgeArticles?: Prisma.KnowledgeArticleUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2436,6 +2931,7 @@ export type UserCreateWithoutNotificationsInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -2447,7 +2943,9 @@ export type UserCreateWithoutNotificationsInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
   articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
   knowledgeArticles?: Prisma.KnowledgeArticleCreateNestedManyWithoutAuthorInput
@@ -2467,6 +2965,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -2478,7 +2977,9 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
   knowledgeArticles?: Prisma.KnowledgeArticleUncheckedCreateNestedManyWithoutAuthorInput
@@ -2514,6 +3015,7 @@ export type UserUpdateWithoutNotificationsInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2525,7 +3027,9 @@ export type UserUpdateWithoutNotificationsInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
   articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
   knowledgeArticles?: Prisma.KnowledgeArticleUpdateManyWithoutAuthorNestedInput
@@ -2545,6 +3049,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2556,7 +3061,9 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
   knowledgeArticles?: Prisma.KnowledgeArticleUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2576,6 +3083,7 @@ export type UserCreateWithoutModerationActionsInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -2587,7 +3095,9 @@ export type UserCreateWithoutModerationActionsInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
@@ -2607,6 +3117,7 @@ export type UserUncheckedCreateWithoutModerationActionsInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -2618,7 +3129,9 @@ export type UserUncheckedCreateWithoutModerationActionsInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
@@ -2654,6 +3167,7 @@ export type UserUpdateWithoutModerationActionsInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2665,7 +3179,9 @@ export type UserUpdateWithoutModerationActionsInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
@@ -2685,6 +3201,7 @@ export type UserUncheckedUpdateWithoutModerationActionsInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2696,7 +3213,9 @@ export type UserUncheckedUpdateWithoutModerationActionsInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2716,6 +3235,7 @@ export type UserCreateManyPlayerRankInput = {
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -2735,6 +3255,7 @@ export type UserUpdateWithoutPlayerRankInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2745,7 +3266,9 @@ export type UserUpdateWithoutPlayerRankInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
@@ -2766,6 +3289,7 @@ export type UserUncheckedUpdateWithoutPlayerRankInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2776,7 +3300,9 @@ export type UserUncheckedUpdateWithoutPlayerRankInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2797,6 +3323,7 @@ export type UserUncheckedUpdateManyWithoutPlayerRankInput = {
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2815,7 +3342,9 @@ export type UserCountOutputType = {
   sessions: number
   clips: number
   comments: number
+  coachComments: number
   clipLikes: number
+  userTags: number
   announcements: number
   notifications: number
   articleRevisions: number
@@ -2830,7 +3359,9 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   clips?: boolean | UserCountOutputTypeCountClipsArgs
   comments?: boolean | UserCountOutputTypeCountCommentsArgs
+  coachComments?: boolean | UserCountOutputTypeCountCoachCommentsArgs
   clipLikes?: boolean | UserCountOutputTypeCountClipLikesArgs
+  userTags?: boolean | UserCountOutputTypeCountUserTagsArgs
   announcements?: boolean | UserCountOutputTypeCountAnnouncementsArgs
   notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
   articleRevisions?: boolean | UserCountOutputTypeCountArticleRevisionsArgs
@@ -2881,8 +3412,22 @@ export type UserCountOutputTypeCountCommentsArgs<ExtArgs extends runtime.Types.E
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountCoachCommentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CoachCommentWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountClipLikesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ClipLikeWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountUserTagsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserTagWhereInput
 }
 
 /**
@@ -2946,6 +3491,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   displayName?: boolean
   profileHandle?: boolean
   discordRoles?: boolean
+  inGuild?: boolean
   playerRankId?: boolean
   joinedAt?: boolean
   bio?: boolean
@@ -2958,7 +3504,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   clips?: boolean | Prisma.User$clipsArgs<ExtArgs>
   comments?: boolean | Prisma.User$commentsArgs<ExtArgs>
+  coachComments?: boolean | Prisma.User$coachCommentsArgs<ExtArgs>
   clipLikes?: boolean | Prisma.User$clipLikesArgs<ExtArgs>
+  userTags?: boolean | Prisma.User$userTagsArgs<ExtArgs>
   announcements?: boolean | Prisma.User$announcementsArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   articleRevisions?: boolean | Prisma.User$articleRevisionsArgs<ExtArgs>
@@ -2980,6 +3528,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   displayName?: boolean
   profileHandle?: boolean
   discordRoles?: boolean
+  inGuild?: boolean
   playerRankId?: boolean
   joinedAt?: boolean
   bio?: boolean
@@ -3001,6 +3550,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   displayName?: boolean
   profileHandle?: boolean
   discordRoles?: boolean
+  inGuild?: boolean
   playerRankId?: boolean
   joinedAt?: boolean
   bio?: boolean
@@ -3022,6 +3572,7 @@ export type UserSelectScalar = {
   displayName?: boolean
   profileHandle?: boolean
   discordRoles?: boolean
+  inGuild?: boolean
   playerRankId?: boolean
   joinedAt?: boolean
   bio?: boolean
@@ -3031,14 +3582,16 @@ export type UserSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "discordId" | "username" | "discriminator" | "avatar" | "locale" | "email" | "displayName" | "profileHandle" | "discordRoles" | "playerRankId" | "joinedAt" | "bio" | "website" | "isSuspended" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "discordId" | "username" | "discriminator" | "avatar" | "locale" | "email" | "displayName" | "profileHandle" | "discordRoles" | "inGuild" | "playerRankId" | "joinedAt" | "bio" | "website" | "isSuspended" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   playerRank?: boolean | Prisma.User$playerRankArgs<ExtArgs>
   roles?: boolean | Prisma.User$rolesArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   clips?: boolean | Prisma.User$clipsArgs<ExtArgs>
   comments?: boolean | Prisma.User$commentsArgs<ExtArgs>
+  coachComments?: boolean | Prisma.User$coachCommentsArgs<ExtArgs>
   clipLikes?: boolean | Prisma.User$clipLikesArgs<ExtArgs>
+  userTags?: boolean | Prisma.User$userTagsArgs<ExtArgs>
   announcements?: boolean | Prisma.User$announcementsArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   articleRevisions?: boolean | Prisma.User$articleRevisionsArgs<ExtArgs>
@@ -3063,7 +3616,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     sessions: Prisma.$SessionPayload<ExtArgs>[]
     clips: Prisma.$ClipPayload<ExtArgs>[]
     comments: Prisma.$CommentPayload<ExtArgs>[]
+    coachComments: Prisma.$CoachCommentPayload<ExtArgs>[]
     clipLikes: Prisma.$ClipLikePayload<ExtArgs>[]
+    userTags: Prisma.$UserTagPayload<ExtArgs>[]
     announcements: Prisma.$AnnouncementPayload<ExtArgs>[]
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
     articleRevisions: Prisma.$ArticleRevisionPayload<ExtArgs>[]
@@ -3083,6 +3638,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     displayName: string | null
     profileHandle: string
     discordRoles: string[]
+    inGuild: boolean
     playerRankId: string | null
     joinedAt: Date
     bio: string | null
@@ -3489,7 +4045,9 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   clips<T extends Prisma.User$clipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$clipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   comments<T extends Prisma.User$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  coachComments<T extends Prisma.User$coachCommentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$coachCommentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CoachCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   clipLikes<T extends Prisma.User$clipLikesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$clipLikesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClipLikePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  userTags<T extends Prisma.User$userTagsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$userTagsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserTagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   announcements<T extends Prisma.User$announcementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$announcementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AnnouncementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   articleRevisions<T extends Prisma.User$articleRevisionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$articleRevisionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ArticleRevisionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3536,6 +4094,7 @@ export interface UserFieldRefs {
   readonly displayName: Prisma.FieldRef<"User", 'String'>
   readonly profileHandle: Prisma.FieldRef<"User", 'String'>
   readonly discordRoles: Prisma.FieldRef<"User", 'String[]'>
+  readonly inGuild: Prisma.FieldRef<"User", 'Boolean'>
   readonly playerRankId: Prisma.FieldRef<"User", 'String'>
   readonly joinedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly bio: Prisma.FieldRef<"User", 'String'>
@@ -4059,6 +4618,30 @@ export type User$commentsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 }
 
 /**
+ * User.coachComments
+ */
+export type User$coachCommentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CoachComment
+   */
+  select?: Prisma.CoachCommentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CoachComment
+   */
+  omit?: Prisma.CoachCommentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CoachCommentInclude<ExtArgs> | null
+  where?: Prisma.CoachCommentWhereInput
+  orderBy?: Prisma.CoachCommentOrderByWithRelationInput | Prisma.CoachCommentOrderByWithRelationInput[]
+  cursor?: Prisma.CoachCommentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CoachCommentScalarFieldEnum | Prisma.CoachCommentScalarFieldEnum[]
+}
+
+/**
  * User.clipLikes
  */
 export type User$clipLikesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -4080,6 +4663,30 @@ export type User$clipLikesArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.ClipLikeScalarFieldEnum | Prisma.ClipLikeScalarFieldEnum[]
+}
+
+/**
+ * User.userTags
+ */
+export type User$userTagsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserTag
+   */
+  select?: Prisma.UserTagSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserTag
+   */
+  omit?: Prisma.UserTagOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserTagInclude<ExtArgs> | null
+  where?: Prisma.UserTagWhereInput
+  orderBy?: Prisma.UserTagOrderByWithRelationInput | Prisma.UserTagOrderByWithRelationInput[]
+  cursor?: Prisma.UserTagWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserTagScalarFieldEnum | Prisma.UserTagScalarFieldEnum[]
 }
 
 /**

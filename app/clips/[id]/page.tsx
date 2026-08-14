@@ -3,6 +3,9 @@ import { prisma } from "@/lib/db";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getSessionUser } from "@/lib/auth";
 import { ClipComments } from "@/components/clip-comments";
+import { CoachComments } from "@/components/coach-comments";
+import { LikeButton } from "@/components/like-button";
+import { UserTags } from "@/components/user-tags";
 
 export const dynamic = "force-dynamic";
 
@@ -26,12 +29,38 @@ export default async function ClipPage({ params }: Props) {
   const clip = await prisma.clip.findUnique({
     where: { id },
     include: {
-      uploader: true,
+      uploader: {
+        include: {
+          userTags: {
+            include: { tag: true },
+          },
+        },
+      },
       category: true,
       tags: { include: { tag: true } },
       comments: {
         orderBy: { createdAt: "desc" },
-        include: { author: true },
+        include: {
+          author: {
+            include: {
+              userTags: {
+                include: { tag: true },
+              },
+            },
+          },
+        },
+      },
+      coachComments: {
+        orderBy: { createdAt: "desc" },
+        include: {
+          author: {
+            include: {
+              userTags: {
+                include: { tag: true },
+              },
+            },
+          },
+        },
       },
       likes: true,
     },
@@ -42,6 +71,24 @@ export default async function ClipPage({ params }: Props) {
   }
 
   const videoUrl = await getPublicUrl(clip.storagePath);
+
+  let isLiked = false;
+  let isCoach = false;
+
+  if (sessionUser) {
+    isLiked = clip.likes.some((like) => like.userId === sessionUser.id);
+
+    const user = await prisma.user.findUnique({
+      where: { id: sessionUser.id },
+      include: {
+        userTags: {
+          include: { tag: true },
+        },
+      },
+    });
+
+    isCoach = user?.userTags.some((ut) => ut.tag.slug === "rhythian-coach") ?? false;
+  }
 
   return (
     <div className="space-y-8">
@@ -65,10 +112,30 @@ export default async function ClipPage({ params }: Props) {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl">
             <h1 className="text-3xl font-semibold text-white">{clip.title}</h1>
-            <p className="mt-3 text-sm leading-7 text-muted">
-              Uploaded by {clip.uploader.username}#{clip.uploader.discriminator} ·{" "}
-              {clip.createdAt.toLocaleDateString()}
-            </p>
+            <div className="mt-3 flex items-center gap-3">
+              {clip.uploader.avatar ? (
+                <img
+                  src={`https://cdn.discordapp.com/avatars/${clip.uploader.discordId}/${clip.uploader.avatar}.png?size=64`}
+                  alt=""
+                  className="h-8 w-8 rounded-full"
+                />
+              ) : (
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/20 text-xs font-semibold text-accent">
+                  {clip.uploader.username.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div>
+                <p className="text-sm font-medium text-white">
+                  {clip.uploader.username}#{clip.uploader.discriminator}
+                </p>
+                <p className="text-xs text-muted">
+                  {clip.createdAt.toLocaleDateString()}
+                </p>
+              </div>
+              {clip.uploader.userTags.length > 0 && (
+                <UserTags tags={clip.uploader.userTags} size="sm" />
+              )}
+            </div>
             <p className="mt-4 text-sm text-muted">{clip.description}</p>
             <div className="mt-5 flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.25em] text-accent">
               <span>{clip.category.name}</span>
@@ -86,14 +153,12 @@ export default async function ClipPage({ params }: Props) {
           </div>
 
           <div className="grid gap-3 text-sm text-muted">
-            <div className="rounded-3xl border border-border bg-background/80 p-4">
-              <p className="text-xs uppercase tracking-[0.24em] text-accent">
-                Likes
-              </p>
-              <p className="mt-2 text-2xl font-semibold text-white">
-                {clip.likes.length}
-              </p>
-            </div>
+            <LikeButton
+              clipId={clip.id}
+              initialLikes={clip.likes.length}
+              isLiked={isLiked}
+              isAuthenticated={Boolean(sessionUser)}
+            />
             <div className="rounded-3xl border border-border bg-background/80 p-4">
               <p className="text-xs uppercase tracking-[0.24em] text-accent">
                 Comments
@@ -107,29 +172,51 @@ export default async function ClipPage({ params }: Props) {
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
-        <div className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
-          <h2 className="text-xl font-semibold text-white">Comments</h2>
+        <div className="space-y-6">
+          <div className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+            <h2 className="text-xl font-semibold text-white">Comments</h2>
 
-          <ClipComments
-            clipId={clip.id}
-            isAuthenticated={Boolean(sessionUser)}
-            comments={clip.comments.map((comment) => ({
-              id: comment.id,
-              text: comment.text,
-              createdAt: comment.createdAt.toISOString(),
-              author: {
-                username: comment.author.username,
-                discriminator: comment.author.discriminator,
-              },
-            }))}
-          />
+            <ClipComments
+              clipId={clip.id}
+              isAuthenticated={Boolean(sessionUser)}
+              comments={clip.comments.map((comment) => ({
+                id: comment.id,
+                text: comment.text,
+                createdAt: comment.createdAt.toISOString(),
+                author: {
+                  username: comment.author.username,
+                  discriminator: comment.author.discriminator,
+                  userTags: comment.author.userTags.map((ut) => ({
+                    tag: { name: ut.tag.name, slug: ut.tag.slug },
+                  })),
+                },
+              }))}
+            />
+          </div>
         </div>
 
-        <aside className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
-          <h2 className="text-xl font-semibold text-white">Related clips</h2>
-          <p className="mt-4 text-sm text-muted">
-            More clips from this category will appear here soon.
-          </p>
+        <aside className="space-y-6">
+          <div className="rounded-3xl border border-accent/30 bg-accent/5 p-6 shadow-glow">
+            <CoachComments
+              clipId={clip.id}
+              comments={clip.coachComments.map((comment) => ({
+                id: comment.id,
+                text: comment.text,
+                createdAt: comment.createdAt.toISOString(),
+                author: {
+                  id: comment.author.id,
+                  username: comment.author.username,
+                  discriminator: comment.author.discriminator,
+                  avatar: comment.author.avatar,
+                  userTags: comment.author.userTags.map((ut) => ({
+                    tag: { name: ut.tag.name, slug: ut.tag.slug },
+                  })),
+                },
+              }))}
+              isCoach={isCoach}
+              isAuthenticated={Boolean(sessionUser)}
+            />
+          </div>
         </aside>
       </section>
     </div>

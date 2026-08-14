@@ -83,6 +83,16 @@ export type KnowledgeArticle = Prisma.KnowledgeArticleModel
  */
 export type Tag = Prisma.TagModel
 /**
+ * Model UserTag
+ * 
+ */
+export type UserTag = Prisma.UserTagModel
+/**
+ * Model CoachComment
+ * 
+ */
+export type CoachComment = Prisma.CoachCommentModel
+/**
  * Model ArticleTag
  * 
  */

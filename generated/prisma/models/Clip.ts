@@ -236,6 +236,7 @@ export type ClipWhereInput = {
   likes?: Prisma.ClipLikeListRelationFilter
   views?: Prisma.ClipViewListRelationFilter
   comments?: Prisma.CommentListRelationFilter
+  coachComments?: Prisma.CoachCommentListRelationFilter
 }
 
 export type ClipOrderByWithRelationInput = {
@@ -256,6 +257,7 @@ export type ClipOrderByWithRelationInput = {
   likes?: Prisma.ClipLikeOrderByRelationAggregateInput
   views?: Prisma.ClipViewOrderByRelationAggregateInput
   comments?: Prisma.CommentOrderByRelationAggregateInput
+  coachComments?: Prisma.CoachCommentOrderByRelationAggregateInput
 }
 
 export type ClipWhereUniqueInput = Prisma.AtLeast<{
@@ -279,6 +281,7 @@ export type ClipWhereUniqueInput = Prisma.AtLeast<{
   likes?: Prisma.ClipLikeListRelationFilter
   views?: Prisma.ClipViewListRelationFilter
   comments?: Prisma.CommentListRelationFilter
+  coachComments?: Prisma.CoachCommentListRelationFilter
 }, "id">
 
 export type ClipOrderByWithAggregationInput = {
@@ -331,6 +334,7 @@ export type ClipCreateInput = {
   likes?: Prisma.ClipLikeCreateNestedManyWithoutClipInput
   views?: Prisma.ClipViewCreateNestedManyWithoutClipInput
   comments?: Prisma.CommentCreateNestedManyWithoutClipInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutClipInput
 }
 
 export type ClipUncheckedCreateInput = {
@@ -349,6 +353,7 @@ export type ClipUncheckedCreateInput = {
   likes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutClipInput
   views?: Prisma.ClipViewUncheckedCreateNestedManyWithoutClipInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutClipInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutClipInput
 }
 
 export type ClipUpdateInput = {
@@ -367,6 +372,7 @@ export type ClipUpdateInput = {
   likes?: Prisma.ClipLikeUpdateManyWithoutClipNestedInput
   views?: Prisma.ClipViewUpdateManyWithoutClipNestedInput
   comments?: Prisma.CommentUpdateManyWithoutClipNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutClipNestedInput
 }
 
 export type ClipUncheckedUpdateInput = {
@@ -385,6 +391,7 @@ export type ClipUncheckedUpdateInput = {
   likes?: Prisma.ClipLikeUncheckedUpdateManyWithoutClipNestedInput
   views?: Prisma.ClipViewUncheckedUpdateManyWithoutClipNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutClipNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutClipNestedInput
 }
 
 export type ClipCreateManyInput = {
@@ -437,6 +444,11 @@ export type ClipOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type ClipScalarRelationFilter = {
+  is?: Prisma.ClipWhereInput
+  isNot?: Prisma.ClipWhereInput
+}
+
 export type ClipCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
@@ -479,11 +491,6 @@ export type ClipMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
-export type ClipScalarRelationFilter = {
-  is?: Prisma.ClipWhereInput
-  isNot?: Prisma.ClipWhereInput
-}
-
 export type ClipCreateNestedManyWithoutUploaderInput = {
   create?: Prisma.XOR<Prisma.ClipCreateWithoutUploaderInput, Prisma.ClipUncheckedCreateWithoutUploaderInput> | Prisma.ClipCreateWithoutUploaderInput[] | Prisma.ClipUncheckedCreateWithoutUploaderInput[]
   connectOrCreate?: Prisma.ClipCreateOrConnectWithoutUploaderInput | Prisma.ClipCreateOrConnectWithoutUploaderInput[]
@@ -524,6 +531,20 @@ export type ClipUncheckedUpdateManyWithoutUploaderNestedInput = {
   update?: Prisma.ClipUpdateWithWhereUniqueWithoutUploaderInput | Prisma.ClipUpdateWithWhereUniqueWithoutUploaderInput[]
   updateMany?: Prisma.ClipUpdateManyWithWhereWithoutUploaderInput | Prisma.ClipUpdateManyWithWhereWithoutUploaderInput[]
   deleteMany?: Prisma.ClipScalarWhereInput | Prisma.ClipScalarWhereInput[]
+}
+
+export type ClipCreateNestedOneWithoutCoachCommentsInput = {
+  create?: Prisma.XOR<Prisma.ClipCreateWithoutCoachCommentsInput, Prisma.ClipUncheckedCreateWithoutCoachCommentsInput>
+  connectOrCreate?: Prisma.ClipCreateOrConnectWithoutCoachCommentsInput
+  connect?: Prisma.ClipWhereUniqueInput
+}
+
+export type ClipUpdateOneRequiredWithoutCoachCommentsNestedInput = {
+  create?: Prisma.XOR<Prisma.ClipCreateWithoutCoachCommentsInput, Prisma.ClipUncheckedCreateWithoutCoachCommentsInput>
+  connectOrCreate?: Prisma.ClipCreateOrConnectWithoutCoachCommentsInput
+  upsert?: Prisma.ClipUpsertWithoutCoachCommentsInput
+  connect?: Prisma.ClipWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ClipUpdateToOneWithWhereWithoutCoachCommentsInput, Prisma.ClipUpdateWithoutCoachCommentsInput>, Prisma.ClipUncheckedUpdateWithoutCoachCommentsInput>
 }
 
 export type ClipCreateNestedManyWithoutCategoryInput = {
@@ -643,6 +664,7 @@ export type ClipCreateWithoutUploaderInput = {
   likes?: Prisma.ClipLikeCreateNestedManyWithoutClipInput
   views?: Prisma.ClipViewCreateNestedManyWithoutClipInput
   comments?: Prisma.CommentCreateNestedManyWithoutClipInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutClipInput
 }
 
 export type ClipUncheckedCreateWithoutUploaderInput = {
@@ -660,6 +682,7 @@ export type ClipUncheckedCreateWithoutUploaderInput = {
   likes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutClipInput
   views?: Prisma.ClipViewUncheckedCreateNestedManyWithoutClipInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutClipInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutClipInput
 }
 
 export type ClipCreateOrConnectWithoutUploaderInput = {
@@ -705,6 +728,94 @@ export type ClipScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Clip"> | Date | string
 }
 
+export type ClipCreateWithoutCoachCommentsInput = {
+  id?: string
+  title: string
+  description: string
+  status?: $Enums.ClipStatus
+  storagePath: string
+  thumbnailPath?: string | null
+  rejectionReason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  uploader: Prisma.UserCreateNestedOneWithoutClipsInput
+  category: Prisma.ClipCategoryCreateNestedOneWithoutClipsInput
+  tags?: Prisma.ClipTagCreateNestedManyWithoutClipInput
+  likes?: Prisma.ClipLikeCreateNestedManyWithoutClipInput
+  views?: Prisma.ClipViewCreateNestedManyWithoutClipInput
+  comments?: Prisma.CommentCreateNestedManyWithoutClipInput
+}
+
+export type ClipUncheckedCreateWithoutCoachCommentsInput = {
+  id?: string
+  title: string
+  description: string
+  status?: $Enums.ClipStatus
+  storagePath: string
+  thumbnailPath?: string | null
+  rejectionReason?: string | null
+  uploaderId: string
+  categoryId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tags?: Prisma.ClipTagUncheckedCreateNestedManyWithoutClipInput
+  likes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutClipInput
+  views?: Prisma.ClipViewUncheckedCreateNestedManyWithoutClipInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutClipInput
+}
+
+export type ClipCreateOrConnectWithoutCoachCommentsInput = {
+  where: Prisma.ClipWhereUniqueInput
+  create: Prisma.XOR<Prisma.ClipCreateWithoutCoachCommentsInput, Prisma.ClipUncheckedCreateWithoutCoachCommentsInput>
+}
+
+export type ClipUpsertWithoutCoachCommentsInput = {
+  update: Prisma.XOR<Prisma.ClipUpdateWithoutCoachCommentsInput, Prisma.ClipUncheckedUpdateWithoutCoachCommentsInput>
+  create: Prisma.XOR<Prisma.ClipCreateWithoutCoachCommentsInput, Prisma.ClipUncheckedCreateWithoutCoachCommentsInput>
+  where?: Prisma.ClipWhereInput
+}
+
+export type ClipUpdateToOneWithWhereWithoutCoachCommentsInput = {
+  where?: Prisma.ClipWhereInput
+  data: Prisma.XOR<Prisma.ClipUpdateWithoutCoachCommentsInput, Prisma.ClipUncheckedUpdateWithoutCoachCommentsInput>
+}
+
+export type ClipUpdateWithoutCoachCommentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
+  storagePath?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  uploader?: Prisma.UserUpdateOneRequiredWithoutClipsNestedInput
+  category?: Prisma.ClipCategoryUpdateOneRequiredWithoutClipsNestedInput
+  tags?: Prisma.ClipTagUpdateManyWithoutClipNestedInput
+  likes?: Prisma.ClipLikeUpdateManyWithoutClipNestedInput
+  views?: Prisma.ClipViewUpdateManyWithoutClipNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutClipNestedInput
+}
+
+export type ClipUncheckedUpdateWithoutCoachCommentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
+  storagePath?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploaderId?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tags?: Prisma.ClipTagUncheckedUpdateManyWithoutClipNestedInput
+  likes?: Prisma.ClipLikeUncheckedUpdateManyWithoutClipNestedInput
+  views?: Prisma.ClipViewUncheckedUpdateManyWithoutClipNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutClipNestedInput
+}
+
 export type ClipCreateWithoutCategoryInput = {
   id?: string
   title: string
@@ -720,6 +831,7 @@ export type ClipCreateWithoutCategoryInput = {
   likes?: Prisma.ClipLikeCreateNestedManyWithoutClipInput
   views?: Prisma.ClipViewCreateNestedManyWithoutClipInput
   comments?: Prisma.CommentCreateNestedManyWithoutClipInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutClipInput
 }
 
 export type ClipUncheckedCreateWithoutCategoryInput = {
@@ -737,6 +849,7 @@ export type ClipUncheckedCreateWithoutCategoryInput = {
   likes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutClipInput
   views?: Prisma.ClipViewUncheckedCreateNestedManyWithoutClipInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutClipInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutClipInput
 }
 
 export type ClipCreateOrConnectWithoutCategoryInput = {
@@ -780,6 +893,7 @@ export type ClipCreateWithoutTagsInput = {
   likes?: Prisma.ClipLikeCreateNestedManyWithoutClipInput
   views?: Prisma.ClipViewCreateNestedManyWithoutClipInput
   comments?: Prisma.CommentCreateNestedManyWithoutClipInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutClipInput
 }
 
 export type ClipUncheckedCreateWithoutTagsInput = {
@@ -797,6 +911,7 @@ export type ClipUncheckedCreateWithoutTagsInput = {
   likes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutClipInput
   views?: Prisma.ClipViewUncheckedCreateNestedManyWithoutClipInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutClipInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutClipInput
 }
 
 export type ClipCreateOrConnectWithoutTagsInput = {
@@ -830,6 +945,7 @@ export type ClipUpdateWithoutTagsInput = {
   likes?: Prisma.ClipLikeUpdateManyWithoutClipNestedInput
   views?: Prisma.ClipViewUpdateManyWithoutClipNestedInput
   comments?: Prisma.CommentUpdateManyWithoutClipNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutClipNestedInput
 }
 
 export type ClipUncheckedUpdateWithoutTagsInput = {
@@ -847,6 +963,7 @@ export type ClipUncheckedUpdateWithoutTagsInput = {
   likes?: Prisma.ClipLikeUncheckedUpdateManyWithoutClipNestedInput
   views?: Prisma.ClipViewUncheckedUpdateManyWithoutClipNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutClipNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutClipNestedInput
 }
 
 export type ClipCreateWithoutLikesInput = {
@@ -864,6 +981,7 @@ export type ClipCreateWithoutLikesInput = {
   tags?: Prisma.ClipTagCreateNestedManyWithoutClipInput
   views?: Prisma.ClipViewCreateNestedManyWithoutClipInput
   comments?: Prisma.CommentCreateNestedManyWithoutClipInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutClipInput
 }
 
 export type ClipUncheckedCreateWithoutLikesInput = {
@@ -881,6 +999,7 @@ export type ClipUncheckedCreateWithoutLikesInput = {
   tags?: Prisma.ClipTagUncheckedCreateNestedManyWithoutClipInput
   views?: Prisma.ClipViewUncheckedCreateNestedManyWithoutClipInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutClipInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutClipInput
 }
 
 export type ClipCreateOrConnectWithoutLikesInput = {
@@ -914,6 +1033,7 @@ export type ClipUpdateWithoutLikesInput = {
   tags?: Prisma.ClipTagUpdateManyWithoutClipNestedInput
   views?: Prisma.ClipViewUpdateManyWithoutClipNestedInput
   comments?: Prisma.CommentUpdateManyWithoutClipNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutClipNestedInput
 }
 
 export type ClipUncheckedUpdateWithoutLikesInput = {
@@ -931,6 +1051,7 @@ export type ClipUncheckedUpdateWithoutLikesInput = {
   tags?: Prisma.ClipTagUncheckedUpdateManyWithoutClipNestedInput
   views?: Prisma.ClipViewUncheckedUpdateManyWithoutClipNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutClipNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutClipNestedInput
 }
 
 export type ClipCreateWithoutViewsInput = {
@@ -948,6 +1069,7 @@ export type ClipCreateWithoutViewsInput = {
   tags?: Prisma.ClipTagCreateNestedManyWithoutClipInput
   likes?: Prisma.ClipLikeCreateNestedManyWithoutClipInput
   comments?: Prisma.CommentCreateNestedManyWithoutClipInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutClipInput
 }
 
 export type ClipUncheckedCreateWithoutViewsInput = {
@@ -965,6 +1087,7 @@ export type ClipUncheckedCreateWithoutViewsInput = {
   tags?: Prisma.ClipTagUncheckedCreateNestedManyWithoutClipInput
   likes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutClipInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutClipInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutClipInput
 }
 
 export type ClipCreateOrConnectWithoutViewsInput = {
@@ -998,6 +1121,7 @@ export type ClipUpdateWithoutViewsInput = {
   tags?: Prisma.ClipTagUpdateManyWithoutClipNestedInput
   likes?: Prisma.ClipLikeUpdateManyWithoutClipNestedInput
   comments?: Prisma.CommentUpdateManyWithoutClipNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutClipNestedInput
 }
 
 export type ClipUncheckedUpdateWithoutViewsInput = {
@@ -1015,6 +1139,7 @@ export type ClipUncheckedUpdateWithoutViewsInput = {
   tags?: Prisma.ClipTagUncheckedUpdateManyWithoutClipNestedInput
   likes?: Prisma.ClipLikeUncheckedUpdateManyWithoutClipNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutClipNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutClipNestedInput
 }
 
 export type ClipCreateWithoutCommentsInput = {
@@ -1032,6 +1157,7 @@ export type ClipCreateWithoutCommentsInput = {
   tags?: Prisma.ClipTagCreateNestedManyWithoutClipInput
   likes?: Prisma.ClipLikeCreateNestedManyWithoutClipInput
   views?: Prisma.ClipViewCreateNestedManyWithoutClipInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutClipInput
 }
 
 export type ClipUncheckedCreateWithoutCommentsInput = {
@@ -1049,6 +1175,7 @@ export type ClipUncheckedCreateWithoutCommentsInput = {
   tags?: Prisma.ClipTagUncheckedCreateNestedManyWithoutClipInput
   likes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutClipInput
   views?: Prisma.ClipViewUncheckedCreateNestedManyWithoutClipInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutClipInput
 }
 
 export type ClipCreateOrConnectWithoutCommentsInput = {
@@ -1082,6 +1209,7 @@ export type ClipUpdateWithoutCommentsInput = {
   tags?: Prisma.ClipTagUpdateManyWithoutClipNestedInput
   likes?: Prisma.ClipLikeUpdateManyWithoutClipNestedInput
   views?: Prisma.ClipViewUpdateManyWithoutClipNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutClipNestedInput
 }
 
 export type ClipUncheckedUpdateWithoutCommentsInput = {
@@ -1099,6 +1227,7 @@ export type ClipUncheckedUpdateWithoutCommentsInput = {
   tags?: Prisma.ClipTagUncheckedUpdateManyWithoutClipNestedInput
   likes?: Prisma.ClipLikeUncheckedUpdateManyWithoutClipNestedInput
   views?: Prisma.ClipViewUncheckedUpdateManyWithoutClipNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutClipNestedInput
 }
 
 export type ClipCreateManyUploaderInput = {
@@ -1129,6 +1258,7 @@ export type ClipUpdateWithoutUploaderInput = {
   likes?: Prisma.ClipLikeUpdateManyWithoutClipNestedInput
   views?: Prisma.ClipViewUpdateManyWithoutClipNestedInput
   comments?: Prisma.CommentUpdateManyWithoutClipNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutClipNestedInput
 }
 
 export type ClipUncheckedUpdateWithoutUploaderInput = {
@@ -1146,6 +1276,7 @@ export type ClipUncheckedUpdateWithoutUploaderInput = {
   likes?: Prisma.ClipLikeUncheckedUpdateManyWithoutClipNestedInput
   views?: Prisma.ClipViewUncheckedUpdateManyWithoutClipNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutClipNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutClipNestedInput
 }
 
 export type ClipUncheckedUpdateManyWithoutUploaderInput = {
@@ -1189,6 +1320,7 @@ export type ClipUpdateWithoutCategoryInput = {
   likes?: Prisma.ClipLikeUpdateManyWithoutClipNestedInput
   views?: Prisma.ClipViewUpdateManyWithoutClipNestedInput
   comments?: Prisma.CommentUpdateManyWithoutClipNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutClipNestedInput
 }
 
 export type ClipUncheckedUpdateWithoutCategoryInput = {
@@ -1206,6 +1338,7 @@ export type ClipUncheckedUpdateWithoutCategoryInput = {
   likes?: Prisma.ClipLikeUncheckedUpdateManyWithoutClipNestedInput
   views?: Prisma.ClipViewUncheckedUpdateManyWithoutClipNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutClipNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutClipNestedInput
 }
 
 export type ClipUncheckedUpdateManyWithoutCategoryInput = {
@@ -1231,6 +1364,7 @@ export type ClipCountOutputType = {
   likes: number
   views: number
   comments: number
+  coachComments: number
 }
 
 export type ClipCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1238,6 +1372,7 @@ export type ClipCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   likes?: boolean | ClipCountOutputTypeCountLikesArgs
   views?: boolean | ClipCountOutputTypeCountViewsArgs
   comments?: boolean | ClipCountOutputTypeCountCommentsArgs
+  coachComments?: boolean | ClipCountOutputTypeCountCoachCommentsArgs
 }
 
 /**
@@ -1278,6 +1413,13 @@ export type ClipCountOutputTypeCountCommentsArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.CommentWhereInput
 }
 
+/**
+ * ClipCountOutputType without action
+ */
+export type ClipCountOutputTypeCountCoachCommentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CoachCommentWhereInput
+}
+
 
 export type ClipSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1297,6 +1439,7 @@ export type ClipSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   likes?: boolean | Prisma.Clip$likesArgs<ExtArgs>
   views?: boolean | Prisma.Clip$viewsArgs<ExtArgs>
   comments?: boolean | Prisma.Clip$commentsArgs<ExtArgs>
+  coachComments?: boolean | Prisma.Clip$coachCommentsArgs<ExtArgs>
   _count?: boolean | Prisma.ClipCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["clip"]>
 
@@ -1354,6 +1497,7 @@ export type ClipInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   likes?: boolean | Prisma.Clip$likesArgs<ExtArgs>
   views?: boolean | Prisma.Clip$viewsArgs<ExtArgs>
   comments?: boolean | Prisma.Clip$commentsArgs<ExtArgs>
+  coachComments?: boolean | Prisma.Clip$coachCommentsArgs<ExtArgs>
   _count?: boolean | Prisma.ClipCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ClipIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1374,6 +1518,7 @@ export type $ClipPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     likes: Prisma.$ClipLikePayload<ExtArgs>[]
     views: Prisma.$ClipViewPayload<ExtArgs>[]
     comments: Prisma.$CommentPayload<ExtArgs>[]
+    coachComments: Prisma.$CoachCommentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1787,6 +1932,7 @@ export interface Prisma__ClipClient<T, Null = never, ExtArgs extends runtime.Typ
   likes<T extends Prisma.Clip$likesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Clip$likesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClipLikePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   views<T extends Prisma.Clip$viewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Clip$viewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClipViewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   comments<T extends Prisma.Clip$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Clip$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  coachComments<T extends Prisma.Clip$coachCommentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Clip$coachCommentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CoachCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2321,6 +2467,30 @@ export type Clip$commentsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.CommentScalarFieldEnum | Prisma.CommentScalarFieldEnum[]
+}
+
+/**
+ * Clip.coachComments
+ */
+export type Clip$coachCommentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CoachComment
+   */
+  select?: Prisma.CoachCommentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CoachComment
+   */
+  omit?: Prisma.CoachCommentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CoachCommentInclude<ExtArgs> | null
+  where?: Prisma.CoachCommentWhereInput
+  orderBy?: Prisma.CoachCommentOrderByWithRelationInput | Prisma.CoachCommentOrderByWithRelationInput[]
+  cursor?: Prisma.CoachCommentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CoachCommentScalarFieldEnum | Prisma.CoachCommentScalarFieldEnum[]
 }
 
 /**

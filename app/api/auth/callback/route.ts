@@ -1,9 +1,20 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { createSession } from "@/lib/auth";
+import { getGuildMember, mapDiscordRolesToTags } from "@/lib/discord";
 
 const DISCORD_TOKEN_URL = "https://discord.com/api/oauth2/token";
 const DISCORD_USER_URL = "https://discord.com/api/users/@me";
+
+const AVAILABLE_TAGS = [
+  "beginner",
+  "intermediate",
+  "experienced",
+  "expert",
+  "content-creator",
+  "veteran",
+  "rhythian-coach",
+];
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -35,8 +46,10 @@ export async function GET(request: Request) {
   }
 
   const tokenData = await tokenResponse.json();
+  const accessToken = tokenData.access_token;
+
   const userResponse = await fetch(DISCORD_USER_URL, {
-    headers: { Authorization: `Bearer ${tokenData.access_token}` },
+    headers: { Authorization: `Bearer ${accessToken}` },
   });
 
   if (!userResponse.ok) {
@@ -45,6 +58,11 @@ export async function GET(request: Request) {
 
   const discordUser = await userResponse.json();
   const handle = `${discordUser.username.toLowerCase()}-${discordUser.discriminator}`;
+
+  const guildMember = await getGuildMember(accessToken);
+  const inGuild = guildMember !== null;
+  const discordRoles = guildMember?.roles ?? [];
+
   const [user] = await Promise.all([
     prisma.user.upsert({
       where: { discordId: discordUser.id },
@@ -55,6 +73,8 @@ export async function GET(request: Request) {
         email: discordUser.email,
         locale: discordUser.locale,
         profileHandle: handle,
+        discordRoles,
+        inGuild,
       },
       create: {
         discordId: discordUser.id,
@@ -64,11 +84,18 @@ export async function GET(request: Request) {
         email: discordUser.email,
         locale: discordUser.locale,
         profileHandle: handle,
+        discordRoles,
+        inGuild,
       },
     }),
   ]);
 
-  // Bootstrap the first signed-in user as an administrator when no roles exist yet.
+  await ensureTagsExist();
+
+  if (inGuild && discordRoles.length > 0) {
+    await syncUserTags(user.id, discordRoles);
+  }
+
   if ((await prisma.role.count()) === 0) {
     const permissions = await prisma.permission.findMany({ select: { id: true } });
     const adminRole = await prisma.role.create({
@@ -96,4 +123,36 @@ export async function GET(request: Request) {
   });
 
   return response;
+}
+
+async function ensureTagsExist() {
+  for (const tagSlug of AVAILABLE_TAGS) {
+    const tagName = tagSlug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    await prisma.tag.upsert({
+      where: { slug: tagSlug },
+      update: {},
+      create: { name: tagName, slug: tagSlug },
+    });
+  }
+}
+
+async function syncUserTags(userId: string, discordRoles: string[]) {
+  const roleMappings = await prisma.discordRoleMapping.findMany();
+  const roleIdToName: Record<string, string> = {};
+  for (const mapping of roleMappings) {
+    const role = await prisma.role.findUnique({ where: { id: mapping.roleId } });
+    if (role) roleIdToName[mapping.discordRoleId] = role.name;
+  }
+
+  const tagSlugs = mapDiscordRolesToTags(discordRoles, roleIdToName);
+
+  const tags = await prisma.tag.findMany({ where: { slug: { in: tagSlugs } } });
+
+  await prisma.userTag.deleteMany({ where: { userId } });
+
+  if (tags.length > 0) {
+    await prisma.userTag.createMany({
+      data: tags.map(tag => ({ userId, tagId: tag.id })),
+    });
+  }
 }

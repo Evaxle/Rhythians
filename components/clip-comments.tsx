@@ -2,12 +2,17 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
+import { UserTags } from "@/components/user-tags";
 
 type CommentItem = {
   id: string;
   text: string;
   createdAt: string;
-  author: { username: string; discriminator: string };
+  author: {
+    username: string;
+    discriminator: string;
+    userTags?: Array<{ tag: { name: string; slug: string } }>;
+  };
 };
 
 export function ClipComments({
@@ -80,7 +85,14 @@ export function ClipComments({
         <div className="mt-6 space-y-4">
           {comments.map((comment) => (
             <article key={comment.id} className="rounded-3xl border border-border bg-background/70 p-5">
-              <p className="text-sm font-semibold text-white">{comment.author.username}#{comment.author.discriminator}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-semibold text-white">
+                  {comment.author.username}#{comment.author.discriminator}
+                </p>
+                {comment.author.userTags && comment.author.userTags.length > 0 && (
+                  <UserTags tags={comment.author.userTags} size="sm" />
+                )}
+              </div>
               <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-muted">{comment.text}</p>
               <p className="mt-3 text-xs uppercase tracking-[0.2em] text-accent">{new Date(comment.createdAt).toLocaleDateString()}</p>
             </article>

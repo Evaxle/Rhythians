@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
+import { UserTags } from "@/components/user-tags";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,7 @@ export default async function ProfilePage({ params }: Props) {
       articleRevisions: true,
       roles: { include: { role: true } },
       playerRank: true,
+      userTags: { include: { tag: true } },
     },
   });
 
@@ -23,21 +25,39 @@ export default async function ProfilePage({ params }: Props) {
     return <p className="rounded-3xl border border-border bg-surface/95 p-8 text-muted">Profile not found.</p>;
   }
 
+  const avatarUrl = user.avatar
+    ? `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png?size=256`
+    : null;
+
   return (
     <div className="space-y-8">
       <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-accent">Profile</p>
-            <h1 className="mt-3 text-3xl font-semibold text-white">@{user.profileHandle}</h1>
-            <p className="mt-3 text-sm leading-7 text-muted">{user.displayName ?? `${user.username}#${user.discriminator}`}</p>
-            <p className="mt-4 text-sm text-muted">Discord roles: {user.roles.map((userRole) => userRole.role.name).join(", ") || "Member"}</p>
-            {user.playerRank ? (
-              <div className="mt-4 inline-flex items-center gap-3 rounded-full border border-border bg-background/80 px-4 py-2 text-sm text-white">
-                <span className="h-3.5 w-3.5 rounded-full" style={{ backgroundColor: user.playerRank.color || "#7289da" }} />
-                <span>{user.playerRank.name}</span>
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex items-start gap-6">
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={`${user.username}'s avatar`}
+                className="h-24 w-24 rounded-full border-2 border-accent/30"
+              />
+            ) : (
+              <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-accent/30 bg-accent/10 text-3xl font-bold text-accent">
+                {user.username.charAt(0).toUpperCase()}
               </div>
-            ) : null}
+            )}
+            <div>
+              <p className="text-sm uppercase tracking-[0.3em] text-accent">Profile</p>
+              <h1 className="mt-2 text-3xl font-semibold text-white">{user.displayName ?? user.username}</h1>
+              <p className="mt-1 text-sm text-muted">@{user.profileHandle}</p>
+              {user.userTags.length > 0 && (
+                <div className="mt-4">
+                  <UserTags tags={user.userTags} size="md" />
+                </div>
+              )}
+              {user.bio && (
+                <p className="mt-4 text-sm leading-7 text-muted">{user.bio}</p>
+              )}
+            </div>
           </div>
           <div className="rounded-3xl border border-border bg-background/80 px-5 py-4 text-sm text-muted">
             <p>Member since</p>

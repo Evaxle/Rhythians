@@ -25,7 +25,17 @@ export async function POST(request: Request, { params }: Props) {
 
   const comment = await prisma.comment.create({
     data: { text, clipId, authorId: user.id },
-    include: { author: { select: { username: true, discriminator: true } } },
+    include: {
+      author: {
+        select: {
+          username: true,
+          discriminator: true,
+          userTags: {
+            include: { tag: true },
+          },
+        },
+      },
+    },
   });
 
   return NextResponse.json({
@@ -33,7 +43,13 @@ export async function POST(request: Request, { params }: Props) {
       id: comment.id,
       text: comment.text,
       createdAt: comment.createdAt.toISOString(),
-      author: comment.author,
+      author: {
+        username: comment.author.username,
+        discriminator: comment.author.discriminator,
+        userTags: comment.author.userTags.map((ut) => ({
+          tag: { name: ut.tag.name, slug: ut.tag.slug },
+        })),
+      },
     },
   }, { status: 201 });
 }

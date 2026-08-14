@@ -64,6 +64,8 @@ export const ModelName = {
   KnowledgeCategory: 'KnowledgeCategory',
   KnowledgeArticle: 'KnowledgeArticle',
   Tag: 'Tag',
+  UserTag: 'UserTag',
+  CoachComment: 'CoachComment',
   ArticleTag: 'ArticleTag',
   ArticleRevision: 'ArticleRevision',
   ClipCategory: 'ClipCategory',
@@ -106,6 +108,7 @@ export const UserScalarFieldEnum = {
   displayName: 'displayName',
   profileHandle: 'profileHandle',
   discordRoles: 'discordRoles',
+  inGuild: 'inGuild',
   playerRankId: 'playerRankId',
   joinedAt: 'joinedAt',
   bio: 'bio',
@@ -261,6 +264,30 @@ export const TagScalarFieldEnum = {
 } as const
 
 export type TagScalarFieldEnum = (typeof TagScalarFieldEnum)[keyof typeof TagScalarFieldEnum]
+
+
+export const UserTagScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  tagId: 'tagId',
+  createdAt: 'createdAt'
+} as const
+
+export type UserTagScalarFieldEnum = (typeof UserTagScalarFieldEnum)[keyof typeof UserTagScalarFieldEnum]
+
+
+export const CoachCommentScalarFieldEnum = {
+  id: 'id',
+  text: 'text',
+  clipId: 'clipId',
+  authorId: 'authorId',
+  isEdited: 'isEdited',
+  isDeleted: 'isDeleted',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CoachCommentScalarFieldEnum = (typeof CoachCommentScalarFieldEnum)[keyof typeof CoachCommentScalarFieldEnum]
 
 
 export const ArticleTagScalarFieldEnum = {
