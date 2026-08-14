@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
+import { canSendMessageToConversation } from "@/lib/friends";
 
 type Props = { params: Promise<{ conversationId: string }> };
 
@@ -17,6 +18,11 @@ export async function POST(request: Request, { params }: Props) {
   });
   if (!membership) {
     return NextResponse.json({ error: "Conversation not found." }, { status: 404 });
+  }
+
+  const gate = await canSendMessageToConversation(user.id, conversationId);
+  if (!gate.allowed) {
+    return NextResponse.json({ error: gate.reason }, { status: 403 });
   }
 
   const body = await request.json().catch(() => null) as { content?: unknown } | null;
@@ -47,6 +53,7 @@ export async function POST(request: Request, { params }: Props) {
         senderId: message.senderId,
         createdAt: message.createdAt.toISOString(),
         isEdited: message.isEdited,
+        isDeleted: message.isDeleted,
       },
     },
     { status: 201 },
@@ -73,7 +80,6 @@ export async function GET(request: Request, { params }: Props) {
   const messages = await prisma.message.findMany({
     where: {
       conversationId,
-      isDeleted: false,
       ...(beforeRaw ? { createdAt: { lt: new Date(beforeRaw) } } : {}),
     },
     orderBy: { createdAt: "desc" },
@@ -87,6 +93,7 @@ export async function GET(request: Request, { params }: Props) {
       senderId: message.senderId,
       createdAt: message.createdAt.toISOString(),
       isEdited: message.isEdited,
+      isDeleted: message.isDeleted,
     })),
   });
 }

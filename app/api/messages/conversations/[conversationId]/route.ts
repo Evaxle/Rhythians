@@ -39,7 +39,6 @@ export async function GET(_request: Request, { params }: Props) {
         include: { user: { select: PUBLIC_USER_FIELDS } },
       },
       messages: {
-        where: { isDeleted: false },
         orderBy: { createdAt: "asc" },
         take: 100,
       },
@@ -75,6 +74,7 @@ export async function GET(_request: Request, { params }: Props) {
         senderId: message.senderId,
         createdAt: message.createdAt.toISOString(),
         isEdited: message.isEdited,
+        isDeleted: message.isDeleted,
       })),
     },
   });

@@ -24,7 +24,7 @@ export default async function RulesPage() {
       </section>
       <div className="grid gap-5">
         {rules.map((rule) => (
-          <article key={rule.id} className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+          <article key={rule.id} id={rule.slug} className="scroll-mt-24 rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-3xl bg-accent/10 text-accent text-lg font-semibold">{rule.order.toString().padStart(2, "0")}</div>
               <div>

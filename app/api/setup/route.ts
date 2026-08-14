@@ -17,6 +17,14 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 DO $$ BEGIN
+  CREATE TYPE "ConversationType" AS ENUM ('direct', 'group');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE "FriendRequestStatus" AS ENUM ('pending', 'accepted', 'declined');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
   CREATE TYPE "PermissionName" AS ENUM ('knowledge_read', 'knowledge_create', 'knowledge_edit', 'knowledge_publish', 'knowledge_delete', 'clips_submit', 'clips_comment', 'clips_moderate', 'clips_delete', 'users_view', 'users_moderate', 'settings_manage', 'announcements_create', 'announcements_delete', 'admin_access');
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
@@ -301,6 +309,48 @@ CREATE TABLE IF NOT EXISTS "SiteSetting" (
     CONSTRAINT "SiteSetting_pkey" PRIMARY KEY ("id")
 );
 
+CREATE TABLE IF NOT EXISTS "Conversation" (
+    "id" TEXT NOT NULL,
+    "type" "ConversationType" NOT NULL DEFAULT 'direct',
+    "name" TEXT,
+    "createdById" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    CONSTRAINT "Conversation_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS "ConversationMember" (
+    "id" TEXT NOT NULL,
+    "conversationId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "role" TEXT NOT NULL DEFAULT 'member',
+    "lastReadAt" TIMESTAMP(3),
+    "joinedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "ConversationMember_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS "Message" (
+    "id" TEXT NOT NULL,
+    "conversationId" TEXT NOT NULL,
+    "senderId" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    "isEdited" BOOLEAN NOT NULL DEFAULT false,
+    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    CONSTRAINT "Message_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS "FriendRequest" (
+    "id" TEXT NOT NULL,
+    "senderId" TEXT NOT NULL,
+    "receiverId" TEXT NOT NULL,
+    "status" "FriendRequestStatus" NOT NULL DEFAULT 'pending',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "respondedAt" TIMESTAMP(3),
+    CONSTRAINT "FriendRequest_pkey" PRIMARY KEY ("id")
+);
+
 CREATE UNIQUE INDEX IF NOT EXISTS "User_discordId_key" ON "User"("discordId");
 CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX IF NOT EXISTS "User_profileHandle_key" ON "User"("profileHandle");
@@ -322,6 +372,13 @@ CREATE UNIQUE INDEX IF NOT EXISTS "ClipCategory_slug_key" ON "ClipCategory"("slu
 CREATE UNIQUE INDEX IF NOT EXISTS "ClipLike_clipId_userId_key" ON "ClipLike"("clipId", "userId");
 CREATE UNIQUE INDEX IF NOT EXISTS "Announcement_slug_key" ON "Announcement"("slug");
 CREATE UNIQUE INDEX IF NOT EXISTS "SiteSetting_key_key" ON "SiteSetting"("key");
+CREATE INDEX IF NOT EXISTS "Conversation_createdById_idx" ON "Conversation"("createdById");
+CREATE INDEX IF NOT EXISTS "ConversationMember_userId_idx" ON "ConversationMember"("userId");
+CREATE UNIQUE INDEX IF NOT EXISTS "ConversationMember_conversationId_userId_key" ON "ConversationMember"("conversationId", "userId");
+CREATE INDEX IF NOT EXISTS "Message_conversationId_createdAt_idx" ON "Message"("conversationId", "createdAt");
+CREATE INDEX IF NOT EXISTS "FriendRequest_receiverId_idx" ON "FriendRequest"("receiverId");
+CREATE INDEX IF NOT EXISTS "FriendRequest_senderId_idx" ON "FriendRequest"("senderId");
+CREATE UNIQUE INDEX IF NOT EXISTS "FriendRequest_senderId_receiverId_key" ON "FriendRequest"("senderId", "receiverId");
 
 DO $$ BEGIN
   ALTER TABLE "User" ADD CONSTRAINT "User_playerRankId_fkey" FOREIGN KEY ("playerRankId") REFERENCES "PlayerRank"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -433,6 +490,34 @@ EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 DO $$ BEGIN
   ALTER TABLE "ModerationAction" ADD CONSTRAINT "ModerationAction_actorId_fkey" FOREIGN KEY ("actorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE "Conversation" ADD CONSTRAINT "Conversation_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE "ConversationMember" ADD CONSTRAINT "ConversationMember_conversationId_fkey" FOREIGN KEY ("conversationId") REFERENCES "Conversation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE "ConversationMember" ADD CONSTRAINT "ConversationMember_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE "Message" ADD CONSTRAINT "Message_conversationId_fkey" FOREIGN KEY ("conversationId") REFERENCES "Conversation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE "Message" ADD CONSTRAINT "Message_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE "FriendRequest" ADD CONSTRAINT "FriendRequest_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE "FriendRequest" ADD CONSTRAINT "FriendRequest_receiverId_fkey" FOREIGN KEY ("receiverId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 `;

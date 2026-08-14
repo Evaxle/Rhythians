@@ -81,7 +81,8 @@ export const ModelName = {
   SiteSetting: 'SiteSetting',
   Conversation: 'Conversation',
   ConversationMember: 'ConversationMember',
-  Message: 'Message'
+  Message: 'Message',
+  FriendRequest: 'FriendRequest'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -494,6 +495,18 @@ export const MessageScalarFieldEnum = {
 } as const
 
 export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
+
+
+export const FriendRequestScalarFieldEnum = {
+  id: 'id',
+  senderId: 'senderId',
+  receiverId: 'receiverId',
+  status: 'status',
+  createdAt: 'createdAt',
+  respondedAt: 'respondedAt'
+} as const
+
+export type FriendRequestScalarFieldEnum = (typeof FriendRequestScalarFieldEnum)[keyof typeof FriendRequestScalarFieldEnum]
 
 
 export const SortOrder = {

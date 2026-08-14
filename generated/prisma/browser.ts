@@ -172,3 +172,8 @@ export type ConversationMember = Prisma.ConversationMemberModel
  * 
  */
 export type Message = Prisma.MessageModel
+/**
+ * Model FriendRequest
+ * 
+ */
+export type FriendRequest = Prisma.FriendRequestModel

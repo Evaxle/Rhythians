@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 import { prisma } from "@/lib/db";
+import { getSessionUser } from "@/lib/auth";
 import { UserTags } from "@/components/user-tags";
+import { FriendButton } from "@/components/friend-button";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +13,7 @@ type Props = {
 
 export default async function ProfilePage({ params }: Props) {
   const { username } = await params;
+  const currentUser = await getSessionUser();
   const user = await prisma.user.findFirst({
     where: { profileHandle: username },
     include: {
@@ -26,6 +29,7 @@ export default async function ProfilePage({ params }: Props) {
     return <p className="rounded-3xl border border-border bg-surface/95 p-8 text-muted">Profile not found.</p>;
   }
 
+  const isOwnProfile = currentUser?.id === user.id;
   const avatarUrl = user.avatar
     ? `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png?size=256`
     : null;
@@ -60,13 +64,16 @@ export default async function ProfilePage({ params }: Props) {
               )}
             </div>
           </div>
-          <div className="flex flex-col gap-3">
-            <Link
-              href={`/messages?user=${encodeURIComponent(user.profileHandle)}`}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent2"
-            >
-              <MessageCircle size={16} /> Message
-            </Link>
+          <div className="flex flex-col items-stretch gap-3">
+            {!isOwnProfile && <FriendButton userId={user.id} />}
+            {!isOwnProfile && (
+              <Link
+                href={`/messages?user=${encodeURIComponent(user.profileHandle)}`}
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:border-accent/40"
+              >
+                <MessageCircle size={16} /> Message
+              </Link>
+            )}
             <div className="rounded-3xl border border-border bg-background/80 px-5 py-4 text-sm text-muted">
               <p>Member since</p>
               <p className="mt-2 text-lg font-semibold text-white">{user.joinedAt.toLocaleDateString()}</p>

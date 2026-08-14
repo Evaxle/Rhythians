@@ -51,6 +51,15 @@ export const ConversationType = {
 export type ConversationType = (typeof ConversationType)[keyof typeof ConversationType]
 
 
+export const FriendRequestStatus = {
+  pending: 'pending',
+  accepted: 'accepted',
+  declined: 'declined'
+} as const
+
+export type FriendRequestStatus = (typeof FriendRequestStatus)[keyof typeof FriendRequestStatus]
+
+
 export const PermissionName = {
   knowledge_read: 'knowledge_read',
   knowledge_create: 'knowledge_create',

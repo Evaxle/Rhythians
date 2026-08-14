@@ -37,6 +37,12 @@ enum ConversationType {
   group
 }
 
+enum FriendRequestStatus {
+  pending
+  accepted
+  declined
+}
+
 enum PermissionName {
   knowledge_read
   knowledge_create
@@ -90,6 +96,8 @@ model User {
   conversations   Conversation[]     @relation("createdConversations")
   conversationMemberships ConversationMember[]
   messagesSent    Message[]
+  sentFriendRequests FriendRequest[] @relation("sentFriendRequests")
+  receivedFriendRequests FriendRequest[] @relation("receivedFriendRequests")
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
 }
@@ -439,4 +447,19 @@ model Message {
   updatedAt      DateTime     @updatedAt
 
   @@index([conversationId, createdAt])
+}
+
+model FriendRequest {
+  id          String             @id @default(uuid())
+  sender      User               @relation("sentFriendRequests", fields: [senderId], references: [id])
+  senderId    String
+  receiver    User               @relation("receivedFriendRequests", fields: [receiverId], references: [id])
+  receiverId  String
+  status      FriendRequestStatus @default(pending)
+  createdAt   DateTime           @default(now())
+  respondedAt DateTime?
+
+  @@unique([senderId, receiverId])
+  @@index([receiverId])
+  @@index([senderId])
 }

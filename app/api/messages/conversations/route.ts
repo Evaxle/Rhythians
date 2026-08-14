@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
+import { getFriendStatus } from "@/lib/friends";
 
 const PUBLIC_USER_FIELDS = {
   id: true,
@@ -108,6 +109,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "User not found." }, { status: 404 });
     }
 
+    const friendStatus = await getFriendStatus(user.id, otherUserId);
+    if (friendStatus === "none") {
+      return NextResponse.json(
+        { error: "Add this user as a friend to start a conversation with them.", friendStatus },
+        { status: 403 },
+      );
+    }
+
     const existing = await prisma.conversation.findFirst({
       where: {
         type: "direct",
@@ -117,7 +126,7 @@ export async function POST(request: Request) {
     });
 
     if (existing && existing.members.length === 2) {
-      return NextResponse.json({ conversationId: existing.id });
+      return NextResponse.json({ conversationId: existing.id, friendStatus });
     }
 
     const conversation = await prisma.conversation.create({
@@ -133,7 +142,7 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json({ conversationId: conversation.id }, { status: 201 });
+    return NextResponse.json({ conversationId: conversation.id, friendStatus }, { status: 201 });
   }
 
   const name = typeof body.name === "string" ? body.name.trim() : "";

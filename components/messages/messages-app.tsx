@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { MessageSquarePlus, Search, Send, Users, Plus, X, ArrowLeft, Loader2 } from "lucide-react";
+import { MessageSquarePlus, Search, Send, Users, Plus, X, ArrowLeft, Loader2, Trash2 } from "lucide-react";
 import type {
   ConversationSummary,
   ConversationDetail,
@@ -75,7 +75,68 @@ export function MessagesApp({
   const [sending, setSending] = useState(false);
   const [draft, setDraft] = useState("");
   const [addToGroupId, setAddToGroupId] = useState<string | null>(null);
+  const [friends, setFriends] = useState<UserLite[]>([]);
+  const [incomingRequests, setIncomingRequests] = useState<Array<{ id: string; user: UserLite; createdAt: string }>>([]);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  const loadFriends = useCallback(async () => {
+    try {
+      const response = await fetch("/api/friends", { cache: "no-store" });
+      if (!response.ok) return;
+      const data = await response.json();
+      setFriends(data.friends ?? []);
+      setIncomingRequests(data.incoming ?? []);
+    } catch {
+      // Ignore transient failures.
+    }
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadFriends();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function respondToRequest(requestId: string, action: "accept" | "decline") {
+    try {
+      const response = await fetch(`/api/friends/requests/${requestId}/${action}`, { method: "POST" });
+      if (!response.ok) return;
+      setIncomingRequests((current) => current.filter((r) => r.id !== requestId));
+      await loadFriends();
+      await loadConversations();
+    } catch {
+      // Ignore transient failures.
+    }
+  }
+
+  async function removeFriend(friendId: string) {
+    try {
+      const response = await fetch(`/api/friends/${friendId}`, { method: "DELETE" });
+      if (!response.ok) return;
+      setFriends((current) => current.filter((f) => f.id !== friendId));
+    } catch {
+      // Ignore transient failures.
+    }
+  }
+
+  async function deleteMessage(messageId: string) {
+    if (!activeId) return;
+    try {
+      const response = await fetch(`/api/messages/conversations/${activeId}/messages/${messageId}`, { method: "DELETE" });
+      if (!response.ok) return;
+      setDetail((current) =>
+        current
+          ? {
+              ...current,
+              messages: current.messages.map((m) => (m.id === messageId ? { ...m, isDeleted: true, content: "" } : m)),
+            }
+          : current,
+      );
+    } catch {
+      // Ignore transient failures.
+    }
+  }
 
   const loadConversations = useCallback(async () => {
     try {
@@ -115,6 +176,7 @@ export function MessagesApp({
   }, []);
 
   const openOrCreateDirect = useCallback(
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization
     async (targetUser: UserLite) => {
       setComposing(true);
       setError("");
@@ -134,6 +196,7 @@ export function MessagesApp({
         setComposing(false);
       }
     },
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization
     [loadConversations, loadDetail],
   );
 
@@ -150,7 +213,6 @@ export function MessagesApp({
   );
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadConversations().then(() => {
       if (initialTargetHandle) {
         return resolveInitialTarget(initialTargetHandle);
@@ -174,7 +236,12 @@ export function MessagesApp({
 
   useEffect(() => {
     if (detail) {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      const container = scrollRef.current;
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      } else {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [detail?.messages.length]);
@@ -200,6 +267,7 @@ export function MessagesApp({
           : current,
       );
       setDraft("");
+      setError("");
       await loadConversations();
     } catch (sendError) {
       setError(sendError instanceof Error ? sendError.message : "Could not send message.");
@@ -228,6 +296,71 @@ export function MessagesApp({
           </div>
 
           <div className="flex-1 overflow-y-auto p-2">
+            {incomingRequests.length > 0 && (
+              <div className="mb-3 rounded-2xl border border-accent/30 bg-accent/5 p-3">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-accent">
+                  Friend requests ({incomingRequests.length})
+                </p>
+                <div className="space-y-2">
+                  {incomingRequests.map((request) => (
+                    <div key={request.id} className="flex items-center gap-2">
+                      <Avatar user={request.user} size="sm" />
+                      <p className="min-w-0 flex-1 truncate text-sm font-semibold text-white">
+                        {request.user.username}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => respondToRequest(request.id, "accept")}
+                        className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-white transition hover:bg-accent2"
+                      >
+                        Accept
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => respondToRequest(request.id, "decline")}
+                        className="rounded-full border border-border bg-white/5 px-3 py-1 text-xs font-semibold text-muted transition hover:text-white"
+                      >
+                        Decline
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {friends.length > 0 && (
+              <div className="mb-3">
+                <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-wider text-muted">
+                  Friends ({friends.length})
+                </p>
+                <div className="space-y-1">
+                  {friends.map((friend) => (
+                    <div key={friend.id} className="flex items-center gap-2 rounded-2xl px-2 py-1.5 transition hover:bg-white/5">
+                      <Avatar user={friend} size="sm" />
+                      <p className="min-w-0 flex-1 truncate text-sm font-semibold text-white">{friend.username}</p>
+                      <button
+                        type="button"
+                        onClick={() => openOrCreateDirect(friend)}
+                        disabled={composing}
+                        className="inline-flex items-center gap-1 rounded-full bg-accent px-3 py-1 text-xs font-semibold text-white transition hover:bg-accent2 disabled:opacity-50"
+                        title={`Message ${friend.username}`}
+                      >
+                        <Send size={11} /> Message
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeFriend(friend.id)}
+                        className="rounded-full border border-border bg-white/5 px-2.5 py-1 text-xs font-semibold text-muted transition hover:border-red-400/40 hover:text-red-300"
+                        title="Remove friend"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {loadingConversations ? (
               <div className="flex items-center justify-center gap-2 p-8 text-sm text-muted">
                 <Loader2 size={16} className="animate-spin" /> Loading conversations...
@@ -352,7 +485,7 @@ export function MessagesApp({
                 )}
               </header>
 
-              <div className="flex-1 overflow-y-auto p-4">
+              <div ref={scrollRef} className="flex-1 overflow-y-auto p-4">
                 {loadingDetail ? (
                   <div className="flex items-center justify-center gap-2 p-8 text-sm text-muted">
                     <Loader2 size={16} className="animate-spin" /> Loading messages...
@@ -369,7 +502,7 @@ export function MessagesApp({
                       return (
                         <div
                           key={message.id}
-                          className={`flex w-full ${mine ? "justify-end" : "justify-start"}`}
+                          className={`group flex w-full ${mine ? "justify-end" : "justify-start"}`}
                         >
                           <div className={`flex max-w-[78%] items-end gap-2 ${mine ? "flex-row-reverse" : ""}`}>
                             {!mine && detail.type === "group" && sender && (
@@ -385,12 +518,27 @@ export function MessagesApp({
                               {!mine && detail.type === "group" && sender && (
                                 <p className="mb-1 text-xs font-semibold text-accent">{sender.username}</p>
                               )}
-                              <p className="whitespace-pre-wrap break-words">{message.content}</p>
+                              {message.isDeleted ? (
+                                <p className="italic opacity-70">This message was deleted.</p>
+                              ) : (
+                                <p className="whitespace-pre-wrap break-words">{message.content}</p>
+                              )}
                               <p className={`mt-1 text-[10px] uppercase tracking-wider ${mine ? "text-white/60" : "text-muted"}`}>
                                 {formatTime(message.createdAt)}
-                                {message.isEdited ? " · edited" : ""}
+                                {message.isEdited && !message.isDeleted ? " · edited" : ""}
                               </p>
                             </div>
+                            {mine && !message.isDeleted && (
+                              <button
+                                type="button"
+                                onClick={() => deleteMessage(message.id)}
+                                className="mb-1 hidden shrink-0 items-center justify-center rounded-full border border-border bg-background/70 p-2 text-muted transition hover:border-red-400/40 hover:text-red-300 group-hover:flex"
+                                aria-label="Delete message"
+                                title="Delete message"
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            )}
                           </div>
                         </div>
                       );
@@ -407,14 +555,15 @@ export function MessagesApp({
                     value={draft}
                     onChange={(event) => setDraft(event.target.value)}
                     onKeyDown={(event) => {
-                      if (event.key === "Enter" && !event.shiftKey) {
+                      if (event.key === "Enter") {
+                        if (event.shiftKey) return;
                         event.preventDefault();
                         sendMessage();
                       }
                     }}
                     rows={1}
                     maxLength={4000}
-                    placeholder="Type a message..."
+                    placeholder="Type a message... (Enter to send, Shift+Enter for newline)"
                     className="max-h-32 flex-1 resize-none rounded-2xl border border-border bg-background/70 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-muted focus:border-accent/60"
                   />
                   <button

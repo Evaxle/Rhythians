@@ -338,6 +338,23 @@ export type EnumConversationTypeWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumConversationTypeFilter<$PrismaModel>
 }
 
+export type EnumFriendRequestStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.FriendRequestStatus | Prisma.EnumFriendRequestStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.FriendRequestStatus[] | Prisma.ListEnumFriendRequestStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FriendRequestStatus[] | Prisma.ListEnumFriendRequestStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFriendRequestStatusFilter<$PrismaModel> | $Enums.FriendRequestStatus
+}
+
+export type EnumFriendRequestStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FriendRequestStatus | Prisma.EnumFriendRequestStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.FriendRequestStatus[] | Prisma.ListEnumFriendRequestStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FriendRequestStatus[] | Prisma.ListEnumFriendRequestStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFriendRequestStatusWithAggregatesFilter<$PrismaModel> | $Enums.FriendRequestStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFriendRequestStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFriendRequestStatusFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -646,6 +663,23 @@ export type NestedEnumConversationTypeWithAggregatesFilter<$PrismaModel = never>
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumConversationTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumConversationTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumFriendRequestStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.FriendRequestStatus | Prisma.EnumFriendRequestStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.FriendRequestStatus[] | Prisma.ListEnumFriendRequestStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FriendRequestStatus[] | Prisma.ListEnumFriendRequestStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFriendRequestStatusFilter<$PrismaModel> | $Enums.FriendRequestStatus
+}
+
+export type NestedEnumFriendRequestStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FriendRequestStatus | Prisma.EnumFriendRequestStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.FriendRequestStatus[] | Prisma.ListEnumFriendRequestStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FriendRequestStatus[] | Prisma.ListEnumFriendRequestStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFriendRequestStatusWithAggregatesFilter<$PrismaModel> | $Enums.FriendRequestStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFriendRequestStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFriendRequestStatusFilter<$PrismaModel>
 }
 
 

@@ -34,6 +34,7 @@ export type MessageItem = {
   senderId: string;
   createdAt: string;
   isEdited: boolean;
+  isDeleted: boolean;
 };
 
 export type ConversationMember = UserLite & { role: string; joinedAt: string };
