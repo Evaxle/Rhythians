@@ -444,11 +444,11 @@ INSERT INTO "Permission" ("id", "name") VALUES
   (gen_random_uuid()::text, 'admin_access')
 ON CONFLICT ("name") DO NOTHING;
 
-INSERT INTO "ClipCategory" ("id", "name", "slug", "description", "order") VALUES
-  (gen_random_uuid()::text, 'Gameplay', 'gameplay', 'In-game footage and highlights', 0),
-  (gen_random_uuid()::text, 'Tutorial', 'tutorial', 'How-to guides and tips', 1),
-  (gen_random_uuid()::text, 'Montage', 'montage', 'Edited compilation clips', 2),
-  (gen_random_uuid()::text, 'Funny', 'funny', 'Humorous moments', 3)
+INSERT INTO "ClipCategory" ("id", "name", "slug", "description", "order", "createdAt", "updatedAt") VALUES
+  (gen_random_uuid()::text, 'Gameplay', 'gameplay', 'In-game footage and highlights', 0, NOW(), NOW()),
+  (gen_random_uuid()::text, 'Tutorial', 'tutorial', 'How-to guides and tips', 1, NOW(), NOW()),
+  (gen_random_uuid()::text, 'Montage', 'montage', 'Edited compilation clips', 2, NOW(), NOW()),
+  (gen_random_uuid()::text, 'Funny', 'funny', 'Humorous moments', 3, NOW(), NOW())
 ON CONFLICT ("slug") DO NOTHING;
 `;
 
