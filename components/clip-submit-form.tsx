@@ -21,11 +21,10 @@ type Props = {
 const validVideoTypes = ["video/mp4", "video/webm", "video/quicktime"];
 const validThumbnailTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
 
-export default function ClipSubmitForm({ categories, tags }: Props) {
+export default function ClipSubmitForm({ tags }: Omit<Props, "categories">) {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [categoryId, setCategoryId] = useState(categories[0]?.id ?? "");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
@@ -82,10 +81,6 @@ export default function ClipSubmitForm({ categories, tags }: Props) {
       setError("Title must be 120 characters or less.");
       return;
     }
-    if (!categoryId) {
-      setError("Please select a category.");
-      return;
-    }
     if (!videoFile) {
       setError("Please choose a video file to upload.");
       return;
@@ -114,7 +109,6 @@ export default function ClipSubmitForm({ categories, tags }: Props) {
         body: JSON.stringify({
           title: title.trim(),
           description: description.trim(),
-          categoryId,
           tagIds: selectedTags,
           storagePath,
           thumbnailPath,
@@ -129,7 +123,6 @@ export default function ClipSubmitForm({ categories, tags }: Props) {
       setSuccess("Clip submitted! It will appear once approved.");
       setTitle("");
       setDescription("");
-      setCategoryId(categories[0]?.id ?? "");
       setSelectedTags([]);
       setVideoFile(null);
       setThumbnailFile(null);
@@ -143,31 +136,15 @@ export default function ClipSubmitForm({ categories, tags }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div>
-          <label className="block text-sm font-semibold text-white">Title</label>
-          <input
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            maxLength={120}
-            className="mt-3 w-full rounded-3xl border border-border bg-background/80 px-4 py-3 text-sm text-white outline-none transition focus:border-accent"
-            placeholder="Enter a catchy title"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-semibold text-white">Category</label>
-          <select
-            value={categoryId}
-            onChange={(event) => setCategoryId(event.target.value)}
-            className="mt-3 w-full rounded-3xl border border-border bg-background/80 px-4 py-3 text-sm text-white outline-none transition focus:border-accent"
-          >
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-        </div>
+      <div>
+        <label className="block text-sm font-semibold text-white">Title</label>
+        <input
+          value={title}
+          onChange={(event) => setTitle(event.target.value)}
+          maxLength={120}
+          className="mt-3 w-full rounded-3xl border border-border bg-background/80 px-4 py-3 text-sm text-white outline-none transition focus:border-accent"
+          placeholder="Enter a catchy title"
+        />
       </div>
 
       <div>

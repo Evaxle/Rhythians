@@ -83,7 +83,7 @@ export default async function ProfilePage({ params }: Props) {
               <Link key={clip.id} href={`/clips/${clip.id}`} className="overflow-hidden rounded-3xl border border-border bg-surface/95 p-5 transition hover:-translate-y-0.5 hover:border-accent/40">
                 <div className="h-40 rounded-3xl bg-white/5" />
                 <div className="mt-4">
-                  <p className="text-sm uppercase tracking-[0.24em] text-accent">{clip.category.name}</p>
+                  <p className="text-sm uppercase tracking-[0.24em] text-accent">{clip.category?.name ?? "Uncategorized"}</p>
                   <h3 className="mt-3 text-lg font-semibold text-white">{clip.title}</h3>
                   <p className="mt-2 text-sm text-muted">{clip.createdAt.toLocaleDateString()}</p>
                 </div>

@@ -192,7 +192,7 @@ export type ClipGroupByOutputType = {
   thumbnailPath: string | null
   rejectionReason: string | null
   uploaderId: string
-  categoryId: string
+  categoryId: string | null
   createdAt: Date
   updatedAt: Date
   _count: ClipCountAggregateOutputType | null
@@ -227,11 +227,11 @@ export type ClipWhereInput = {
   thumbnailPath?: Prisma.StringNullableFilter<"Clip"> | string | null
   rejectionReason?: Prisma.StringNullableFilter<"Clip"> | string | null
   uploaderId?: Prisma.StringFilter<"Clip"> | string
-  categoryId?: Prisma.StringFilter<"Clip"> | string
+  categoryId?: Prisma.StringNullableFilter<"Clip"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Clip"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Clip"> | Date | string
   uploader?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  category?: Prisma.XOR<Prisma.ClipCategoryScalarRelationFilter, Prisma.ClipCategoryWhereInput>
+  category?: Prisma.XOR<Prisma.ClipCategoryNullableScalarRelationFilter, Prisma.ClipCategoryWhereInput> | null
   tags?: Prisma.ClipTagListRelationFilter
   likes?: Prisma.ClipLikeListRelationFilter
   views?: Prisma.ClipViewListRelationFilter
@@ -248,7 +248,7 @@ export type ClipOrderByWithRelationInput = {
   thumbnailPath?: Prisma.SortOrderInput | Prisma.SortOrder
   rejectionReason?: Prisma.SortOrderInput | Prisma.SortOrder
   uploaderId?: Prisma.SortOrder
-  categoryId?: Prisma.SortOrder
+  categoryId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   uploader?: Prisma.UserOrderByWithRelationInput
@@ -272,11 +272,11 @@ export type ClipWhereUniqueInput = Prisma.AtLeast<{
   thumbnailPath?: Prisma.StringNullableFilter<"Clip"> | string | null
   rejectionReason?: Prisma.StringNullableFilter<"Clip"> | string | null
   uploaderId?: Prisma.StringFilter<"Clip"> | string
-  categoryId?: Prisma.StringFilter<"Clip"> | string
+  categoryId?: Prisma.StringNullableFilter<"Clip"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Clip"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Clip"> | Date | string
   uploader?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  category?: Prisma.XOR<Prisma.ClipCategoryScalarRelationFilter, Prisma.ClipCategoryWhereInput>
+  category?: Prisma.XOR<Prisma.ClipCategoryNullableScalarRelationFilter, Prisma.ClipCategoryWhereInput> | null
   tags?: Prisma.ClipTagListRelationFilter
   likes?: Prisma.ClipLikeListRelationFilter
   views?: Prisma.ClipViewListRelationFilter
@@ -293,7 +293,7 @@ export type ClipOrderByWithAggregationInput = {
   thumbnailPath?: Prisma.SortOrderInput | Prisma.SortOrder
   rejectionReason?: Prisma.SortOrderInput | Prisma.SortOrder
   uploaderId?: Prisma.SortOrder
-  categoryId?: Prisma.SortOrder
+  categoryId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ClipCountOrderByAggregateInput
@@ -313,7 +313,7 @@ export type ClipScalarWhereWithAggregatesInput = {
   thumbnailPath?: Prisma.StringNullableWithAggregatesFilter<"Clip"> | string | null
   rejectionReason?: Prisma.StringNullableWithAggregatesFilter<"Clip"> | string | null
   uploaderId?: Prisma.StringWithAggregatesFilter<"Clip"> | string
-  categoryId?: Prisma.StringWithAggregatesFilter<"Clip"> | string
+  categoryId?: Prisma.StringNullableWithAggregatesFilter<"Clip"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Clip"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Clip"> | Date | string
 }
@@ -329,7 +329,7 @@ export type ClipCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   uploader: Prisma.UserCreateNestedOneWithoutClipsInput
-  category: Prisma.ClipCategoryCreateNestedOneWithoutClipsInput
+  category?: Prisma.ClipCategoryCreateNestedOneWithoutClipsInput
   tags?: Prisma.ClipTagCreateNestedManyWithoutClipInput
   likes?: Prisma.ClipLikeCreateNestedManyWithoutClipInput
   views?: Prisma.ClipViewCreateNestedManyWithoutClipInput
@@ -346,7 +346,7 @@ export type ClipUncheckedCreateInput = {
   thumbnailPath?: string | null
   rejectionReason?: string | null
   uploaderId: string
-  categoryId: string
+  categoryId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tags?: Prisma.ClipTagUncheckedCreateNestedManyWithoutClipInput
@@ -367,7 +367,7 @@ export type ClipUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploader?: Prisma.UserUpdateOneRequiredWithoutClipsNestedInput
-  category?: Prisma.ClipCategoryUpdateOneRequiredWithoutClipsNestedInput
+  category?: Prisma.ClipCategoryUpdateOneWithoutClipsNestedInput
   tags?: Prisma.ClipTagUpdateManyWithoutClipNestedInput
   likes?: Prisma.ClipLikeUpdateManyWithoutClipNestedInput
   views?: Prisma.ClipViewUpdateManyWithoutClipNestedInput
@@ -384,7 +384,7 @@ export type ClipUncheckedUpdateInput = {
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   uploaderId?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tags?: Prisma.ClipTagUncheckedUpdateManyWithoutClipNestedInput
@@ -403,7 +403,7 @@ export type ClipCreateManyInput = {
   thumbnailPath?: string | null
   rejectionReason?: string | null
   uploaderId: string
-  categoryId: string
+  categoryId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -429,7 +429,7 @@ export type ClipUncheckedUpdateManyInput = {
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   uploaderId?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -659,7 +659,7 @@ export type ClipCreateWithoutUploaderInput = {
   rejectionReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  category: Prisma.ClipCategoryCreateNestedOneWithoutClipsInput
+  category?: Prisma.ClipCategoryCreateNestedOneWithoutClipsInput
   tags?: Prisma.ClipTagCreateNestedManyWithoutClipInput
   likes?: Prisma.ClipLikeCreateNestedManyWithoutClipInput
   views?: Prisma.ClipViewCreateNestedManyWithoutClipInput
@@ -675,7 +675,7 @@ export type ClipUncheckedCreateWithoutUploaderInput = {
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
-  categoryId: string
+  categoryId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tags?: Prisma.ClipTagUncheckedCreateNestedManyWithoutClipInput
@@ -723,7 +723,7 @@ export type ClipScalarWhereInput = {
   thumbnailPath?: Prisma.StringNullableFilter<"Clip"> | string | null
   rejectionReason?: Prisma.StringNullableFilter<"Clip"> | string | null
   uploaderId?: Prisma.StringFilter<"Clip"> | string
-  categoryId?: Prisma.StringFilter<"Clip"> | string
+  categoryId?: Prisma.StringNullableFilter<"Clip"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Clip"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Clip"> | Date | string
 }
@@ -739,7 +739,7 @@ export type ClipCreateWithoutCoachCommentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   uploader: Prisma.UserCreateNestedOneWithoutClipsInput
-  category: Prisma.ClipCategoryCreateNestedOneWithoutClipsInput
+  category?: Prisma.ClipCategoryCreateNestedOneWithoutClipsInput
   tags?: Prisma.ClipTagCreateNestedManyWithoutClipInput
   likes?: Prisma.ClipLikeCreateNestedManyWithoutClipInput
   views?: Prisma.ClipViewCreateNestedManyWithoutClipInput
@@ -755,7 +755,7 @@ export type ClipUncheckedCreateWithoutCoachCommentsInput = {
   thumbnailPath?: string | null
   rejectionReason?: string | null
   uploaderId: string
-  categoryId: string
+  categoryId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tags?: Prisma.ClipTagUncheckedCreateNestedManyWithoutClipInput
@@ -791,7 +791,7 @@ export type ClipUpdateWithoutCoachCommentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploader?: Prisma.UserUpdateOneRequiredWithoutClipsNestedInput
-  category?: Prisma.ClipCategoryUpdateOneRequiredWithoutClipsNestedInput
+  category?: Prisma.ClipCategoryUpdateOneWithoutClipsNestedInput
   tags?: Prisma.ClipTagUpdateManyWithoutClipNestedInput
   likes?: Prisma.ClipLikeUpdateManyWithoutClipNestedInput
   views?: Prisma.ClipViewUpdateManyWithoutClipNestedInput
@@ -807,7 +807,7 @@ export type ClipUncheckedUpdateWithoutCoachCommentsInput = {
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   uploaderId?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tags?: Prisma.ClipTagUncheckedUpdateManyWithoutClipNestedInput
@@ -889,7 +889,7 @@ export type ClipCreateWithoutTagsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   uploader: Prisma.UserCreateNestedOneWithoutClipsInput
-  category: Prisma.ClipCategoryCreateNestedOneWithoutClipsInput
+  category?: Prisma.ClipCategoryCreateNestedOneWithoutClipsInput
   likes?: Prisma.ClipLikeCreateNestedManyWithoutClipInput
   views?: Prisma.ClipViewCreateNestedManyWithoutClipInput
   comments?: Prisma.CommentCreateNestedManyWithoutClipInput
@@ -905,7 +905,7 @@ export type ClipUncheckedCreateWithoutTagsInput = {
   thumbnailPath?: string | null
   rejectionReason?: string | null
   uploaderId: string
-  categoryId: string
+  categoryId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   likes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutClipInput
@@ -941,7 +941,7 @@ export type ClipUpdateWithoutTagsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploader?: Prisma.UserUpdateOneRequiredWithoutClipsNestedInput
-  category?: Prisma.ClipCategoryUpdateOneRequiredWithoutClipsNestedInput
+  category?: Prisma.ClipCategoryUpdateOneWithoutClipsNestedInput
   likes?: Prisma.ClipLikeUpdateManyWithoutClipNestedInput
   views?: Prisma.ClipViewUpdateManyWithoutClipNestedInput
   comments?: Prisma.CommentUpdateManyWithoutClipNestedInput
@@ -957,7 +957,7 @@ export type ClipUncheckedUpdateWithoutTagsInput = {
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   uploaderId?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   likes?: Prisma.ClipLikeUncheckedUpdateManyWithoutClipNestedInput
@@ -977,7 +977,7 @@ export type ClipCreateWithoutLikesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   uploader: Prisma.UserCreateNestedOneWithoutClipsInput
-  category: Prisma.ClipCategoryCreateNestedOneWithoutClipsInput
+  category?: Prisma.ClipCategoryCreateNestedOneWithoutClipsInput
   tags?: Prisma.ClipTagCreateNestedManyWithoutClipInput
   views?: Prisma.ClipViewCreateNestedManyWithoutClipInput
   comments?: Prisma.CommentCreateNestedManyWithoutClipInput
@@ -993,7 +993,7 @@ export type ClipUncheckedCreateWithoutLikesInput = {
   thumbnailPath?: string | null
   rejectionReason?: string | null
   uploaderId: string
-  categoryId: string
+  categoryId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tags?: Prisma.ClipTagUncheckedCreateNestedManyWithoutClipInput
@@ -1029,7 +1029,7 @@ export type ClipUpdateWithoutLikesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploader?: Prisma.UserUpdateOneRequiredWithoutClipsNestedInput
-  category?: Prisma.ClipCategoryUpdateOneRequiredWithoutClipsNestedInput
+  category?: Prisma.ClipCategoryUpdateOneWithoutClipsNestedInput
   tags?: Prisma.ClipTagUpdateManyWithoutClipNestedInput
   views?: Prisma.ClipViewUpdateManyWithoutClipNestedInput
   comments?: Prisma.CommentUpdateManyWithoutClipNestedInput
@@ -1045,7 +1045,7 @@ export type ClipUncheckedUpdateWithoutLikesInput = {
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   uploaderId?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tags?: Prisma.ClipTagUncheckedUpdateManyWithoutClipNestedInput
@@ -1065,7 +1065,7 @@ export type ClipCreateWithoutViewsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   uploader: Prisma.UserCreateNestedOneWithoutClipsInput
-  category: Prisma.ClipCategoryCreateNestedOneWithoutClipsInput
+  category?: Prisma.ClipCategoryCreateNestedOneWithoutClipsInput
   tags?: Prisma.ClipTagCreateNestedManyWithoutClipInput
   likes?: Prisma.ClipLikeCreateNestedManyWithoutClipInput
   comments?: Prisma.CommentCreateNestedManyWithoutClipInput
@@ -1081,7 +1081,7 @@ export type ClipUncheckedCreateWithoutViewsInput = {
   thumbnailPath?: string | null
   rejectionReason?: string | null
   uploaderId: string
-  categoryId: string
+  categoryId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tags?: Prisma.ClipTagUncheckedCreateNestedManyWithoutClipInput
@@ -1117,7 +1117,7 @@ export type ClipUpdateWithoutViewsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploader?: Prisma.UserUpdateOneRequiredWithoutClipsNestedInput
-  category?: Prisma.ClipCategoryUpdateOneRequiredWithoutClipsNestedInput
+  category?: Prisma.ClipCategoryUpdateOneWithoutClipsNestedInput
   tags?: Prisma.ClipTagUpdateManyWithoutClipNestedInput
   likes?: Prisma.ClipLikeUpdateManyWithoutClipNestedInput
   comments?: Prisma.CommentUpdateManyWithoutClipNestedInput
@@ -1133,7 +1133,7 @@ export type ClipUncheckedUpdateWithoutViewsInput = {
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   uploaderId?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tags?: Prisma.ClipTagUncheckedUpdateManyWithoutClipNestedInput
@@ -1153,7 +1153,7 @@ export type ClipCreateWithoutCommentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   uploader: Prisma.UserCreateNestedOneWithoutClipsInput
-  category: Prisma.ClipCategoryCreateNestedOneWithoutClipsInput
+  category?: Prisma.ClipCategoryCreateNestedOneWithoutClipsInput
   tags?: Prisma.ClipTagCreateNestedManyWithoutClipInput
   likes?: Prisma.ClipLikeCreateNestedManyWithoutClipInput
   views?: Prisma.ClipViewCreateNestedManyWithoutClipInput
@@ -1169,7 +1169,7 @@ export type ClipUncheckedCreateWithoutCommentsInput = {
   thumbnailPath?: string | null
   rejectionReason?: string | null
   uploaderId: string
-  categoryId: string
+  categoryId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tags?: Prisma.ClipTagUncheckedCreateNestedManyWithoutClipInput
@@ -1205,7 +1205,7 @@ export type ClipUpdateWithoutCommentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploader?: Prisma.UserUpdateOneRequiredWithoutClipsNestedInput
-  category?: Prisma.ClipCategoryUpdateOneRequiredWithoutClipsNestedInput
+  category?: Prisma.ClipCategoryUpdateOneWithoutClipsNestedInput
   tags?: Prisma.ClipTagUpdateManyWithoutClipNestedInput
   likes?: Prisma.ClipLikeUpdateManyWithoutClipNestedInput
   views?: Prisma.ClipViewUpdateManyWithoutClipNestedInput
@@ -1221,7 +1221,7 @@ export type ClipUncheckedUpdateWithoutCommentsInput = {
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   uploaderId?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tags?: Prisma.ClipTagUncheckedUpdateManyWithoutClipNestedInput
@@ -1238,7 +1238,7 @@ export type ClipCreateManyUploaderInput = {
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
-  categoryId: string
+  categoryId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1253,7 +1253,7 @@ export type ClipUpdateWithoutUploaderInput = {
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  category?: Prisma.ClipCategoryUpdateOneRequiredWithoutClipsNestedInput
+  category?: Prisma.ClipCategoryUpdateOneWithoutClipsNestedInput
   tags?: Prisma.ClipTagUpdateManyWithoutClipNestedInput
   likes?: Prisma.ClipLikeUpdateManyWithoutClipNestedInput
   views?: Prisma.ClipViewUpdateManyWithoutClipNestedInput
@@ -1269,7 +1269,7 @@ export type ClipUncheckedUpdateWithoutUploaderInput = {
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tags?: Prisma.ClipTagUncheckedUpdateManyWithoutClipNestedInput
@@ -1287,7 +1287,7 @@ export type ClipUncheckedUpdateManyWithoutUploaderInput = {
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1434,7 +1434,7 @@ export type ClipSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   createdAt?: boolean
   updatedAt?: boolean
   uploader?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  category?: boolean | Prisma.ClipCategoryDefaultArgs<ExtArgs>
+  category?: boolean | Prisma.Clip$categoryArgs<ExtArgs>
   tags?: boolean | Prisma.Clip$tagsArgs<ExtArgs>
   likes?: boolean | Prisma.Clip$likesArgs<ExtArgs>
   views?: boolean | Prisma.Clip$viewsArgs<ExtArgs>
@@ -1456,7 +1456,7 @@ export type ClipSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   createdAt?: boolean
   updatedAt?: boolean
   uploader?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  category?: boolean | Prisma.ClipCategoryDefaultArgs<ExtArgs>
+  category?: boolean | Prisma.Clip$categoryArgs<ExtArgs>
 }, ExtArgs["result"]["clip"]>
 
 export type ClipSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1472,7 +1472,7 @@ export type ClipSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   createdAt?: boolean
   updatedAt?: boolean
   uploader?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  category?: boolean | Prisma.ClipCategoryDefaultArgs<ExtArgs>
+  category?: boolean | Prisma.Clip$categoryArgs<ExtArgs>
 }, ExtArgs["result"]["clip"]>
 
 export type ClipSelectScalar = {
@@ -1492,7 +1492,7 @@ export type ClipSelectScalar = {
 export type ClipOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "status" | "storagePath" | "thumbnailPath" | "rejectionReason" | "uploaderId" | "categoryId" | "createdAt" | "updatedAt", ExtArgs["result"]["clip"]>
 export type ClipInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   uploader?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  category?: boolean | Prisma.ClipCategoryDefaultArgs<ExtArgs>
+  category?: boolean | Prisma.Clip$categoryArgs<ExtArgs>
   tags?: boolean | Prisma.Clip$tagsArgs<ExtArgs>
   likes?: boolean | Prisma.Clip$likesArgs<ExtArgs>
   views?: boolean | Prisma.Clip$viewsArgs<ExtArgs>
@@ -1502,18 +1502,18 @@ export type ClipInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 }
 export type ClipIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   uploader?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  category?: boolean | Prisma.ClipCategoryDefaultArgs<ExtArgs>
+  category?: boolean | Prisma.Clip$categoryArgs<ExtArgs>
 }
 export type ClipIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   uploader?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  category?: boolean | Prisma.ClipCategoryDefaultArgs<ExtArgs>
+  category?: boolean | Prisma.Clip$categoryArgs<ExtArgs>
 }
 
 export type $ClipPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Clip"
   objects: {
     uploader: Prisma.$UserPayload<ExtArgs>
-    category: Prisma.$ClipCategoryPayload<ExtArgs>
+    category: Prisma.$ClipCategoryPayload<ExtArgs> | null
     tags: Prisma.$ClipTagPayload<ExtArgs>[]
     likes: Prisma.$ClipLikePayload<ExtArgs>[]
     views: Prisma.$ClipViewPayload<ExtArgs>[]
@@ -1529,7 +1529,7 @@ export type $ClipPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     thumbnailPath: string | null
     rejectionReason: string | null
     uploaderId: string
-    categoryId: string
+    categoryId: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["clip"]>
@@ -1927,7 +1927,7 @@ readonly fields: ClipFieldRefs;
 export interface Prisma__ClipClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   uploader<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  category<T extends Prisma.ClipCategoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClipCategoryDefaultArgs<ExtArgs>>): Prisma.Prisma__ClipCategoryClient<runtime.Types.Result.GetResult<Prisma.$ClipCategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  category<T extends Prisma.Clip$categoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Clip$categoryArgs<ExtArgs>>): Prisma.Prisma__ClipCategoryClient<runtime.Types.Result.GetResult<Prisma.$ClipCategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   tags<T extends Prisma.Clip$tagsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Clip$tagsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClipTagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   likes<T extends Prisma.Clip$likesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Clip$likesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClipLikePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   views<T extends Prisma.Clip$viewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Clip$viewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClipViewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2371,6 +2371,25 @@ export type ClipDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Limit how many Clips to delete.
    */
   limit?: number
+}
+
+/**
+ * Clip.category
+ */
+export type Clip$categoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ClipCategory
+   */
+  select?: Prisma.ClipCategorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ClipCategory
+   */
+  omit?: Prisma.ClipCategoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ClipCategoryInclude<ExtArgs> | null
+  where?: Prisma.ClipCategoryWhereInput
 }
 
 /**

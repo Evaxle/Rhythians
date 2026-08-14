@@ -12,10 +12,9 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { title, description, categoryId, tagIds, storagePath, thumbnailPath } = body as {
+  const { title, description, tagIds, storagePath, thumbnailPath } = body as {
     title?: string;
     description?: string;
-    categoryId?: string;
     tagIds?: string[];
     storagePath?: string;
     thumbnailPath?: string;
@@ -24,16 +23,8 @@ export async function POST(request: Request) {
   if (!title || typeof title !== "string" || title.length > 120) {
     return NextResponse.json({ error: "Title is required and must be less than 120 characters." }, { status: 400 });
   }
-  if (!categoryId) {
-    return NextResponse.json({ error: "Category is required." }, { status: 400 });
-  }
   if (!storagePath) {
     return NextResponse.json({ error: "Video storage path is required." }, { status: 400 });
-  }
-
-  const category = await prisma.clipCategory.findUnique({ where: { id: categoryId } });
-  if (!category) {
-    return NextResponse.json({ error: "Selected category does not exist." }, { status: 400 });
   }
 
   const validatedTagIds = Array.isArray(tagIds) ? tagIds.filter((id) => typeof id === "string") : [];
@@ -51,7 +42,6 @@ export async function POST(request: Request) {
       storagePath,
       thumbnailPath,
       uploaderId: user.id,
-      categoryId,
       tags: {
         create: validatedTagIds.map((tagId) => ({ tag: { connect: { id: tagId } } })),
       },
@@ -64,7 +54,7 @@ export async function POST(request: Request) {
       action: "clip_submitted",
       targetType: "clip",
       targetId: clip.id,
-      metadata: { title, category: category.name },
+      metadata: { title },
     },
   });
 

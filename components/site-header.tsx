@@ -10,10 +10,8 @@ export async function SiteHeader() {
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-3 text-lg font-semibold text-white">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10 text-accent ring-1 ring-accent/20">
-              R
-            </div>
-            Rhythians
+            <img src="/favicon.ico" alt="Rhythians" className="h-11 w-11 rounded-2xl" />
+            Rhythians Beta
           </Link>
           <nav className="hidden items-center gap-4 md:flex">
             <Link href="/" className="text-sm text-muted transition hover:text-white">Home</Link>

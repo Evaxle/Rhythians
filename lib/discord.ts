@@ -43,6 +43,7 @@ export const ROLE_TO_TAG_MAP: Record<string, string> = {
   "content creator": "content-creator",
   veteran: "veteran",
   "rhythian coach": "rhythian-coach",
+  tester: "tester",
 };
 
 export function mapDiscordRolesToTags(discordRoles: string[], roleMappings: Record<string, string>): string[] {

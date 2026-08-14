@@ -138,7 +138,7 @@ export default async function ClipPage({ params }: Props) {
             </div>
             <p className="mt-4 text-sm text-muted">{clip.description}</p>
             <div className="mt-5 flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.25em] text-accent">
-              <span>{clip.category.name}</span>
+              <span>{clip.category?.name ?? "Uncategorized"}</span>
               {clip.tags.map(
                 (item: { id: string; tag: { name: string } }) => (
                   <span

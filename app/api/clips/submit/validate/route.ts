@@ -9,18 +9,10 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { categoryId, tagIds, storagePath } = body as { categoryId?: string; tagIds?: string[]; storagePath?: string };
+  const { tagIds, storagePath } = body as { tagIds?: string[]; storagePath?: string };
 
   if (!storagePath) {
     return NextResponse.json({ error: "Video upload missing." }, { status: 400 });
-  }
-  if (!categoryId) {
-    return NextResponse.json({ error: "Category is required." }, { status: 400 });
-  }
-
-  const category = await prisma.clipCategory.findUnique({ where: { id: categoryId } });
-  if (!category) {
-    return NextResponse.json({ error: "Invalid clip category." }, { status: 400 });
   }
 
   const tags = await prisma.tag.findMany({ where: { id: { in: tagIds ?? [] } } });

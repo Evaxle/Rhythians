@@ -270,24 +270,24 @@ model ClipCategory {
 }
 
 model Clip {
-  id             String        @id @default(uuid())
+  id             String         @id @default(uuid())
   title          String
   description    String
-  status         ClipStatus    @default(pending)
+  status         ClipStatus     @default(pending)
   storagePath    String
   thumbnailPath  String?
   rejectionReason String?
-  uploader       User          @relation("uploadedClips", fields: [uploaderId], references: [id])
+  uploader       User           @relation("uploadedClips", fields: [uploaderId], references: [id])
   uploaderId     String
-  category       ClipCategory  @relation(fields: [categoryId], references: [id])
-  categoryId     String
+  category       ClipCategory?  @relation(fields: [categoryId], references: [id])
+  categoryId     String?
   tags           ClipTag[]
   likes          ClipLike[]
   views          ClipView[]
   comments       Comment[]
   coachComments  CoachComment[]
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 }
 
 model ClipTag {

@@ -14,6 +14,7 @@ const AVAILABLE_TAGS = [
   "content-creator",
   "veteran",
   "rhythian-coach",
+  "tester",
 ];
 
 export async function GET(request: Request) {

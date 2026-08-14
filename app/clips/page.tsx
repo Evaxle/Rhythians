@@ -49,7 +49,7 @@ export default async function ClipsPage() {
               };
               category: {
                 name: string;
-              };
+              } | null;
             }) => (
               <Link
                 key={clip.id}
@@ -59,7 +59,7 @@ export default async function ClipsPage() {
                 <div className="aspect-video bg-white/5" />
                 <div className="p-5">
                   <div className="flex items-center justify-between text-xs uppercase tracking-[0.24em] text-accent">
-                    <span>{clip.category.name}</span>
+                    <span>{clip.category?.name ?? "Uncategorized"}</span>
                     <span>{clip.uploader.username}</span>
                   </div>
                   <h2 className="mt-4 text-lg font-semibold text-white">

@@ -400,9 +400,9 @@ export type ClipCategorySumOrderByAggregateInput = {
   order?: Prisma.SortOrder
 }
 
-export type ClipCategoryScalarRelationFilter = {
-  is?: Prisma.ClipCategoryWhereInput
-  isNot?: Prisma.ClipCategoryWhereInput
+export type ClipCategoryNullableScalarRelationFilter = {
+  is?: Prisma.ClipCategoryWhereInput | null
+  isNot?: Prisma.ClipCategoryWhereInput | null
 }
 
 export type ClipCategoryCreateNestedOneWithoutClipsInput = {
@@ -411,10 +411,12 @@ export type ClipCategoryCreateNestedOneWithoutClipsInput = {
   connect?: Prisma.ClipCategoryWhereUniqueInput
 }
 
-export type ClipCategoryUpdateOneRequiredWithoutClipsNestedInput = {
+export type ClipCategoryUpdateOneWithoutClipsNestedInput = {
   create?: Prisma.XOR<Prisma.ClipCategoryCreateWithoutClipsInput, Prisma.ClipCategoryUncheckedCreateWithoutClipsInput>
   connectOrCreate?: Prisma.ClipCategoryCreateOrConnectWithoutClipsInput
   upsert?: Prisma.ClipCategoryUpsertWithoutClipsInput
+  disconnect?: Prisma.ClipCategoryWhereInput | boolean
+  delete?: Prisma.ClipCategoryWhereInput | boolean
   connect?: Prisma.ClipCategoryWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.ClipCategoryUpdateToOneWithWhereWithoutClipsInput, Prisma.ClipCategoryUpdateWithoutClipsInput>, Prisma.ClipCategoryUncheckedUpdateWithoutClipsInput>
 }

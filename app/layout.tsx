@@ -11,11 +11,14 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Rhythians",
+  title: "Rhythians Beta",
   description: "Discord community platform for knowledge, clips, and community media.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  icons: {
+    icon: "/favicon.ico",
+  },
   openGraph: {
-    title: "Rhythians Community",
+    title: "Rhythians Beta Community",
     description: "A community platform for curated knowledge, clips, and Discord integration.",
     type: "website",
   },

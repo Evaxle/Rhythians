@@ -9,7 +9,7 @@ type PendingClip = {
   createdAt: string;
   storagePath: string;
   uploader: { username: string; discriminator: string };
-  category: { name: string };
+  category: { name: string } | null;
   videoUrl: string | null;
 };
 
@@ -51,7 +51,7 @@ export function ClipModerationQueue({ initialClips }: { initialClips: PendingCli
         <article key={clip.id} className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
           <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
             <div>
-              <p className="text-xs uppercase tracking-[0.25em] text-accent">{clip.category.name}</p>
+              <p className="text-xs uppercase tracking-[0.25em] text-accent">{clip.category?.name ?? "Uncategorized"}</p>
               <h2 className="mt-2 text-2xl font-semibold text-white">{clip.title}</h2>
               <p className="mt-3 text-sm leading-7 text-muted">{clip.description || "No description provided."}</p>
               <p className="mt-4 text-xs text-muted">Uploaded by {clip.uploader.username}#{clip.uploader.discriminator} on {new Date(clip.createdAt).toLocaleDateString()}</p>
