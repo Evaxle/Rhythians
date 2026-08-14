@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { supabaseAdmin } from "@/lib/supabase";
+import { getSessionUser } from "@/lib/auth";
+import { ClipComments } from "@/components/clip-comments";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +21,7 @@ async function getPublicUrl(path: string) {
 
 export default async function ClipPage({ params }: Props) {
   const { id } = await params;
+  const sessionUser = await getSessionUser();
 
   const clip = await prisma.clip.findUnique({
     where: { id },
@@ -107,38 +110,19 @@ export default async function ClipPage({ params }: Props) {
         <div className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
           <h2 className="text-xl font-semibold text-white">Comments</h2>
 
-          {clip.comments.length === 0 ? (
-            <p className="mt-4 text-sm text-muted">No comments yet.</p>
-          ) : (
-            <div className="mt-6 space-y-4">
-              {clip.comments.map(
-                (comment: {
-                  id: string;
-                  text: string;
-                  createdAt: Date;
-                  author: {
-                    username: string;
-                    discriminator: string;
-                  };
-                }) => (
-                  <article
-                    key={comment.id}
-                    className="rounded-3xl border border-border bg-background/70 p-5"
-                  >
-                    <p className="text-sm font-semibold text-white">
-                      {comment.author.username}#{comment.author.discriminator}
-                    </p>
-                    <p className="mt-2 text-sm leading-7 text-muted">
-                      {comment.text}
-                    </p>
-                    <p className="mt-3 text-xs uppercase tracking-[0.2em] text-accent">
-                      {comment.createdAt.toLocaleDateString()}
-                    </p>
-                  </article>
-                )
-              )}
-            </div>
-          )}
+          <ClipComments
+            clipId={clip.id}
+            isAuthenticated={Boolean(sessionUser)}
+            comments={clip.comments.map((comment) => ({
+              id: comment.id,
+              text: comment.text,
+              createdAt: comment.createdAt.toISOString(),
+              author: {
+                username: comment.author.username,
+                discriminator: comment.author.discriminator,
+              },
+            }))}
+          />
         </div>
 
         <aside className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">

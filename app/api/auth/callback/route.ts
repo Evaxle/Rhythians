@@ -68,6 +68,21 @@ export async function GET(request: Request) {
     }),
   ]);
 
+  // Bootstrap the first signed-in user as an administrator when no roles exist yet.
+  if ((await prisma.role.count()) === 0) {
+    const permissions = await prisma.permission.findMany({ select: { id: true } });
+    const adminRole = await prisma.role.create({
+      data: {
+        name: "Admin",
+        description: "Full access to community administration.",
+        permissions: {
+          create: permissions.map(({ id }) => ({ permissionId: id })),
+        },
+      },
+    });
+    await prisma.userRole.create({ data: { userId: user.id, roleId: adminRole.id } });
+  }
+
   const token = await createSession(user.id);
   const response = NextResponse.redirect(new URL("/", request.url));
   response.cookies.set({

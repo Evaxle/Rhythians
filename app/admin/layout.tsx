@@ -1,7 +1,13 @@
 import { ReactNode } from "react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getSessionUser, hasPermission } from "@/lib/auth";
 
-export default function AdminLayout({ children }: { children: ReactNode }) {
+export default async function AdminLayout({ children }: { children: ReactNode }) {
+  const user = await getSessionUser();
+  if (!user) redirect("/login");
+  if (!hasPermission(user, "admin_access") && !hasPermission(user, "clips_moderate")) redirect("/");
+
   return (
     <div className="grid min-h-[calc(100vh-128px)] grid-cols-1 gap-6 lg:grid-cols-[280px_1fr]">
       <aside className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
