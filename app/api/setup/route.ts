@@ -4,10 +4,22 @@ import { Client } from "pg";
 const MIGRATION_SQL = `
 CREATE SCHEMA IF NOT EXISTS "public";
 
-CREATE TYPE "ClipStatus" AS ENUM ('pending', 'approved', 'rejected', 'hidden', 'deleted');
-CREATE TYPE "ReportStatus" AS ENUM ('open', 'reviewing', 'resolved', 'dismissed');
-CREATE TYPE "NotificationType" AS ENUM ('clip_approved', 'clip_rejected', 'comment_reply', 'clip_like', 'article_published', 'announcement', 'moderation');
-CREATE TYPE "PermissionName" AS ENUM ('knowledge_read', 'knowledge_create', 'knowledge_edit', 'knowledge_publish', 'knowledge_delete', 'clips_submit', 'clips_comment', 'clips_moderate', 'clips_delete', 'users_view', 'users_moderate', 'settings_manage', 'announcements_create', 'announcements_delete', 'admin_access');
+DO $$ BEGIN
+  CREATE TYPE "ClipStatus" AS ENUM ('pending', 'approved', 'rejected', 'hidden', 'deleted');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE "ReportStatus" AS ENUM ('open', 'reviewing', 'resolved', 'dismissed');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE "NotificationType" AS ENUM ('clip_approved', 'clip_rejected', 'comment_reply', 'clip_like', 'article_published', 'announcement', 'moderation');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE "PermissionName" AS ENUM ('knowledge_read', 'knowledge_create', 'knowledge_edit', 'knowledge_publish', 'knowledge_delete', 'clips_submit', 'clips_comment', 'clips_moderate', 'clips_delete', 'users_view', 'users_moderate', 'settings_manage', 'announcements_create', 'announcements_delete', 'admin_access');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 CREATE TABLE IF NOT EXISTS "User" (
     "id" TEXT NOT NULL,
