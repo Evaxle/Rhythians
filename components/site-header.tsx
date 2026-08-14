@@ -19,6 +19,9 @@ export async function SiteHeader() {
             <Link href="/clips" className="text-sm text-muted transition hover:text-white">Clips</Link>
             <Link href="/rules" className="text-sm text-muted transition hover:text-white">Rules</Link>
             <Link href="/community" className="text-sm text-muted transition hover:text-white">Community</Link>
+            {user && (
+              <Link href="/messages" className="text-sm text-muted transition hover:text-white">Messages</Link>
+            )}
           </nav>
         </div>
         <div className="flex items-center gap-3">
@@ -48,6 +51,9 @@ export async function SiteHeader() {
                 </div>
                 <Link href={`/profile/${user.profileHandle}`} className="mt-1 block rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">
                   View profile
+                </Link>
+                <Link href="/messages" className="block rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">
+                  Messages
                 </Link>
                 <Link href="/settings" className="block rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">
                   Settings

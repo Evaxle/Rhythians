@@ -37,10 +37,19 @@ export const NotificationType = {
   clip_like: 'clip_like',
   article_published: 'article_published',
   announcement: 'announcement',
-  moderation: 'moderation'
+  moderation: 'moderation',
+  new_message: 'new_message'
 } as const
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
+
+
+export const ConversationType = {
+  direct: 'direct',
+  group: 'group'
+} as const
+
+export type ConversationType = (typeof ConversationType)[keyof typeof ConversationType]
 
 
 export const PermissionName = {

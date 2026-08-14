@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MessageCircle } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { UserTags } from "@/components/user-tags";
 
@@ -59,9 +60,17 @@ export default async function ProfilePage({ params }: Props) {
               )}
             </div>
           </div>
-          <div className="rounded-3xl border border-border bg-background/80 px-5 py-4 text-sm text-muted">
-            <p>Member since</p>
-            <p className="mt-2 text-lg font-semibold text-white">{user.joinedAt.toLocaleDateString()}</p>
+          <div className="flex flex-col gap-3">
+            <Link
+              href={`/messages?user=${encodeURIComponent(user.profileHandle)}`}
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent2"
+            >
+              <MessageCircle size={16} /> Message
+            </Link>
+            <div className="rounded-3xl border border-border bg-background/80 px-5 py-4 text-sm text-muted">
+              <p>Member since</p>
+              <p className="mt-2 text-lg font-semibold text-white">{user.joinedAt.toLocaleDateString()}</p>
+            </div>
           </div>
         </div>
       </section>
