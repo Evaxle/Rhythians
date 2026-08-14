@@ -1,12 +1,12 @@
 import { ReactNode } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getSessionUser, hasPermission } from "@/lib/auth";
+import { getSessionUser, isOwner } from "@/lib/auth";
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const user = await getSessionUser();
   if (!user) redirect("/login");
-  if (!hasPermission(user, "admin_access") && !hasPermission(user, "clips_moderate")) redirect("/");
+  if (!isOwner(user)) redirect("/");
 
   return (
     <div className="grid min-h-[calc(100vh-128px)] grid-cols-1 gap-6 lg:grid-cols-[280px_1fr]">

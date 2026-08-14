@@ -15,6 +15,12 @@ export async function getSessionUser() {
   return session.user;
 }
 
+export function isOwner(user: { discordId: string } | null) {
+  if (!user) return false;
+  const ownerId = process.env.OWNER_DISCORD_ID;
+  return Boolean(ownerId) && user.discordId === ownerId;
+}
+
 export function hasPermission(user: { roles: Array<any> } | null, permission: string) {
   if (!user) return false;
   const permissions = new Set(user.roles.flatMap((roleRecord: any) => roleRecord.role.permissions.map((rp: any) => rp.permission.name)));

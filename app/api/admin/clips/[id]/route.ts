@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUser, hasPermission } from "@/lib/auth";
+import { getSessionUser, isOwner } from "@/lib/auth";
 
 type Props = { params: Promise<{ id: string }> };
 
 export async function PATCH(request: Request, { params }: Props) {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
-  if (!hasPermission(user, "admin_access") && !hasPermission(user, "clips_moderate")) {
+  if (!isOwner(user)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
