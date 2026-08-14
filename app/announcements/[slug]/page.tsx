@@ -4,12 +4,13 @@ import { prisma } from "@/lib/db";
 export const dynamic = "force-dynamic";
 
 type Props = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
 export default async function AnnouncementPage({ params }: Props) {
+  const { slug } = await params;
   const announcement = await prisma.announcement.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
   });
 
   if (!announcement || !announcement.published) return notFound();

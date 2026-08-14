@@ -4,12 +4,13 @@ import { prisma } from "@/lib/db";
 export const dynamic = "force-dynamic";
 
 type Props = {
-  params: { username: string };
+  params: Promise<{ username: string }>;
 };
 
 export default async function ProfilePage({ params }: Props) {
+  const { username } = await params;
   const user = await prisma.user.findFirst({
-    where: { profileHandle: params.username },
+    where: { profileHandle: username },
     include: {
       clips: { where: { status: "approved" }, orderBy: { createdAt: "desc" }, include: { category: true } },
       articleRevisions: true,

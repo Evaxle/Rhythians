@@ -1,16 +1,19 @@
 import "./globals.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
 import { TailwindIndicator } from "@/components/tailwind-indicator";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const viewport: Viewport = {
+  themeColor: "#0b0f19",
+};
+
 export const metadata: Metadata = {
   title: "Rhythians",
   description: "Discord community platform for knowledge, clips, and community media.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
-  themeColor: "#0b0f19",
   openGraph: {
     title: "Rhythians Community",
     description: "A community platform for curated knowledge, clips, and Discord integration.",

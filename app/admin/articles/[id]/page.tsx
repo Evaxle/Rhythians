@@ -4,12 +4,13 @@ import { prisma } from "@/lib/db";
 export const dynamic = "force-dynamic";
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export default async function AdminArticlePage({ params }: Props) {
+  const { id } = await params;
   const article = await prisma.knowledgeArticle.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: { category: true, author: true },
   });
 

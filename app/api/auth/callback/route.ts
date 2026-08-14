@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
   if (!code) {
-    return NextResponse.redirect("/login");
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   if (!process.env.DISCORD_CLIENT_ID || !process.env.DISCORD_CLIENT_SECRET || !process.env.DISCORD_REDIRECT_URI) {
@@ -31,7 +31,7 @@ export async function GET(request: Request) {
   });
 
   if (!tokenResponse.ok) {
-    return NextResponse.redirect("/login");
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   const tokenData = await tokenResponse.json();
@@ -40,7 +40,7 @@ export async function GET(request: Request) {
   });
 
   if (!userResponse.ok) {
-    return NextResponse.redirect("/login");
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   const discordUser = await userResponse.json();
@@ -69,7 +69,7 @@ export async function GET(request: Request) {
   ]);
 
   const token = await createSession(user.id);
-  const response = NextResponse.redirect("/");
+  const response = NextResponse.redirect(new URL("/", request.url));
   response.cookies.set({
     name: process.env.SESSION_COOKIE_NAME ?? "rhythians_session",
     value: token,

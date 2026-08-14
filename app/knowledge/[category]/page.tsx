@@ -5,12 +5,13 @@ import { prisma } from "@/lib/db";
 export const dynamic = "force-dynamic";
 
 type Props = {
-  params: { category: string };
+  params: Promise<{ category: string }>;
 };
 
 export default async function KnowledgeCategoryPage({ params }: Props) {
+  const { category: categorySlug } = await params;
   const category = await prisma.knowledgeCategory.findUnique({
-    where: { slug: params.category },
+    where: { slug: categorySlug },
     include: { articles: { where: { published: true }, orderBy: { updatedAt: "desc" } } },
   });
 
