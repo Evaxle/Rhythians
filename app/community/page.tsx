@@ -10,7 +10,7 @@ export default function CommunityPage() {
             <h1 className="mt-3 text-3xl font-semibold text-white">Discord server information</h1>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-muted">Stay connected with the Discord community, discover server features, and see how the website complements the chat experience.</p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link href="https://discord.gg/" className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent2">Join Discord</Link>
+              <Link href="https://discord.gg/Q88NM7XhJ" className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent2">Join Discord</Link>
             </div>
           </div>
           <div className="rounded-3xl border border-border bg-background/80 p-6">
