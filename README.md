@@ -148,36 +148,3 @@ Users can report other users and posts (clips) with a reason and optional detail
 2. Create a storage bucket named `media`.
 3. Set bucket permissions and storage policies.
 4. Add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY`.
-
-## Admin Bootstrapping
-
-The application bootstraps the first admin from the Discord user who signs in first if there are no existing roles configured. A full admin must be created through the admin dashboard afterward.
-
-## Security
-
-- **Security headers** on every response: CSP (`frame-ancestors 'none'`, no external scripts/frames), `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, and HSTS in production.
-- **CSRF defense**: SameSite=Lax sessions plus a middleware check that rejects cross-origin `POST`/`PATCH`/`PUT`/`DELETE` requests to API routes.
-- **Rate limiting** on auth (login/register), reports, clip submission, onboarding, avatar uploads, and the Discord sync endpoints.
-- **Owner-only** admin panel; **post-reviewer tag** gates the approval panel; banned/suspended accounts are blocked at session load.
-- Passwords hashed with scrypt; sessions are server-side and destroyed on logout.
-- The `/api/setup` database bootstrap endpoint requires a `SETUP_SECRET` environment variable.
-
-Set a strong `SETUP_SECRET` and (optionally) `CRON_SECRET` in production.
-
-## Deployment
-
-- Deploy the Next.js app to Vercel.
-- Use Supabase for the database and storage.
-- Use environment variables for all credentials.
-
-## Commands
-
-- `npm run dev`
-- `npm run build`
-- `npm run start`
-- `npm run lint`
-- `npm run typecheck`
-- `npm run db:migrate`
-- `npm run db:push`
-- `npm run db:seed`
-- `npm run bot:start`
