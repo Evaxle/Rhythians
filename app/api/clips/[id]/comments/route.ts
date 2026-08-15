@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
+import { censorProfanity } from "@/lib/profanity";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -18,13 +19,15 @@ export async function POST(request: Request, { params }: Props) {
     return NextResponse.json({ error: "Comment must be between 1 and 2000 characters." }, { status: 400 });
   }
 
+  const filtered = censorProfanity(text).filtered;
+
   const clip = await prisma.clip.findUnique({ where: { id: clipId }, select: { status: true } });
   if (!clip || clip.status !== "approved") {
     return NextResponse.json({ error: "Clip not found." }, { status: 404 });
   }
 
   const comment = await prisma.comment.create({
-    data: { text, clipId, authorId: user.id },
+    data: { text: filtered, clipId, authorId: user.id },
     include: {
       author: {
         select: {

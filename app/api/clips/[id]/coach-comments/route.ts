@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
+import { censorProfanity } from "@/lib/profanity";
 
 export async function POST(
   request: Request,
@@ -53,7 +54,7 @@ export async function POST(
 
   const comment = await prisma.coachComment.create({
     data: {
-      text: text.trim(),
+      text: censorProfanity(text.trim()).filtered,
       clipId,
       authorId: user.id,
     },

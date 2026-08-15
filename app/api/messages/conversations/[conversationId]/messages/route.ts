@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { canSendMessageToConversation } from "@/lib/friends";
+import { censorProfanity } from "@/lib/profanity";
 
 type Props = { params: Promise<{ conversationId: string }> };
 
@@ -32,11 +33,13 @@ export async function POST(request: Request, { params }: Props) {
     return NextResponse.json({ error: "Message must be between 1 and 4000 characters." }, { status: 400 });
   }
 
+  const filtered = censorProfanity(content).filtered;
+
   const message = await prisma.message.create({
     data: {
       conversationId,
       senderId: user.id,
-      content,
+      content: filtered,
     },
   });
 

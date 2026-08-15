@@ -86,6 +86,12 @@
 4. Deploy the app.
 
 > The scheduled 1-minute Discord sync runs automatically via the cron job in `vercel.json`. If you set `CRON_SECRET`, append `?secret=<CRON_SECRET>` to the cron path in `vercel.json` so the request authenticates.
+>
+> A daily database cleanup cron (`/api/internal/db-cleanup`, 3:00 UTC) also runs automatically. It prunes expired sessions, read notifications older than 30 days, dismissed reports and handled Rhythia link requests older than 90 days, and backfills the profanity filter over existing content the first time it runs.
+>
+> If the first backfill times out on a large database, run it once manually: `npm run db:cleanup` (use `npm run db:cleanup -- --force` to re-run the backfill later after changing the word list).
+>
+> Profanity filtering: comments, coach comments, and direct messages are censored server-side at write time by `lib/profanity.ts` (leetspeak, stretched words, separators, and spaced-out words are handled). Verify with `npm run test:profanity`.
 
 ### 5. Verification
 1. Visit `/login` and test Discord login.
