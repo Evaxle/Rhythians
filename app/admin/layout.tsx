@@ -31,6 +31,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
               <p className="mb-2 uppercase tracking-[0.24em] text-[11px] text-accent">Community</p>
               <Link href="/admin/users" className="block rounded-2xl px-3 py-2 transition hover:bg-white/5">Users</Link>
               <Link href="/admin/reports" className="block rounded-2xl px-3 py-2 transition hover:bg-white/5">Reports</Link>
+              <Link href="/admin/rhythia-requests" className="block rounded-2xl px-3 py-2 transition hover:bg-white/5">Rhythia requests</Link>
             </div>
             <div className="mt-4 border-t border-border pt-4">
               <p className="mb-2 uppercase tracking-[0.24em] text-[11px] text-accent">Discord</p>

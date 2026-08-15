@@ -78,6 +78,15 @@ export const CameraMode = {
 export type CameraMode = (typeof CameraMode)[keyof typeof CameraMode]
 
 
+export const RhythiaProfileRequestStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  denied: 'denied'
+} as const
+
+export type RhythiaProfileRequestStatus = (typeof RhythiaProfileRequestStatus)[keyof typeof RhythiaProfileRequestStatus]
+
+
 export const PermissionName = {
   knowledge_read: 'knowledge_read',
   knowledge_create: 'knowledge_create',

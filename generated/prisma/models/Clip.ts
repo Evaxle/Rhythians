@@ -681,14 +681,6 @@ export type EnumClipStatusFieldUpdateOperationsInput = {
   set?: $Enums.ClipStatus
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type NullableEnumCameraModeFieldUpdateOperationsInput = {
   set?: $Enums.CameraMode | null
 }

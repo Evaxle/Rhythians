@@ -398,6 +398,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   User: 'User',
+  RhythiaProfile: 'RhythiaProfile',
+  RhythiaProfileRequest: 'RhythiaProfileRequest',
   Session: 'Session',
   Role: 'Role',
   Permission: 'Permission',
@@ -445,7 +447,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "role" | "permission" | "rolePermission" | "userRole" | "discordRoleMapping" | "playerRank" | "discordRoleRankMapping" | "rule" | "knowledgeCategory" | "knowledgeArticle" | "tag" | "userTag" | "discordRoleTagMapping" | "coachComment" | "articleTag" | "articleRevision" | "clipCategory" | "clip" | "clipTag" | "clipLike" | "clipView" | "comment" | "report" | "announcement" | "notification" | "moderationAction" | "siteSetting" | "conversation" | "conversationMember" | "message" | "friendRequest"
+    modelProps: "user" | "rhythiaProfile" | "rhythiaProfileRequest" | "session" | "role" | "permission" | "rolePermission" | "userRole" | "discordRoleMapping" | "playerRank" | "discordRoleRankMapping" | "rule" | "knowledgeCategory" | "knowledgeArticle" | "tag" | "userTag" | "discordRoleTagMapping" | "coachComment" | "articleTag" | "articleRevision" | "clipCategory" | "clip" | "clipTag" | "clipLike" | "clipView" | "comment" | "report" | "announcement" | "notification" | "moderationAction" | "siteSetting" | "conversation" | "conversationMember" | "message" | "friendRequest"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -520,6 +522,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.UserCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.UserCountAggregateOutputType> | number
+        }
+      }
+    }
+    RhythiaProfile: {
+      payload: Prisma.$RhythiaProfilePayload<ExtArgs>
+      fields: Prisma.RhythiaProfileFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RhythiaProfileFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhythiaProfilePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RhythiaProfileFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhythiaProfilePayload>
+        }
+        findFirst: {
+          args: Prisma.RhythiaProfileFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhythiaProfilePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RhythiaProfileFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhythiaProfilePayload>
+        }
+        findMany: {
+          args: Prisma.RhythiaProfileFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhythiaProfilePayload>[]
+        }
+        create: {
+          args: Prisma.RhythiaProfileCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhythiaProfilePayload>
+        }
+        createMany: {
+          args: Prisma.RhythiaProfileCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RhythiaProfileCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhythiaProfilePayload>[]
+        }
+        delete: {
+          args: Prisma.RhythiaProfileDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhythiaProfilePayload>
+        }
+        update: {
+          args: Prisma.RhythiaProfileUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhythiaProfilePayload>
+        }
+        deleteMany: {
+          args: Prisma.RhythiaProfileDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RhythiaProfileUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RhythiaProfileUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhythiaProfilePayload>[]
+        }
+        upsert: {
+          args: Prisma.RhythiaProfileUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhythiaProfilePayload>
+        }
+        aggregate: {
+          args: Prisma.RhythiaProfileAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRhythiaProfile>
+        }
+        groupBy: {
+          args: Prisma.RhythiaProfileGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RhythiaProfileGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RhythiaProfileCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RhythiaProfileCountAggregateOutputType> | number
+        }
+      }
+    }
+    RhythiaProfileRequest: {
+      payload: Prisma.$RhythiaProfileRequestPayload<ExtArgs>
+      fields: Prisma.RhythiaProfileRequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RhythiaProfileRequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhythiaProfileRequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RhythiaProfileRequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhythiaProfileRequestPayload>
+        }
+        findFirst: {
+          args: Prisma.RhythiaProfileRequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhythiaProfileRequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RhythiaProfileRequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhythiaProfileRequestPayload>
+        }
+        findMany: {
+          args: Prisma.RhythiaProfileRequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhythiaProfileRequestPayload>[]
+        }
+        create: {
+          args: Prisma.RhythiaProfileRequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhythiaProfileRequestPayload>
+        }
+        createMany: {
+          args: Prisma.RhythiaProfileRequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RhythiaProfileRequestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhythiaProfileRequestPayload>[]
+        }
+        delete: {
+          args: Prisma.RhythiaProfileRequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhythiaProfileRequestPayload>
+        }
+        update: {
+          args: Prisma.RhythiaProfileRequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhythiaProfileRequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.RhythiaProfileRequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RhythiaProfileRequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RhythiaProfileRequestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhythiaProfileRequestPayload>[]
+        }
+        upsert: {
+          args: Prisma.RhythiaProfileRequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhythiaProfileRequestPayload>
+        }
+        aggregate: {
+          args: Prisma.RhythiaProfileRequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRhythiaProfileRequest>
+        }
+        groupBy: {
+          args: Prisma.RhythiaProfileRequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RhythiaProfileRequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RhythiaProfileRequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RhythiaProfileRequestCountAggregateOutputType> | number
         }
       }
     }
@@ -2956,6 +3106,44 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const RhythiaProfileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  profileId: 'profileId',
+  profileUrl: 'profileUrl',
+  username: 'username',
+  country: 'country',
+  flag: 'flag',
+  globalRank: 'globalRank',
+  countryRank: 'countryRank',
+  rhythmPoints: 'rhythmPoints',
+  title: 'title',
+  scores: 'scores',
+  syncedAt: 'syncedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RhythiaProfileScalarFieldEnum = (typeof RhythiaProfileScalarFieldEnum)[keyof typeof RhythiaProfileScalarFieldEnum]
+
+
+export const RhythiaProfileRequestScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  profileId: 'profileId',
+  profileUrl: 'profileUrl',
+  rhythiaUsername: 'rhythiaUsername',
+  claimedUsername: 'claimedUsername',
+  status: 'status',
+  adminNote: 'adminNote',
+  createdAt: 'createdAt',
+  resolvedAt: 'resolvedAt',
+  resolvedBy: 'resolvedBy'
+} as const
+
+export type RhythiaProfileRequestScalarFieldEnum = (typeof RhythiaProfileRequestScalarFieldEnum)[keyof typeof RhythiaProfileRequestScalarFieldEnum]
+
+
 export const SessionScalarFieldEnum = {
   id: 'id',
   token: 'token',
@@ -3361,6 +3549,13 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
 export const NullableJsonNullValueInput = {
   DbNull: DbNull,
   JsonNull: JsonNull
@@ -3436,20 +3631,6 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
- * Reference to a field of type 'PermissionName'
- */
-export type EnumPermissionNameFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PermissionName'>
-    
-
-
-/**
- * Reference to a field of type 'PermissionName[]'
- */
-export type ListEnumPermissionNameFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PermissionName[]'>
-    
-
-
-/**
  * Reference to a field of type 'Int'
  */
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -3460,6 +3641,62 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+/**
+ * Reference to a field of type 'Float[]'
+ */
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
+ * Reference to a field of type 'RhythiaProfileRequestStatus'
+ */
+export type EnumRhythiaProfileRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RhythiaProfileRequestStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'RhythiaProfileRequestStatus[]'
+ */
+export type ListEnumRhythiaProfileRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RhythiaProfileRequestStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'PermissionName'
+ */
+export type EnumPermissionNameFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PermissionName'>
+    
+
+
+/**
+ * Reference to a field of type 'PermissionName[]'
+ */
+export type ListEnumPermissionNameFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PermissionName[]'>
     
 
 
@@ -3534,20 +3771,6 @@ export type ListEnumNotificationTypeFieldRefInput<$PrismaModel> = FieldRefInputT
 
 
 /**
- * Reference to a field of type 'Json'
- */
-export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-/**
- * Reference to a field of type 'QueryMode'
- */
-export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
-    
-
-
-/**
  * Reference to a field of type 'ConversationType'
  */
 export type EnumConversationTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ConversationType'>
@@ -3572,20 +3795,6 @@ export type EnumFriendRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputTy
  * Reference to a field of type 'FriendRequestStatus[]'
  */
 export type ListEnumFriendRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FriendRequestStatus[]'>
-    
-
-
-/**
- * Reference to a field of type 'Float'
- */
-export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
-    
-
-
-/**
- * Reference to a field of type 'Float[]'
- */
-export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 /**
@@ -3740,6 +3949,8 @@ export interface PrismaClientOptionsWithAdapter extends PrismaClientBaseOptions 
 export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaClientOptionsWithAdapter
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
+  rhythiaProfile?: Prisma.RhythiaProfileOmit
+  rhythiaProfileRequest?: Prisma.RhythiaProfileRequestOmit
   session?: Prisma.SessionOmit
   role?: Prisma.RoleOmit
   permission?: Prisma.PermissionOmit

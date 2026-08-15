@@ -499,14 +499,6 @@ export type PlayerRankUpdateOneWithoutUsersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerRankUpdateToOneWithWhereWithoutUsersInput, Prisma.PlayerRankUpdateWithoutUsersInput>, Prisma.PlayerRankUncheckedUpdateWithoutUsersInput>
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type PlayerRankCreateNestedOneWithoutDiscordRoleRankMappingsInput = {
   create?: Prisma.XOR<Prisma.PlayerRankCreateWithoutDiscordRoleRankMappingsInput, Prisma.PlayerRankUncheckedCreateWithoutDiscordRoleRankMappingsInput>
   connectOrCreate?: Prisma.PlayerRankCreateOrConnectWithoutDiscordRoleRankMappingsInput

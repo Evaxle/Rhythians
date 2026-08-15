@@ -6,6 +6,8 @@ import { getAvatarUrl } from "@/lib/avatar";
 import { UserTags } from "@/components/user-tags";
 import { FriendButton } from "@/components/friend-button";
 import { ReportButton } from "@/components/report-button";
+import { RhythiaConnect } from "@/components/rhythia-connect";
+import { RhythiaStats } from "@/components/rhythia-stats";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +26,7 @@ export default async function ProfilePage({ params }: Props) {
       roles: { include: { role: true } },
       playerRank: true,
       userTags: { include: { tag: true } },
+      rhythiaProfile: true,
     },
   });
 
@@ -66,6 +69,7 @@ export default async function ProfilePage({ params }: Props) {
           </div>
           <div className="flex flex-col items-stretch gap-3">
             {!isOwnProfile && <FriendButton userId={user.id} />}
+            {isOwnProfile && <RhythiaConnect connectedUrl={user.rhythiaProfile?.profileUrl} />}
             {!isOwnProfile && (
               <Link
                 href={`/messages?user=${encodeURIComponent(user.profileHandle)}`}
@@ -84,6 +88,8 @@ export default async function ProfilePage({ params }: Props) {
           </div>
         </div>
       </section>
+
+      {user.rhythiaProfile && <RhythiaStats profile={user.rhythiaProfile} />}
 
       <section className="space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

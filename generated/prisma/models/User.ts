@@ -318,6 +318,8 @@ export type UserWhereInput = {
   messagesSent?: Prisma.MessageListRelationFilter
   sentFriendRequests?: Prisma.FriendRequestListRelationFilter
   receivedFriendRequests?: Prisma.FriendRequestListRelationFilter
+  rhythiaProfile?: Prisma.XOR<Prisma.RhythiaProfileNullableScalarRelationFilter, Prisma.RhythiaProfileWhereInput> | null
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -361,6 +363,8 @@ export type UserOrderByWithRelationInput = {
   messagesSent?: Prisma.MessageOrderByRelationAggregateInput
   sentFriendRequests?: Prisma.FriendRequestOrderByRelationAggregateInput
   receivedFriendRequests?: Prisma.FriendRequestOrderByRelationAggregateInput
+  rhythiaProfile?: Prisma.RhythiaProfileOrderByWithRelationInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -407,6 +411,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   messagesSent?: Prisma.MessageListRelationFilter
   sentFriendRequests?: Prisma.FriendRequestListRelationFilter
   receivedFriendRequests?: Prisma.FriendRequestListRelationFilter
+  rhythiaProfile?: Prisma.XOR<Prisma.RhythiaProfileNullableScalarRelationFilter, Prisma.RhythiaProfileWhereInput> | null
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestListRelationFilter
 }, "id" | "discordId" | "email" | "profileHandle">
 
 export type UserOrderByWithAggregationInput = {
@@ -501,6 +507,8 @@ export type UserCreateInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -543,6 +551,8 @@ export type UserUncheckedCreateInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -585,6 +595,8 @@ export type UserUpdateInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -627,6 +639,8 @@ export type UserUncheckedUpdateInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -815,6 +829,34 @@ export type BoolFieldUpdateOperationsInput = {
 
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type UserCreateNestedOneWithoutRhythiaProfileInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutRhythiaProfileInput, Prisma.UserUncheckedCreateWithoutRhythiaProfileInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRhythiaProfileInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutRhythiaProfileNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutRhythiaProfileInput, Prisma.UserUncheckedCreateWithoutRhythiaProfileInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRhythiaProfileInput
+  upsert?: Prisma.UserUpsertWithoutRhythiaProfileInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutRhythiaProfileInput, Prisma.UserUpdateWithoutRhythiaProfileInput>, Prisma.UserUncheckedUpdateWithoutRhythiaProfileInput>
+}
+
+export type UserCreateNestedOneWithoutRhythiaProfileRequestsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutRhythiaProfileRequestsInput, Prisma.UserUncheckedCreateWithoutRhythiaProfileRequestsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRhythiaProfileRequestsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutRhythiaProfileRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutRhythiaProfileRequestsInput, Prisma.UserUncheckedCreateWithoutRhythiaProfileRequestsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRhythiaProfileRequestsInput
+  upsert?: Prisma.UserUpsertWithoutRhythiaProfileRequestsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutRhythiaProfileRequestsInput, Prisma.UserUpdateWithoutRhythiaProfileRequestsInput>, Prisma.UserUncheckedUpdateWithoutRhythiaProfileRequestsInput>
 }
 
 export type UserCreateNestedOneWithoutSessionsInput = {
@@ -1129,6 +1171,382 @@ export type UserUpdateOneRequiredWithoutReceivedFriendRequestsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReceivedFriendRequestsInput, Prisma.UserUpdateWithoutReceivedFriendRequestsInput>, Prisma.UserUncheckedUpdateWithoutReceivedFriendRequestsInput>
 }
 
+export type UserCreateWithoutRhythiaProfileInput = {
+  id?: string
+  discordId?: string | null
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  passwordHash?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  onboardingCompleted?: boolean
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
+  roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionCreateNestedManyWithoutActorInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
+  receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutRhythiaProfileInput = {
+  id?: string
+  discordId?: string | null
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  passwordHash?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  onboardingCompleted?: boolean
+  playerRankId?: string | null
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportUncheckedCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutActorInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
+  receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutRhythiaProfileInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutRhythiaProfileInput, Prisma.UserUncheckedCreateWithoutRhythiaProfileInput>
+}
+
+export type UserUpsertWithoutRhythiaProfileInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutRhythiaProfileInput, Prisma.UserUncheckedUpdateWithoutRhythiaProfileInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutRhythiaProfileInput, Prisma.UserUncheckedCreateWithoutRhythiaProfileInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutRhythiaProfileInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutRhythiaProfileInput, Prisma.UserUncheckedUpdateWithoutRhythiaProfileInput>
+}
+
+export type UserUpdateWithoutRhythiaProfileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
+  roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUpdateManyWithoutActorNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
+  receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutRhythiaProfileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUncheckedUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUncheckedUpdateManyWithoutActorNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
+  receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutRhythiaProfileRequestsInput = {
+  id?: string
+  discordId?: string | null
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  passwordHash?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  onboardingCompleted?: boolean
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
+  roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionCreateNestedManyWithoutActorInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
+  receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutRhythiaProfileRequestsInput = {
+  id?: string
+  discordId?: string | null
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  passwordHash?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  onboardingCompleted?: boolean
+  playerRankId?: string | null
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportUncheckedCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutActorInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
+  receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutRhythiaProfileRequestsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutRhythiaProfileRequestsInput, Prisma.UserUncheckedCreateWithoutRhythiaProfileRequestsInput>
+}
+
+export type UserUpsertWithoutRhythiaProfileRequestsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutRhythiaProfileRequestsInput, Prisma.UserUncheckedUpdateWithoutRhythiaProfileRequestsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutRhythiaProfileRequestsInput, Prisma.UserUncheckedCreateWithoutRhythiaProfileRequestsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutRhythiaProfileRequestsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutRhythiaProfileRequestsInput, Prisma.UserUncheckedUpdateWithoutRhythiaProfileRequestsInput>
+}
+
+export type UserUpdateWithoutRhythiaProfileRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
+  roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUpdateManyWithoutActorNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
+  receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutRhythiaProfileRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUncheckedUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUncheckedUpdateManyWithoutActorNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
+  receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+}
+
 export type UserCreateWithoutSessionsInput = {
   id?: string
   discordId?: string | null
@@ -1168,6 +1586,8 @@ export type UserCreateWithoutSessionsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -1209,6 +1629,8 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -1266,6 +1688,8 @@ export type UserUpdateWithoutSessionsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -1307,6 +1731,8 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRolesInput = {
@@ -1348,6 +1774,8 @@ export type UserCreateWithoutRolesInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRolesInput = {
@@ -1389,6 +1817,8 @@ export type UserUncheckedCreateWithoutRolesInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRolesInput = {
@@ -1446,6 +1876,8 @@ export type UserUpdateWithoutRolesInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRolesInput = {
@@ -1487,6 +1919,8 @@ export type UserUncheckedUpdateWithoutRolesInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPlayerRankInput = {
@@ -1528,6 +1962,8 @@ export type UserCreateWithoutPlayerRankInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPlayerRankInput = {
@@ -1569,6 +2005,8 @@ export type UserUncheckedCreateWithoutPlayerRankInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPlayerRankInput = {
@@ -1662,6 +2100,8 @@ export type UserCreateWithoutKnowledgeArticlesInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutKnowledgeArticlesInput = {
@@ -1703,6 +2143,8 @@ export type UserUncheckedCreateWithoutKnowledgeArticlesInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutKnowledgeArticlesInput = {
@@ -1760,6 +2202,8 @@ export type UserUpdateWithoutKnowledgeArticlesInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutKnowledgeArticlesInput = {
@@ -1801,6 +2245,8 @@ export type UserUncheckedUpdateWithoutKnowledgeArticlesInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutUserTagsInput = {
@@ -1842,6 +2288,8 @@ export type UserCreateWithoutUserTagsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutUserTagsInput = {
@@ -1883,6 +2331,8 @@ export type UserUncheckedCreateWithoutUserTagsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutUserTagsInput = {
@@ -1940,6 +2390,8 @@ export type UserUpdateWithoutUserTagsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUserTagsInput = {
@@ -1981,6 +2433,8 @@ export type UserUncheckedUpdateWithoutUserTagsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCoachCommentsInput = {
@@ -2022,6 +2476,8 @@ export type UserCreateWithoutCoachCommentsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCoachCommentsInput = {
@@ -2063,6 +2519,8 @@ export type UserUncheckedCreateWithoutCoachCommentsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCoachCommentsInput = {
@@ -2120,6 +2578,8 @@ export type UserUpdateWithoutCoachCommentsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCoachCommentsInput = {
@@ -2161,6 +2621,8 @@ export type UserUncheckedUpdateWithoutCoachCommentsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutArticleRevisionsInput = {
@@ -2202,6 +2664,8 @@ export type UserCreateWithoutArticleRevisionsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutArticleRevisionsInput = {
@@ -2243,6 +2707,8 @@ export type UserUncheckedCreateWithoutArticleRevisionsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutArticleRevisionsInput = {
@@ -2300,6 +2766,8 @@ export type UserUpdateWithoutArticleRevisionsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutArticleRevisionsInput = {
@@ -2341,6 +2809,8 @@ export type UserUncheckedUpdateWithoutArticleRevisionsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutClipsInput = {
@@ -2382,6 +2852,8 @@ export type UserCreateWithoutClipsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutClipsInput = {
@@ -2423,6 +2895,8 @@ export type UserUncheckedCreateWithoutClipsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutClipsInput = {
@@ -2480,6 +2954,8 @@ export type UserUpdateWithoutClipsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutClipsInput = {
@@ -2521,6 +2997,8 @@ export type UserUncheckedUpdateWithoutClipsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutClipLikesInput = {
@@ -2562,6 +3040,8 @@ export type UserCreateWithoutClipLikesInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutClipLikesInput = {
@@ -2603,6 +3083,8 @@ export type UserUncheckedCreateWithoutClipLikesInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutClipLikesInput = {
@@ -2660,6 +3142,8 @@ export type UserUpdateWithoutClipLikesInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutClipLikesInput = {
@@ -2701,6 +3185,8 @@ export type UserUncheckedUpdateWithoutClipLikesInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCommentsInput = {
@@ -2742,6 +3228,8 @@ export type UserCreateWithoutCommentsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCommentsInput = {
@@ -2783,6 +3271,8 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCommentsInput = {
@@ -2840,6 +3330,8 @@ export type UserUpdateWithoutCommentsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentsInput = {
@@ -2881,6 +3373,8 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReportsInput = {
@@ -2922,6 +3416,8 @@ export type UserCreateWithoutReportsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReportsInput = {
@@ -2963,6 +3459,8 @@ export type UserUncheckedCreateWithoutReportsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReportsInput = {
@@ -3009,6 +3507,8 @@ export type UserCreateWithoutReportedResolvedByInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReportedResolvedByInput = {
@@ -3050,6 +3550,8 @@ export type UserUncheckedCreateWithoutReportedResolvedByInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReportedResolvedByInput = {
@@ -3107,6 +3609,8 @@ export type UserUpdateWithoutReportsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportsInput = {
@@ -3148,6 +3652,8 @@ export type UserUncheckedUpdateWithoutReportsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutReportedResolvedByInput = {
@@ -3200,6 +3706,8 @@ export type UserUpdateWithoutReportedResolvedByInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportedResolvedByInput = {
@@ -3241,6 +3749,8 @@ export type UserUncheckedUpdateWithoutReportedResolvedByInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAnnouncementsInput = {
@@ -3282,6 +3792,8 @@ export type UserCreateWithoutAnnouncementsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAnnouncementsInput = {
@@ -3323,6 +3835,8 @@ export type UserUncheckedCreateWithoutAnnouncementsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAnnouncementsInput = {
@@ -3380,6 +3894,8 @@ export type UserUpdateWithoutAnnouncementsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAnnouncementsInput = {
@@ -3421,6 +3937,8 @@ export type UserUncheckedUpdateWithoutAnnouncementsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutNotificationsInput = {
@@ -3462,6 +3980,8 @@ export type UserCreateWithoutNotificationsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -3503,6 +4023,8 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -3560,6 +4082,8 @@ export type UserUpdateWithoutNotificationsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -3601,6 +4125,8 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutModerationActionsInput = {
@@ -3642,6 +4168,8 @@ export type UserCreateWithoutModerationActionsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutModerationActionsInput = {
@@ -3683,6 +4211,8 @@ export type UserUncheckedCreateWithoutModerationActionsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutModerationActionsInput = {
@@ -3740,6 +4270,8 @@ export type UserUpdateWithoutModerationActionsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutModerationActionsInput = {
@@ -3781,6 +4313,8 @@ export type UserUncheckedUpdateWithoutModerationActionsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutConversationsInput = {
@@ -3822,6 +4356,8 @@ export type UserCreateWithoutConversationsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutConversationsInput = {
@@ -3863,6 +4399,8 @@ export type UserUncheckedCreateWithoutConversationsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutConversationsInput = {
@@ -3920,6 +4458,8 @@ export type UserUpdateWithoutConversationsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversationsInput = {
@@ -3961,6 +4501,8 @@ export type UserUncheckedUpdateWithoutConversationsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutConversationMembershipsInput = {
@@ -4002,6 +4544,8 @@ export type UserCreateWithoutConversationMembershipsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutConversationMembershipsInput = {
@@ -4043,6 +4587,8 @@ export type UserUncheckedCreateWithoutConversationMembershipsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutConversationMembershipsInput = {
@@ -4100,6 +4646,8 @@ export type UserUpdateWithoutConversationMembershipsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversationMembershipsInput = {
@@ -4141,6 +4689,8 @@ export type UserUncheckedUpdateWithoutConversationMembershipsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMessagesSentInput = {
@@ -4182,6 +4732,8 @@ export type UserCreateWithoutMessagesSentInput = {
   conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMessagesSentInput = {
@@ -4223,6 +4775,8 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMessagesSentInput = {
@@ -4280,6 +4834,8 @@ export type UserUpdateWithoutMessagesSentInput = {
   conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessagesSentInput = {
@@ -4321,6 +4877,8 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSentFriendRequestsInput = {
@@ -4362,6 +4920,8 @@ export type UserCreateWithoutSentFriendRequestsInput = {
   conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSentFriendRequestsInput = {
@@ -4403,6 +4963,8 @@ export type UserUncheckedCreateWithoutSentFriendRequestsInput = {
   conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSentFriendRequestsInput = {
@@ -4449,6 +5011,8 @@ export type UserCreateWithoutReceivedFriendRequestsInput = {
   conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReceivedFriendRequestsInput = {
@@ -4490,6 +5054,8 @@ export type UserUncheckedCreateWithoutReceivedFriendRequestsInput = {
   conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReceivedFriendRequestsInput = {
@@ -4547,6 +5113,8 @@ export type UserUpdateWithoutSentFriendRequestsInput = {
   conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSentFriendRequestsInput = {
@@ -4588,6 +5156,8 @@ export type UserUncheckedUpdateWithoutSentFriendRequestsInput = {
   conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutReceivedFriendRequestsInput = {
@@ -4640,6 +5210,8 @@ export type UserUpdateWithoutReceivedFriendRequestsInput = {
   conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReceivedFriendRequestsInput = {
@@ -4681,6 +5253,8 @@ export type UserUncheckedUpdateWithoutReceivedFriendRequestsInput = {
   conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyPlayerRankInput = {
@@ -4744,6 +5318,8 @@ export type UserUpdateWithoutPlayerRankInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPlayerRankInput = {
@@ -4785,6 +5361,8 @@ export type UserUncheckedUpdateWithoutPlayerRankInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutPlayerRankInput = {
@@ -4834,6 +5412,7 @@ export type UserCountOutputType = {
   messagesSent: number
   sentFriendRequests: number
   receivedFriendRequests: number
+  rhythiaProfileRequests: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -4856,6 +5435,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   messagesSent?: boolean | UserCountOutputTypeCountMessagesSentArgs
   sentFriendRequests?: boolean | UserCountOutputTypeCountSentFriendRequestsArgs
   receivedFriendRequests?: boolean | UserCountOutputTypeCountReceivedFriendRequestsArgs
+  rhythiaProfileRequests?: boolean | UserCountOutputTypeCountRhythiaProfileRequestsArgs
 }
 
 /**
@@ -5001,6 +5581,13 @@ export type UserCountOutputTypeCountReceivedFriendRequestsArgs<ExtArgs extends r
   where?: Prisma.FriendRequestWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountRhythiaProfileRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RhythiaProfileRequestWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -5043,6 +5630,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   messagesSent?: boolean | Prisma.User$messagesSentArgs<ExtArgs>
   sentFriendRequests?: boolean | Prisma.User$sentFriendRequestsArgs<ExtArgs>
   receivedFriendRequests?: boolean | Prisma.User$receivedFriendRequestsArgs<ExtArgs>
+  rhythiaProfile?: boolean | Prisma.User$rhythiaProfileArgs<ExtArgs>
+  rhythiaProfileRequests?: boolean | Prisma.User$rhythiaProfileRequestsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -5139,6 +5728,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   messagesSent?: boolean | Prisma.User$messagesSentArgs<ExtArgs>
   sentFriendRequests?: boolean | Prisma.User$sentFriendRequestsArgs<ExtArgs>
   receivedFriendRequests?: boolean | Prisma.User$receivedFriendRequestsArgs<ExtArgs>
+  rhythiaProfile?: boolean | Prisma.User$rhythiaProfileArgs<ExtArgs>
+  rhythiaProfileRequests?: boolean | Prisma.User$rhythiaProfileRequestsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -5171,6 +5762,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     messagesSent: Prisma.$MessagePayload<ExtArgs>[]
     sentFriendRequests: Prisma.$FriendRequestPayload<ExtArgs>[]
     receivedFriendRequests: Prisma.$FriendRequestPayload<ExtArgs>[]
+    rhythiaProfile: Prisma.$RhythiaProfilePayload<ExtArgs> | null
+    rhythiaProfileRequests: Prisma.$RhythiaProfileRequestPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -5607,6 +6200,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   messagesSent<T extends Prisma.User$messagesSentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$messagesSentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sentFriendRequests<T extends Prisma.User$sentFriendRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sentFriendRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FriendRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   receivedFriendRequests<T extends Prisma.User$receivedFriendRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$receivedFriendRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FriendRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  rhythiaProfile<T extends Prisma.User$rhythiaProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$rhythiaProfileArgs<ExtArgs>>): Prisma.Prisma__RhythiaProfileClient<runtime.Types.Result.GetResult<Prisma.$RhythiaProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  rhythiaProfileRequests<T extends Prisma.User$rhythiaProfileRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$rhythiaProfileRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RhythiaProfileRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6529,6 +7124,49 @@ export type User$receivedFriendRequestsArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.FriendRequestScalarFieldEnum | Prisma.FriendRequestScalarFieldEnum[]
+}
+
+/**
+ * User.rhythiaProfile
+ */
+export type User$rhythiaProfileArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RhythiaProfile
+   */
+  select?: Prisma.RhythiaProfileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RhythiaProfile
+   */
+  omit?: Prisma.RhythiaProfileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RhythiaProfileInclude<ExtArgs> | null
+  where?: Prisma.RhythiaProfileWhereInput
+}
+
+/**
+ * User.rhythiaProfileRequests
+ */
+export type User$rhythiaProfileRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RhythiaProfileRequest
+   */
+  select?: Prisma.RhythiaProfileRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RhythiaProfileRequest
+   */
+  omit?: Prisma.RhythiaProfileRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RhythiaProfileRequestInclude<ExtArgs> | null
+  where?: Prisma.RhythiaProfileRequestWhereInput
+  orderBy?: Prisma.RhythiaProfileRequestOrderByWithRelationInput | Prisma.RhythiaProfileRequestOrderByWithRelationInput[]
+  cursor?: Prisma.RhythiaProfileRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RhythiaProfileRequestScalarFieldEnum | Prisma.RhythiaProfileRequestScalarFieldEnum[]
 }
 
 /**

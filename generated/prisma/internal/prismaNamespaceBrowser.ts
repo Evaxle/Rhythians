@@ -52,6 +52,8 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
+  RhythiaProfile: 'RhythiaProfile',
+  RhythiaProfileRequest: 'RhythiaProfileRequest',
   Session: 'Session',
   Role: 'Role',
   Permission: 'Permission',
@@ -126,6 +128,44 @@ export const UserScalarFieldEnum = {
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const RhythiaProfileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  profileId: 'profileId',
+  profileUrl: 'profileUrl',
+  username: 'username',
+  country: 'country',
+  flag: 'flag',
+  globalRank: 'globalRank',
+  countryRank: 'countryRank',
+  rhythmPoints: 'rhythmPoints',
+  title: 'title',
+  scores: 'scores',
+  syncedAt: 'syncedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RhythiaProfileScalarFieldEnum = (typeof RhythiaProfileScalarFieldEnum)[keyof typeof RhythiaProfileScalarFieldEnum]
+
+
+export const RhythiaProfileRequestScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  profileId: 'profileId',
+  profileUrl: 'profileUrl',
+  rhythiaUsername: 'rhythiaUsername',
+  claimedUsername: 'claimedUsername',
+  status: 'status',
+  adminNote: 'adminNote',
+  createdAt: 'createdAt',
+  resolvedAt: 'resolvedAt',
+  resolvedBy: 'resolvedBy'
+} as const
+
+export type RhythiaProfileRequestScalarFieldEnum = (typeof RhythiaProfileRequestScalarFieldEnum)[keyof typeof RhythiaProfileRequestScalarFieldEnum]
 
 
 export const SessionScalarFieldEnum = {
@@ -531,6 +571,13 @@ export const SortOrder = {
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const NullableJsonNullValueInput = {

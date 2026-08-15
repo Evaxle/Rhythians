@@ -23,6 +23,16 @@ export * from './enums';
  */
 export type User = Prisma.UserModel
 /**
+ * Model RhythiaProfile
+ * 
+ */
+export type RhythiaProfile = Prisma.RhythiaProfileModel
+/**
+ * Model RhythiaProfileRequest
+ * 
+ */
+export type RhythiaProfileRequest = Prisma.RhythiaProfileRequestModel
+/**
  * Model Session
  * 
  */
