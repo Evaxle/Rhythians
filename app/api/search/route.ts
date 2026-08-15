@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { PUBLIC_USER_FIELDS } from "@/lib/friends";
+import { searchKnowledge } from "@/lib/knowledge";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -22,23 +23,7 @@ export async function GET(request: Request) {
       take: 10,
       select: PUBLIC_USER_FIELDS,
     }),
-    prisma.knowledgeArticle.findMany({
-      where: {
-        published: true,
-        OR: [
-          { title: { contains: q, mode: "insensitive" } },
-          { description: { contains: q, mode: "insensitive" } },
-        ],
-      },
-      take: 10,
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        description: true,
-        category: { select: { slug: true, name: true } },
-      },
-    }),
+    Promise.resolve(searchKnowledge(q)),
     prisma.clip.findMany({
       where: {
         status: "approved",

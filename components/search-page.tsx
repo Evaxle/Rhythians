@@ -204,11 +204,11 @@ export function SearchPage() {
             render={(article) => (
               <Link
                 key={article.id}
-                href={`/knowledge/${article.category.slug}/${article.slug}`}
+                href={`/knowledge/${article.category.slug}`}
                 className="block rounded-2xl border border-border bg-background/70 px-4 py-3 transition hover:border-accent/40"
               >
                 <p className="text-sm font-semibold text-white">{article.title}</p>
-                <p className="mt-1 line-clamp-2 text-xs text-muted">{article.description}</p>
+                <p className="mt-1 line-clamp-2 text-xs text-muted">{article.category.name} — {article.description}</p>
               </Link>
             )}
           />

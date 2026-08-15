@@ -9,7 +9,7 @@ export default function AdminDashboardPage() {
             { title: "Users", value: "—" },
             { title: "Clips", value: "—" },
             { title: "Pending", value: "—" },
-            { title: "Articles", value: "—" },
+            { title: "Reports", value: "—" },
           ].map((card) => (
             <div key={card.title} className="rounded-3xl border border-border bg-background/70 p-6">
               <p className="text-sm text-muted">{card.title}</p>
@@ -19,14 +19,14 @@ export default function AdminDashboardPage() {
         </div>
       </section>
       <div className="grid gap-6 lg:grid-cols-3">
-        <Link href="/admin/articles" className="rounded-3xl border border-border bg-surface/95 p-6 text-sm text-white transition hover:border-accent/40">
-          Manage articles
-        </Link>
         <Link href="/admin/clips" className="rounded-3xl border border-border bg-surface/95 p-6 text-sm text-white transition hover:border-accent/40">
           Review clips
         </Link>
         <Link href="/admin/rules" className="rounded-3xl border border-border bg-surface/95 p-6 text-sm text-white transition hover:border-accent/40">
           Manage rules
+        </Link>
+        <Link href="/admin/announcements" className="rounded-3xl border border-border bg-surface/95 p-6 text-sm text-white transition hover:border-accent/40">
+          Manage announcements
         </Link>
       </div>
     </div>

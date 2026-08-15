@@ -20,7 +20,6 @@ export default async function AdminLayout({ children }: { children: ReactNode })
             <Link href="/admin" className="block rounded-2xl px-3 py-2 text-white transition hover:bg-white/5">Dashboard</Link>
             <div className="mt-4 border-t border-border pt-4">
               <p className="mb-2 uppercase tracking-[0.24em] text-[11px] text-accent">Content</p>
-              <Link href="/admin/articles" className="block rounded-2xl px-3 py-2 transition hover:bg-white/5">Articles</Link>
               <Link href="/admin/rules" className="block rounded-2xl px-3 py-2 transition hover:bg-white/5">Rules</Link>
               <Link href="/admin/announcements" className="block rounded-2xl px-3 py-2 transition hover:bg-white/5">Announcements</Link>
             </div>
