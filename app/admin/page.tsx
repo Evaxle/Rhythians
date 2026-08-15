@@ -22,11 +22,11 @@ export default function AdminDashboardPage() {
         <Link href="/admin/clips" className="rounded-3xl border border-border bg-surface/95 p-6 text-sm text-white transition hover:border-accent/40">
           Review clips
         </Link>
-        <Link href="/admin/rules" className="rounded-3xl border border-border bg-surface/95 p-6 text-sm text-white transition hover:border-accent/40">
-          Manage rules
-        </Link>
         <Link href="/admin/announcements" className="rounded-3xl border border-border bg-surface/95 p-6 text-sm text-white transition hover:border-accent/40">
           Manage announcements
+        </Link>
+        <Link href="/admin/discord" className="rounded-3xl border border-border bg-surface/95 p-6 text-sm text-white transition hover:border-accent/40">
+          Discord integration
         </Link>
       </div>
     </div>

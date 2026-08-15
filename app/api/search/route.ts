@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { PUBLIC_USER_FIELDS } from "@/lib/friends";
 import { searchKnowledge } from "@/lib/knowledge";
+import { searchRules } from "@/lib/rules";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -51,17 +52,7 @@ export async function GET(request: Request) {
       take: 10,
       select: { id: true, title: true, slug: true, createdAt: true },
     }),
-    prisma.rule.findMany({
-      where: {
-        enabled: true,
-        OR: [
-          { title: { contains: q, mode: "insensitive" } },
-          { content: { contains: q, mode: "insensitive" } },
-        ],
-      },
-      take: 10,
-      select: { id: true, title: true, slug: true },
-    }),
+    Promise.resolve(searchRules(q)),
   ]);
 
   return NextResponse.json({ users, articles, clips, announcements, rules });
