@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
+import { getThumbnailUrl } from "@/lib/clips";
+import { cameraModeLabel, cameraModeEmoji } from "@/lib/camera-mode";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +12,13 @@ export default async function ClipsPage() {
     include: { uploader: true, category: true },
     take: 12,
   });
+
+  const clipsWithThumbs = await Promise.all(
+    clips.map(async (clip) => ({
+      ...clip,
+      thumbnailUrl: await getThumbnailUrl(clip.thumbnailPath),
+    }))
+  );
 
   return (
     <div className="space-y-8">
@@ -33,30 +42,39 @@ export default async function ClipsPage() {
         </div>
       </section>
 
-      {clips.length === 0 ? (
+      {clipsWithThumbs.length === 0 ? (
         <div className="rounded-3xl border border-border bg-background/80 p-8 text-sm text-muted">
           No approved clips are available yet.
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {clips.map(
-            (clip: {
-              id: string;
-              title: string;
-              createdAt: Date;
-              uploader: {
-                username: string;
-              };
-              category: {
-                name: string;
-              } | null;
-            }) => (
+          {clipsWithThumbs.map((clip) => {
+            const modeLabel = cameraModeLabel(clip.cameraMode);
+            const modeEmoji = cameraModeEmoji(clip.cameraMode);
+            return (
               <Link
                 key={clip.id}
                 href={`/clips/${clip.id}`}
-                className="overflow-hidden rounded-3xl border border-border bg-surface/95 shadow-glow transition hover:-translate-y-0.5 hover:border-accent/40"
+                className="group overflow-hidden rounded-3xl border border-border bg-surface/95 shadow-glow transition hover:-translate-y-1 hover:border-accent/40 hover:shadow-glow"
               >
-                <div className="aspect-video bg-white/5" />
+                <div className="relative aspect-video overflow-hidden bg-white/5">
+                  {clip.thumbnailUrl ? (
+                    <img
+                      src={clip.thumbnailUrl}
+                      alt={clip.title}
+                      className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-xs text-muted">
+                      No thumbnail
+                    </div>
+                  )}
+                  {modeLabel && (
+                    <span className="absolute left-3 top-3 rounded-full border border-accent/30 bg-background/80 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-accent backdrop-blur">
+                      {modeEmoji} {modeLabel}
+                    </span>
+                  )}
+                </div>
                 <div className="p-5">
                   <div className="flex items-center justify-between text-xs uppercase tracking-[0.24em] text-accent">
                     <span>{clip.category?.name ?? "Uncategorized"}</span>
@@ -70,8 +88,8 @@ export default async function ClipsPage() {
                   </p>
                 </div>
               </Link>
-            )
-          )}
+            );
+          })}
         </div>
       )}
     </div>

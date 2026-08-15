@@ -28,6 +28,7 @@ export type UserTagMinAggregateOutputType = {
   id: string | null
   userId: string | null
   tagId: string | null
+  source: $Enums.TagSource | null
   createdAt: Date | null
 }
 
@@ -35,6 +36,7 @@ export type UserTagMaxAggregateOutputType = {
   id: string | null
   userId: string | null
   tagId: string | null
+  source: $Enums.TagSource | null
   createdAt: Date | null
 }
 
@@ -42,6 +44,7 @@ export type UserTagCountAggregateOutputType = {
   id: number
   userId: number
   tagId: number
+  source: number
   createdAt: number
   _all: number
 }
@@ -51,6 +54,7 @@ export type UserTagMinAggregateInputType = {
   id?: true
   userId?: true
   tagId?: true
+  source?: true
   createdAt?: true
 }
 
@@ -58,6 +62,7 @@ export type UserTagMaxAggregateInputType = {
   id?: true
   userId?: true
   tagId?: true
+  source?: true
   createdAt?: true
 }
 
@@ -65,6 +70,7 @@ export type UserTagCountAggregateInputType = {
   id?: true
   userId?: true
   tagId?: true
+  source?: true
   createdAt?: true
   _all?: true
 }
@@ -145,6 +151,7 @@ export type UserTagGroupByOutputType = {
   id: string
   userId: string
   tagId: string
+  source: $Enums.TagSource
   createdAt: Date
   _count: UserTagCountAggregateOutputType | null
   _min: UserTagMinAggregateOutputType | null
@@ -173,6 +180,7 @@ export type UserTagWhereInput = {
   id?: Prisma.StringFilter<"UserTag"> | string
   userId?: Prisma.StringFilter<"UserTag"> | string
   tagId?: Prisma.StringFilter<"UserTag"> | string
+  source?: Prisma.EnumTagSourceFilter<"UserTag"> | $Enums.TagSource
   createdAt?: Prisma.DateTimeFilter<"UserTag"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   tag?: Prisma.XOR<Prisma.TagScalarRelationFilter, Prisma.TagWhereInput>
@@ -182,6 +190,7 @@ export type UserTagOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   tagId?: Prisma.SortOrder
+  source?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   tag?: Prisma.TagOrderByWithRelationInput
@@ -195,6 +204,7 @@ export type UserTagWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.UserTagWhereInput | Prisma.UserTagWhereInput[]
   userId?: Prisma.StringFilter<"UserTag"> | string
   tagId?: Prisma.StringFilter<"UserTag"> | string
+  source?: Prisma.EnumTagSourceFilter<"UserTag"> | $Enums.TagSource
   createdAt?: Prisma.DateTimeFilter<"UserTag"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   tag?: Prisma.XOR<Prisma.TagScalarRelationFilter, Prisma.TagWhereInput>
@@ -204,6 +214,7 @@ export type UserTagOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   tagId?: Prisma.SortOrder
+  source?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.UserTagCountOrderByAggregateInput
   _max?: Prisma.UserTagMaxOrderByAggregateInput
@@ -217,11 +228,13 @@ export type UserTagScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"UserTag"> | string
   userId?: Prisma.StringWithAggregatesFilter<"UserTag"> | string
   tagId?: Prisma.StringWithAggregatesFilter<"UserTag"> | string
+  source?: Prisma.EnumTagSourceWithAggregatesFilter<"UserTag"> | $Enums.TagSource
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"UserTag"> | Date | string
 }
 
 export type UserTagCreateInput = {
   id?: string
+  source?: $Enums.TagSource
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutUserTagsInput
   tag: Prisma.TagCreateNestedOneWithoutUsersInput
@@ -231,11 +244,13 @@ export type UserTagUncheckedCreateInput = {
   id?: string
   userId: string
   tagId: string
+  source?: $Enums.TagSource
   createdAt?: Date | string
 }
 
 export type UserTagUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.EnumTagSourceFieldUpdateOperationsInput | $Enums.TagSource
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutUserTagsNestedInput
   tag?: Prisma.TagUpdateOneRequiredWithoutUsersNestedInput
@@ -245,6 +260,7 @@ export type UserTagUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   tagId?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.EnumTagSourceFieldUpdateOperationsInput | $Enums.TagSource
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -252,11 +268,13 @@ export type UserTagCreateManyInput = {
   id?: string
   userId: string
   tagId: string
+  source?: $Enums.TagSource
   createdAt?: Date | string
 }
 
 export type UserTagUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.EnumTagSourceFieldUpdateOperationsInput | $Enums.TagSource
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -264,6 +282,7 @@ export type UserTagUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   tagId?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.EnumTagSourceFieldUpdateOperationsInput | $Enums.TagSource
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -286,6 +305,7 @@ export type UserTagCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   tagId?: Prisma.SortOrder
+  source?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -293,6 +313,7 @@ export type UserTagMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   tagId?: Prisma.SortOrder
+  source?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -300,6 +321,7 @@ export type UserTagMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   tagId?: Prisma.SortOrder
+  source?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -387,8 +409,13 @@ export type UserTagUncheckedUpdateManyWithoutTagNestedInput = {
   deleteMany?: Prisma.UserTagScalarWhereInput | Prisma.UserTagScalarWhereInput[]
 }
 
+export type EnumTagSourceFieldUpdateOperationsInput = {
+  set?: $Enums.TagSource
+}
+
 export type UserTagCreateWithoutUserInput = {
   id?: string
+  source?: $Enums.TagSource
   createdAt?: Date | string
   tag: Prisma.TagCreateNestedOneWithoutUsersInput
 }
@@ -396,6 +423,7 @@ export type UserTagCreateWithoutUserInput = {
 export type UserTagUncheckedCreateWithoutUserInput = {
   id?: string
   tagId: string
+  source?: $Enums.TagSource
   createdAt?: Date | string
 }
 
@@ -432,11 +460,13 @@ export type UserTagScalarWhereInput = {
   id?: Prisma.StringFilter<"UserTag"> | string
   userId?: Prisma.StringFilter<"UserTag"> | string
   tagId?: Prisma.StringFilter<"UserTag"> | string
+  source?: Prisma.EnumTagSourceFilter<"UserTag"> | $Enums.TagSource
   createdAt?: Prisma.DateTimeFilter<"UserTag"> | Date | string
 }
 
 export type UserTagCreateWithoutTagInput = {
   id?: string
+  source?: $Enums.TagSource
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutUserTagsInput
 }
@@ -444,6 +474,7 @@ export type UserTagCreateWithoutTagInput = {
 export type UserTagUncheckedCreateWithoutTagInput = {
   id?: string
   userId: string
+  source?: $Enums.TagSource
   createdAt?: Date | string
 }
 
@@ -476,11 +507,13 @@ export type UserTagUpdateManyWithWhereWithoutTagInput = {
 export type UserTagCreateManyUserInput = {
   id?: string
   tagId: string
+  source?: $Enums.TagSource
   createdAt?: Date | string
 }
 
 export type UserTagUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.EnumTagSourceFieldUpdateOperationsInput | $Enums.TagSource
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tag?: Prisma.TagUpdateOneRequiredWithoutUsersNestedInput
 }
@@ -488,23 +521,27 @@ export type UserTagUpdateWithoutUserInput = {
 export type UserTagUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tagId?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.EnumTagSourceFieldUpdateOperationsInput | $Enums.TagSource
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type UserTagUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tagId?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.EnumTagSourceFieldUpdateOperationsInput | $Enums.TagSource
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type UserTagCreateManyTagInput = {
   id?: string
   userId: string
+  source?: $Enums.TagSource
   createdAt?: Date | string
 }
 
 export type UserTagUpdateWithoutTagInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.EnumTagSourceFieldUpdateOperationsInput | $Enums.TagSource
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutUserTagsNestedInput
 }
@@ -512,12 +549,14 @@ export type UserTagUpdateWithoutTagInput = {
 export type UserTagUncheckedUpdateWithoutTagInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.EnumTagSourceFieldUpdateOperationsInput | $Enums.TagSource
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type UserTagUncheckedUpdateManyWithoutTagInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.EnumTagSourceFieldUpdateOperationsInput | $Enums.TagSource
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -527,6 +566,7 @@ export type UserTagSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   id?: boolean
   userId?: boolean
   tagId?: boolean
+  source?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   tag?: boolean | Prisma.TagDefaultArgs<ExtArgs>
@@ -536,6 +576,7 @@ export type UserTagSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   userId?: boolean
   tagId?: boolean
+  source?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   tag?: boolean | Prisma.TagDefaultArgs<ExtArgs>
@@ -545,6 +586,7 @@ export type UserTagSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   userId?: boolean
   tagId?: boolean
+  source?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   tag?: boolean | Prisma.TagDefaultArgs<ExtArgs>
@@ -554,10 +596,11 @@ export type UserTagSelectScalar = {
   id?: boolean
   userId?: boolean
   tagId?: boolean
+  source?: boolean
   createdAt?: boolean
 }
 
-export type UserTagOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "tagId" | "createdAt", ExtArgs["result"]["userTag"]>
+export type UserTagOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "tagId" | "source" | "createdAt", ExtArgs["result"]["userTag"]>
 export type UserTagInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   tag?: boolean | Prisma.TagDefaultArgs<ExtArgs>
@@ -581,6 +624,7 @@ export type $UserTagPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     id: string
     userId: string
     tagId: string
+    source: $Enums.TagSource
     createdAt: Date
   }, ExtArgs["result"]["userTag"]>
   composites: {}
@@ -1010,6 +1054,7 @@ export interface UserTagFieldRefs {
   readonly id: Prisma.FieldRef<"UserTag", 'String'>
   readonly userId: Prisma.FieldRef<"UserTag", 'String'>
   readonly tagId: Prisma.FieldRef<"UserTag", 'String'>
+  readonly source: Prisma.FieldRef<"UserTag", 'TagSource'>
   readonly createdAt: Prisma.FieldRef<"UserTag", 'DateTime'>
 }
     

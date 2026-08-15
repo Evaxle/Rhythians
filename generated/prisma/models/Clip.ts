@@ -40,6 +40,7 @@ export type ClipMinAggregateOutputType = {
   description: string | null
   status: $Enums.ClipStatus | null
   featuredOrder: number | null
+  cameraMode: $Enums.CameraMode | null
   storagePath: string | null
   thumbnailPath: string | null
   rejectionReason: string | null
@@ -55,6 +56,7 @@ export type ClipMaxAggregateOutputType = {
   description: string | null
   status: $Enums.ClipStatus | null
   featuredOrder: number | null
+  cameraMode: $Enums.CameraMode | null
   storagePath: string | null
   thumbnailPath: string | null
   rejectionReason: string | null
@@ -70,6 +72,7 @@ export type ClipCountAggregateOutputType = {
   description: number
   status: number
   featuredOrder: number
+  cameraMode: number
   storagePath: number
   thumbnailPath: number
   rejectionReason: number
@@ -95,6 +98,7 @@ export type ClipMinAggregateInputType = {
   description?: true
   status?: true
   featuredOrder?: true
+  cameraMode?: true
   storagePath?: true
   thumbnailPath?: true
   rejectionReason?: true
@@ -110,6 +114,7 @@ export type ClipMaxAggregateInputType = {
   description?: true
   status?: true
   featuredOrder?: true
+  cameraMode?: true
   storagePath?: true
   thumbnailPath?: true
   rejectionReason?: true
@@ -125,6 +130,7 @@ export type ClipCountAggregateInputType = {
   description?: true
   status?: true
   featuredOrder?: true
+  cameraMode?: true
   storagePath?: true
   thumbnailPath?: true
   rejectionReason?: true
@@ -227,6 +233,7 @@ export type ClipGroupByOutputType = {
   description: string
   status: $Enums.ClipStatus
   featuredOrder: number | null
+  cameraMode: $Enums.CameraMode | null
   storagePath: string
   thumbnailPath: string | null
   rejectionReason: string | null
@@ -265,6 +272,7 @@ export type ClipWhereInput = {
   description?: Prisma.StringFilter<"Clip"> | string
   status?: Prisma.EnumClipStatusFilter<"Clip"> | $Enums.ClipStatus
   featuredOrder?: Prisma.IntNullableFilter<"Clip"> | number | null
+  cameraMode?: Prisma.EnumCameraModeNullableFilter<"Clip"> | $Enums.CameraMode | null
   storagePath?: Prisma.StringFilter<"Clip"> | string
   thumbnailPath?: Prisma.StringNullableFilter<"Clip"> | string | null
   rejectionReason?: Prisma.StringNullableFilter<"Clip"> | string | null
@@ -287,6 +295,7 @@ export type ClipOrderByWithRelationInput = {
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
   featuredOrder?: Prisma.SortOrderInput | Prisma.SortOrder
+  cameraMode?: Prisma.SortOrderInput | Prisma.SortOrder
   storagePath?: Prisma.SortOrder
   thumbnailPath?: Prisma.SortOrderInput | Prisma.SortOrder
   rejectionReason?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -312,6 +321,7 @@ export type ClipWhereUniqueInput = Prisma.AtLeast<{
   description?: Prisma.StringFilter<"Clip"> | string
   status?: Prisma.EnumClipStatusFilter<"Clip"> | $Enums.ClipStatus
   featuredOrder?: Prisma.IntNullableFilter<"Clip"> | number | null
+  cameraMode?: Prisma.EnumCameraModeNullableFilter<"Clip"> | $Enums.CameraMode | null
   storagePath?: Prisma.StringFilter<"Clip"> | string
   thumbnailPath?: Prisma.StringNullableFilter<"Clip"> | string | null
   rejectionReason?: Prisma.StringNullableFilter<"Clip"> | string | null
@@ -334,6 +344,7 @@ export type ClipOrderByWithAggregationInput = {
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
   featuredOrder?: Prisma.SortOrderInput | Prisma.SortOrder
+  cameraMode?: Prisma.SortOrderInput | Prisma.SortOrder
   storagePath?: Prisma.SortOrder
   thumbnailPath?: Prisma.SortOrderInput | Prisma.SortOrder
   rejectionReason?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -357,6 +368,7 @@ export type ClipScalarWhereWithAggregatesInput = {
   description?: Prisma.StringWithAggregatesFilter<"Clip"> | string
   status?: Prisma.EnumClipStatusWithAggregatesFilter<"Clip"> | $Enums.ClipStatus
   featuredOrder?: Prisma.IntNullableWithAggregatesFilter<"Clip"> | number | null
+  cameraMode?: Prisma.EnumCameraModeNullableWithAggregatesFilter<"Clip"> | $Enums.CameraMode | null
   storagePath?: Prisma.StringWithAggregatesFilter<"Clip"> | string
   thumbnailPath?: Prisma.StringNullableWithAggregatesFilter<"Clip"> | string | null
   rejectionReason?: Prisma.StringNullableWithAggregatesFilter<"Clip"> | string | null
@@ -372,6 +384,7 @@ export type ClipCreateInput = {
   description: string
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
+  cameraMode?: $Enums.CameraMode | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -392,6 +405,7 @@ export type ClipUncheckedCreateInput = {
   description: string
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
+  cameraMode?: $Enums.CameraMode | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -412,6 +426,7 @@ export type ClipUpdateInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -432,6 +447,7 @@ export type ClipUncheckedUpdateInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -452,6 +468,7 @@ export type ClipCreateManyInput = {
   description: string
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
+  cameraMode?: $Enums.CameraMode | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -467,6 +484,7 @@ export type ClipUpdateManyMutationInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -480,6 +498,7 @@ export type ClipUncheckedUpdateManyInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -510,6 +529,7 @@ export type ClipCountOrderByAggregateInput = {
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
   featuredOrder?: Prisma.SortOrder
+  cameraMode?: Prisma.SortOrder
   storagePath?: Prisma.SortOrder
   thumbnailPath?: Prisma.SortOrder
   rejectionReason?: Prisma.SortOrder
@@ -529,6 +549,7 @@ export type ClipMaxOrderByAggregateInput = {
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
   featuredOrder?: Prisma.SortOrder
+  cameraMode?: Prisma.SortOrder
   storagePath?: Prisma.SortOrder
   thumbnailPath?: Prisma.SortOrder
   rejectionReason?: Prisma.SortOrder
@@ -544,6 +565,7 @@ export type ClipMinOrderByAggregateInput = {
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
   featuredOrder?: Prisma.SortOrder
+  cameraMode?: Prisma.SortOrder
   storagePath?: Prisma.SortOrder
   thumbnailPath?: Prisma.SortOrder
   rejectionReason?: Prisma.SortOrder
@@ -667,6 +689,10 @@ export type NullableIntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type NullableEnumCameraModeFieldUpdateOperationsInput = {
+  set?: $Enums.CameraMode | null
+}
+
 export type ClipCreateNestedOneWithoutTagsInput = {
   create?: Prisma.XOR<Prisma.ClipCreateWithoutTagsInput, Prisma.ClipUncheckedCreateWithoutTagsInput>
   connectOrCreate?: Prisma.ClipCreateOrConnectWithoutTagsInput
@@ -729,6 +755,7 @@ export type ClipCreateWithoutUploaderInput = {
   description: string
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
+  cameraMode?: $Enums.CameraMode | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -748,6 +775,7 @@ export type ClipUncheckedCreateWithoutUploaderInput = {
   description: string
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
+  cameraMode?: $Enums.CameraMode | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -796,6 +824,7 @@ export type ClipScalarWhereInput = {
   description?: Prisma.StringFilter<"Clip"> | string
   status?: Prisma.EnumClipStatusFilter<"Clip"> | $Enums.ClipStatus
   featuredOrder?: Prisma.IntNullableFilter<"Clip"> | number | null
+  cameraMode?: Prisma.EnumCameraModeNullableFilter<"Clip"> | $Enums.CameraMode | null
   storagePath?: Prisma.StringFilter<"Clip"> | string
   thumbnailPath?: Prisma.StringNullableFilter<"Clip"> | string | null
   rejectionReason?: Prisma.StringNullableFilter<"Clip"> | string | null
@@ -811,6 +840,7 @@ export type ClipCreateWithoutCoachCommentsInput = {
   description: string
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
+  cameraMode?: $Enums.CameraMode | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -830,6 +860,7 @@ export type ClipUncheckedCreateWithoutCoachCommentsInput = {
   description: string
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
+  cameraMode?: $Enums.CameraMode | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -865,6 +896,7 @@ export type ClipUpdateWithoutCoachCommentsInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -884,6 +916,7 @@ export type ClipUncheckedUpdateWithoutCoachCommentsInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -903,6 +936,7 @@ export type ClipCreateWithoutCategoryInput = {
   description: string
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
+  cameraMode?: $Enums.CameraMode | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -922,6 +956,7 @@ export type ClipUncheckedCreateWithoutCategoryInput = {
   description: string
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
+  cameraMode?: $Enums.CameraMode | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -967,6 +1002,7 @@ export type ClipCreateWithoutTagsInput = {
   description: string
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
+  cameraMode?: $Enums.CameraMode | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -986,6 +1022,7 @@ export type ClipUncheckedCreateWithoutTagsInput = {
   description: string
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
+  cameraMode?: $Enums.CameraMode | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -1021,6 +1058,7 @@ export type ClipUpdateWithoutTagsInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1040,6 +1078,7 @@ export type ClipUncheckedUpdateWithoutTagsInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1059,6 +1098,7 @@ export type ClipCreateWithoutLikesInput = {
   description: string
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
+  cameraMode?: $Enums.CameraMode | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -1078,6 +1118,7 @@ export type ClipUncheckedCreateWithoutLikesInput = {
   description: string
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
+  cameraMode?: $Enums.CameraMode | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -1113,6 +1154,7 @@ export type ClipUpdateWithoutLikesInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1132,6 +1174,7 @@ export type ClipUncheckedUpdateWithoutLikesInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1151,6 +1194,7 @@ export type ClipCreateWithoutViewsInput = {
   description: string
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
+  cameraMode?: $Enums.CameraMode | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -1170,6 +1214,7 @@ export type ClipUncheckedCreateWithoutViewsInput = {
   description: string
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
+  cameraMode?: $Enums.CameraMode | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -1205,6 +1250,7 @@ export type ClipUpdateWithoutViewsInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1224,6 +1270,7 @@ export type ClipUncheckedUpdateWithoutViewsInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1243,6 +1290,7 @@ export type ClipCreateWithoutCommentsInput = {
   description: string
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
+  cameraMode?: $Enums.CameraMode | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -1262,6 +1310,7 @@ export type ClipUncheckedCreateWithoutCommentsInput = {
   description: string
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
+  cameraMode?: $Enums.CameraMode | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -1297,6 +1346,7 @@ export type ClipUpdateWithoutCommentsInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1316,6 +1366,7 @@ export type ClipUncheckedUpdateWithoutCommentsInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1335,6 +1386,7 @@ export type ClipCreateManyUploaderInput = {
   description: string
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
+  cameraMode?: $Enums.CameraMode | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -1349,6 +1401,7 @@ export type ClipUpdateWithoutUploaderInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1368,6 +1421,7 @@ export type ClipUncheckedUpdateWithoutUploaderInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1387,6 +1441,7 @@ export type ClipUncheckedUpdateManyWithoutUploaderInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1401,6 +1456,7 @@ export type ClipCreateManyCategoryInput = {
   description: string
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
+  cameraMode?: $Enums.CameraMode | null
   storagePath: string
   thumbnailPath?: string | null
   rejectionReason?: string | null
@@ -1415,6 +1471,7 @@ export type ClipUpdateWithoutCategoryInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1434,6 +1491,7 @@ export type ClipUncheckedUpdateWithoutCategoryInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1453,6 +1511,7 @@ export type ClipUncheckedUpdateManyWithoutCategoryInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
   storagePath?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnailPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1534,6 +1593,7 @@ export type ClipSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   description?: boolean
   status?: boolean
   featuredOrder?: boolean
+  cameraMode?: boolean
   storagePath?: boolean
   thumbnailPath?: boolean
   rejectionReason?: boolean
@@ -1557,6 +1617,7 @@ export type ClipSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   description?: boolean
   status?: boolean
   featuredOrder?: boolean
+  cameraMode?: boolean
   storagePath?: boolean
   thumbnailPath?: boolean
   rejectionReason?: boolean
@@ -1574,6 +1635,7 @@ export type ClipSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   description?: boolean
   status?: boolean
   featuredOrder?: boolean
+  cameraMode?: boolean
   storagePath?: boolean
   thumbnailPath?: boolean
   rejectionReason?: boolean
@@ -1591,6 +1653,7 @@ export type ClipSelectScalar = {
   description?: boolean
   status?: boolean
   featuredOrder?: boolean
+  cameraMode?: boolean
   storagePath?: boolean
   thumbnailPath?: boolean
   rejectionReason?: boolean
@@ -1600,7 +1663,7 @@ export type ClipSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ClipOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "status" | "featuredOrder" | "storagePath" | "thumbnailPath" | "rejectionReason" | "uploaderId" | "categoryId" | "createdAt" | "updatedAt", ExtArgs["result"]["clip"]>
+export type ClipOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "status" | "featuredOrder" | "cameraMode" | "storagePath" | "thumbnailPath" | "rejectionReason" | "uploaderId" | "categoryId" | "createdAt" | "updatedAt", ExtArgs["result"]["clip"]>
 export type ClipInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   uploader?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   category?: boolean | Prisma.Clip$categoryArgs<ExtArgs>
@@ -1637,6 +1700,7 @@ export type $ClipPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     description: string
     status: $Enums.ClipStatus
     featuredOrder: number | null
+    cameraMode: $Enums.CameraMode | null
     storagePath: string
     thumbnailPath: string | null
     rejectionReason: string | null
@@ -2079,6 +2143,7 @@ export interface ClipFieldRefs {
   readonly description: Prisma.FieldRef<"Clip", 'String'>
   readonly status: Prisma.FieldRef<"Clip", 'ClipStatus'>
   readonly featuredOrder: Prisma.FieldRef<"Clip", 'Int'>
+  readonly cameraMode: Prisma.FieldRef<"Clip", 'CameraMode'>
   readonly storagePath: Prisma.FieldRef<"Clip", 'String'>
   readonly thumbnailPath: Prisma.FieldRef<"Clip", 'String'>
   readonly rejectionReason: Prisma.FieldRef<"Clip", 'String'>

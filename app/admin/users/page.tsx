@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { getAvatarUrl } from "@/lib/avatar";
 import { UserTagsManager } from "@/components/user-tags-manager";
 
 export const dynamic = "force-dynamic";
@@ -42,9 +43,9 @@ export default async function AdminUsersPage() {
             >
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div className="flex items-center gap-4">
-                  {user.avatar ? (
+                  {getAvatarUrl(user, 64) ? (
                     <img
-                      src={`https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png?size=64`}
+                      src={getAvatarUrl(user, 64)!}
                       alt=""
                       className="h-12 w-12 rounded-full"
                     />

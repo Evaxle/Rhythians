@@ -25,6 +25,7 @@
 3. Create a storage bucket named `media`.
 4. Make the bucket private so uploads require signed URLs.
    - Do not allow anonymous public uploads.
+   - Profile pictures use a separate public `avatars` bucket that is created automatically on first upload.
 5. Add the following env vars in your deployment and local `.env`:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -34,6 +35,7 @@
    - `npm run db:migrate`
 7. Run seed only if you want baseline categories, roles, rules, and settings:
    - `npm run db:seed`
+8. The database bootstrap endpoint `/api/setup` is now locked. To use it, set a long random `SETUP_SECRET` and call `/api/setup?secret=<SETUP_SECRET>`.
 
 ### 2. Discord OAuth
 1. Create or select a Discord app in the Developer Portal.
@@ -46,11 +48,15 @@
 
 ### 3. Discord Bot
 1. Create/configure a Discord bot in the same Developer Portal app.
-2. Invite it to your server with at least `bot` and member read/send permissions.
-3. Configure these env vars:
+2. Enable the **Server Members Intent** under Bot → Privileged Gateway Intents (required for role → tag sync).
+3. Invite it to your server with at least `bot` and member read/send permissions.
+4. Configure these env vars:
    - `DISCORD_BOT_TOKEN`
    - `DISCORD_GUILD_ID`
-4. Also collect channel IDs for:
+5. Run the bot so role changes sync in real time: `npm run bot:start`
+   (host it on a server/VPS that stays online).
+6. Configure role → tag mappings at **Admin → Discord → Integration** as the owner.
+7. Also collect channel IDs for:
    - clip submissions
    - clip moderation
    - announcements
@@ -73,9 +79,13 @@
    - `DISCORD_REDIRECT_URI=https://YOUR-DOMAIN.com/api/auth/callback`
    - `DATABASE_URL=...`
    - `STORAGE_BUCKET=media`
-   - `SESSION_COOKIE_NAME=rhythians_session`
-   - `SESSION_EXPIRES_DAYS=30`
+    - `SESSION_COOKIE_NAME=rhythians_session`
+    - `SESSION_EXPIRES_DAYS=30`
+    - `CRON_SECRET=<random string>` (optional — required if you want the scheduled Discord sync to require a secret)
+    - `SETUP_SECRET=<long random string>` (required — protects the `/api/setup` database bootstrap endpoint)
 4. Deploy the app.
+
+> The scheduled 1-minute Discord sync runs automatically via the cron job in `vercel.json`. If you set `CRON_SECRET`, append `?secret=<CRON_SECRET>` to the cron path in `vercel.json` so the request authenticates.
 
 ### 5. Verification
 1. Visit `/login` and test Discord login.

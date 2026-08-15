@@ -65,6 +65,7 @@ export const ModelName = {
   KnowledgeArticle: 'KnowledgeArticle',
   Tag: 'Tag',
   UserTag: 'UserTag',
+  DiscordRoleTagMapping: 'DiscordRoleTagMapping',
   CoachComment: 'CoachComment',
   ArticleTag: 'ArticleTag',
   ArticleRevision: 'ArticleRevision',
@@ -109,10 +110,12 @@ export const UserScalarFieldEnum = {
   avatar: 'avatar',
   locale: 'locale',
   email: 'email',
+  passwordHash: 'passwordHash',
   displayName: 'displayName',
   profileHandle: 'profileHandle',
   discordRoles: 'discordRoles',
   inGuild: 'inGuild',
+  onboardingCompleted: 'onboardingCompleted',
   playerRankId: 'playerRankId',
   joinedAt: 'joinedAt',
   bio: 'bio',
@@ -274,10 +277,22 @@ export const UserTagScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   tagId: 'tagId',
+  source: 'source',
   createdAt: 'createdAt'
 } as const
 
 export type UserTagScalarFieldEnum = (typeof UserTagScalarFieldEnum)[keyof typeof UserTagScalarFieldEnum]
+
+
+export const DiscordRoleTagMappingScalarFieldEnum = {
+  id: 'id',
+  discordRoleId: 'discordRoleId',
+  tagId: 'tagId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DiscordRoleTagMappingScalarFieldEnum = (typeof DiscordRoleTagMappingScalarFieldEnum)[keyof typeof DiscordRoleTagMappingScalarFieldEnum]
 
 
 export const CoachCommentScalarFieldEnum = {
@@ -334,6 +349,7 @@ export const ClipScalarFieldEnum = {
   description: 'description',
   status: 'status',
   featuredOrder: 'featuredOrder',
+  cameraMode: 'cameraMode',
   storagePath: 'storagePath',
   thumbnailPath: 'thumbnailPath',
   rejectionReason: 'rejectionReason',

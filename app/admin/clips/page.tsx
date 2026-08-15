@@ -1,31 +1,10 @@
-import { prisma } from "@/lib/db";
-import { supabaseAdmin } from "@/lib/supabase";
 import { ClipModerationQueue } from "@/components/clip-moderation-queue";
+import { getPendingClips } from "@/lib/clips";
 
 export const dynamic = "force-dynamic";
 
-async function getVideoUrl(path: string) {
-  if (!supabaseAdmin) return null;
-  const { data, error } = await supabaseAdmin.storage.from(process.env.STORAGE_BUCKET ?? "media").createSignedUrl(path, 300);
-  return error || !data ? null : data.signedUrl;
-}
-
 export default async function AdminClipsPage() {
-  const pendingClips = await prisma.clip.findMany({
-    where: { status: "pending" },
-    orderBy: { createdAt: "asc" },
-    include: { uploader: { select: { username: true, discriminator: true } }, category: { select: { name: true } } },
-  });
-  const clips = await Promise.all(pendingClips.map(async (clip) => ({
-    id: clip.id,
-    title: clip.title,
-    description: clip.description,
-    createdAt: clip.createdAt.toISOString(),
-    storagePath: clip.storagePath,
-    uploader: clip.uploader,
-    category: clip.category,
-    videoUrl: await getVideoUrl(clip.storagePath),
-  })));
+  const clips = await getPendingClips();
 
   return (
     <div className="space-y-8">
@@ -37,7 +16,7 @@ export default async function AdminClipsPage() {
           </div>
         </div>
       </section>
-      <ClipModerationQueue initialClips={clips} />
+      <ClipModerationQueue initialClips={clips} apiBase="/api/admin/clips" />
     </div>
   );
 }

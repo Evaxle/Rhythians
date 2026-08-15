@@ -32,9 +32,11 @@ export type UserMinAggregateOutputType = {
   avatar: string | null
   locale: string | null
   email: string | null
+  passwordHash: string | null
   displayName: string | null
   profileHandle: string | null
   inGuild: boolean | null
+  onboardingCompleted: boolean | null
   playerRankId: string | null
   joinedAt: Date | null
   bio: string | null
@@ -52,9 +54,11 @@ export type UserMaxAggregateOutputType = {
   avatar: string | null
   locale: string | null
   email: string | null
+  passwordHash: string | null
   displayName: string | null
   profileHandle: string | null
   inGuild: boolean | null
+  onboardingCompleted: boolean | null
   playerRankId: string | null
   joinedAt: Date | null
   bio: string | null
@@ -72,10 +76,12 @@ export type UserCountAggregateOutputType = {
   avatar: number
   locale: number
   email: number
+  passwordHash: number
   displayName: number
   profileHandle: number
   discordRoles: number
   inGuild: number
+  onboardingCompleted: number
   playerRankId: number
   joinedAt: number
   bio: number
@@ -95,9 +101,11 @@ export type UserMinAggregateInputType = {
   avatar?: true
   locale?: true
   email?: true
+  passwordHash?: true
   displayName?: true
   profileHandle?: true
   inGuild?: true
+  onboardingCompleted?: true
   playerRankId?: true
   joinedAt?: true
   bio?: true
@@ -115,9 +123,11 @@ export type UserMaxAggregateInputType = {
   avatar?: true
   locale?: true
   email?: true
+  passwordHash?: true
   displayName?: true
   profileHandle?: true
   inGuild?: true
+  onboardingCompleted?: true
   playerRankId?: true
   joinedAt?: true
   bio?: true
@@ -135,10 +145,12 @@ export type UserCountAggregateInputType = {
   avatar?: true
   locale?: true
   email?: true
+  passwordHash?: true
   displayName?: true
   profileHandle?: true
   discordRoles?: true
   inGuild?: true
+  onboardingCompleted?: true
   playerRankId?: true
   joinedAt?: true
   bio?: true
@@ -223,16 +235,18 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 
 export type UserGroupByOutputType = {
   id: string
-  discordId: string
+  discordId: string | null
   username: string
   discriminator: string
   avatar: string | null
   locale: string | null
   email: string | null
+  passwordHash: string | null
   displayName: string | null
   profileHandle: string
   discordRoles: string[]
   inGuild: boolean
+  onboardingCompleted: boolean
   playerRankId: string | null
   joinedAt: Date
   bio: string | null
@@ -265,16 +279,18 @@ export type UserWhereInput = {
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   id?: Prisma.StringFilter<"User"> | string
-  discordId?: Prisma.StringFilter<"User"> | string
+  discordId?: Prisma.StringNullableFilter<"User"> | string | null
   username?: Prisma.StringFilter<"User"> | string
   discriminator?: Prisma.StringFilter<"User"> | string
   avatar?: Prisma.StringNullableFilter<"User"> | string | null
   locale?: Prisma.StringNullableFilter<"User"> | string | null
   email?: Prisma.StringNullableFilter<"User"> | string | null
+  passwordHash?: Prisma.StringNullableFilter<"User"> | string | null
   displayName?: Prisma.StringNullableFilter<"User"> | string | null
   profileHandle?: Prisma.StringFilter<"User"> | string
   discordRoles?: Prisma.StringNullableListFilter<"User">
   inGuild?: Prisma.BoolFilter<"User"> | boolean
+  onboardingCompleted?: Prisma.BoolFilter<"User"> | boolean
   playerRankId?: Prisma.StringNullableFilter<"User"> | string | null
   joinedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   bio?: Prisma.StringNullableFilter<"User"> | string | null
@@ -306,16 +322,18 @@ export type UserWhereInput = {
 
 export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  discordId?: Prisma.SortOrder
+  discordId?: Prisma.SortOrderInput | Prisma.SortOrder
   username?: Prisma.SortOrder
   discriminator?: Prisma.SortOrder
   avatar?: Prisma.SortOrderInput | Prisma.SortOrder
   locale?: Prisma.SortOrderInput | Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
+  passwordHash?: Prisma.SortOrderInput | Prisma.SortOrder
   displayName?: Prisma.SortOrderInput | Prisma.SortOrder
   profileHandle?: Prisma.SortOrder
   discordRoles?: Prisma.SortOrder
   inGuild?: Prisma.SortOrder
+  onboardingCompleted?: Prisma.SortOrder
   playerRankId?: Prisma.SortOrderInput | Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
   bio?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -357,9 +375,11 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   discriminator?: Prisma.StringFilter<"User"> | string
   avatar?: Prisma.StringNullableFilter<"User"> | string | null
   locale?: Prisma.StringNullableFilter<"User"> | string | null
+  passwordHash?: Prisma.StringNullableFilter<"User"> | string | null
   displayName?: Prisma.StringNullableFilter<"User"> | string | null
   discordRoles?: Prisma.StringNullableListFilter<"User">
   inGuild?: Prisma.BoolFilter<"User"> | boolean
+  onboardingCompleted?: Prisma.BoolFilter<"User"> | boolean
   playerRankId?: Prisma.StringNullableFilter<"User"> | string | null
   joinedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   bio?: Prisma.StringNullableFilter<"User"> | string | null
@@ -391,16 +411,18 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  discordId?: Prisma.SortOrder
+  discordId?: Prisma.SortOrderInput | Prisma.SortOrder
   username?: Prisma.SortOrder
   discriminator?: Prisma.SortOrder
   avatar?: Prisma.SortOrderInput | Prisma.SortOrder
   locale?: Prisma.SortOrderInput | Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
+  passwordHash?: Prisma.SortOrderInput | Prisma.SortOrder
   displayName?: Prisma.SortOrderInput | Prisma.SortOrder
   profileHandle?: Prisma.SortOrder
   discordRoles?: Prisma.SortOrder
   inGuild?: Prisma.SortOrder
+  onboardingCompleted?: Prisma.SortOrder
   playerRankId?: Prisma.SortOrderInput | Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
   bio?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -418,16 +440,18 @@ export type UserScalarWhereWithAggregatesInput = {
   OR?: Prisma.UserScalarWhereWithAggregatesInput[]
   NOT?: Prisma.UserScalarWhereWithAggregatesInput | Prisma.UserScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"User"> | string
-  discordId?: Prisma.StringWithAggregatesFilter<"User"> | string
+  discordId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   username?: Prisma.StringWithAggregatesFilter<"User"> | string
   discriminator?: Prisma.StringWithAggregatesFilter<"User"> | string
   avatar?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   locale?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   email?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  passwordHash?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   displayName?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   profileHandle?: Prisma.StringWithAggregatesFilter<"User"> | string
   discordRoles?: Prisma.StringNullableListFilter<"User">
   inGuild?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  onboardingCompleted?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   playerRankId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   joinedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   bio?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
@@ -439,16 +463,18 @@ export type UserScalarWhereWithAggregatesInput = {
 
 export type UserCreateInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -479,16 +505,18 @@ export type UserCreateInput = {
 
 export type UserUncheckedCreateInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -519,16 +547,18 @@ export type UserUncheckedCreateInput = {
 
 export type UserUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -559,16 +589,18 @@ export type UserUpdateInput = {
 
 export type UserUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -599,16 +631,18 @@ export type UserUncheckedUpdateInput = {
 
 export type UserCreateManyInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -620,16 +654,18 @@ export type UserCreateManyInput = {
 
 export type UserUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -640,16 +676,18 @@ export type UserUpdateManyMutationInput = {
 
 export type UserUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -675,10 +713,12 @@ export type UserCountOrderByAggregateInput = {
   avatar?: Prisma.SortOrder
   locale?: Prisma.SortOrder
   email?: Prisma.SortOrder
+  passwordHash?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
   profileHandle?: Prisma.SortOrder
   discordRoles?: Prisma.SortOrder
   inGuild?: Prisma.SortOrder
+  onboardingCompleted?: Prisma.SortOrder
   playerRankId?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
   bio?: Prisma.SortOrder
@@ -696,9 +736,11 @@ export type UserMaxOrderByAggregateInput = {
   avatar?: Prisma.SortOrder
   locale?: Prisma.SortOrder
   email?: Prisma.SortOrder
+  passwordHash?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
   profileHandle?: Prisma.SortOrder
   inGuild?: Prisma.SortOrder
+  onboardingCompleted?: Prisma.SortOrder
   playerRankId?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
   bio?: Prisma.SortOrder
@@ -716,9 +758,11 @@ export type UserMinOrderByAggregateInput = {
   avatar?: Prisma.SortOrder
   locale?: Prisma.SortOrder
   email?: Prisma.SortOrder
+  passwordHash?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
   profileHandle?: Prisma.SortOrder
   inGuild?: Prisma.SortOrder
+  onboardingCompleted?: Prisma.SortOrder
   playerRankId?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
   bio?: Prisma.SortOrder
@@ -1087,16 +1131,18 @@ export type UserUpdateOneRequiredWithoutReceivedFriendRequestsNestedInput = {
 
 export type UserCreateWithoutSessionsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -1126,16 +1172,18 @@ export type UserCreateWithoutSessionsInput = {
 
 export type UserUncheckedCreateWithoutSessionsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -1181,16 +1229,18 @@ export type UserUpdateToOneWithWhereWithoutSessionsInput = {
 
 export type UserUpdateWithoutSessionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1220,16 +1270,18 @@ export type UserUpdateWithoutSessionsInput = {
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1259,16 +1311,18 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
 
 export type UserCreateWithoutRolesInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -1298,16 +1352,18 @@ export type UserCreateWithoutRolesInput = {
 
 export type UserUncheckedCreateWithoutRolesInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -1353,16 +1409,18 @@ export type UserUpdateToOneWithWhereWithoutRolesInput = {
 
 export type UserUpdateWithoutRolesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1392,16 +1450,18 @@ export type UserUpdateWithoutRolesInput = {
 
 export type UserUncheckedUpdateWithoutRolesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1431,16 +1491,18 @@ export type UserUncheckedUpdateWithoutRolesInput = {
 
 export type UserCreateWithoutPlayerRankInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -1470,16 +1532,18 @@ export type UserCreateWithoutPlayerRankInput = {
 
 export type UserUncheckedCreateWithoutPlayerRankInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -1538,16 +1602,18 @@ export type UserScalarWhereInput = {
   OR?: Prisma.UserScalarWhereInput[]
   NOT?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
   id?: Prisma.StringFilter<"User"> | string
-  discordId?: Prisma.StringFilter<"User"> | string
+  discordId?: Prisma.StringNullableFilter<"User"> | string | null
   username?: Prisma.StringFilter<"User"> | string
   discriminator?: Prisma.StringFilter<"User"> | string
   avatar?: Prisma.StringNullableFilter<"User"> | string | null
   locale?: Prisma.StringNullableFilter<"User"> | string | null
   email?: Prisma.StringNullableFilter<"User"> | string | null
+  passwordHash?: Prisma.StringNullableFilter<"User"> | string | null
   displayName?: Prisma.StringNullableFilter<"User"> | string | null
   profileHandle?: Prisma.StringFilter<"User"> | string
   discordRoles?: Prisma.StringNullableListFilter<"User">
   inGuild?: Prisma.BoolFilter<"User"> | boolean
+  onboardingCompleted?: Prisma.BoolFilter<"User"> | boolean
   playerRankId?: Prisma.StringNullableFilter<"User"> | string | null
   joinedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   bio?: Prisma.StringNullableFilter<"User"> | string | null
@@ -1559,16 +1625,18 @@ export type UserScalarWhereInput = {
 
 export type UserCreateWithoutKnowledgeArticlesInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -1598,16 +1666,18 @@ export type UserCreateWithoutKnowledgeArticlesInput = {
 
 export type UserUncheckedCreateWithoutKnowledgeArticlesInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -1653,16 +1723,18 @@ export type UserUpdateToOneWithWhereWithoutKnowledgeArticlesInput = {
 
 export type UserUpdateWithoutKnowledgeArticlesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1692,16 +1764,18 @@ export type UserUpdateWithoutKnowledgeArticlesInput = {
 
 export type UserUncheckedUpdateWithoutKnowledgeArticlesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1731,16 +1805,18 @@ export type UserUncheckedUpdateWithoutKnowledgeArticlesInput = {
 
 export type UserCreateWithoutUserTagsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -1770,16 +1846,18 @@ export type UserCreateWithoutUserTagsInput = {
 
 export type UserUncheckedCreateWithoutUserTagsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -1825,16 +1903,18 @@ export type UserUpdateToOneWithWhereWithoutUserTagsInput = {
 
 export type UserUpdateWithoutUserTagsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1864,16 +1944,18 @@ export type UserUpdateWithoutUserTagsInput = {
 
 export type UserUncheckedUpdateWithoutUserTagsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1903,16 +1985,18 @@ export type UserUncheckedUpdateWithoutUserTagsInput = {
 
 export type UserCreateWithoutCoachCommentsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -1942,16 +2026,18 @@ export type UserCreateWithoutCoachCommentsInput = {
 
 export type UserUncheckedCreateWithoutCoachCommentsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -1997,16 +2083,18 @@ export type UserUpdateToOneWithWhereWithoutCoachCommentsInput = {
 
 export type UserUpdateWithoutCoachCommentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2036,16 +2124,18 @@ export type UserUpdateWithoutCoachCommentsInput = {
 
 export type UserUncheckedUpdateWithoutCoachCommentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2075,16 +2165,18 @@ export type UserUncheckedUpdateWithoutCoachCommentsInput = {
 
 export type UserCreateWithoutArticleRevisionsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -2114,16 +2206,18 @@ export type UserCreateWithoutArticleRevisionsInput = {
 
 export type UserUncheckedCreateWithoutArticleRevisionsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -2169,16 +2263,18 @@ export type UserUpdateToOneWithWhereWithoutArticleRevisionsInput = {
 
 export type UserUpdateWithoutArticleRevisionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2208,16 +2304,18 @@ export type UserUpdateWithoutArticleRevisionsInput = {
 
 export type UserUncheckedUpdateWithoutArticleRevisionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2247,16 +2345,18 @@ export type UserUncheckedUpdateWithoutArticleRevisionsInput = {
 
 export type UserCreateWithoutClipsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -2286,16 +2386,18 @@ export type UserCreateWithoutClipsInput = {
 
 export type UserUncheckedCreateWithoutClipsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -2341,16 +2443,18 @@ export type UserUpdateToOneWithWhereWithoutClipsInput = {
 
 export type UserUpdateWithoutClipsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2380,16 +2484,18 @@ export type UserUpdateWithoutClipsInput = {
 
 export type UserUncheckedUpdateWithoutClipsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2419,16 +2525,18 @@ export type UserUncheckedUpdateWithoutClipsInput = {
 
 export type UserCreateWithoutClipLikesInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -2458,16 +2566,18 @@ export type UserCreateWithoutClipLikesInput = {
 
 export type UserUncheckedCreateWithoutClipLikesInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -2513,16 +2623,18 @@ export type UserUpdateToOneWithWhereWithoutClipLikesInput = {
 
 export type UserUpdateWithoutClipLikesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2552,16 +2664,18 @@ export type UserUpdateWithoutClipLikesInput = {
 
 export type UserUncheckedUpdateWithoutClipLikesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2591,16 +2705,18 @@ export type UserUncheckedUpdateWithoutClipLikesInput = {
 
 export type UserCreateWithoutCommentsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -2630,16 +2746,18 @@ export type UserCreateWithoutCommentsInput = {
 
 export type UserUncheckedCreateWithoutCommentsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -2685,16 +2803,18 @@ export type UserUpdateToOneWithWhereWithoutCommentsInput = {
 
 export type UserUpdateWithoutCommentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2724,16 +2844,18 @@ export type UserUpdateWithoutCommentsInput = {
 
 export type UserUncheckedUpdateWithoutCommentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2763,16 +2885,18 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
 
 export type UserCreateWithoutReportsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -2802,16 +2926,18 @@ export type UserCreateWithoutReportsInput = {
 
 export type UserUncheckedCreateWithoutReportsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -2846,16 +2972,18 @@ export type UserCreateOrConnectWithoutReportsInput = {
 
 export type UserCreateWithoutReportedResolvedByInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -2885,16 +3013,18 @@ export type UserCreateWithoutReportedResolvedByInput = {
 
 export type UserUncheckedCreateWithoutReportedResolvedByInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -2940,16 +3070,18 @@ export type UserUpdateToOneWithWhereWithoutReportsInput = {
 
 export type UserUpdateWithoutReportsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2979,16 +3111,18 @@ export type UserUpdateWithoutReportsInput = {
 
 export type UserUncheckedUpdateWithoutReportsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3029,16 +3163,18 @@ export type UserUpdateToOneWithWhereWithoutReportedResolvedByInput = {
 
 export type UserUpdateWithoutReportedResolvedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3068,16 +3204,18 @@ export type UserUpdateWithoutReportedResolvedByInput = {
 
 export type UserUncheckedUpdateWithoutReportedResolvedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3107,16 +3245,18 @@ export type UserUncheckedUpdateWithoutReportedResolvedByInput = {
 
 export type UserCreateWithoutAnnouncementsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -3146,16 +3286,18 @@ export type UserCreateWithoutAnnouncementsInput = {
 
 export type UserUncheckedCreateWithoutAnnouncementsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -3201,16 +3343,18 @@ export type UserUpdateToOneWithWhereWithoutAnnouncementsInput = {
 
 export type UserUpdateWithoutAnnouncementsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3240,16 +3384,18 @@ export type UserUpdateWithoutAnnouncementsInput = {
 
 export type UserUncheckedUpdateWithoutAnnouncementsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3279,16 +3425,18 @@ export type UserUncheckedUpdateWithoutAnnouncementsInput = {
 
 export type UserCreateWithoutNotificationsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -3318,16 +3466,18 @@ export type UserCreateWithoutNotificationsInput = {
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -3373,16 +3523,18 @@ export type UserUpdateToOneWithWhereWithoutNotificationsInput = {
 
 export type UserUpdateWithoutNotificationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3412,16 +3564,18 @@ export type UserUpdateWithoutNotificationsInput = {
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3451,16 +3605,18 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
 
 export type UserCreateWithoutModerationActionsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -3490,16 +3646,18 @@ export type UserCreateWithoutModerationActionsInput = {
 
 export type UserUncheckedCreateWithoutModerationActionsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -3545,16 +3703,18 @@ export type UserUpdateToOneWithWhereWithoutModerationActionsInput = {
 
 export type UserUpdateWithoutModerationActionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3584,16 +3744,18 @@ export type UserUpdateWithoutModerationActionsInput = {
 
 export type UserUncheckedUpdateWithoutModerationActionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3623,16 +3785,18 @@ export type UserUncheckedUpdateWithoutModerationActionsInput = {
 
 export type UserCreateWithoutConversationsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -3662,16 +3826,18 @@ export type UserCreateWithoutConversationsInput = {
 
 export type UserUncheckedCreateWithoutConversationsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -3717,16 +3883,18 @@ export type UserUpdateToOneWithWhereWithoutConversationsInput = {
 
 export type UserUpdateWithoutConversationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3756,16 +3924,18 @@ export type UserUpdateWithoutConversationsInput = {
 
 export type UserUncheckedUpdateWithoutConversationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3795,16 +3965,18 @@ export type UserUncheckedUpdateWithoutConversationsInput = {
 
 export type UserCreateWithoutConversationMembershipsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -3834,16 +4006,18 @@ export type UserCreateWithoutConversationMembershipsInput = {
 
 export type UserUncheckedCreateWithoutConversationMembershipsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -3889,16 +4063,18 @@ export type UserUpdateToOneWithWhereWithoutConversationMembershipsInput = {
 
 export type UserUpdateWithoutConversationMembershipsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3928,16 +4104,18 @@ export type UserUpdateWithoutConversationMembershipsInput = {
 
 export type UserUncheckedUpdateWithoutConversationMembershipsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3967,16 +4145,18 @@ export type UserUncheckedUpdateWithoutConversationMembershipsInput = {
 
 export type UserCreateWithoutMessagesSentInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -4006,16 +4186,18 @@ export type UserCreateWithoutMessagesSentInput = {
 
 export type UserUncheckedCreateWithoutMessagesSentInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -4061,16 +4243,18 @@ export type UserUpdateToOneWithWhereWithoutMessagesSentInput = {
 
 export type UserUpdateWithoutMessagesSentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4100,16 +4284,18 @@ export type UserUpdateWithoutMessagesSentInput = {
 
 export type UserUncheckedUpdateWithoutMessagesSentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4139,16 +4325,18 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
 
 export type UserCreateWithoutSentFriendRequestsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -4178,16 +4366,18 @@ export type UserCreateWithoutSentFriendRequestsInput = {
 
 export type UserUncheckedCreateWithoutSentFriendRequestsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -4222,16 +4412,18 @@ export type UserCreateOrConnectWithoutSentFriendRequestsInput = {
 
 export type UserCreateWithoutReceivedFriendRequestsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -4261,16 +4453,18 @@ export type UserCreateWithoutReceivedFriendRequestsInput = {
 
 export type UserUncheckedCreateWithoutReceivedFriendRequestsInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: string | null
   joinedAt?: Date | string
   bio?: string | null
@@ -4316,16 +4510,18 @@ export type UserUpdateToOneWithWhereWithoutSentFriendRequestsInput = {
 
 export type UserUpdateWithoutSentFriendRequestsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4355,16 +4551,18 @@ export type UserUpdateWithoutSentFriendRequestsInput = {
 
 export type UserUncheckedUpdateWithoutSentFriendRequestsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4405,16 +4603,18 @@ export type UserUpdateToOneWithWhereWithoutReceivedFriendRequestsInput = {
 
 export type UserUpdateWithoutReceivedFriendRequestsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4444,16 +4644,18 @@ export type UserUpdateWithoutReceivedFriendRequestsInput = {
 
 export type UserUncheckedUpdateWithoutReceivedFriendRequestsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4483,16 +4685,18 @@ export type UserUncheckedUpdateWithoutReceivedFriendRequestsInput = {
 
 export type UserCreateManyPlayerRankInput = {
   id?: string
-  discordId: string
+  discordId?: string | null
   username: string
   discriminator: string
   avatar?: string | null
   locale?: string | null
   email?: string | null
+  passwordHash?: string | null
   displayName?: string | null
   profileHandle: string
   discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
   inGuild?: boolean
+  onboardingCompleted?: boolean
   joinedAt?: Date | string
   bio?: string | null
   website?: string | null
@@ -4503,16 +4707,18 @@ export type UserCreateManyPlayerRankInput = {
 
 export type UserUpdateWithoutPlayerRankInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4542,16 +4748,18 @@ export type UserUpdateWithoutPlayerRankInput = {
 
 export type UserUncheckedUpdateWithoutPlayerRankInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4581,16 +4789,18 @@ export type UserUncheckedUpdateWithoutPlayerRankInput = {
 
 export type UserUncheckedUpdateManyWithoutPlayerRankInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  discordId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
   discriminator?: Prisma.StringFieldUpdateOperationsInput | string
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4800,10 +5010,12 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   avatar?: boolean
   locale?: boolean
   email?: boolean
+  passwordHash?: boolean
   displayName?: boolean
   profileHandle?: boolean
   discordRoles?: boolean
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: boolean
   joinedAt?: boolean
   bio?: boolean
@@ -4842,10 +5054,12 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   avatar?: boolean
   locale?: boolean
   email?: boolean
+  passwordHash?: boolean
   displayName?: boolean
   profileHandle?: boolean
   discordRoles?: boolean
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: boolean
   joinedAt?: boolean
   bio?: boolean
@@ -4864,10 +5078,12 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   avatar?: boolean
   locale?: boolean
   email?: boolean
+  passwordHash?: boolean
   displayName?: boolean
   profileHandle?: boolean
   discordRoles?: boolean
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: boolean
   joinedAt?: boolean
   bio?: boolean
@@ -4886,10 +5102,12 @@ export type UserSelectScalar = {
   avatar?: boolean
   locale?: boolean
   email?: boolean
+  passwordHash?: boolean
   displayName?: boolean
   profileHandle?: boolean
   discordRoles?: boolean
   inGuild?: boolean
+  onboardingCompleted?: boolean
   playerRankId?: boolean
   joinedAt?: boolean
   bio?: boolean
@@ -4899,7 +5117,7 @@ export type UserSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "discordId" | "username" | "discriminator" | "avatar" | "locale" | "email" | "displayName" | "profileHandle" | "discordRoles" | "inGuild" | "playerRankId" | "joinedAt" | "bio" | "website" | "isSuspended" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "discordId" | "username" | "discriminator" | "avatar" | "locale" | "email" | "passwordHash" | "displayName" | "profileHandle" | "discordRoles" | "inGuild" | "onboardingCompleted" | "playerRankId" | "joinedAt" | "bio" | "website" | "isSuspended" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   playerRank?: boolean | Prisma.User$playerRankArgs<ExtArgs>
   roles?: boolean | Prisma.User$rolesArgs<ExtArgs>
@@ -4956,16 +5174,18 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    discordId: string
+    discordId: string | null
     username: string
     discriminator: string
     avatar: string | null
     locale: string | null
     email: string | null
+    passwordHash: string | null
     displayName: string | null
     profileHandle: string
     discordRoles: string[]
     inGuild: boolean
+    onboardingCompleted: boolean
     playerRankId: string | null
     joinedAt: Date
     bio: string | null
@@ -5423,10 +5643,12 @@ export interface UserFieldRefs {
   readonly avatar: Prisma.FieldRef<"User", 'String'>
   readonly locale: Prisma.FieldRef<"User", 'String'>
   readonly email: Prisma.FieldRef<"User", 'String'>
+  readonly passwordHash: Prisma.FieldRef<"User", 'String'>
   readonly displayName: Prisma.FieldRef<"User", 'String'>
   readonly profileHandle: Prisma.FieldRef<"User", 'String'>
   readonly discordRoles: Prisma.FieldRef<"User", 'String[]'>
   readonly inGuild: Prisma.FieldRef<"User", 'Boolean'>
+  readonly onboardingCompleted: Prisma.FieldRef<"User", 'Boolean'>
   readonly playerRankId: Prisma.FieldRef<"User", 'String'>
   readonly joinedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly bio: Prisma.FieldRef<"User", 'String'>

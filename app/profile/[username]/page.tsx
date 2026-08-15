@@ -2,8 +2,10 @@ import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
+import { getAvatarUrl } from "@/lib/avatar";
 import { UserTags } from "@/components/user-tags";
 import { FriendButton } from "@/components/friend-button";
+import { ReportButton } from "@/components/report-button";
 
 export const dynamic = "force-dynamic";
 
@@ -30,9 +32,7 @@ export default async function ProfilePage({ params }: Props) {
   }
 
   const isOwnProfile = currentUser?.id === user.id;
-  const avatarUrl = user.avatar
-    ? `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png?size=256`
-    : null;
+  const avatarUrl = getAvatarUrl(user, 256);
 
   return (
     <div className="space-y-8">
@@ -73,6 +73,9 @@ export default async function ProfilePage({ params }: Props) {
               >
                 <MessageCircle size={16} /> Message
               </Link>
+            )}
+            {currentUser && !isOwnProfile && (
+              <ReportButton targetType="user" targetId={user.id} targetLabel={user.username} />
             )}
             <div className="rounded-3xl border border-border bg-background/80 px-5 py-4 text-sm text-muted">
               <p>Member since</p>

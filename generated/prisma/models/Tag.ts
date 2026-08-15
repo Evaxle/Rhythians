@@ -177,6 +177,7 @@ export type TagWhereInput = {
   clips?: Prisma.ClipTagListRelationFilter
   articles?: Prisma.ArticleTagListRelationFilter
   users?: Prisma.UserTagListRelationFilter
+  discordRoleTagMappings?: Prisma.DiscordRoleTagMappingListRelationFilter
 }
 
 export type TagOrderByWithRelationInput = {
@@ -187,6 +188,7 @@ export type TagOrderByWithRelationInput = {
   clips?: Prisma.ClipTagOrderByRelationAggregateInput
   articles?: Prisma.ArticleTagOrderByRelationAggregateInput
   users?: Prisma.UserTagOrderByRelationAggregateInput
+  discordRoleTagMappings?: Prisma.DiscordRoleTagMappingOrderByRelationAggregateInput
 }
 
 export type TagWhereUniqueInput = Prisma.AtLeast<{
@@ -200,6 +202,7 @@ export type TagWhereUniqueInput = Prisma.AtLeast<{
   clips?: Prisma.ClipTagListRelationFilter
   articles?: Prisma.ArticleTagListRelationFilter
   users?: Prisma.UserTagListRelationFilter
+  discordRoleTagMappings?: Prisma.DiscordRoleTagMappingListRelationFilter
 }, "id" | "name" | "slug">
 
 export type TagOrderByWithAggregationInput = {
@@ -230,6 +233,7 @@ export type TagCreateInput = {
   clips?: Prisma.ClipTagCreateNestedManyWithoutTagInput
   articles?: Prisma.ArticleTagCreateNestedManyWithoutTagInput
   users?: Prisma.UserTagCreateNestedManyWithoutTagInput
+  discordRoleTagMappings?: Prisma.DiscordRoleTagMappingCreateNestedManyWithoutTagInput
 }
 
 export type TagUncheckedCreateInput = {
@@ -240,6 +244,7 @@ export type TagUncheckedCreateInput = {
   clips?: Prisma.ClipTagUncheckedCreateNestedManyWithoutTagInput
   articles?: Prisma.ArticleTagUncheckedCreateNestedManyWithoutTagInput
   users?: Prisma.UserTagUncheckedCreateNestedManyWithoutTagInput
+  discordRoleTagMappings?: Prisma.DiscordRoleTagMappingUncheckedCreateNestedManyWithoutTagInput
 }
 
 export type TagUpdateInput = {
@@ -250,6 +255,7 @@ export type TagUpdateInput = {
   clips?: Prisma.ClipTagUpdateManyWithoutTagNestedInput
   articles?: Prisma.ArticleTagUpdateManyWithoutTagNestedInput
   users?: Prisma.UserTagUpdateManyWithoutTagNestedInput
+  discordRoleTagMappings?: Prisma.DiscordRoleTagMappingUpdateManyWithoutTagNestedInput
 }
 
 export type TagUncheckedUpdateInput = {
@@ -260,6 +266,7 @@ export type TagUncheckedUpdateInput = {
   clips?: Prisma.ClipTagUncheckedUpdateManyWithoutTagNestedInput
   articles?: Prisma.ArticleTagUncheckedUpdateManyWithoutTagNestedInput
   users?: Prisma.UserTagUncheckedUpdateManyWithoutTagNestedInput
+  discordRoleTagMappings?: Prisma.DiscordRoleTagMappingUncheckedUpdateManyWithoutTagNestedInput
 }
 
 export type TagCreateManyInput = {
@@ -323,6 +330,20 @@ export type TagUpdateOneRequiredWithoutUsersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TagUpdateToOneWithWhereWithoutUsersInput, Prisma.TagUpdateWithoutUsersInput>, Prisma.TagUncheckedUpdateWithoutUsersInput>
 }
 
+export type TagCreateNestedOneWithoutDiscordRoleTagMappingsInput = {
+  create?: Prisma.XOR<Prisma.TagCreateWithoutDiscordRoleTagMappingsInput, Prisma.TagUncheckedCreateWithoutDiscordRoleTagMappingsInput>
+  connectOrCreate?: Prisma.TagCreateOrConnectWithoutDiscordRoleTagMappingsInput
+  connect?: Prisma.TagWhereUniqueInput
+}
+
+export type TagUpdateOneRequiredWithoutDiscordRoleTagMappingsNestedInput = {
+  create?: Prisma.XOR<Prisma.TagCreateWithoutDiscordRoleTagMappingsInput, Prisma.TagUncheckedCreateWithoutDiscordRoleTagMappingsInput>
+  connectOrCreate?: Prisma.TagCreateOrConnectWithoutDiscordRoleTagMappingsInput
+  upsert?: Prisma.TagUpsertWithoutDiscordRoleTagMappingsInput
+  connect?: Prisma.TagWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TagUpdateToOneWithWhereWithoutDiscordRoleTagMappingsInput, Prisma.TagUpdateWithoutDiscordRoleTagMappingsInput>, Prisma.TagUncheckedUpdateWithoutDiscordRoleTagMappingsInput>
+}
+
 export type TagCreateNestedOneWithoutArticlesInput = {
   create?: Prisma.XOR<Prisma.TagCreateWithoutArticlesInput, Prisma.TagUncheckedCreateWithoutArticlesInput>
   connectOrCreate?: Prisma.TagCreateOrConnectWithoutArticlesInput
@@ -358,6 +379,7 @@ export type TagCreateWithoutUsersInput = {
   createdAt?: Date | string
   clips?: Prisma.ClipTagCreateNestedManyWithoutTagInput
   articles?: Prisma.ArticleTagCreateNestedManyWithoutTagInput
+  discordRoleTagMappings?: Prisma.DiscordRoleTagMappingCreateNestedManyWithoutTagInput
 }
 
 export type TagUncheckedCreateWithoutUsersInput = {
@@ -367,6 +389,7 @@ export type TagUncheckedCreateWithoutUsersInput = {
   createdAt?: Date | string
   clips?: Prisma.ClipTagUncheckedCreateNestedManyWithoutTagInput
   articles?: Prisma.ArticleTagUncheckedCreateNestedManyWithoutTagInput
+  discordRoleTagMappings?: Prisma.DiscordRoleTagMappingUncheckedCreateNestedManyWithoutTagInput
 }
 
 export type TagCreateOrConnectWithoutUsersInput = {
@@ -392,6 +415,7 @@ export type TagUpdateWithoutUsersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clips?: Prisma.ClipTagUpdateManyWithoutTagNestedInput
   articles?: Prisma.ArticleTagUpdateManyWithoutTagNestedInput
+  discordRoleTagMappings?: Prisma.DiscordRoleTagMappingUpdateManyWithoutTagNestedInput
 }
 
 export type TagUncheckedUpdateWithoutUsersInput = {
@@ -401,6 +425,63 @@ export type TagUncheckedUpdateWithoutUsersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clips?: Prisma.ClipTagUncheckedUpdateManyWithoutTagNestedInput
   articles?: Prisma.ArticleTagUncheckedUpdateManyWithoutTagNestedInput
+  discordRoleTagMappings?: Prisma.DiscordRoleTagMappingUncheckedUpdateManyWithoutTagNestedInput
+}
+
+export type TagCreateWithoutDiscordRoleTagMappingsInput = {
+  id?: string
+  name: string
+  slug: string
+  createdAt?: Date | string
+  clips?: Prisma.ClipTagCreateNestedManyWithoutTagInput
+  articles?: Prisma.ArticleTagCreateNestedManyWithoutTagInput
+  users?: Prisma.UserTagCreateNestedManyWithoutTagInput
+}
+
+export type TagUncheckedCreateWithoutDiscordRoleTagMappingsInput = {
+  id?: string
+  name: string
+  slug: string
+  createdAt?: Date | string
+  clips?: Prisma.ClipTagUncheckedCreateNestedManyWithoutTagInput
+  articles?: Prisma.ArticleTagUncheckedCreateNestedManyWithoutTagInput
+  users?: Prisma.UserTagUncheckedCreateNestedManyWithoutTagInput
+}
+
+export type TagCreateOrConnectWithoutDiscordRoleTagMappingsInput = {
+  where: Prisma.TagWhereUniqueInput
+  create: Prisma.XOR<Prisma.TagCreateWithoutDiscordRoleTagMappingsInput, Prisma.TagUncheckedCreateWithoutDiscordRoleTagMappingsInput>
+}
+
+export type TagUpsertWithoutDiscordRoleTagMappingsInput = {
+  update: Prisma.XOR<Prisma.TagUpdateWithoutDiscordRoleTagMappingsInput, Prisma.TagUncheckedUpdateWithoutDiscordRoleTagMappingsInput>
+  create: Prisma.XOR<Prisma.TagCreateWithoutDiscordRoleTagMappingsInput, Prisma.TagUncheckedCreateWithoutDiscordRoleTagMappingsInput>
+  where?: Prisma.TagWhereInput
+}
+
+export type TagUpdateToOneWithWhereWithoutDiscordRoleTagMappingsInput = {
+  where?: Prisma.TagWhereInput
+  data: Prisma.XOR<Prisma.TagUpdateWithoutDiscordRoleTagMappingsInput, Prisma.TagUncheckedUpdateWithoutDiscordRoleTagMappingsInput>
+}
+
+export type TagUpdateWithoutDiscordRoleTagMappingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clips?: Prisma.ClipTagUpdateManyWithoutTagNestedInput
+  articles?: Prisma.ArticleTagUpdateManyWithoutTagNestedInput
+  users?: Prisma.UserTagUpdateManyWithoutTagNestedInput
+}
+
+export type TagUncheckedUpdateWithoutDiscordRoleTagMappingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clips?: Prisma.ClipTagUncheckedUpdateManyWithoutTagNestedInput
+  articles?: Prisma.ArticleTagUncheckedUpdateManyWithoutTagNestedInput
+  users?: Prisma.UserTagUncheckedUpdateManyWithoutTagNestedInput
 }
 
 export type TagCreateWithoutArticlesInput = {
@@ -410,6 +491,7 @@ export type TagCreateWithoutArticlesInput = {
   createdAt?: Date | string
   clips?: Prisma.ClipTagCreateNestedManyWithoutTagInput
   users?: Prisma.UserTagCreateNestedManyWithoutTagInput
+  discordRoleTagMappings?: Prisma.DiscordRoleTagMappingCreateNestedManyWithoutTagInput
 }
 
 export type TagUncheckedCreateWithoutArticlesInput = {
@@ -419,6 +501,7 @@ export type TagUncheckedCreateWithoutArticlesInput = {
   createdAt?: Date | string
   clips?: Prisma.ClipTagUncheckedCreateNestedManyWithoutTagInput
   users?: Prisma.UserTagUncheckedCreateNestedManyWithoutTagInput
+  discordRoleTagMappings?: Prisma.DiscordRoleTagMappingUncheckedCreateNestedManyWithoutTagInput
 }
 
 export type TagCreateOrConnectWithoutArticlesInput = {
@@ -444,6 +527,7 @@ export type TagUpdateWithoutArticlesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clips?: Prisma.ClipTagUpdateManyWithoutTagNestedInput
   users?: Prisma.UserTagUpdateManyWithoutTagNestedInput
+  discordRoleTagMappings?: Prisma.DiscordRoleTagMappingUpdateManyWithoutTagNestedInput
 }
 
 export type TagUncheckedUpdateWithoutArticlesInput = {
@@ -453,6 +537,7 @@ export type TagUncheckedUpdateWithoutArticlesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clips?: Prisma.ClipTagUncheckedUpdateManyWithoutTagNestedInput
   users?: Prisma.UserTagUncheckedUpdateManyWithoutTagNestedInput
+  discordRoleTagMappings?: Prisma.DiscordRoleTagMappingUncheckedUpdateManyWithoutTagNestedInput
 }
 
 export type TagCreateWithoutClipsInput = {
@@ -462,6 +547,7 @@ export type TagCreateWithoutClipsInput = {
   createdAt?: Date | string
   articles?: Prisma.ArticleTagCreateNestedManyWithoutTagInput
   users?: Prisma.UserTagCreateNestedManyWithoutTagInput
+  discordRoleTagMappings?: Prisma.DiscordRoleTagMappingCreateNestedManyWithoutTagInput
 }
 
 export type TagUncheckedCreateWithoutClipsInput = {
@@ -471,6 +557,7 @@ export type TagUncheckedCreateWithoutClipsInput = {
   createdAt?: Date | string
   articles?: Prisma.ArticleTagUncheckedCreateNestedManyWithoutTagInput
   users?: Prisma.UserTagUncheckedCreateNestedManyWithoutTagInput
+  discordRoleTagMappings?: Prisma.DiscordRoleTagMappingUncheckedCreateNestedManyWithoutTagInput
 }
 
 export type TagCreateOrConnectWithoutClipsInput = {
@@ -496,6 +583,7 @@ export type TagUpdateWithoutClipsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   articles?: Prisma.ArticleTagUpdateManyWithoutTagNestedInput
   users?: Prisma.UserTagUpdateManyWithoutTagNestedInput
+  discordRoleTagMappings?: Prisma.DiscordRoleTagMappingUpdateManyWithoutTagNestedInput
 }
 
 export type TagUncheckedUpdateWithoutClipsInput = {
@@ -505,6 +593,7 @@ export type TagUncheckedUpdateWithoutClipsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   articles?: Prisma.ArticleTagUncheckedUpdateManyWithoutTagNestedInput
   users?: Prisma.UserTagUncheckedUpdateManyWithoutTagNestedInput
+  discordRoleTagMappings?: Prisma.DiscordRoleTagMappingUncheckedUpdateManyWithoutTagNestedInput
 }
 
 
@@ -516,12 +605,14 @@ export type TagCountOutputType = {
   clips: number
   articles: number
   users: number
+  discordRoleTagMappings: number
 }
 
 export type TagCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   clips?: boolean | TagCountOutputTypeCountClipsArgs
   articles?: boolean | TagCountOutputTypeCountArticlesArgs
   users?: boolean | TagCountOutputTypeCountUsersArgs
+  discordRoleTagMappings?: boolean | TagCountOutputTypeCountDiscordRoleTagMappingsArgs
 }
 
 /**
@@ -555,6 +646,13 @@ export type TagCountOutputTypeCountUsersArgs<ExtArgs extends runtime.Types.Exten
   where?: Prisma.UserTagWhereInput
 }
 
+/**
+ * TagCountOutputType without action
+ */
+export type TagCountOutputTypeCountDiscordRoleTagMappingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DiscordRoleTagMappingWhereInput
+}
+
 
 export type TagSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -564,6 +662,7 @@ export type TagSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = ru
   clips?: boolean | Prisma.Tag$clipsArgs<ExtArgs>
   articles?: boolean | Prisma.Tag$articlesArgs<ExtArgs>
   users?: boolean | Prisma.Tag$usersArgs<ExtArgs>
+  discordRoleTagMappings?: boolean | Prisma.Tag$discordRoleTagMappingsArgs<ExtArgs>
   _count?: boolean | Prisma.TagCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tag"]>
 
@@ -593,6 +692,7 @@ export type TagInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   clips?: boolean | Prisma.Tag$clipsArgs<ExtArgs>
   articles?: boolean | Prisma.Tag$articlesArgs<ExtArgs>
   users?: boolean | Prisma.Tag$usersArgs<ExtArgs>
+  discordRoleTagMappings?: boolean | Prisma.Tag$discordRoleTagMappingsArgs<ExtArgs>
   _count?: boolean | Prisma.TagCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TagIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -604,6 +704,7 @@ export type $TagPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
     clips: Prisma.$ClipTagPayload<ExtArgs>[]
     articles: Prisma.$ArticleTagPayload<ExtArgs>[]
     users: Prisma.$UserTagPayload<ExtArgs>[]
+    discordRoleTagMappings: Prisma.$DiscordRoleTagMappingPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1007,6 +1108,7 @@ export interface Prisma__TagClient<T, Null = never, ExtArgs extends runtime.Type
   clips<T extends Prisma.Tag$clipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tag$clipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClipTagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   articles<T extends Prisma.Tag$articlesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tag$articlesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ArticleTagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   users<T extends Prisma.Tag$usersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tag$usersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserTagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  discordRoleTagMappings<T extends Prisma.Tag$discordRoleTagMappingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tag$discordRoleTagMappingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DiscordRoleTagMappingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1502,6 +1604,30 @@ export type Tag$usersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   take?: number
   skip?: number
   distinct?: Prisma.UserTagScalarFieldEnum | Prisma.UserTagScalarFieldEnum[]
+}
+
+/**
+ * Tag.discordRoleTagMappings
+ */
+export type Tag$discordRoleTagMappingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DiscordRoleTagMapping
+   */
+  select?: Prisma.DiscordRoleTagMappingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DiscordRoleTagMapping
+   */
+  omit?: Prisma.DiscordRoleTagMappingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DiscordRoleTagMappingInclude<ExtArgs> | null
+  where?: Prisma.DiscordRoleTagMappingWhereInput
+  orderBy?: Prisma.DiscordRoleTagMappingOrderByWithRelationInput | Prisma.DiscordRoleTagMappingOrderByWithRelationInput[]
+  cursor?: Prisma.DiscordRoleTagMappingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DiscordRoleTagMappingScalarFieldEnum | Prisma.DiscordRoleTagMappingScalarFieldEnum[]
 }
 
 /**

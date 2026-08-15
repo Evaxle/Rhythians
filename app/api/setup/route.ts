@@ -25,21 +25,36 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 DO $$ BEGIN
+  CREATE TYPE "TagSource" AS ENUM ('discord', 'manual', 'onboarding');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TYPE "TagSource" ADD VALUE IF NOT EXISTS 'onboarding';
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE "CameraMode" AS ENUM ('lock', 'spin', 'vr');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
   CREATE TYPE "PermissionName" AS ENUM ('knowledge_read', 'knowledge_create', 'knowledge_edit', 'knowledge_publish', 'knowledge_delete', 'clips_submit', 'clips_comment', 'clips_moderate', 'clips_delete', 'users_view', 'users_moderate', 'settings_manage', 'announcements_create', 'announcements_delete', 'admin_access');
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
 CREATE TABLE IF NOT EXISTS "User" (
     "id" TEXT NOT NULL,
-    "discordId" TEXT NOT NULL,
+    "discordId" TEXT,
     "username" TEXT NOT NULL,
     "discriminator" TEXT NOT NULL,
     "avatar" TEXT,
     "locale" TEXT,
     "email" TEXT,
+    "passwordHash" TEXT,
     "displayName" TEXT,
     "profileHandle" TEXT NOT NULL,
     "discordRoles" TEXT[] DEFAULT ARRAY[]::TEXT[],
+    "inGuild" BOOLEAN NOT NULL DEFAULT false,
+    "onboardingCompleted" BOOLEAN NOT NULL DEFAULT false,
     "playerRankId" TEXT,
     "joinedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "bio" TEXT,
@@ -49,6 +64,10 @@ CREATE TABLE IF NOT EXISTS "User" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
+
+ALTER TABLE "User" ALTER COLUMN "discordId" DROP NOT NULL;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "passwordHash" TEXT;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "onboardingCompleted" BOOLEAN NOT NULL DEFAULT false;
 
 CREATE TABLE IF NOT EXISTS "Session" (
     "id" TEXT NOT NULL,
@@ -171,6 +190,26 @@ CREATE TABLE IF NOT EXISTS "Tag" (
     CONSTRAINT "Tag_pkey" PRIMARY KEY ("id")
 );
 
+CREATE TABLE IF NOT EXISTS "UserTag" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "tagId" TEXT NOT NULL,
+    "source" "TagSource" NOT NULL DEFAULT 'discord',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "UserTag_pkey" PRIMARY KEY ("id")
+);
+
+ALTER TABLE "UserTag" ADD COLUMN IF NOT EXISTS "source" "TagSource" NOT NULL DEFAULT 'discord';
+
+CREATE TABLE IF NOT EXISTS "DiscordRoleTagMapping" (
+    "id" TEXT NOT NULL,
+    "discordRoleId" TEXT NOT NULL,
+    "tagId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    CONSTRAINT "DiscordRoleTagMapping_pkey" PRIMARY KEY ("id")
+);
+
 CREATE TABLE IF NOT EXISTS "ArticleTag" (
     "id" TEXT NOT NULL,
     "articleId" TEXT NOT NULL,
@@ -204,6 +243,8 @@ CREATE TABLE IF NOT EXISTS "Clip" (
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "status" "ClipStatus" NOT NULL DEFAULT 'pending',
+    "featuredOrder" INTEGER,
+    "cameraMode" "CameraMode",
     "storagePath" TEXT NOT NULL,
     "thumbnailPath" TEXT,
     "rejectionReason" TEXT,
@@ -213,6 +254,8 @@ CREATE TABLE IF NOT EXISTS "Clip" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     CONSTRAINT "Clip_pkey" PRIMARY KEY ("id")
 );
+
+ALTER TABLE "Clip" ADD COLUMN IF NOT EXISTS "cameraMode" "CameraMode";
 
 CREATE TABLE IF NOT EXISTS "ClipTag" (
     "id" TEXT NOT NULL,
@@ -379,6 +422,8 @@ CREATE INDEX IF NOT EXISTS "Message_conversationId_createdAt_idx" ON "Message"("
 CREATE INDEX IF NOT EXISTS "FriendRequest_receiverId_idx" ON "FriendRequest"("receiverId");
 CREATE INDEX IF NOT EXISTS "FriendRequest_senderId_idx" ON "FriendRequest"("senderId");
 CREATE UNIQUE INDEX IF NOT EXISTS "FriendRequest_senderId_receiverId_key" ON "FriendRequest"("senderId", "receiverId");
+CREATE UNIQUE INDEX IF NOT EXISTS "UserTag_userId_tagId_key" ON "UserTag"("userId", "tagId");
+CREATE UNIQUE INDEX IF NOT EXISTS "DiscordRoleTagMapping_discordRoleId_key" ON "DiscordRoleTagMapping"("discordRoleId");
 
 DO $$ BEGIN
   ALTER TABLE "User" ADD CONSTRAINT "User_playerRankId_fkey" FOREIGN KEY ("playerRankId") REFERENCES "PlayerRank"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -520,6 +565,18 @@ DO $$ BEGIN
   ALTER TABLE "FriendRequest" ADD CONSTRAINT "FriendRequest_receiverId_fkey" FOREIGN KEY ("receiverId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
+DO $$ BEGIN
+  ALTER TABLE "UserTag" ADD CONSTRAINT "UserTag_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE "UserTag" ADD CONSTRAINT "UserTag_tagId_fkey" FOREIGN KEY ("tagId") REFERENCES "Tag"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE "DiscordRoleTagMapping" ADD CONSTRAINT "DiscordRoleTagMapping_tagId_fkey" FOREIGN KEY ("tagId") REFERENCES "Tag"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 `;
 
 const SEED_SQL = `
@@ -553,7 +610,13 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const secret = url.searchParams.get("secret");
 
-  if (secret !== process.env.SESSION_COOKIE_NAME) {
+  if (!process.env.SETUP_SECRET) {
+    return NextResponse.json(
+      { error: "SETUP_SECRET is not configured. The setup endpoint is disabled." },
+      { status: 503 }
+    );
+  }
+  if (secret !== process.env.SETUP_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

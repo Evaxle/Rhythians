@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { createSession } from "@/lib/auth";
-import { getGuildMember, mapDiscordRolesToTags } from "@/lib/discord";
+import { createSession, setSessionCookie } from "@/lib/auth";
+import { getGuildMember } from "@/lib/discord";
+import { syncUserTagsFromDiscord } from "@/lib/discord-sync";
 
 const DISCORD_TOKEN_URL = "https://discord.com/api/oauth2/token";
 const DISCORD_USER_URL = "https://discord.com/api/users/@me";
@@ -15,6 +16,11 @@ const AVAILABLE_TAGS = [
   "veteran",
   "rhythian-coach",
   "tester",
+  "post-reviewer",
+  "mentor",
+  "camera-lock",
+  "camera-spin",
+  "camera-vr",
 ];
 
 export async function GET(request: Request) {
@@ -93,8 +99,10 @@ export async function GET(request: Request) {
 
   await ensureTagsExist();
 
-  if (inGuild && discordRoles.length > 0) {
-    await syncUserTags(user.id, discordRoles);
+  if (inGuild) {
+    await syncUserTagsFromDiscord(prisma, user.id, discordRoles);
+  } else {
+    await prisma.userTag.deleteMany({ where: { userId: user.id, source: "discord" } });
   }
 
   if ((await prisma.role.count()) === 0) {
@@ -113,15 +121,7 @@ export async function GET(request: Request) {
 
   const token = await createSession(user.id);
   const response = NextResponse.redirect(new URL("/", request.url));
-  response.cookies.set({
-    name: process.env.SESSION_COOKIE_NAME ?? "rhythians_session",
-    value: token,
-    httpOnly: true,
-    path: "/",
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: Number(process.env.SESSION_EXPIRES_DAYS ?? 30) * 24 * 60 * 60,
-  });
+  setSessionCookie(response, token);
 
   return response;
 }
@@ -133,27 +133,6 @@ async function ensureTagsExist() {
       where: { slug: tagSlug },
       update: {},
       create: { name: tagName, slug: tagSlug },
-    });
-  }
-}
-
-async function syncUserTags(userId: string, discordRoles: string[]) {
-  const roleMappings = await prisma.discordRoleMapping.findMany();
-  const roleIdToName: Record<string, string> = {};
-  for (const mapping of roleMappings) {
-    const role = await prisma.role.findUnique({ where: { id: mapping.roleId } });
-    if (role) roleIdToName[mapping.discordRoleId] = role.name;
-  }
-
-  const tagSlugs = mapDiscordRolesToTags(discordRoles, roleIdToName);
-
-  const tags = await prisma.tag.findMany({ where: { slug: { in: tagSlugs } } });
-
-  await prisma.userTag.deleteMany({ where: { userId } });
-
-  if (tags.length > 0) {
-    await prisma.userTag.createMany({
-      data: tags.map(tag => ({ userId, tagId: tag.id })),
     });
   }
 }

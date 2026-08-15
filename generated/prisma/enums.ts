@@ -60,6 +60,24 @@ export const FriendRequestStatus = {
 export type FriendRequestStatus = (typeof FriendRequestStatus)[keyof typeof FriendRequestStatus]
 
 
+export const TagSource = {
+  discord: 'discord',
+  manual: 'manual',
+  onboarding: 'onboarding'
+} as const
+
+export type TagSource = (typeof TagSource)[keyof typeof TagSource]
+
+
+export const CameraMode = {
+  lock: 'lock',
+  spin: 'spin',
+  vr: 'vr'
+} as const
+
+export type CameraMode = (typeof CameraMode)[keyof typeof CameraMode]
+
+
 export const PermissionName = {
   knowledge_read: 'knowledge_read',
   knowledge_create: 'knowledge_create',

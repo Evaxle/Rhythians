@@ -62,3 +62,86 @@ export function mapDiscordRolesToTags(discordRoles: string[], roleMappings: Reco
   
   return tags;
 }
+
+export interface DiscordRole {
+  id: string;
+  name: string;
+  color: number;
+  position: number;
+  hoist: boolean;
+  managed: boolean;
+  mentionable: boolean;
+  permissions: string;
+}
+
+export interface DiscordGuildInfo {
+  id: string;
+  name: string;
+  icon: string | null;
+  owner_id: string;
+  approximate_member_count?: number;
+  member_count?: number;
+}
+
+function botAuth(token: string) {
+  return { Authorization: `Bot ${token}`, "Content-Type": "application/json" };
+}
+
+export async function getGuildInfo(token: string, guildId: string): Promise<DiscordGuildInfo | null> {
+  try {
+    const response = await fetch(`${DISCORD_API_BASE}/guilds/${guildId}`, { headers: botAuth(token) });
+    if (!response.ok) throw new Error(`Discord API error: ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to fetch guild info:", error);
+    return null;
+  }
+}
+
+export async function getGuildRoles(token: string, guildId: string): Promise<DiscordRole[]> {
+  try {
+    const response = await fetch(`${DISCORD_API_BASE}/guilds/${guildId}/roles`, { headers: botAuth(token) });
+    if (!response.ok) throw new Error(`Discord API error: ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to fetch guild roles:", error);
+    return [];
+  }
+}
+
+export async function getGuildMemberById(token: string, guildId: string, userId: string): Promise<DiscordGuildMember | null> {
+  try {
+    const response = await fetch(`${DISCORD_API_BASE}/guilds/${guildId}/members/${userId}`, { headers: botAuth(token) });
+    if (response.status === 404) return null;
+    if (!response.ok) throw new Error(`Discord API error: ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to fetch guild member:", error);
+    return null;
+  }
+}
+
+export async function getAllGuildMembers(token: string, guildId: string): Promise<DiscordGuildMember[]> {
+  const members: DiscordGuildMember[] = [];
+  let after: string | undefined;
+
+  try {
+    for (let i = 0; i < 50; i++) {
+      const params = new URLSearchParams({ limit: "100" });
+      if (after) params.set("after", after);
+      const response = await fetch(`${DISCORD_API_BASE}/guilds/${guildId}/members?${params}`, {
+        headers: botAuth(token),
+      });
+      if (!response.ok) throw new Error(`Discord API error: ${response.status}`);
+      const batch = await response.json();
+      if (!Array.isArray(batch) || batch.length === 0) break;
+      members.push(...batch);
+      after = batch[batch.length - 1].user?.id;
+      if (!after || batch.length < 100) break;
+    }
+  } catch (error) {
+    console.error("Failed to fetch guild members:", error);
+  }
+
+  return members;
+}

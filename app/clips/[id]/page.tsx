@@ -2,10 +2,13 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getSessionUser } from "@/lib/auth";
+import { getAvatarUrl } from "@/lib/avatar";
+import { cameraModeLabel, cameraModeEmoji } from "@/lib/camera-mode";
 import { ClipComments } from "@/components/clip-comments";
 import { CoachComments } from "@/components/coach-comments";
 import { LikeButton } from "@/components/like-button";
 import { UserTags } from "@/components/user-tags";
+import { ReportButton } from "@/components/report-button";
 
 export const dynamic = "force-dynamic";
 
@@ -113,9 +116,9 @@ export default async function ClipPage({ params }: Props) {
           <div className="max-w-3xl">
             <h1 className="text-3xl font-semibold text-white">{clip.title}</h1>
             <div className="mt-3 flex items-center gap-3">
-              {clip.uploader.avatar ? (
+              {getAvatarUrl(clip.uploader, 64) ? (
                 <img
-                  src={`https://cdn.discordapp.com/avatars/${clip.uploader.discordId}/${clip.uploader.avatar}.png?size=64`}
+                  src={getAvatarUrl(clip.uploader, 64)!}
                   alt=""
                   className="h-8 w-8 rounded-full"
                 />
@@ -139,6 +142,11 @@ export default async function ClipPage({ params }: Props) {
             <p className="mt-4 text-sm text-muted">{clip.description}</p>
             <div className="mt-5 flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.25em] text-accent">
               <span>{clip.category?.name ?? "Uncategorized"}</span>
+              {cameraModeLabel(clip.cameraMode) && (
+                <span className="rounded-full border border-accent/30 bg-accent/10 px-2.5 py-0.5 text-[10px] font-semibold tracking-wider text-accent">
+                  {cameraModeEmoji(clip.cameraMode)} {cameraModeLabel(clip.cameraMode)}
+                </span>
+              )}
               {clip.tags.map(
                 (item: { id: string; tag: { name: string } }) => (
                   <span
@@ -167,6 +175,7 @@ export default async function ClipPage({ params }: Props) {
                 {clip.comments.length}
               </p>
             </div>
+            {sessionUser && <ReportButton targetType="clip" targetId={clip.id} targetLabel={clip.title} />}
           </div>
         </div>
       </section>

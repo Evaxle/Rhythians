@@ -45,7 +45,7 @@ export async function PATCH(
 
   if (tagIds.length > 0) {
     await prisma.userTag.createMany({
-      data: tagIds.map((tagId: string) => ({ userId, tagId })),
+      data: tagIds.map((tagId: string) => ({ userId, tagId, source: "manual" })),
     });
   }
 

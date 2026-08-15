@@ -88,6 +88,11 @@ export type Tag = Prisma.TagModel
  */
 export type UserTag = Prisma.UserTagModel
 /**
+ * Model DiscordRoleTagMapping
+ * 
+ */
+export type DiscordRoleTagMapping = Prisma.DiscordRoleTagMappingModel
+/**
  * Model CoachComment
  * 
  */

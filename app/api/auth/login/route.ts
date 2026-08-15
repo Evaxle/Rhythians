@@ -1,4 +1,8 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { createSession, setSessionCookie } from "@/lib/auth";
+import { verifyPassword } from "@/lib/password";
+import { checkRateLimit } from "@/lib/security";
 
 const DISCORD_AUTH_URL = "https://discord.com/api/oauth2/authorize";
 const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
@@ -19,4 +23,57 @@ export async function GET() {
   });
 
   return NextResponse.redirect(`${DISCORD_AUTH_URL}?${params.toString()}`);
+}
+
+export async function POST(request: Request) {
+  const rate = checkRateLimit(request, "auth_login", 10, 15 * 60 * 1000);
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { error: "Too many sign-in attempts. Please try again later." },
+      { status: 429, headers: { "Retry-After": String(rate.retryAfterSec) } }
+    );
+  }
+
+  const body = (await request.json().catch(() => null)) as {
+    identifier?: unknown;
+    password?: unknown;
+  } | null;
+
+  const identifier = typeof body?.identifier === "string" ? body.identifier.trim() : "";
+  const password = typeof body?.password === "string" ? body.password : "";
+
+  if (!identifier || !password) {
+    return NextResponse.json({ error: "Username or email and password are required." }, { status: 400 });
+  }
+
+  const user = await prisma.user.findFirst({
+    where: {
+      OR: [
+        { email: identifier.toLowerCase() },
+        { username: identifier },
+      ],
+    },
+  });
+
+  if (!user || !user.passwordHash) {
+    return NextResponse.json({ error: "Invalid credentials." }, { status: 401 });
+  }
+
+  const valid = await verifyPassword(password, user.passwordHash);
+  if (!valid) {
+    return NextResponse.json({ error: "Invalid credentials." }, { status: 401 });
+  }
+
+  if (user.isSuspended) {
+    return NextResponse.json({ error: "This account has been suspended." }, { status: 403 });
+  }
+
+  const token = await createSession(user.id);
+  const response = NextResponse.json({
+    user: { id: user.id, username: user.username, profileHandle: user.profileHandle, onboardingCompleted: user.onboardingCompleted },
+    redirectTo: user.onboardingCompleted ? "/" : "/onboarding",
+  });
+  setSessionCookie(response, token);
+
+  return response;
 }

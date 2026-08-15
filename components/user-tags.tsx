@@ -14,6 +14,11 @@ const TAG_COLORS: Record<string, string> = {
   veteran: "bg-orange-500/20 text-orange-300 border-orange-500/30",
   "rhythian-coach": "bg-accent/20 text-accent border-accent/30",
   tester: "bg-pink-500/20 text-pink-300 border-pink-500/30",
+  "post-reviewer": "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
+  mentor: "bg-indigo-500/20 text-indigo-300 border-indigo-500/30",
+  "camera-lock": "bg-slate-500/20 text-slate-300 border-slate-500/30",
+  "camera-spin": "bg-teal-500/20 text-teal-300 border-teal-500/30",
+  "camera-vr": "bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/30",
 };
 
 export function UserTags({ tags, size = "sm" }: UserTagsProps) {

@@ -1,18 +1,40 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getSessionUser } from "@/lib/auth";
+import { LoginForm } from "@/components/login-form";
 
-export default function LoginPage() {
+export const dynamic = "force-dynamic";
+
+export default async function LoginPage() {
+  const user = await getSessionUser();
+  if (user) redirect("/");
+
   return (
-    <div className="mx-auto max-w-2xl rounded-3xl border border-border bg-surface/95 p-10 shadow-glow">
-      <div className="space-y-6 text-center">
-        <p className="text-sm uppercase tracking-[0.28em] text-accent">Login</p>
-        <h1 className="text-3xl font-semibold text-white">Sign in with Discord</h1>
-        <p className="text-sm leading-7 text-muted">Authenticate using your Discord account to access community features, submit clips, and contribute knowledge.</p>
-        <div className="flex justify-center">
-          <Link href="/api/auth/login" className="inline-flex items-center gap-3 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white transition hover:bg-accent2">
-            Continue with Discord
-          </Link>
+    <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
+      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+        <p className="text-sm uppercase tracking-[0.28em] text-accent">Discord</p>
+        <h2 className="mt-3 text-2xl font-semibold text-white">Continue with Discord</h2>
+        <p className="mt-3 text-sm leading-7 text-muted">
+          Sign in with your Discord account. Your roles sync automatically to tags on your profile.
+        </p>
+        <Link
+          href="/api/auth/login"
+          className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-[#5865F2] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#4752c4]"
+        >
+          Continue with Discord
+        </Link>
+      </section>
+
+      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+        <p className="text-sm uppercase tracking-[0.28em] text-accent">Account</p>
+        <h2 className="mt-3 text-2xl font-semibold text-white">Sign in with username</h2>
+        <p className="mt-3 text-sm leading-7 text-muted">
+          Use your Rhythians username or email and password.
+        </p>
+        <div className="mt-6">
+          <LoginForm />
         </div>
-      </div>
+      </section>
     </div>
   );
 }

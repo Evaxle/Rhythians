@@ -2,7 +2,7 @@
 
 export type UserLite = {
   id: string;
-  discordId: string;
+  discordId: string | null;
   username: string;
   discriminator: string;
   avatar: string | null;
@@ -52,8 +52,12 @@ export function userDisplayName(user: Pick<UserLite, "displayName" | "username">
   return user.displayName ?? user.username;
 }
 
-export function userAvatarUrl(user: Pick<UserLite, "avatar" | "discordId" | "username"> & { discordId?: string }) {
-  if (user.avatar && user.discordId) {
+export function userAvatarUrl(user: Pick<UserLite, "avatar" | "discordId" | "username">) {
+  if (!user.avatar) return null;
+  if (user.avatar.startsWith("http://") || user.avatar.startsWith("https://")) {
+    return user.avatar;
+  }
+  if (user.discordId) {
     return `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png?size=64`;
   }
   return null;

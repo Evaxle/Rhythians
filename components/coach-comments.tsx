@@ -99,7 +99,9 @@ export function CoachComments({ clipId, comments: initialComments, isCoach, isAu
               <div className="flex items-start gap-3">
                 {comment.author.avatar ? (
                   <img
-                    src={`https://cdn.discordapp.com/avatars/${comment.author.id}/${comment.author.avatar}.png?size=64`}
+                    src={comment.author.avatar.startsWith("http")
+                      ? comment.author.avatar
+                      : `https://cdn.discordapp.com/avatars/${comment.author.id}/${comment.author.avatar}.png?size=64`}
                     alt=""
                     className="h-8 w-8 rounded-full"
                   />

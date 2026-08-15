@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { CAMERA_MODES } from "@/lib/camera-mode";
 
 type ClipCategory = {
   id: string;
@@ -26,6 +27,7 @@ export default function ClipSubmitForm({ tags }: Omit<Props, "categories">) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [cameraMode, setCameraMode] = useState<string>("");
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -68,6 +70,38 @@ export default function ClipSubmitForm({ tags }: Omit<Props, "categories">) {
     return data.path;
   };
 
+  const generateThumbnail = async (file: File): Promise<File> => {
+    const url = URL.createObjectURL(file);
+    const video = document.createElement("video");
+    video.src = url;
+    video.muted = true;
+    video.playsInline = true;
+
+    await new Promise<void>((resolve, reject) => {
+      video.onloadedmetadata = () => resolve();
+      video.onerror = () => reject(new Error("Could not read the video to create a thumbnail."));
+    });
+
+    const duration = video.duration;
+    const safeDuration = Number.isFinite(duration) && duration > 0.2 ? duration : 10;
+    const target = Math.min(Math.max(safeDuration * (0.05 + Math.random() * 0.75), 0), safeDuration - 0.1);
+    video.currentTime = target;
+
+    await new Promise<void>((resolve) => {
+      video.onseeked = () => resolve();
+    });
+
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth || 1280;
+    canvas.height = video.videoHeight || 720;
+    canvas.getContext("2d")?.drawImage(video, 0, 0, canvas.width, canvas.height);
+    URL.revokeObjectURL(url);
+
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob((b) => resolve(b), "image/jpeg", 0.8));
+    if (!blob) throw new Error("Could not generate a thumbnail for this video.");
+    return new File([blob], "auto-thumbnail.jpg", { type: "image/jpeg" });
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
@@ -98,9 +132,17 @@ export default function ClipSubmitForm({ tags }: Omit<Props, "categories">) {
 
     try {
       const storagePath = await uploadFile(videoFile, "clips");
+
       let thumbnailPath: string | undefined;
       if (thumbnailFile) {
         thumbnailPath = await uploadFile(thumbnailFile, "thumbnails");
+      } else {
+        try {
+          const autoThumbnail = await generateThumbnail(videoFile);
+          thumbnailPath = await uploadFile(autoThumbnail, "thumbnails");
+        } catch (thumbnailError) {
+          console.warn("Auto thumbnail failed:", thumbnailError);
+        }
       }
 
       const submitResponse = await fetch("/api/clips/submit", {
@@ -110,6 +152,7 @@ export default function ClipSubmitForm({ tags }: Omit<Props, "categories">) {
           title: title.trim(),
           description: description.trim(),
           tagIds: selectedTags,
+          cameraMode: cameraMode || null,
           storagePath,
           thumbnailPath,
         }),
@@ -124,6 +167,7 @@ export default function ClipSubmitForm({ tags }: Omit<Props, "categories">) {
       setTitle("");
       setDescription("");
       setSelectedTags([]);
+      setCameraMode("");
       setVideoFile(null);
       setThumbnailFile(null);
       router.refresh();
@@ -156,6 +200,27 @@ export default function ClipSubmitForm({ tags }: Omit<Props, "categories">) {
           className="mt-3 w-full rounded-3xl border border-border bg-background/80 px-4 py-3 text-sm text-white outline-none transition focus:border-accent"
           placeholder="Share what makes this clip special..."
         />
+      </div>
+
+      <div>
+        <p className="text-sm font-semibold text-white">Camera mode</p>
+        <p className="mt-1 text-xs text-muted">Shown on the post thumbnail so viewers know how it was captured.</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {CAMERA_MODES.map((mode) => (
+            <button
+              key={mode.value}
+              type="button"
+              onClick={() => setCameraMode(mode.value)}
+              className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
+                cameraMode === mode.value
+                  ? "border-accent bg-accent/20 text-accent"
+                  : "border-border bg-background/80 text-muted hover:border-accent/50 hover:text-white"
+              }`}
+            >
+              {mode.emoji} {mode.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div>

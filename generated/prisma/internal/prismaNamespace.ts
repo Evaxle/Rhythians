@@ -411,6 +411,7 @@ export const ModelName = {
   KnowledgeArticle: 'KnowledgeArticle',
   Tag: 'Tag',
   UserTag: 'UserTag',
+  DiscordRoleTagMapping: 'DiscordRoleTagMapping',
   CoachComment: 'CoachComment',
   ArticleTag: 'ArticleTag',
   ArticleRevision: 'ArticleRevision',
@@ -444,7 +445,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "role" | "permission" | "rolePermission" | "userRole" | "discordRoleMapping" | "playerRank" | "discordRoleRankMapping" | "rule" | "knowledgeCategory" | "knowledgeArticle" | "tag" | "userTag" | "coachComment" | "articleTag" | "articleRevision" | "clipCategory" | "clip" | "clipTag" | "clipLike" | "clipView" | "comment" | "report" | "announcement" | "notification" | "moderationAction" | "siteSetting" | "conversation" | "conversationMember" | "message" | "friendRequest"
+    modelProps: "user" | "session" | "role" | "permission" | "rolePermission" | "userRole" | "discordRoleMapping" | "playerRank" | "discordRoleRankMapping" | "rule" | "knowledgeCategory" | "knowledgeArticle" | "tag" | "userTag" | "discordRoleTagMapping" | "coachComment" | "articleTag" | "articleRevision" | "clipCategory" | "clip" | "clipTag" | "clipLike" | "clipView" | "comment" | "report" | "announcement" | "notification" | "moderationAction" | "siteSetting" | "conversation" | "conversationMember" | "message" | "friendRequest"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1481,6 +1482,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.UserTagCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.UserTagCountAggregateOutputType> | number
+        }
+      }
+    }
+    DiscordRoleTagMapping: {
+      payload: Prisma.$DiscordRoleTagMappingPayload<ExtArgs>
+      fields: Prisma.DiscordRoleTagMappingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DiscordRoleTagMappingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscordRoleTagMappingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DiscordRoleTagMappingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscordRoleTagMappingPayload>
+        }
+        findFirst: {
+          args: Prisma.DiscordRoleTagMappingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscordRoleTagMappingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DiscordRoleTagMappingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscordRoleTagMappingPayload>
+        }
+        findMany: {
+          args: Prisma.DiscordRoleTagMappingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscordRoleTagMappingPayload>[]
+        }
+        create: {
+          args: Prisma.DiscordRoleTagMappingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscordRoleTagMappingPayload>
+        }
+        createMany: {
+          args: Prisma.DiscordRoleTagMappingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DiscordRoleTagMappingCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscordRoleTagMappingPayload>[]
+        }
+        delete: {
+          args: Prisma.DiscordRoleTagMappingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscordRoleTagMappingPayload>
+        }
+        update: {
+          args: Prisma.DiscordRoleTagMappingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscordRoleTagMappingPayload>
+        }
+        deleteMany: {
+          args: Prisma.DiscordRoleTagMappingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DiscordRoleTagMappingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DiscordRoleTagMappingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscordRoleTagMappingPayload>[]
+        }
+        upsert: {
+          args: Prisma.DiscordRoleTagMappingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscordRoleTagMappingPayload>
+        }
+        aggregate: {
+          args: Prisma.DiscordRoleTagMappingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDiscordRoleTagMapping>
+        }
+        groupBy: {
+          args: Prisma.DiscordRoleTagMappingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DiscordRoleTagMappingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DiscordRoleTagMappingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DiscordRoleTagMappingCountAggregateOutputType> | number
         }
       }
     }
@@ -2863,10 +2938,12 @@ export const UserScalarFieldEnum = {
   avatar: 'avatar',
   locale: 'locale',
   email: 'email',
+  passwordHash: 'passwordHash',
   displayName: 'displayName',
   profileHandle: 'profileHandle',
   discordRoles: 'discordRoles',
   inGuild: 'inGuild',
+  onboardingCompleted: 'onboardingCompleted',
   playerRankId: 'playerRankId',
   joinedAt: 'joinedAt',
   bio: 'bio',
@@ -3028,10 +3105,22 @@ export const UserTagScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   tagId: 'tagId',
+  source: 'source',
   createdAt: 'createdAt'
 } as const
 
 export type UserTagScalarFieldEnum = (typeof UserTagScalarFieldEnum)[keyof typeof UserTagScalarFieldEnum]
+
+
+export const DiscordRoleTagMappingScalarFieldEnum = {
+  id: 'id',
+  discordRoleId: 'discordRoleId',
+  tagId: 'tagId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DiscordRoleTagMappingScalarFieldEnum = (typeof DiscordRoleTagMappingScalarFieldEnum)[keyof typeof DiscordRoleTagMappingScalarFieldEnum]
 
 
 export const CoachCommentScalarFieldEnum = {
@@ -3088,6 +3177,7 @@ export const ClipScalarFieldEnum = {
   description: 'description',
   status: 'status',
   featuredOrder: 'featuredOrder',
+  cameraMode: 'cameraMode',
   storagePath: 'storagePath',
   thumbnailPath: 'thumbnailPath',
   rejectionReason: 'rejectionReason',
@@ -3374,6 +3464,20 @@ export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
+ * Reference to a field of type 'TagSource'
+ */
+export type EnumTagSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TagSource'>
+    
+
+
+/**
+ * Reference to a field of type 'TagSource[]'
+ */
+export type ListEnumTagSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TagSource[]'>
+    
+
+
+/**
  * Reference to a field of type 'ClipStatus'
  */
 export type EnumClipStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ClipStatus'>
@@ -3384,6 +3488,20 @@ export type EnumClipStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Prism
  * Reference to a field of type 'ClipStatus[]'
  */
 export type ListEnumClipStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ClipStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CameraMode'
+ */
+export type EnumCameraModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CameraMode'>
+    
+
+
+/**
+ * Reference to a field of type 'CameraMode[]'
+ */
+export type ListEnumCameraModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CameraMode[]'>
     
 
 
@@ -3635,6 +3753,7 @@ export type GlobalOmitConfig = {
   knowledgeArticle?: Prisma.KnowledgeArticleOmit
   tag?: Prisma.TagOmit
   userTag?: Prisma.UserTagOmit
+  discordRoleTagMapping?: Prisma.DiscordRoleTagMappingOmit
   coachComment?: Prisma.CoachCommentOmit
   articleTag?: Prisma.ArticleTagOmit
   articleRevision?: Prisma.ArticleRevisionOmit

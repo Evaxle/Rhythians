@@ -167,6 +167,23 @@ export type IntWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedIntFilter<$PrismaModel>
 }
 
+export type EnumTagSourceFilter<$PrismaModel = never> = {
+  equals?: $Enums.TagSource | Prisma.EnumTagSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.TagSource[] | Prisma.ListEnumTagSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TagSource[] | Prisma.ListEnumTagSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTagSourceFilter<$PrismaModel> | $Enums.TagSource
+}
+
+export type EnumTagSourceWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.TagSource | Prisma.EnumTagSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.TagSource[] | Prisma.ListEnumTagSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TagSource[] | Prisma.ListEnumTagSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTagSourceWithAggregatesFilter<$PrismaModel> | $Enums.TagSource
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumTagSourceFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumTagSourceFilter<$PrismaModel>
+}
+
 export type EnumClipStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.ClipStatus | Prisma.EnumClipStatusFieldRefInput<$PrismaModel>
   in?: $Enums.ClipStatus[] | Prisma.ListEnumClipStatusFieldRefInput<$PrismaModel>
@@ -183,6 +200,13 @@ export type IntNullableFilter<$PrismaModel = never> = {
   gt?: number | Prisma.IntFieldRefInput<$PrismaModel>
   gte?: number | Prisma.IntFieldRefInput<$PrismaModel>
   not?: Prisma.NestedIntNullableFilter<$PrismaModel> | number | null
+}
+
+export type EnumCameraModeNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.CameraMode | Prisma.EnumCameraModeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.CameraMode[] | Prisma.ListEnumCameraModeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.CameraMode[] | Prisma.ListEnumCameraModeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumCameraModeNullableFilter<$PrismaModel> | $Enums.CameraMode | null
 }
 
 export type EnumClipStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -209,6 +233,16 @@ export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
   _sum?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _max?: Prisma.NestedIntNullableFilter<$PrismaModel>
+}
+
+export type EnumCameraModeNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CameraMode | Prisma.EnumCameraModeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.CameraMode[] | Prisma.ListEnumCameraModeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.CameraMode[] | Prisma.ListEnumCameraModeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumCameraModeNullableWithAggregatesFilter<$PrismaModel> | $Enums.CameraMode | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCameraModeNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCameraModeNullableFilter<$PrismaModel>
 }
 
 export type EnumReportStatusFilter<$PrismaModel = never> = {
@@ -521,11 +555,35 @@ export type NestedFloatFilter<$PrismaModel = never> = {
   not?: Prisma.NestedFloatFilter<$PrismaModel> | number
 }
 
+export type NestedEnumTagSourceFilter<$PrismaModel = never> = {
+  equals?: $Enums.TagSource | Prisma.EnumTagSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.TagSource[] | Prisma.ListEnumTagSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TagSource[] | Prisma.ListEnumTagSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTagSourceFilter<$PrismaModel> | $Enums.TagSource
+}
+
+export type NestedEnumTagSourceWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.TagSource | Prisma.EnumTagSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.TagSource[] | Prisma.ListEnumTagSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TagSource[] | Prisma.ListEnumTagSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTagSourceWithAggregatesFilter<$PrismaModel> | $Enums.TagSource
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumTagSourceFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumTagSourceFilter<$PrismaModel>
+}
+
 export type NestedEnumClipStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.ClipStatus | Prisma.EnumClipStatusFieldRefInput<$PrismaModel>
   in?: $Enums.ClipStatus[] | Prisma.ListEnumClipStatusFieldRefInput<$PrismaModel>
   notIn?: $Enums.ClipStatus[] | Prisma.ListEnumClipStatusFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnumClipStatusFilter<$PrismaModel> | $Enums.ClipStatus
+}
+
+export type NestedEnumCameraModeNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.CameraMode | Prisma.EnumCameraModeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.CameraMode[] | Prisma.ListEnumCameraModeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.CameraMode[] | Prisma.ListEnumCameraModeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumCameraModeNullableFilter<$PrismaModel> | $Enums.CameraMode | null
 }
 
 export type NestedEnumClipStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -563,6 +621,16 @@ export type NestedFloatNullableFilter<$PrismaModel = never> = {
   gt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   gte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   not?: Prisma.NestedFloatNullableFilter<$PrismaModel> | number | null
+}
+
+export type NestedEnumCameraModeNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CameraMode | Prisma.EnumCameraModeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.CameraMode[] | Prisma.ListEnumCameraModeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.CameraMode[] | Prisma.ListEnumCameraModeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumCameraModeNullableWithAggregatesFilter<$PrismaModel> | $Enums.CameraMode | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCameraModeNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCameraModeNullableFilter<$PrismaModel>
 }
 
 export type NestedEnumReportStatusFilter<$PrismaModel = never> = {

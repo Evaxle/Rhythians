@@ -43,6 +43,18 @@ enum FriendRequestStatus {
   declined
 }
 
+enum TagSource {
+  discord
+  manual
+  onboarding
+}
+
+enum CameraMode {
+  lock
+  spin
+  vr
+}
+
 enum PermissionName {
   knowledge_read
   knowledge_create
@@ -62,17 +74,19 @@ enum PermissionName {
 }
 
 model User {
-  id              String             @id @default(uuid())
-  discordId       String             @unique
-  username        String
-  discriminator   String
-  avatar          String?
-  locale          String?
-  email           String?            @unique
-  displayName     String?
-  profileHandle   String             @unique
-  discordRoles    String[]           @default([])
-  inGuild         Boolean            @default(false)
+  id                  String             @id @default(uuid())
+  discordId           String?            @unique
+  username            String
+  discriminator       String
+  avatar              String?
+  locale              String?
+  email               String?            @unique
+  passwordHash        String?
+  displayName         String?
+  profileHandle       String             @unique
+  discordRoles        String[]           @default([])
+  inGuild             Boolean            @default(false)
+  onboardingCompleted Boolean            @default(false)
   playerRank      PlayerRank?        @relation(fields: [playerRankId], references: [id])
   playerRankId    String?
   joinedAt        DateTime           @default(now())
@@ -223,23 +237,34 @@ model KnowledgeArticle {
 }
 
 model Tag {
-  id        String       @id @default(uuid())
-  name      String       @unique
-  slug      String       @unique
+  id        String                 @id @default(uuid())
+  name      String                 @unique
+  slug      String                 @unique
   clips     ClipTag[]
   articles  ArticleTag[]
   users     UserTag[]
-  createdAt DateTime     @default(now())
+  discordRoleTagMappings DiscordRoleTagMapping[]
+  createdAt DateTime               @default(now())
 }
 
 model UserTag {
-  id        String   @id @default(uuid())
-  user      User     @relation(fields: [userId], references: [id])
+  id        String    @id @default(uuid())
+  user      User      @relation(fields: [userId], references: [id])
   userId    String
-  tag       Tag      @relation(fields: [tagId], references: [id])
+  tag       Tag       @relation(fields: [tagId], references: [id])
   tagId     String
-  createdAt DateTime @default(now())
+  source    TagSource @default(discord)
+  createdAt DateTime  @default(now())
   @@unique([userId, tagId])
+}
+
+model DiscordRoleTagMapping {
+  id            String   @id @default(uuid())
+  discordRoleId String   @unique
+  tag           Tag      @relation(fields: [tagId], references: [id])
+  tagId         String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model CoachComment {
@@ -291,6 +316,7 @@ model Clip {
   description    String
   status         ClipStatus     @default(pending)
   featuredOrder  Int?
+  cameraMode     CameraMode?
   storagePath    String
   thumbnailPath  String?
   rejectionReason String?
