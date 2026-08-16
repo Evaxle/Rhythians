@@ -12,6 +12,7 @@ import {
   userAvatarUrl,
   getAvatarInitial,
 } from "@/components/messages/types";
+import { RichText } from "@/components/rich-text";
 
 const POLL_INTERVAL = 4000;
 
@@ -521,7 +522,7 @@ export function MessagesApp({
                               {message.isDeleted ? (
                                 <p className="italic opacity-70">This message was deleted.</p>
                               ) : (
-                                <p className="whitespace-pre-wrap break-words">{message.content}</p>
+                                <RichText text={message.content} />
                               )}
                               <p className={`mt-1 text-[10px] uppercase tracking-wider ${mine ? "text-white/60" : "text-muted"}`}>
                                 {formatTime(message.createdAt)}

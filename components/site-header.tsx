@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Search, MessageCircle } from "lucide-react";
-import { getSessionUser } from "@/lib/auth";
+import { getSessionUser, isOwner } from "@/lib/auth";
 import { canAccessApproval } from "@/lib/approval";
 import { getAvatarUrl } from "@/lib/avatar";
 import { NotificationsBell } from "@/components/notifications-bell";
@@ -9,6 +9,7 @@ import { ProfileMenu } from "@/components/profile-menu";
 export async function SiteHeader() {
   const user = await getSessionUser();
   const hasApprovalAccess = user ? await canAccessApproval(user) : false;
+  const isAdmin = isOwner(user);
 
   return (
     <header className="border-b border-border bg-surface/80 backdrop-blur-xl">
@@ -29,6 +30,9 @@ export async function SiteHeader() {
             )}
             {hasApprovalAccess && (
               <Link href="/approval" className="text-sm text-accent transition hover:text-white">Review</Link>
+            )}
+            {isAdmin && (
+              <Link href="/admin" className="text-sm font-semibold text-accent transition hover:text-white">Admin</Link>
             )}
           </nav>
         </div>

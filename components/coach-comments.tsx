@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { UserTags } from "@/components/user-tags";
+import { RichText } from "@/components/rich-text";
 
 interface CoachComment {
   id: string;
@@ -115,7 +116,7 @@ export function CoachComments({ clipId, comments: initialComments, isCoach, isAu
                     <span className="font-medium text-white">{comment.author.username}</span>
                     <UserTags tags={comment.author.userTags} size="sm" />
                   </div>
-                  <p className="mt-1 text-sm text-muted">{comment.text}</p>
+                  <RichText className="mt-1 text-sm text-muted" text={comment.text} />
                   <p className="mt-1 text-xs text-muted/60">
                     {new Date(comment.createdAt).toLocaleDateString()}
                   </p>

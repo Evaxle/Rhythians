@@ -9,6 +9,7 @@ import { CoachComments } from "@/components/coach-comments";
 import { LikeButton } from "@/components/like-button";
 import { UserTags } from "@/components/user-tags";
 import { ReportButton } from "@/components/report-button";
+import { CopyClipId } from "@/components/copy-clip-id";
 
 export const dynamic = "force-dynamic";
 
@@ -126,6 +127,10 @@ export default async function ClipPage({ params }: Props) {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl">
             <h1 className="text-3xl font-semibold text-white">{clip.title}</h1>
+            <div className="mt-2 flex items-center gap-3">
+              <CopyClipId clipId={clip.id} />
+              <p className="text-xs text-muted">Tag it with <span className="font-semibold text-white">/clip {clip.id.slice(0, 8)}…</span></p>
+            </div>
             <div className="mt-3 flex items-center gap-3">
               {getAvatarUrl(clip.uploader, 64) ? (
                 <img

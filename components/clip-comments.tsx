@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { UserTags } from "@/components/user-tags";
+import { RichText } from "@/components/rich-text";
 
 type CommentItem = {
   id: string;
@@ -93,7 +94,7 @@ export function ClipComments({
                   <UserTags tags={comment.author.userTags} size="sm" />
                 )}
               </div>
-              <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-muted">{comment.text}</p>
+              <RichText className="mt-2 text-sm leading-7 text-muted" text={comment.text} />
               <p className="mt-3 text-xs uppercase tracking-[0.2em] text-accent">{new Date(comment.createdAt).toLocaleDateString()}</p>
             </article>
           ))}
