@@ -85,7 +85,7 @@
     - `SETUP_SECRET=<long random string>` (required — protects the `/api/setup` database bootstrap endpoint)
 4. Deploy the app.
 
-> The scheduled 1-minute Discord sync runs automatically via the cron job in `vercel.json`. If you set `CRON_SECRET`, append `?secret=<CRON_SECRET>` to the cron path in `vercel.json` so the request authenticates.
+> The scheduled Discord sync runs automatically via the cron job in `vercel.json` (daily at 03:30 UTC). If you set `CRON_SECRET`, append `?secret=<CRON_SECRET>` to the cron path in `vercel.json` so the request authenticates.
 >
 > A daily database cleanup cron (`/api/internal/db-cleanup`, 3:00 UTC) also runs automatically. It prunes expired sessions, read notifications older than 30 days, dismissed reports and handled Rhythia link requests older than 90 days, and backfills the profanity filter over existing content the first time it runs.
 >
