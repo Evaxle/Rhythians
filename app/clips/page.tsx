@@ -9,7 +9,7 @@ export default async function ClipsPage() {
   const clips = await prisma.clip.findMany({
     where: { status: "approved" },
     orderBy: { createdAt: "desc" },
-    include: { uploader: true, category: true },
+    include: { uploader: true, category: true, reviewedBy: { select: { username: true, discriminator: true, displayName: true } } },
     take: 12,
   });
 
@@ -83,6 +83,11 @@ export default async function ClipsPage() {
                   <h2 className="mt-4 text-lg font-semibold text-white">
                     {clip.title}
                   </h2>
+                  {clip.reviewedBy && (
+                    <p className="mt-2 text-xs text-muted">
+                      Approved by <span className="font-semibold text-white">{clip.reviewedBy.displayName ?? clip.reviewedBy.username}</span>
+                    </p>
+                  )}
                   <p className="mt-3 text-sm text-muted">
                     {clip.createdAt.toLocaleDateString()}
                   </p>

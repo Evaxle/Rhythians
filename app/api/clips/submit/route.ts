@@ -21,10 +21,9 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { title, description, tagIds, cameraMode, storagePath, thumbnailPath } = body as {
+  const { title, description, cameraMode, storagePath, thumbnailPath } = body as {
     title?: string;
     description?: string;
-    tagIds?: string[];
     cameraMode?: string;
     storagePath?: string;
     thumbnailPath?: string;
@@ -42,14 +41,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Video storage path is required." }, { status: 400 });
   }
 
-  const validatedTagIds = Array.isArray(tagIds) ? tagIds.filter((id) => typeof id === "string") : [];
-  if (validatedTagIds.length > 0) {
-    const existingTags = await prisma.tag.findMany({ where: { id: { in: validatedTagIds } } });
-    if (existingTags.length !== validatedTagIds.length) {
-      return NextResponse.json({ error: "One or more tag selections are invalid." }, { status: 400 });
-    }
-  }
-
   const clip = await prisma.clip.create({
     data: {
       title,
@@ -58,9 +49,6 @@ export async function POST(request: Request) {
       thumbnailPath,
       cameraMode: validCameraModes.has(cameraMode ?? "") ? (cameraMode as "lock" | "spin" | "vr") : null,
       uploaderId: user.id,
-      tags: {
-        create: validatedTagIds.map((tagId) => ({ tag: { connect: { id: tagId } } })),
-      },
     },
   });
 

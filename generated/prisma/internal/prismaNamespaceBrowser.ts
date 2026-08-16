@@ -393,6 +393,8 @@ export const ClipScalarFieldEnum = {
   storagePath: 'storagePath',
   thumbnailPath: 'thumbnailPath',
   rejectionReason: 'rejectionReason',
+  reviewedById: 'reviewedById',
+  reviewedAt: 'reviewedAt',
   uploaderId: 'uploaderId',
   categoryId: 'categoryId',
   createdAt: 'createdAt',

@@ -10,7 +10,10 @@ export async function GET() {
   if (!isOwner(sessionUser)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const requests = await prisma.rhythiaProfileRequest.findMany({
-    include: { user: { select: { id: true, username: true, discriminator: true, profileHandle: true, avatar: true } } },
+    include: {
+      user: { select: { id: true, username: true, discriminator: true, profileHandle: true, avatar: true } },
+      resolvedByUser: { select: { id: true, username: true, discriminator: true, profileHandle: true, avatar: true } },
+    },
   });
 
   const rank: Record<string, number> = { pending: 0, approved: 1, denied: 2 };
@@ -27,6 +30,7 @@ export async function GET() {
       adminNote: request.adminNote,
       createdAt: request.createdAt.toISOString(),
       resolvedAt: request.resolvedAt?.toISOString() ?? null,
+      resolvedBy: request.resolvedByUser,
       user: request.user,
     })),
   });

@@ -37,6 +37,18 @@ export async function PATCH(request: Request, { params }: Props) {
     } catch {
       return NextResponse.json({ error: "Couldn't load that Rhythia profile to link it. Try again." }, { status: 502 });
     }
+
+    const alreadyLinked = await prisma.rhythiaProfile.findUnique({
+      where: { profileId: requestRecord.profileId },
+      select: { userId: true },
+    });
+    if (alreadyLinked && alreadyLinked.userId !== requestRecord.userId) {
+      return NextResponse.json(
+        { error: "That Rhythia profile is already linked to a different account." },
+        { status: 409 }
+      );
+    }
+
     await prisma.rhythiaProfile.upsert({
       where: { userId: requestRecord.userId },
       create: { userId: requestRecord.userId, profileUrl: requestRecord.profileUrl, ...profileData },

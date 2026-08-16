@@ -302,6 +302,7 @@ export type UserWhereInput = {
   roles?: Prisma.UserRoleListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
   clips?: Prisma.ClipListRelationFilter
+  reviewedClips?: Prisma.ClipListRelationFilter
   comments?: Prisma.CommentListRelationFilter
   coachComments?: Prisma.CoachCommentListRelationFilter
   clipLikes?: Prisma.ClipLikeListRelationFilter
@@ -320,6 +321,7 @@ export type UserWhereInput = {
   receivedFriendRequests?: Prisma.FriendRequestListRelationFilter
   rhythiaProfile?: Prisma.XOR<Prisma.RhythiaProfileNullableScalarRelationFilter, Prisma.RhythiaProfileWhereInput> | null
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestListRelationFilter
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -347,6 +349,7 @@ export type UserOrderByWithRelationInput = {
   roles?: Prisma.UserRoleOrderByRelationAggregateInput
   sessions?: Prisma.SessionOrderByRelationAggregateInput
   clips?: Prisma.ClipOrderByRelationAggregateInput
+  reviewedClips?: Prisma.ClipOrderByRelationAggregateInput
   comments?: Prisma.CommentOrderByRelationAggregateInput
   coachComments?: Prisma.CoachCommentOrderByRelationAggregateInput
   clipLikes?: Prisma.ClipLikeOrderByRelationAggregateInput
@@ -365,6 +368,7 @@ export type UserOrderByWithRelationInput = {
   receivedFriendRequests?: Prisma.FriendRequestOrderByRelationAggregateInput
   rhythiaProfile?: Prisma.RhythiaProfileOrderByWithRelationInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestOrderByRelationAggregateInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -395,6 +399,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   roles?: Prisma.UserRoleListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
   clips?: Prisma.ClipListRelationFilter
+  reviewedClips?: Prisma.ClipListRelationFilter
   comments?: Prisma.CommentListRelationFilter
   coachComments?: Prisma.CoachCommentListRelationFilter
   clipLikes?: Prisma.ClipLikeListRelationFilter
@@ -413,6 +418,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   receivedFriendRequests?: Prisma.FriendRequestListRelationFilter
   rhythiaProfile?: Prisma.XOR<Prisma.RhythiaProfileNullableScalarRelationFilter, Prisma.RhythiaProfileWhereInput> | null
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestListRelationFilter
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestListRelationFilter
 }, "id" | "discordId" | "email" | "profileHandle">
 
 export type UserOrderByWithAggregationInput = {
@@ -491,6 +497,7 @@ export type UserCreateInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
@@ -509,6 +516,7 @@ export type UserCreateInput = {
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -535,6 +543,7 @@ export type UserUncheckedCreateInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
@@ -553,6 +562,7 @@ export type UserUncheckedCreateInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUpdateInput = {
@@ -579,6 +589,7 @@ export type UserUpdateInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
@@ -597,6 +608,7 @@ export type UserUpdateInput = {
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -623,6 +635,7 @@ export type UserUncheckedUpdateInput = {
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -641,6 +654,7 @@ export type UserUncheckedUpdateInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -791,6 +805,11 @@ export type UserScalarRelationFilter = {
   isNot?: Prisma.UserWhereInput
 }
 
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
+}
+
 export type UserListRelationFilter = {
   every?: Prisma.UserWhereInput
   some?: Prisma.UserWhereInput
@@ -799,11 +818,6 @@ export type UserListRelationFilter = {
 
 export type UserOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
-}
-
-export type UserNullableScalarRelationFilter = {
-  is?: Prisma.UserWhereInput | null
-  isNot?: Prisma.UserWhereInput | null
 }
 
 export type UserCreatediscordRolesInput = {
@@ -851,12 +865,28 @@ export type UserCreateNestedOneWithoutRhythiaProfileRequestsInput = {
   connect?: Prisma.UserWhereUniqueInput
 }
 
+export type UserCreateNestedOneWithoutResolvedRhythiaRequestsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutResolvedRhythiaRequestsInput, Prisma.UserUncheckedCreateWithoutResolvedRhythiaRequestsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutResolvedRhythiaRequestsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
 export type UserUpdateOneRequiredWithoutRhythiaProfileRequestsNestedInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutRhythiaProfileRequestsInput, Prisma.UserUncheckedCreateWithoutRhythiaProfileRequestsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutRhythiaProfileRequestsInput
   upsert?: Prisma.UserUpsertWithoutRhythiaProfileRequestsInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutRhythiaProfileRequestsInput, Prisma.UserUpdateWithoutRhythiaProfileRequestsInput>, Prisma.UserUncheckedUpdateWithoutRhythiaProfileRequestsInput>
+}
+
+export type UserUpdateOneWithoutResolvedRhythiaRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutResolvedRhythiaRequestsInput, Prisma.UserUncheckedCreateWithoutResolvedRhythiaRequestsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutResolvedRhythiaRequestsInput
+  upsert?: Prisma.UserUpsertWithoutResolvedRhythiaRequestsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutResolvedRhythiaRequestsInput, Prisma.UserUpdateWithoutResolvedRhythiaRequestsInput>, Prisma.UserUncheckedUpdateWithoutResolvedRhythiaRequestsInput>
 }
 
 export type UserCreateNestedOneWithoutSessionsInput = {
@@ -985,10 +1015,26 @@ export type UserUpdateOneRequiredWithoutArticleRevisionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutArticleRevisionsInput, Prisma.UserUpdateWithoutArticleRevisionsInput>, Prisma.UserUncheckedUpdateWithoutArticleRevisionsInput>
 }
 
+export type UserCreateNestedOneWithoutReviewedClipsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReviewedClipsInput, Prisma.UserUncheckedCreateWithoutReviewedClipsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReviewedClipsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
 export type UserCreateNestedOneWithoutClipsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutClipsInput, Prisma.UserUncheckedCreateWithoutClipsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutClipsInput
   connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutReviewedClipsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReviewedClipsInput, Prisma.UserUncheckedCreateWithoutReviewedClipsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReviewedClipsInput
+  upsert?: Prisma.UserUpsertWithoutReviewedClipsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReviewedClipsInput, Prisma.UserUpdateWithoutReviewedClipsInput>, Prisma.UserUncheckedUpdateWithoutReviewedClipsInput>
 }
 
 export type UserUpdateOneRequiredWithoutClipsNestedInput = {
@@ -1195,6 +1241,7 @@ export type UserCreateWithoutRhythiaProfileInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
@@ -1212,6 +1259,7 @@ export type UserCreateWithoutRhythiaProfileInput = {
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUncheckedCreateWithoutRhythiaProfileInput = {
@@ -1238,6 +1286,7 @@ export type UserUncheckedCreateWithoutRhythiaProfileInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
@@ -1255,6 +1304,7 @@ export type UserUncheckedCreateWithoutRhythiaProfileInput = {
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserCreateOrConnectWithoutRhythiaProfileInput = {
@@ -1297,6 +1347,7 @@ export type UserUpdateWithoutRhythiaProfileInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
@@ -1314,6 +1365,7 @@ export type UserUpdateWithoutRhythiaProfileInput = {
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRhythiaProfileInput = {
@@ -1340,6 +1392,7 @@ export type UserUncheckedUpdateWithoutRhythiaProfileInput = {
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -1357,6 +1410,7 @@ export type UserUncheckedUpdateWithoutRhythiaProfileInput = {
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserCreateWithoutRhythiaProfileRequestsInput = {
@@ -1383,6 +1437,7 @@ export type UserCreateWithoutRhythiaProfileRequestsInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
@@ -1400,6 +1455,7 @@ export type UserCreateWithoutRhythiaProfileRequestsInput = {
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUncheckedCreateWithoutRhythiaProfileRequestsInput = {
@@ -1426,6 +1482,7 @@ export type UserUncheckedCreateWithoutRhythiaProfileRequestsInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
@@ -1443,11 +1500,107 @@ export type UserUncheckedCreateWithoutRhythiaProfileRequestsInput = {
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserCreateOrConnectWithoutRhythiaProfileRequestsInput = {
   where: Prisma.UserWhereUniqueInput
   create: Prisma.XOR<Prisma.UserCreateWithoutRhythiaProfileRequestsInput, Prisma.UserUncheckedCreateWithoutRhythiaProfileRequestsInput>
+}
+
+export type UserCreateWithoutResolvedRhythiaRequestsInput = {
+  id?: string
+  discordId?: string | null
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  passwordHash?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  onboardingCompleted?: boolean
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
+  roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionCreateNestedManyWithoutActorInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
+  receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutResolvedRhythiaRequestsInput = {
+  id?: string
+  discordId?: string | null
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  passwordHash?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  onboardingCompleted?: boolean
+  playerRankId?: string | null
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportUncheckedCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutActorInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
+  receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutResolvedRhythiaRequestsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutResolvedRhythiaRequestsInput, Prisma.UserUncheckedCreateWithoutResolvedRhythiaRequestsInput>
 }
 
 export type UserUpsertWithoutRhythiaProfileRequestsInput = {
@@ -1485,6 +1638,7 @@ export type UserUpdateWithoutRhythiaProfileRequestsInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
@@ -1502,6 +1656,7 @@ export type UserUpdateWithoutRhythiaProfileRequestsInput = {
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRhythiaProfileRequestsInput = {
@@ -1528,6 +1683,7 @@ export type UserUncheckedUpdateWithoutRhythiaProfileRequestsInput = {
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -1545,6 +1701,108 @@ export type UserUncheckedUpdateWithoutRhythiaProfileRequestsInput = {
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
+}
+
+export type UserUpsertWithoutResolvedRhythiaRequestsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutResolvedRhythiaRequestsInput, Prisma.UserUncheckedUpdateWithoutResolvedRhythiaRequestsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutResolvedRhythiaRequestsInput, Prisma.UserUncheckedCreateWithoutResolvedRhythiaRequestsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutResolvedRhythiaRequestsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutResolvedRhythiaRequestsInput, Prisma.UserUncheckedUpdateWithoutResolvedRhythiaRequestsInput>
+}
+
+export type UserUpdateWithoutResolvedRhythiaRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
+  roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUpdateManyWithoutActorNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
+  receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutResolvedRhythiaRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUncheckedUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUncheckedUpdateManyWithoutActorNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
+  receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -1570,6 +1828,7 @@ export type UserCreateWithoutSessionsInput = {
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
@@ -1588,6 +1847,7 @@ export type UserCreateWithoutSessionsInput = {
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -1613,6 +1873,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
@@ -1631,6 +1892,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -1672,6 +1934,7 @@ export type UserUpdateWithoutSessionsInput = {
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
@@ -1690,6 +1953,7 @@ export type UserUpdateWithoutSessionsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -1715,6 +1979,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -1733,6 +1998,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserCreateWithoutRolesInput = {
@@ -1758,6 +2024,7 @@ export type UserCreateWithoutRolesInput = {
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
@@ -1776,6 +2043,7 @@ export type UserCreateWithoutRolesInput = {
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUncheckedCreateWithoutRolesInput = {
@@ -1801,6 +2069,7 @@ export type UserUncheckedCreateWithoutRolesInput = {
   updatedAt?: Date | string
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
@@ -1819,6 +2088,7 @@ export type UserUncheckedCreateWithoutRolesInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserCreateOrConnectWithoutRolesInput = {
@@ -1860,6 +2130,7 @@ export type UserUpdateWithoutRolesInput = {
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
@@ -1878,6 +2149,7 @@ export type UserUpdateWithoutRolesInput = {
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRolesInput = {
@@ -1903,6 +2175,7 @@ export type UserUncheckedUpdateWithoutRolesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -1921,6 +2194,7 @@ export type UserUncheckedUpdateWithoutRolesInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserCreateWithoutPlayerRankInput = {
@@ -1946,6 +2220,7 @@ export type UserCreateWithoutPlayerRankInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
@@ -1964,6 +2239,7 @@ export type UserCreateWithoutPlayerRankInput = {
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUncheckedCreateWithoutPlayerRankInput = {
@@ -1989,6 +2265,7 @@ export type UserUncheckedCreateWithoutPlayerRankInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
@@ -2007,6 +2284,7 @@ export type UserUncheckedCreateWithoutPlayerRankInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserCreateOrConnectWithoutPlayerRankInput = {
@@ -2085,6 +2363,7 @@ export type UserCreateWithoutKnowledgeArticlesInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
@@ -2102,6 +2381,7 @@ export type UserCreateWithoutKnowledgeArticlesInput = {
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUncheckedCreateWithoutKnowledgeArticlesInput = {
@@ -2128,6 +2408,7 @@ export type UserUncheckedCreateWithoutKnowledgeArticlesInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
@@ -2145,6 +2426,7 @@ export type UserUncheckedCreateWithoutKnowledgeArticlesInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserCreateOrConnectWithoutKnowledgeArticlesInput = {
@@ -2187,6 +2469,7 @@ export type UserUpdateWithoutKnowledgeArticlesInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
@@ -2204,6 +2487,7 @@ export type UserUpdateWithoutKnowledgeArticlesInput = {
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutKnowledgeArticlesInput = {
@@ -2230,6 +2514,7 @@ export type UserUncheckedUpdateWithoutKnowledgeArticlesInput = {
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -2247,6 +2532,7 @@ export type UserUncheckedUpdateWithoutKnowledgeArticlesInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserCreateWithoutUserTagsInput = {
@@ -2273,6 +2559,7 @@ export type UserCreateWithoutUserTagsInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
@@ -2290,6 +2577,7 @@ export type UserCreateWithoutUserTagsInput = {
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUncheckedCreateWithoutUserTagsInput = {
@@ -2316,6 +2604,7 @@ export type UserUncheckedCreateWithoutUserTagsInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
@@ -2333,6 +2622,7 @@ export type UserUncheckedCreateWithoutUserTagsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserCreateOrConnectWithoutUserTagsInput = {
@@ -2375,6 +2665,7 @@ export type UserUpdateWithoutUserTagsInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
@@ -2392,6 +2683,7 @@ export type UserUpdateWithoutUserTagsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUserTagsInput = {
@@ -2418,6 +2710,7 @@ export type UserUncheckedUpdateWithoutUserTagsInput = {
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -2435,6 +2728,7 @@ export type UserUncheckedUpdateWithoutUserTagsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserCreateWithoutCoachCommentsInput = {
@@ -2461,6 +2755,7 @@ export type UserCreateWithoutCoachCommentsInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
   userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
@@ -2478,6 +2773,7 @@ export type UserCreateWithoutCoachCommentsInput = {
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUncheckedCreateWithoutCoachCommentsInput = {
@@ -2504,6 +2800,7 @@ export type UserUncheckedCreateWithoutCoachCommentsInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
   userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
@@ -2521,6 +2818,7 @@ export type UserUncheckedCreateWithoutCoachCommentsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserCreateOrConnectWithoutCoachCommentsInput = {
@@ -2563,6 +2861,7 @@ export type UserUpdateWithoutCoachCommentsInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
   userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
@@ -2580,6 +2879,7 @@ export type UserUpdateWithoutCoachCommentsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCoachCommentsInput = {
@@ -2606,6 +2906,7 @@ export type UserUncheckedUpdateWithoutCoachCommentsInput = {
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
   userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
@@ -2623,6 +2924,7 @@ export type UserUncheckedUpdateWithoutCoachCommentsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserCreateWithoutArticleRevisionsInput = {
@@ -2649,6 +2951,7 @@ export type UserCreateWithoutArticleRevisionsInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
@@ -2666,6 +2969,7 @@ export type UserCreateWithoutArticleRevisionsInput = {
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUncheckedCreateWithoutArticleRevisionsInput = {
@@ -2692,6 +2996,7 @@ export type UserUncheckedCreateWithoutArticleRevisionsInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
@@ -2709,6 +3014,7 @@ export type UserUncheckedCreateWithoutArticleRevisionsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserCreateOrConnectWithoutArticleRevisionsInput = {
@@ -2751,6 +3057,7 @@ export type UserUpdateWithoutArticleRevisionsInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
@@ -2768,9 +3075,301 @@ export type UserUpdateWithoutArticleRevisionsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutArticleRevisionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUncheckedUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUncheckedUpdateManyWithoutActorNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
+  receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
+}
+
+export type UserCreateWithoutReviewedClipsInput = {
+  id?: string
+  discordId?: string | null
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  passwordHash?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  onboardingCompleted?: boolean
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
+  roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionCreateNestedManyWithoutActorInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
+  receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
+}
+
+export type UserUncheckedCreateWithoutReviewedClipsInput = {
+  id?: string
+  discordId?: string | null
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  passwordHash?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  onboardingCompleted?: boolean
+  playerRankId?: string | null
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportUncheckedCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutActorInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
+  receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
+}
+
+export type UserCreateOrConnectWithoutReviewedClipsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReviewedClipsInput, Prisma.UserUncheckedCreateWithoutReviewedClipsInput>
+}
+
+export type UserCreateWithoutClipsInput = {
+  id?: string
+  discordId?: string | null
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  passwordHash?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  onboardingCompleted?: boolean
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
+  roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionCreateNestedManyWithoutActorInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
+  receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
+}
+
+export type UserUncheckedCreateWithoutClipsInput = {
+  id?: string
+  discordId?: string | null
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  passwordHash?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  onboardingCompleted?: boolean
+  playerRankId?: string | null
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportUncheckedCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutActorInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
+  receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
+}
+
+export type UserCreateOrConnectWithoutClipsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutClipsInput, Prisma.UserUncheckedCreateWithoutClipsInput>
+}
+
+export type UserUpsertWithoutReviewedClipsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReviewedClipsInput, Prisma.UserUncheckedUpdateWithoutReviewedClipsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReviewedClipsInput, Prisma.UserUncheckedCreateWithoutReviewedClipsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReviewedClipsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReviewedClipsInput, Prisma.UserUncheckedUpdateWithoutReviewedClipsInput>
+}
+
+export type UserUpdateWithoutReviewedClipsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
+  roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUpdateManyWithoutActorNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
+  receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReviewedClipsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2800,6 +3399,7 @@ export type UserUncheckedUpdateWithoutArticleRevisionsInput = {
   userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
   knowledgeArticles?: Prisma.KnowledgeArticleUncheckedUpdateManyWithoutAuthorNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportedResolvedBy?: Prisma.ReportUncheckedUpdateManyWithoutResolverNestedInput
@@ -2811,97 +3411,7 @@ export type UserUncheckedUpdateWithoutArticleRevisionsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
-}
-
-export type UserCreateWithoutClipsInput = {
-  id?: string
-  discordId?: string | null
-  username: string
-  discriminator: string
-  avatar?: string | null
-  locale?: string | null
-  email?: string | null
-  passwordHash?: string | null
-  displayName?: string | null
-  profileHandle: string
-  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
-  inGuild?: boolean
-  onboardingCompleted?: boolean
-  joinedAt?: Date | string
-  bio?: string | null
-  website?: string | null
-  isSuspended?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
-  roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
-  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
-  clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
-  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
-  announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
-  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
-  knowledgeArticles?: Prisma.KnowledgeArticleCreateNestedManyWithoutAuthorInput
-  reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
-  reportedResolvedBy?: Prisma.ReportCreateNestedManyWithoutResolverInput
-  moderationActions?: Prisma.ModerationActionCreateNestedManyWithoutActorInput
-  conversations?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
-  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
-  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
-  sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
-  receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
-  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
-  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
-}
-
-export type UserUncheckedCreateWithoutClipsInput = {
-  id?: string
-  discordId?: string | null
-  username: string
-  discriminator: string
-  avatar?: string | null
-  locale?: string | null
-  email?: string | null
-  passwordHash?: string | null
-  displayName?: string | null
-  profileHandle: string
-  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
-  inGuild?: boolean
-  onboardingCompleted?: boolean
-  playerRankId?: string | null
-  joinedAt?: Date | string
-  bio?: string | null
-  website?: string | null
-  isSuspended?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
-  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
-  clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
-  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
-  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
-  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
-  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedCreateNestedManyWithoutAuthorInput
-  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
-  reportedResolvedBy?: Prisma.ReportUncheckedCreateNestedManyWithoutResolverInput
-  moderationActions?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutActorInput
-  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
-  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
-  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
-  sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
-  receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
-  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
-  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
-}
-
-export type UserCreateOrConnectWithoutClipsInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutClipsInput, Prisma.UserUncheckedCreateWithoutClipsInput>
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUpsertWithoutClipsInput = {
@@ -2938,6 +3448,7 @@ export type UserUpdateWithoutClipsInput = {
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
@@ -2956,6 +3467,7 @@ export type UserUpdateWithoutClipsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutClipsInput = {
@@ -2981,6 +3493,7 @@ export type UserUncheckedUpdateWithoutClipsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -2999,6 +3512,7 @@ export type UserUncheckedUpdateWithoutClipsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserCreateWithoutClipLikesInput = {
@@ -3025,6 +3539,7 @@ export type UserCreateWithoutClipLikesInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
@@ -3042,6 +3557,7 @@ export type UserCreateWithoutClipLikesInput = {
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUncheckedCreateWithoutClipLikesInput = {
@@ -3068,6 +3584,7 @@ export type UserUncheckedCreateWithoutClipLikesInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
@@ -3085,6 +3602,7 @@ export type UserUncheckedCreateWithoutClipLikesInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserCreateOrConnectWithoutClipLikesInput = {
@@ -3127,6 +3645,7 @@ export type UserUpdateWithoutClipLikesInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
@@ -3144,6 +3663,7 @@ export type UserUpdateWithoutClipLikesInput = {
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutClipLikesInput = {
@@ -3170,6 +3690,7 @@ export type UserUncheckedUpdateWithoutClipLikesInput = {
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
@@ -3187,6 +3708,7 @@ export type UserUncheckedUpdateWithoutClipLikesInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserCreateWithoutCommentsInput = {
@@ -3213,6 +3735,7 @@ export type UserCreateWithoutCommentsInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
   coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
   userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
@@ -3230,6 +3753,7 @@ export type UserCreateWithoutCommentsInput = {
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUncheckedCreateWithoutCommentsInput = {
@@ -3256,6 +3780,7 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
   coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
   userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
@@ -3273,6 +3798,7 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserCreateOrConnectWithoutCommentsInput = {
@@ -3315,6 +3841,7 @@ export type UserUpdateWithoutCommentsInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
   userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
@@ -3332,6 +3859,7 @@ export type UserUpdateWithoutCommentsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentsInput = {
@@ -3358,6 +3886,7 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
   coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
   userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
@@ -3375,6 +3904,7 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserCreateWithoutReportsInput = {
@@ -3401,6 +3931,7 @@ export type UserCreateWithoutReportsInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
@@ -3418,6 +3949,7 @@ export type UserCreateWithoutReportsInput = {
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUncheckedCreateWithoutReportsInput = {
@@ -3444,6 +3976,7 @@ export type UserUncheckedCreateWithoutReportsInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
@@ -3461,6 +3994,7 @@ export type UserUncheckedCreateWithoutReportsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserCreateOrConnectWithoutReportsInput = {
@@ -3492,6 +4026,7 @@ export type UserCreateWithoutReportedResolvedByInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
@@ -3509,6 +4044,7 @@ export type UserCreateWithoutReportedResolvedByInput = {
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUncheckedCreateWithoutReportedResolvedByInput = {
@@ -3535,6 +4071,7 @@ export type UserUncheckedCreateWithoutReportedResolvedByInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
@@ -3552,6 +4089,7 @@ export type UserUncheckedCreateWithoutReportedResolvedByInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserCreateOrConnectWithoutReportedResolvedByInput = {
@@ -3594,6 +4132,7 @@ export type UserUpdateWithoutReportsInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
@@ -3611,6 +4150,7 @@ export type UserUpdateWithoutReportsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportsInput = {
@@ -3637,6 +4177,7 @@ export type UserUncheckedUpdateWithoutReportsInput = {
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -3654,6 +4195,7 @@ export type UserUncheckedUpdateWithoutReportsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUpsertWithoutReportedResolvedByInput = {
@@ -3691,6 +4233,7 @@ export type UserUpdateWithoutReportedResolvedByInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
@@ -3708,6 +4251,7 @@ export type UserUpdateWithoutReportedResolvedByInput = {
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportedResolvedByInput = {
@@ -3734,6 +4278,7 @@ export type UserUncheckedUpdateWithoutReportedResolvedByInput = {
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -3751,6 +4296,7 @@ export type UserUncheckedUpdateWithoutReportedResolvedByInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserCreateWithoutAnnouncementsInput = {
@@ -3777,6 +4323,7 @@ export type UserCreateWithoutAnnouncementsInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
@@ -3794,6 +4341,7 @@ export type UserCreateWithoutAnnouncementsInput = {
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUncheckedCreateWithoutAnnouncementsInput = {
@@ -3820,6 +4368,7 @@ export type UserUncheckedCreateWithoutAnnouncementsInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
@@ -3837,6 +4386,7 @@ export type UserUncheckedCreateWithoutAnnouncementsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserCreateOrConnectWithoutAnnouncementsInput = {
@@ -3879,6 +4429,7 @@ export type UserUpdateWithoutAnnouncementsInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
@@ -3896,6 +4447,7 @@ export type UserUpdateWithoutAnnouncementsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAnnouncementsInput = {
@@ -3922,6 +4474,7 @@ export type UserUncheckedUpdateWithoutAnnouncementsInput = {
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -3939,6 +4492,7 @@ export type UserUncheckedUpdateWithoutAnnouncementsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserCreateWithoutNotificationsInput = {
@@ -3965,6 +4519,7 @@ export type UserCreateWithoutNotificationsInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
@@ -3982,6 +4537,7 @@ export type UserCreateWithoutNotificationsInput = {
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -4008,6 +4564,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
@@ -4025,6 +4582,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -4067,6 +4625,7 @@ export type UserUpdateWithoutNotificationsInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
@@ -4084,6 +4643,7 @@ export type UserUpdateWithoutNotificationsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -4110,6 +4670,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -4127,6 +4688,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserCreateWithoutModerationActionsInput = {
@@ -4153,6 +4715,7 @@ export type UserCreateWithoutModerationActionsInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
@@ -4170,6 +4733,7 @@ export type UserCreateWithoutModerationActionsInput = {
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUncheckedCreateWithoutModerationActionsInput = {
@@ -4196,6 +4760,7 @@ export type UserUncheckedCreateWithoutModerationActionsInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
@@ -4213,6 +4778,7 @@ export type UserUncheckedCreateWithoutModerationActionsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserCreateOrConnectWithoutModerationActionsInput = {
@@ -4255,6 +4821,7 @@ export type UserUpdateWithoutModerationActionsInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
@@ -4272,6 +4839,7 @@ export type UserUpdateWithoutModerationActionsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutModerationActionsInput = {
@@ -4298,6 +4866,7 @@ export type UserUncheckedUpdateWithoutModerationActionsInput = {
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -4315,6 +4884,7 @@ export type UserUncheckedUpdateWithoutModerationActionsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserCreateWithoutConversationsInput = {
@@ -4341,6 +4911,7 @@ export type UserCreateWithoutConversationsInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
@@ -4358,6 +4929,7 @@ export type UserCreateWithoutConversationsInput = {
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUncheckedCreateWithoutConversationsInput = {
@@ -4384,6 +4956,7 @@ export type UserUncheckedCreateWithoutConversationsInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
@@ -4401,6 +4974,7 @@ export type UserUncheckedCreateWithoutConversationsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserCreateOrConnectWithoutConversationsInput = {
@@ -4443,6 +5017,7 @@ export type UserUpdateWithoutConversationsInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
@@ -4460,6 +5035,7 @@ export type UserUpdateWithoutConversationsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversationsInput = {
@@ -4486,6 +5062,7 @@ export type UserUncheckedUpdateWithoutConversationsInput = {
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -4503,6 +5080,7 @@ export type UserUncheckedUpdateWithoutConversationsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserCreateWithoutConversationMembershipsInput = {
@@ -4529,6 +5107,7 @@ export type UserCreateWithoutConversationMembershipsInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
@@ -4546,6 +5125,7 @@ export type UserCreateWithoutConversationMembershipsInput = {
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUncheckedCreateWithoutConversationMembershipsInput = {
@@ -4572,6 +5152,7 @@ export type UserUncheckedCreateWithoutConversationMembershipsInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
@@ -4589,6 +5170,7 @@ export type UserUncheckedCreateWithoutConversationMembershipsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserCreateOrConnectWithoutConversationMembershipsInput = {
@@ -4631,6 +5213,7 @@ export type UserUpdateWithoutConversationMembershipsInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
@@ -4648,6 +5231,7 @@ export type UserUpdateWithoutConversationMembershipsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversationMembershipsInput = {
@@ -4674,6 +5258,7 @@ export type UserUncheckedUpdateWithoutConversationMembershipsInput = {
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -4691,6 +5276,7 @@ export type UserUncheckedUpdateWithoutConversationMembershipsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserCreateWithoutMessagesSentInput = {
@@ -4717,6 +5303,7 @@ export type UserCreateWithoutMessagesSentInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
@@ -4734,6 +5321,7 @@ export type UserCreateWithoutMessagesSentInput = {
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUncheckedCreateWithoutMessagesSentInput = {
@@ -4760,6 +5348,7 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
@@ -4777,6 +5366,7 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserCreateOrConnectWithoutMessagesSentInput = {
@@ -4819,6 +5409,7 @@ export type UserUpdateWithoutMessagesSentInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
@@ -4836,6 +5427,7 @@ export type UserUpdateWithoutMessagesSentInput = {
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessagesSentInput = {
@@ -4862,6 +5454,7 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -4879,6 +5472,7 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserCreateWithoutSentFriendRequestsInput = {
@@ -4905,6 +5499,7 @@ export type UserCreateWithoutSentFriendRequestsInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
@@ -4922,6 +5517,7 @@ export type UserCreateWithoutSentFriendRequestsInput = {
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUncheckedCreateWithoutSentFriendRequestsInput = {
@@ -4948,6 +5544,7 @@ export type UserUncheckedCreateWithoutSentFriendRequestsInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
@@ -4965,6 +5562,7 @@ export type UserUncheckedCreateWithoutSentFriendRequestsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserCreateOrConnectWithoutSentFriendRequestsInput = {
@@ -4996,6 +5594,7 @@ export type UserCreateWithoutReceivedFriendRequestsInput = {
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
@@ -5013,6 +5612,7 @@ export type UserCreateWithoutReceivedFriendRequestsInput = {
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserUncheckedCreateWithoutReceivedFriendRequestsInput = {
@@ -5039,6 +5639,7 @@ export type UserUncheckedCreateWithoutReceivedFriendRequestsInput = {
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
   clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
@@ -5056,6 +5657,7 @@ export type UserUncheckedCreateWithoutReceivedFriendRequestsInput = {
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
 
 export type UserCreateOrConnectWithoutReceivedFriendRequestsInput = {
@@ -5098,6 +5700,7 @@ export type UserUpdateWithoutSentFriendRequestsInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
@@ -5115,6 +5718,7 @@ export type UserUpdateWithoutSentFriendRequestsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSentFriendRequestsInput = {
@@ -5141,6 +5745,7 @@ export type UserUncheckedUpdateWithoutSentFriendRequestsInput = {
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -5158,6 +5763,7 @@ export type UserUncheckedUpdateWithoutSentFriendRequestsInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUpsertWithoutReceivedFriendRequestsInput = {
@@ -5195,6 +5801,7 @@ export type UserUpdateWithoutReceivedFriendRequestsInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
@@ -5212,6 +5819,7 @@ export type UserUpdateWithoutReceivedFriendRequestsInput = {
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReceivedFriendRequestsInput = {
@@ -5238,6 +5846,7 @@ export type UserUncheckedUpdateWithoutReceivedFriendRequestsInput = {
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -5255,6 +5864,7 @@ export type UserUncheckedUpdateWithoutReceivedFriendRequestsInput = {
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserCreateManyPlayerRankInput = {
@@ -5302,6 +5912,7 @@ export type UserUpdateWithoutPlayerRankInput = {
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
@@ -5320,6 +5931,7 @@ export type UserUpdateWithoutPlayerRankInput = {
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPlayerRankInput = {
@@ -5345,6 +5957,7 @@ export type UserUncheckedUpdateWithoutPlayerRankInput = {
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
   clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -5363,6 +5976,7 @@ export type UserUncheckedUpdateWithoutPlayerRankInput = {
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutPlayerRankInput = {
@@ -5396,6 +6010,7 @@ export type UserCountOutputType = {
   roles: number
   sessions: number
   clips: number
+  reviewedClips: number
   comments: number
   coachComments: number
   clipLikes: number
@@ -5413,12 +6028,14 @@ export type UserCountOutputType = {
   sentFriendRequests: number
   receivedFriendRequests: number
   rhythiaProfileRequests: number
+  resolvedRhythiaRequests: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   roles?: boolean | UserCountOutputTypeCountRolesArgs
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   clips?: boolean | UserCountOutputTypeCountClipsArgs
+  reviewedClips?: boolean | UserCountOutputTypeCountReviewedClipsArgs
   comments?: boolean | UserCountOutputTypeCountCommentsArgs
   coachComments?: boolean | UserCountOutputTypeCountCoachCommentsArgs
   clipLikes?: boolean | UserCountOutputTypeCountClipLikesArgs
@@ -5436,6 +6053,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   sentFriendRequests?: boolean | UserCountOutputTypeCountSentFriendRequestsArgs
   receivedFriendRequests?: boolean | UserCountOutputTypeCountReceivedFriendRequestsArgs
   rhythiaProfileRequests?: boolean | UserCountOutputTypeCountRhythiaProfileRequestsArgs
+  resolvedRhythiaRequests?: boolean | UserCountOutputTypeCountResolvedRhythiaRequestsArgs
 }
 
 /**
@@ -5466,6 +6084,13 @@ export type UserCountOutputTypeCountSessionsArgs<ExtArgs extends runtime.Types.E
  * UserCountOutputType without action
  */
 export type UserCountOutputTypeCountClipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ClipWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountReviewedClipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ClipWhereInput
 }
 
@@ -5588,6 +6213,13 @@ export type UserCountOutputTypeCountRhythiaProfileRequestsArgs<ExtArgs extends r
   where?: Prisma.RhythiaProfileRequestWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountResolvedRhythiaRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RhythiaProfileRequestWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -5614,6 +6246,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   roles?: boolean | Prisma.User$rolesArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   clips?: boolean | Prisma.User$clipsArgs<ExtArgs>
+  reviewedClips?: boolean | Prisma.User$reviewedClipsArgs<ExtArgs>
   comments?: boolean | Prisma.User$commentsArgs<ExtArgs>
   coachComments?: boolean | Prisma.User$coachCommentsArgs<ExtArgs>
   clipLikes?: boolean | Prisma.User$clipLikesArgs<ExtArgs>
@@ -5632,6 +6265,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   receivedFriendRequests?: boolean | Prisma.User$receivedFriendRequestsArgs<ExtArgs>
   rhythiaProfile?: boolean | Prisma.User$rhythiaProfileArgs<ExtArgs>
   rhythiaProfileRequests?: boolean | Prisma.User$rhythiaProfileRequestsArgs<ExtArgs>
+  resolvedRhythiaRequests?: boolean | Prisma.User$resolvedRhythiaRequestsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -5712,6 +6346,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   roles?: boolean | Prisma.User$rolesArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   clips?: boolean | Prisma.User$clipsArgs<ExtArgs>
+  reviewedClips?: boolean | Prisma.User$reviewedClipsArgs<ExtArgs>
   comments?: boolean | Prisma.User$commentsArgs<ExtArgs>
   coachComments?: boolean | Prisma.User$coachCommentsArgs<ExtArgs>
   clipLikes?: boolean | Prisma.User$clipLikesArgs<ExtArgs>
@@ -5730,6 +6365,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   receivedFriendRequests?: boolean | Prisma.User$receivedFriendRequestsArgs<ExtArgs>
   rhythiaProfile?: boolean | Prisma.User$rhythiaProfileArgs<ExtArgs>
   rhythiaProfileRequests?: boolean | Prisma.User$rhythiaProfileRequestsArgs<ExtArgs>
+  resolvedRhythiaRequests?: boolean | Prisma.User$resolvedRhythiaRequestsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -5746,6 +6382,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     roles: Prisma.$UserRolePayload<ExtArgs>[]
     sessions: Prisma.$SessionPayload<ExtArgs>[]
     clips: Prisma.$ClipPayload<ExtArgs>[]
+    reviewedClips: Prisma.$ClipPayload<ExtArgs>[]
     comments: Prisma.$CommentPayload<ExtArgs>[]
     coachComments: Prisma.$CoachCommentPayload<ExtArgs>[]
     clipLikes: Prisma.$ClipLikePayload<ExtArgs>[]
@@ -5764,6 +6401,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     receivedFriendRequests: Prisma.$FriendRequestPayload<ExtArgs>[]
     rhythiaProfile: Prisma.$RhythiaProfilePayload<ExtArgs> | null
     rhythiaProfileRequests: Prisma.$RhythiaProfileRequestPayload<ExtArgs>[]
+    resolvedRhythiaRequests: Prisma.$RhythiaProfileRequestPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -6184,6 +6822,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   roles<T extends Prisma.User$rolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$rolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserRolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   clips<T extends Prisma.User$clipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$clipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  reviewedClips<T extends Prisma.User$reviewedClipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reviewedClipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   comments<T extends Prisma.User$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   coachComments<T extends Prisma.User$coachCommentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$coachCommentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CoachCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   clipLikes<T extends Prisma.User$clipLikesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$clipLikesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClipLikePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -6202,6 +6841,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   receivedFriendRequests<T extends Prisma.User$receivedFriendRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$receivedFriendRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FriendRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   rhythiaProfile<T extends Prisma.User$rhythiaProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$rhythiaProfileArgs<ExtArgs>>): Prisma.Prisma__RhythiaProfileClient<runtime.Types.Result.GetResult<Prisma.$RhythiaProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   rhythiaProfileRequests<T extends Prisma.User$rhythiaProfileRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$rhythiaProfileRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RhythiaProfileRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  resolvedRhythiaRequests<T extends Prisma.User$resolvedRhythiaRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$resolvedRhythiaRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RhythiaProfileRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6743,6 +7383,30 @@ export type User$clipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
 }
 
 /**
+ * User.reviewedClips
+ */
+export type User$reviewedClipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Clip
+   */
+  select?: Prisma.ClipSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Clip
+   */
+  omit?: Prisma.ClipOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ClipInclude<ExtArgs> | null
+  where?: Prisma.ClipWhereInput
+  orderBy?: Prisma.ClipOrderByWithRelationInput | Prisma.ClipOrderByWithRelationInput[]
+  cursor?: Prisma.ClipWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ClipScalarFieldEnum | Prisma.ClipScalarFieldEnum[]
+}
+
+/**
  * User.comments
  */
 export type User$commentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -7149,6 +7813,30 @@ export type User$rhythiaProfileArgs<ExtArgs extends runtime.Types.Extensions.Int
  * User.rhythiaProfileRequests
  */
 export type User$rhythiaProfileRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RhythiaProfileRequest
+   */
+  select?: Prisma.RhythiaProfileRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RhythiaProfileRequest
+   */
+  omit?: Prisma.RhythiaProfileRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RhythiaProfileRequestInclude<ExtArgs> | null
+  where?: Prisma.RhythiaProfileRequestWhereInput
+  orderBy?: Prisma.RhythiaProfileRequestOrderByWithRelationInput | Prisma.RhythiaProfileRequestOrderByWithRelationInput[]
+  cursor?: Prisma.RhythiaProfileRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RhythiaProfileRequestScalarFieldEnum | Prisma.RhythiaProfileRequestScalarFieldEnum[]
+}
+
+/**
+ * User.resolvedRhythiaRequests
+ */
+export type User$resolvedRhythiaRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the RhythiaProfileRequest
    */

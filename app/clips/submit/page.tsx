@@ -7,7 +7,6 @@ export const dynamic = "force-dynamic";
 
 export default async function ClipSubmitPage() {
   const user = await getSessionUser();
-  const tags = await prisma.tag.findMany({ orderBy: { name: "asc" } });
 
   return (
     <div className="space-y-8">
@@ -21,7 +20,7 @@ export default async function ClipSubmitPage() {
         </div>
       </section>
       {user ? (
-        <ClipSubmitForm tags={tags} />
+        <ClipSubmitForm />
       ) : (
         <div className="rounded-3xl border border-dashed border-border bg-background/70 p-8 text-center text-sm text-muted">
           <p className="text-lg font-semibold text-white">Sign in with Discord to submit a clip.</p>

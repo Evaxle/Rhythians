@@ -265,6 +265,7 @@ export type RhythiaProfileRequestWhereInput = {
   resolvedAt?: Prisma.DateTimeNullableFilter<"RhythiaProfileRequest"> | Date | string | null
   resolvedBy?: Prisma.StringNullableFilter<"RhythiaProfileRequest"> | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  resolvedByUser?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
 export type RhythiaProfileRequestOrderByWithRelationInput = {
@@ -280,6 +281,7 @@ export type RhythiaProfileRequestOrderByWithRelationInput = {
   resolvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   resolvedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
+  resolvedByUser?: Prisma.UserOrderByWithRelationInput
 }
 
 export type RhythiaProfileRequestWhereUniqueInput = Prisma.AtLeast<{
@@ -298,6 +300,7 @@ export type RhythiaProfileRequestWhereUniqueInput = Prisma.AtLeast<{
   resolvedAt?: Prisma.DateTimeNullableFilter<"RhythiaProfileRequest"> | Date | string | null
   resolvedBy?: Prisma.StringNullableFilter<"RhythiaProfileRequest"> | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  resolvedByUser?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id">
 
 export type RhythiaProfileRequestOrderByWithAggregationInput = {
@@ -346,8 +349,8 @@ export type RhythiaProfileRequestCreateInput = {
   adminNote?: string | null
   createdAt?: Date | string
   resolvedAt?: Date | string | null
-  resolvedBy?: string | null
   user: Prisma.UserCreateNestedOneWithoutRhythiaProfileRequestsInput
+  resolvedByUser?: Prisma.UserCreateNestedOneWithoutResolvedRhythiaRequestsInput
 }
 
 export type RhythiaProfileRequestUncheckedCreateInput = {
@@ -374,8 +377,8 @@ export type RhythiaProfileRequestUpdateInput = {
   adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  resolvedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutRhythiaProfileRequestsNestedInput
+  resolvedByUser?: Prisma.UserUpdateOneWithoutResolvedRhythiaRequestsNestedInput
 }
 
 export type RhythiaProfileRequestUncheckedUpdateInput = {
@@ -416,7 +419,6 @@ export type RhythiaProfileRequestUpdateManyMutationInput = {
   adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  resolvedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type RhythiaProfileRequestUncheckedUpdateManyInput = {
@@ -500,10 +502,24 @@ export type RhythiaProfileRequestCreateNestedManyWithoutUserInput = {
   connect?: Prisma.RhythiaProfileRequestWhereUniqueInput | Prisma.RhythiaProfileRequestWhereUniqueInput[]
 }
 
+export type RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput = {
+  create?: Prisma.XOR<Prisma.RhythiaProfileRequestCreateWithoutResolvedByUserInput, Prisma.RhythiaProfileRequestUncheckedCreateWithoutResolvedByUserInput> | Prisma.RhythiaProfileRequestCreateWithoutResolvedByUserInput[] | Prisma.RhythiaProfileRequestUncheckedCreateWithoutResolvedByUserInput[]
+  connectOrCreate?: Prisma.RhythiaProfileRequestCreateOrConnectWithoutResolvedByUserInput | Prisma.RhythiaProfileRequestCreateOrConnectWithoutResolvedByUserInput[]
+  createMany?: Prisma.RhythiaProfileRequestCreateManyResolvedByUserInputEnvelope
+  connect?: Prisma.RhythiaProfileRequestWhereUniqueInput | Prisma.RhythiaProfileRequestWhereUniqueInput[]
+}
+
 export type RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput = {
   create?: Prisma.XOR<Prisma.RhythiaProfileRequestCreateWithoutUserInput, Prisma.RhythiaProfileRequestUncheckedCreateWithoutUserInput> | Prisma.RhythiaProfileRequestCreateWithoutUserInput[] | Prisma.RhythiaProfileRequestUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.RhythiaProfileRequestCreateOrConnectWithoutUserInput | Prisma.RhythiaProfileRequestCreateOrConnectWithoutUserInput[]
   createMany?: Prisma.RhythiaProfileRequestCreateManyUserInputEnvelope
+  connect?: Prisma.RhythiaProfileRequestWhereUniqueInput | Prisma.RhythiaProfileRequestWhereUniqueInput[]
+}
+
+export type RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput = {
+  create?: Prisma.XOR<Prisma.RhythiaProfileRequestCreateWithoutResolvedByUserInput, Prisma.RhythiaProfileRequestUncheckedCreateWithoutResolvedByUserInput> | Prisma.RhythiaProfileRequestCreateWithoutResolvedByUserInput[] | Prisma.RhythiaProfileRequestUncheckedCreateWithoutResolvedByUserInput[]
+  connectOrCreate?: Prisma.RhythiaProfileRequestCreateOrConnectWithoutResolvedByUserInput | Prisma.RhythiaProfileRequestCreateOrConnectWithoutResolvedByUserInput[]
+  createMany?: Prisma.RhythiaProfileRequestCreateManyResolvedByUserInputEnvelope
   connect?: Prisma.RhythiaProfileRequestWhereUniqueInput | Prisma.RhythiaProfileRequestWhereUniqueInput[]
 }
 
@@ -521,6 +537,20 @@ export type RhythiaProfileRequestUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.RhythiaProfileRequestScalarWhereInput | Prisma.RhythiaProfileRequestScalarWhereInput[]
 }
 
+export type RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput = {
+  create?: Prisma.XOR<Prisma.RhythiaProfileRequestCreateWithoutResolvedByUserInput, Prisma.RhythiaProfileRequestUncheckedCreateWithoutResolvedByUserInput> | Prisma.RhythiaProfileRequestCreateWithoutResolvedByUserInput[] | Prisma.RhythiaProfileRequestUncheckedCreateWithoutResolvedByUserInput[]
+  connectOrCreate?: Prisma.RhythiaProfileRequestCreateOrConnectWithoutResolvedByUserInput | Prisma.RhythiaProfileRequestCreateOrConnectWithoutResolvedByUserInput[]
+  upsert?: Prisma.RhythiaProfileRequestUpsertWithWhereUniqueWithoutResolvedByUserInput | Prisma.RhythiaProfileRequestUpsertWithWhereUniqueWithoutResolvedByUserInput[]
+  createMany?: Prisma.RhythiaProfileRequestCreateManyResolvedByUserInputEnvelope
+  set?: Prisma.RhythiaProfileRequestWhereUniqueInput | Prisma.RhythiaProfileRequestWhereUniqueInput[]
+  disconnect?: Prisma.RhythiaProfileRequestWhereUniqueInput | Prisma.RhythiaProfileRequestWhereUniqueInput[]
+  delete?: Prisma.RhythiaProfileRequestWhereUniqueInput | Prisma.RhythiaProfileRequestWhereUniqueInput[]
+  connect?: Prisma.RhythiaProfileRequestWhereUniqueInput | Prisma.RhythiaProfileRequestWhereUniqueInput[]
+  update?: Prisma.RhythiaProfileRequestUpdateWithWhereUniqueWithoutResolvedByUserInput | Prisma.RhythiaProfileRequestUpdateWithWhereUniqueWithoutResolvedByUserInput[]
+  updateMany?: Prisma.RhythiaProfileRequestUpdateManyWithWhereWithoutResolvedByUserInput | Prisma.RhythiaProfileRequestUpdateManyWithWhereWithoutResolvedByUserInput[]
+  deleteMany?: Prisma.RhythiaProfileRequestScalarWhereInput | Prisma.RhythiaProfileRequestScalarWhereInput[]
+}
+
 export type RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput = {
   create?: Prisma.XOR<Prisma.RhythiaProfileRequestCreateWithoutUserInput, Prisma.RhythiaProfileRequestUncheckedCreateWithoutUserInput> | Prisma.RhythiaProfileRequestCreateWithoutUserInput[] | Prisma.RhythiaProfileRequestUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.RhythiaProfileRequestCreateOrConnectWithoutUserInput | Prisma.RhythiaProfileRequestCreateOrConnectWithoutUserInput[]
@@ -532,6 +562,20 @@ export type RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput = {
   connect?: Prisma.RhythiaProfileRequestWhereUniqueInput | Prisma.RhythiaProfileRequestWhereUniqueInput[]
   update?: Prisma.RhythiaProfileRequestUpdateWithWhereUniqueWithoutUserInput | Prisma.RhythiaProfileRequestUpdateWithWhereUniqueWithoutUserInput[]
   updateMany?: Prisma.RhythiaProfileRequestUpdateManyWithWhereWithoutUserInput | Prisma.RhythiaProfileRequestUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.RhythiaProfileRequestScalarWhereInput | Prisma.RhythiaProfileRequestScalarWhereInput[]
+}
+
+export type RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput = {
+  create?: Prisma.XOR<Prisma.RhythiaProfileRequestCreateWithoutResolvedByUserInput, Prisma.RhythiaProfileRequestUncheckedCreateWithoutResolvedByUserInput> | Prisma.RhythiaProfileRequestCreateWithoutResolvedByUserInput[] | Prisma.RhythiaProfileRequestUncheckedCreateWithoutResolvedByUserInput[]
+  connectOrCreate?: Prisma.RhythiaProfileRequestCreateOrConnectWithoutResolvedByUserInput | Prisma.RhythiaProfileRequestCreateOrConnectWithoutResolvedByUserInput[]
+  upsert?: Prisma.RhythiaProfileRequestUpsertWithWhereUniqueWithoutResolvedByUserInput | Prisma.RhythiaProfileRequestUpsertWithWhereUniqueWithoutResolvedByUserInput[]
+  createMany?: Prisma.RhythiaProfileRequestCreateManyResolvedByUserInputEnvelope
+  set?: Prisma.RhythiaProfileRequestWhereUniqueInput | Prisma.RhythiaProfileRequestWhereUniqueInput[]
+  disconnect?: Prisma.RhythiaProfileRequestWhereUniqueInput | Prisma.RhythiaProfileRequestWhereUniqueInput[]
+  delete?: Prisma.RhythiaProfileRequestWhereUniqueInput | Prisma.RhythiaProfileRequestWhereUniqueInput[]
+  connect?: Prisma.RhythiaProfileRequestWhereUniqueInput | Prisma.RhythiaProfileRequestWhereUniqueInput[]
+  update?: Prisma.RhythiaProfileRequestUpdateWithWhereUniqueWithoutResolvedByUserInput | Prisma.RhythiaProfileRequestUpdateWithWhereUniqueWithoutResolvedByUserInput[]
+  updateMany?: Prisma.RhythiaProfileRequestUpdateManyWithWhereWithoutResolvedByUserInput | Prisma.RhythiaProfileRequestUpdateManyWithWhereWithoutResolvedByUserInput[]
   deleteMany?: Prisma.RhythiaProfileRequestScalarWhereInput | Prisma.RhythiaProfileRequestScalarWhereInput[]
 }
 
@@ -553,7 +597,7 @@ export type RhythiaProfileRequestCreateWithoutUserInput = {
   adminNote?: string | null
   createdAt?: Date | string
   resolvedAt?: Date | string | null
-  resolvedBy?: string | null
+  resolvedByUser?: Prisma.UserCreateNestedOneWithoutResolvedRhythiaRequestsInput
 }
 
 export type RhythiaProfileRequestUncheckedCreateWithoutUserInput = {
@@ -576,6 +620,42 @@ export type RhythiaProfileRequestCreateOrConnectWithoutUserInput = {
 
 export type RhythiaProfileRequestCreateManyUserInputEnvelope = {
   data: Prisma.RhythiaProfileRequestCreateManyUserInput | Prisma.RhythiaProfileRequestCreateManyUserInput[]
+  skipDuplicates?: boolean
+}
+
+export type RhythiaProfileRequestCreateWithoutResolvedByUserInput = {
+  id?: string
+  profileId: number
+  profileUrl: string
+  rhythiaUsername: string
+  claimedUsername: string
+  status?: $Enums.RhythiaProfileRequestStatus
+  adminNote?: string | null
+  createdAt?: Date | string
+  resolvedAt?: Date | string | null
+  user: Prisma.UserCreateNestedOneWithoutRhythiaProfileRequestsInput
+}
+
+export type RhythiaProfileRequestUncheckedCreateWithoutResolvedByUserInput = {
+  id?: string
+  userId: string
+  profileId: number
+  profileUrl: string
+  rhythiaUsername: string
+  claimedUsername: string
+  status?: $Enums.RhythiaProfileRequestStatus
+  adminNote?: string | null
+  createdAt?: Date | string
+  resolvedAt?: Date | string | null
+}
+
+export type RhythiaProfileRequestCreateOrConnectWithoutResolvedByUserInput = {
+  where: Prisma.RhythiaProfileRequestWhereUniqueInput
+  create: Prisma.XOR<Prisma.RhythiaProfileRequestCreateWithoutResolvedByUserInput, Prisma.RhythiaProfileRequestUncheckedCreateWithoutResolvedByUserInput>
+}
+
+export type RhythiaProfileRequestCreateManyResolvedByUserInputEnvelope = {
+  data: Prisma.RhythiaProfileRequestCreateManyResolvedByUserInput | Prisma.RhythiaProfileRequestCreateManyResolvedByUserInput[]
   skipDuplicates?: boolean
 }
 
@@ -612,6 +692,22 @@ export type RhythiaProfileRequestScalarWhereInput = {
   resolvedBy?: Prisma.StringNullableFilter<"RhythiaProfileRequest"> | string | null
 }
 
+export type RhythiaProfileRequestUpsertWithWhereUniqueWithoutResolvedByUserInput = {
+  where: Prisma.RhythiaProfileRequestWhereUniqueInput
+  update: Prisma.XOR<Prisma.RhythiaProfileRequestUpdateWithoutResolvedByUserInput, Prisma.RhythiaProfileRequestUncheckedUpdateWithoutResolvedByUserInput>
+  create: Prisma.XOR<Prisma.RhythiaProfileRequestCreateWithoutResolvedByUserInput, Prisma.RhythiaProfileRequestUncheckedCreateWithoutResolvedByUserInput>
+}
+
+export type RhythiaProfileRequestUpdateWithWhereUniqueWithoutResolvedByUserInput = {
+  where: Prisma.RhythiaProfileRequestWhereUniqueInput
+  data: Prisma.XOR<Prisma.RhythiaProfileRequestUpdateWithoutResolvedByUserInput, Prisma.RhythiaProfileRequestUncheckedUpdateWithoutResolvedByUserInput>
+}
+
+export type RhythiaProfileRequestUpdateManyWithWhereWithoutResolvedByUserInput = {
+  where: Prisma.RhythiaProfileRequestScalarWhereInput
+  data: Prisma.XOR<Prisma.RhythiaProfileRequestUpdateManyMutationInput, Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserInput>
+}
+
 export type RhythiaProfileRequestCreateManyUserInput = {
   id?: string
   profileId: number
@@ -625,6 +721,19 @@ export type RhythiaProfileRequestCreateManyUserInput = {
   resolvedBy?: string | null
 }
 
+export type RhythiaProfileRequestCreateManyResolvedByUserInput = {
+  id?: string
+  userId: string
+  profileId: number
+  profileUrl: string
+  rhythiaUsername: string
+  claimedUsername: string
+  status?: $Enums.RhythiaProfileRequestStatus
+  adminNote?: string | null
+  createdAt?: Date | string
+  resolvedAt?: Date | string | null
+}
+
 export type RhythiaProfileRequestUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   profileId?: Prisma.IntFieldUpdateOperationsInput | number
@@ -635,7 +744,7 @@ export type RhythiaProfileRequestUpdateWithoutUserInput = {
   adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  resolvedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resolvedByUser?: Prisma.UserUpdateOneWithoutResolvedRhythiaRequestsNestedInput
 }
 
 export type RhythiaProfileRequestUncheckedUpdateWithoutUserInput = {
@@ -664,6 +773,45 @@ export type RhythiaProfileRequestUncheckedUpdateManyWithoutUserInput = {
   resolvedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
+export type RhythiaProfileRequestUpdateWithoutResolvedByUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  profileId?: Prisma.IntFieldUpdateOperationsInput | number
+  profileUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  rhythiaUsername?: Prisma.StringFieldUpdateOperationsInput | string
+  claimedUsername?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumRhythiaProfileRequestStatusFieldUpdateOperationsInput | $Enums.RhythiaProfileRequestStatus
+  adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  user?: Prisma.UserUpdateOneRequiredWithoutRhythiaProfileRequestsNestedInput
+}
+
+export type RhythiaProfileRequestUncheckedUpdateWithoutResolvedByUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  profileId?: Prisma.IntFieldUpdateOperationsInput | number
+  profileUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  rhythiaUsername?: Prisma.StringFieldUpdateOperationsInput | string
+  claimedUsername?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumRhythiaProfileRequestStatusFieldUpdateOperationsInput | $Enums.RhythiaProfileRequestStatus
+  adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  profileId?: Prisma.IntFieldUpdateOperationsInput | number
+  profileUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  rhythiaUsername?: Prisma.StringFieldUpdateOperationsInput | string
+  claimedUsername?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumRhythiaProfileRequestStatusFieldUpdateOperationsInput | $Enums.RhythiaProfileRequestStatus
+  adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
 
 
 export type RhythiaProfileRequestSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -679,6 +827,7 @@ export type RhythiaProfileRequestSelect<ExtArgs extends runtime.Types.Extensions
   resolvedAt?: boolean
   resolvedBy?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  resolvedByUser?: boolean | Prisma.RhythiaProfileRequest$resolvedByUserArgs<ExtArgs>
 }, ExtArgs["result"]["rhythiaProfileRequest"]>
 
 export type RhythiaProfileRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -694,6 +843,7 @@ export type RhythiaProfileRequestSelectCreateManyAndReturn<ExtArgs extends runti
   resolvedAt?: boolean
   resolvedBy?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  resolvedByUser?: boolean | Prisma.RhythiaProfileRequest$resolvedByUserArgs<ExtArgs>
 }, ExtArgs["result"]["rhythiaProfileRequest"]>
 
 export type RhythiaProfileRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -709,6 +859,7 @@ export type RhythiaProfileRequestSelectUpdateManyAndReturn<ExtArgs extends runti
   resolvedAt?: boolean
   resolvedBy?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  resolvedByUser?: boolean | Prisma.RhythiaProfileRequest$resolvedByUserArgs<ExtArgs>
 }, ExtArgs["result"]["rhythiaProfileRequest"]>
 
 export type RhythiaProfileRequestSelectScalar = {
@@ -728,18 +879,22 @@ export type RhythiaProfileRequestSelectScalar = {
 export type RhythiaProfileRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "profileId" | "profileUrl" | "rhythiaUsername" | "claimedUsername" | "status" | "adminNote" | "createdAt" | "resolvedAt" | "resolvedBy", ExtArgs["result"]["rhythiaProfileRequest"]>
 export type RhythiaProfileRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  resolvedByUser?: boolean | Prisma.RhythiaProfileRequest$resolvedByUserArgs<ExtArgs>
 }
 export type RhythiaProfileRequestIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  resolvedByUser?: boolean | Prisma.RhythiaProfileRequest$resolvedByUserArgs<ExtArgs>
 }
 export type RhythiaProfileRequestIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  resolvedByUser?: boolean | Prisma.RhythiaProfileRequest$resolvedByUserArgs<ExtArgs>
 }
 
 export type $RhythiaProfileRequestPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "RhythiaProfileRequest"
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
+    resolvedByUser: Prisma.$UserPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1148,6 +1303,7 @@ readonly fields: RhythiaProfileRequestFieldRefs;
 export interface Prisma__RhythiaProfileRequestClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  resolvedByUser<T extends Prisma.RhythiaProfileRequest$resolvedByUserArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RhythiaProfileRequest$resolvedByUserArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1586,6 +1742,25 @@ export type RhythiaProfileRequestDeleteManyArgs<ExtArgs extends runtime.Types.Ex
    * Limit how many RhythiaProfileRequests to delete.
    */
   limit?: number
+}
+
+/**
+ * RhythiaProfileRequest.resolvedByUser
+ */
+export type RhythiaProfileRequest$resolvedByUserArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

@@ -3,6 +3,14 @@
 import { useState } from "react";
 import { CheckCircle2, ExternalLink, XCircle } from "lucide-react";
 
+interface ResolvedByUser {
+  id: string;
+  username: string;
+  discriminator: string;
+  profileHandle: string;
+  avatar: string | null;
+}
+
 interface RequestItem {
   id: string;
   profileId: number;
@@ -12,6 +20,8 @@ interface RequestItem {
   status: "pending" | "approved" | "denied";
   adminNote: string | null;
   createdAt: string;
+  resolvedAt: string | null;
+  resolvedBy: ResolvedByUser | null;
   user: { id: string; username: string; discriminator: string; profileHandle: string; avatar: string | null };
 }
 
@@ -110,6 +120,20 @@ export function RhythiaRequestsManager({ initialRequests }: { initialRequests: R
                     {request.adminNote && (
                       <p className="mt-3 rounded-2xl border border-border bg-background/60 p-3 text-sm text-muted">
                         {request.adminNote}
+                      </p>
+                    )}
+
+                    {request.status !== "pending" && (
+                      <p className="mt-3 text-xs text-muted">
+                        {request.status === "approved" ? "Approved" : "Denied"}
+                        {request.resolvedAt ? ` on ${new Date(request.resolvedAt).toLocaleDateString()}` : ""}
+                        {request.resolvedBy ? (
+                          <>
+                            {" "}by <span className="font-semibold text-white">{request.resolvedBy.username}</span>
+                          </>
+                        ) : (
+                          ""
+                        )}
                       </p>
                     )}
                   </div>

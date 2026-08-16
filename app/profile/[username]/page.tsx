@@ -21,7 +21,7 @@ export default async function ProfilePage({ params }: Props) {
   const user = await prisma.user.findFirst({
     where: { profileHandle: username },
     include: {
-      clips: { where: { status: "approved" }, orderBy: { createdAt: "desc" }, include: { category: true } },
+      clips: { where: { status: "approved" }, orderBy: { createdAt: "desc" }, include: { category: true, reviewedBy: { select: { username: true, displayName: true } } } },
       articleRevisions: true,
       roles: { include: { role: true } },
       playerRank: true,
@@ -110,6 +110,11 @@ export default async function ProfilePage({ params }: Props) {
                 <div className="mt-4">
                   <p className="text-sm uppercase tracking-[0.24em] text-accent">{clip.category?.name ?? "Uncategorized"}</p>
                   <h3 className="mt-3 text-lg font-semibold text-white">{clip.title}</h3>
+                  {clip.reviewedBy && (
+                    <p className="mt-2 text-xs text-muted">
+                      Approved by <span className="font-semibold text-white">{clip.reviewedBy.displayName ?? clip.reviewedBy.username}</span>
+                    </p>
+                  )}
                   <p className="mt-2 text-sm text-muted">{clip.createdAt.toLocaleDateString()}</p>
                 </div>
               </Link>

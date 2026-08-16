@@ -4,41 +4,19 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CAMERA_MODES } from "@/lib/camera-mode";
 
-type ClipCategory = {
-  id: string;
-  name: string;
-};
-
-type Tag = {
-  id: string;
-  name: string;
-};
-
-type Props = {
-  categories: ClipCategory[];
-  tags: Tag[];
-};
-
 const validVideoTypes = ["video/mp4", "video/webm", "video/quicktime"];
 const validThumbnailTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
 
-export default function ClipSubmitForm({ tags }: Omit<Props, "categories">) {
+export default function ClipSubmitForm() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [cameraMode, setCameraMode] = useState<string>("");
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-
-  const handleTagToggle = (tagId: string) => {
-    setSelectedTags((current) =>
-      current.includes(tagId) ? current.filter((id) => id !== tagId) : [...current, tagId]
-    );
-  };
 
   const uploadFile = async (file: File, folder: string) => {
     const response = await fetch("/api/clip-upload", {
@@ -151,7 +129,6 @@ export default function ClipSubmitForm({ tags }: Omit<Props, "categories">) {
         body: JSON.stringify({
           title: title.trim(),
           description: description.trim(),
-          tagIds: selectedTags,
           cameraMode: cameraMode || null,
           storagePath,
           thumbnailPath,
@@ -166,7 +143,6 @@ export default function ClipSubmitForm({ tags }: Omit<Props, "categories">) {
       setSuccess("Clip submitted! It will appear once approved.");
       setTitle("");
       setDescription("");
-      setSelectedTags([]);
       setCameraMode("");
       setVideoFile(null);
       setThumbnailFile(null);
@@ -218,25 +194,6 @@ export default function ClipSubmitForm({ tags }: Omit<Props, "categories">) {
               }`}
             >
               {mode.emoji} {mode.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <p className="text-sm font-semibold text-white">Tags</p>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {tags.map((tag) => (
-            <button
-              key={tag.id}
-              type="button"
-              onClick={() => handleTagToggle(tag.id)}
-              className={`rounded-full border px-4 py-2 text-sm transition ${selectedTags.includes(tag.id)
-                ? "border-accent bg-accent/10 text-white"
-                : "border-border bg-background/80 text-muted"
-              }`}
-            >
-              {tag.name}
             </button>
           ))}
         </div>

@@ -5,7 +5,10 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminRhythiaRequestsPage() {
   const requests = await prisma.rhythiaProfileRequest.findMany({
-    include: { user: { select: { id: true, username: true, discriminator: true, profileHandle: true, avatar: true } } },
+    include: {
+      user: { select: { id: true, username: true, discriminator: true, profileHandle: true, avatar: true } },
+      resolvedByUser: { select: { id: true, username: true, discriminator: true, profileHandle: true, avatar: true } },
+    },
   });
 
   const rank: Record<string, number> = { pending: 0, approved: 1, denied: 2 };
@@ -34,6 +37,8 @@ export default async function AdminRhythiaRequestsPage() {
           status: request.status,
           adminNote: request.adminNote,
           createdAt: request.createdAt.toISOString(),
+          resolvedAt: request.resolvedAt?.toISOString() ?? null,
+          resolvedBy: request.resolvedByUser,
           user: request.user,
         }))}
       />

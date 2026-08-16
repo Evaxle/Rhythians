@@ -31,6 +31,8 @@ export async function moderateClip(
     data: {
       status,
       rejectionReason: status === "rejected" ? reason : null,
+      reviewedById: actorId,
+      reviewedAt: new Date(),
     },
     select: { id: true, status: true, rejectionReason: true },
   });

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Sparkles, MessageCircle, BookOpen, Video, Globe } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getPublishedArticleCount } from "@/lib/knowledge";
+import { WelcomeModal } from "@/components/welcome-modal";
 
 export const dynamic = "force-dynamic";
 
@@ -38,6 +39,7 @@ export default async function HomePage() {
 
   return (
     <div className="space-y-10">
+      <WelcomeModal />
       <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
         <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
           <div className="space-y-6">

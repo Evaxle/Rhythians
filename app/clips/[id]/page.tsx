@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { supabaseAdmin } from "@/lib/supabase";
-import { getSessionUser } from "@/lib/auth";
+import { getSessionUser, isOwner } from "@/lib/auth";
 import { getAvatarUrl } from "@/lib/avatar";
 import { cameraModeLabel, cameraModeEmoji } from "@/lib/camera-mode";
 import { ClipComments } from "@/components/clip-comments";
@@ -39,8 +39,8 @@ export default async function ClipPage({ params }: Props) {
           },
         },
       },
+      reviewedBy: { select: { username: true, discriminator: true, displayName: true } },
       category: true,
-      tags: { include: { tag: true } },
       comments: {
         orderBy: { createdAt: "desc" },
         include: {
@@ -69,7 +69,18 @@ export default async function ClipPage({ params }: Props) {
     },
   });
 
-  if (!clip || clip.status !== "approved") {
+  if (!clip) {
+    return notFound();
+  }
+
+  const canViewClip =
+    clip.status === "approved" ||
+    (Boolean(sessionUser) &&
+      (sessionUser!.id === clip.uploaderId ||
+        clip.reviewedById === sessionUser!.id ||
+        isOwner(sessionUser)));
+
+  if (!canViewClip) {
     return notFound();
   }
 
@@ -139,6 +150,22 @@ export default async function ClipPage({ params }: Props) {
                 <UserTags tags={clip.uploader.userTags} size="sm" />
               )}
             </div>
+            {clip.status === "approved" && clip.reviewedBy && (
+              <p className="mt-3 inline-flex flex-wrap items-center gap-2 text-xs text-muted">
+                <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">
+                  Approved
+                </span>
+                Approved by <span className="font-semibold text-white">{clip.reviewedBy.displayName ?? clip.reviewedBy.username}</span>
+              </p>
+            )}
+            {clip.status === "rejected" && (
+              <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-400/10 p-4">
+                <p className="text-sm font-semibold text-red-200">
+                  Denied by {clip.reviewedBy ? (clip.reviewedBy.displayName ?? clip.reviewedBy.username) : "a reviewer"}
+                </p>
+                {clip.rejectionReason && <p className="mt-1 text-sm leading-6 text-red-100/80">{clip.rejectionReason}</p>}
+              </div>
+            )}
             <p className="mt-4 text-sm text-muted">{clip.description}</p>
             <div className="mt-5 flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.25em] text-accent">
               <span>{clip.category?.name ?? "Uncategorized"}</span>
@@ -146,16 +173,6 @@ export default async function ClipPage({ params }: Props) {
                 <span className="rounded-full border border-accent/30 bg-accent/10 px-2.5 py-0.5 text-[10px] font-semibold tracking-wider text-accent">
                   {cameraModeEmoji(clip.cameraMode)} {cameraModeLabel(clip.cameraMode)}
                 </span>
-              )}
-              {clip.tags.map(
-                (item: { id: string; tag: { name: string } }) => (
-                  <span
-                    key={item.id}
-                    className="rounded-full border border-border bg-white/5 px-3 py-1"
-                  >
-                    #{item.tag.name}
-                  </span>
-                )
               )}
             </div>
           </div>

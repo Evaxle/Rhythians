@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 
@@ -12,9 +12,28 @@ interface ProfileMenuUser {
   profileHandle: string;
 }
 
+const CLOSE_DELAY_MS = 250;
+
 export function ProfileMenu({ user }: { user: ProfileMenuUser }) {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    };
+  }, []);
+
+  function openMenu() {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    setOpen(true);
+  }
+
+  function scheduleClose() {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    closeTimerRef.current = setTimeout(() => setOpen(false), CLOSE_DELAY_MS);
+  }
 
   const avatarUrl = user.avatar
     ? user.avatar.startsWith("http")
@@ -28,8 +47,8 @@ export function ProfileMenu({ user }: { user: ProfileMenuUser }) {
     <div
       ref={wrapperRef}
       className="relative"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      onMouseEnter={openMenu}
+      onMouseLeave={scheduleClose}
     >
       <button
         onClick={() => setOpen((current) => !current)}
