@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { getRankedMapsCached, getOrCreateDailyMap, startOfMonthUTC } from "../lib/daily";
+import { RANKS } from "../lib/ranks";
 import { prisma } from "../lib/db";
 
 async function main() {
@@ -11,12 +12,14 @@ async function main() {
   const used = await prisma.dailyMap.count({ where: { date: { gte: monthStart } } });
   console.log(`Daily maps already picked this month: ${used}`);
 
-  const today = await getOrCreateDailyMap();
-  console.log(`Today's daily map: ${today.title} (${today.starRating.toFixed(2)} stars) -> ${today.downloadUrl}`);
+  for (const rank of RANKS) {
+    const today = await getOrCreateDailyMap(rank.index);
+    console.log(`[${rank.name}] Today: ${today.title} (${today.starRating.toFixed(2)} stars)`);
 
-  const tomorrow = new Date(Date.UTC(today.date.getUTCFullYear(), today.date.getUTCMonth(), today.date.getUTCDate() + 1));
-  const tomorrowMap = await getOrCreateDailyMap(tomorrow);
-  console.log(`Tomorrow's daily map: ${tomorrowMap.title} (${tomorrowMap.starRating.toFixed(2)} stars)`);
+    const tomorrow = new Date(Date.UTC(today.date.getUTCFullYear(), today.date.getUTCMonth(), today.date.getUTCDate() + 1));
+    const tomorrowMap = await getOrCreateDailyMap(rank.index, tomorrow);
+    console.log(`[${rank.name}] Tomorrow: ${tomorrowMap.title} (${tomorrowMap.starRating.toFixed(2)} stars)`);
+  }
 }
 
 main()

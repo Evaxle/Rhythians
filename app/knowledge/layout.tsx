@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Settings2, Grid3X3 } from "lucide-react";
+import { Settings2, Grid3X3, Trophy } from "lucide-react";
 
 const navItems = [
+  { href: "/knowledge/ranking", label: "About Ranking", icon: Trophy },
   { href: "/knowledge/settings", label: "Settings Guide", icon: Settings2 },
   { href: "/knowledge/patterns", label: "Patterns Wiki", icon: Grid3X3 },
 ];

@@ -3554,7 +3554,9 @@ export const UserScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   rhp: 'rhp',
-  avgMapRating: 'avgMapRating'
+  avgMapRating: 'avgMapRating',
+  dailyStreak: 'dailyStreak',
+  lastDailyBeatAt: 'lastDailyBeatAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -4014,6 +4016,7 @@ export type FriendRequestScalarFieldEnum = (typeof FriendRequestScalarFieldEnum)
 export const DailyMapScalarFieldEnum = {
   id: 'id',
   date: 'date',
+  rankIndex: 'rankIndex',
   beatmapId: 'beatmapId',
   title: 'title',
   artist: 'artist',

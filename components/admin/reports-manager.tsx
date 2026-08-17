@@ -95,11 +95,15 @@ export function ReportsManager({
     }
   }
 
-  async function refreshDaily() {
+  async function refreshDaily(dailyMapId?: string) {
     setError("");
     setBusyId("refresh");
     try {
-      const response = await fetch("/api/admin/daily/refresh", { method: "POST" });
+      const response = await fetch("/api/admin/daily/refresh", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dailyMapId }),
+      });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Could not refresh the daily map.");
       setRefreshMessage(`Daily map refreshed to: ${data.map.title} (${data.map.starRating.toFixed(2)} stars).`);
@@ -290,16 +294,18 @@ export function ReportsManager({
                     <div className="flex shrink-0 flex-wrap gap-2 lg:flex-col">
                       {isMapReport ? (
                         <div className="space-y-2">
-                          <button
-                            onClick={() => {
-                              if (window.confirm(`Refresh today's daily map? This replaces it for everyone.`)) refreshDaily();
-                            }}
-                            disabled={busyId === "refresh"}
-                            className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent2 disabled:opacity-50"
-                          >
-                            <RefreshCw size={15} className={busyId === "refresh" ? "animate-spin" : ""} />
-                            {busyId === "refresh" ? "Refreshing..." : "Refresh daily map"}
-                          </button>
+                          {report.targetType === "daily_map" && (
+                            <button
+                              onClick={() => {
+                                if (window.confirm(`Refresh today's daily map? This replaces it for everyone in that rank.`)) refreshDaily(report.targetId);
+                              }}
+                              disabled={busyId === "refresh"}
+                              className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent2 disabled:opacity-50"
+                            >
+                              <RefreshCw size={15} className={busyId === "refresh" ? "animate-spin" : ""} />
+                              {busyId === "refresh" ? "Refreshing..." : "Refresh daily map"}
+                            </button>
+                          )}
                           <div className="flex gap-2">
                             <button
                               onClick={() => runAction(report.id, "resolve")}

@@ -79,6 +79,10 @@ export function roundRating(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
+export function fairRatingFromStars(stars: number): number {
+  return roundRating(stars * 0.41);
+}
+
 export function accuracyMultiplier(accuracy: number): number {
   if (accuracy >= 98) return 1.0;
   if (accuracy >= 96) return 0.98;

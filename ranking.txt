@@ -1,0 +1,162 @@
+================================================
+  RHYTHIANS RANKED SYSTEM — FULL REFERENCE
+================================================
+
+Rhythians uses a competitive ladder built around Rhythian Points (RHP).
+There are 9 ranks, each split into 5 tiers. You climb by beating maps and
+daily maps; you can also lose RHP by failing challenge maps, so the ladder
+stays fair and everyone plays maps near their own skill level.
+
+------------------------------------------------
+1. THE RANKS
+------------------------------------------------
+Each rank spans 500 RHP and contains 5 tiers (100 RHP each).
+Your rank is based purely on your current RHP.
+
+  RANK      RHP RANGE        MAP RATING RANGE   COLOR
+  Copper    0     - 500      0.00 - 1.49        Copper
+  Bronze    501   - 1000     1.50 - 1.99        Bronze
+  Silver    1001  - 1500     2.00 - 2.49        Silver
+  Gold      1501  - 2000     2.50 - 2.99        Gold
+  Platinum  2001  - 2500     3.00 - 3.49        Platinum
+  Emerald   2501  - 3000     3.50 - 3.99        Emerald
+  Diamond   3001  - 3500     4.00 - 4.49        Diamond
+  Master    3501  - 4000     4.50 - 4.99        Master
+  Unnamed   4001+            5.00 - 9.99        Unnamed
+
+Each of the first 8 ranks has 5 tiers:
+  Tier 1  = first 100 RHP of the rank
+  Tier 2  = second 100 RHP
+  Tier 3  = third 100 RHP
+  Tier 4  = fourth 100 RHP
+  Tier 5  = fifth 100 RHP (the top tier, next stop is the next rank)
+
+Examples:
+  Copper 1  = 0 - 100 RHP
+  Copper 2  = 101 - 200 RHP
+  Copper 3  = 201 - 300 RHP
+  Copper 4  = 301 - 400 RHP
+  Copper 5  = 401 - 500 RHP
+  Bronze 1  = 501 - 600 RHP   (just crossed into Bronze)
+  ...and so on up to Master 5 = 3501 - 4000 RHP.
+
+The Unnamed rank has no tiers. Instead, it shows your GLOBAL position
+(#1, #2, #3...) on the rank badge. It is the peak of the ladder.
+
+------------------------------------------------
+2. RHYTHIAN POINTS (RHP)
+------------------------------------------------
+RHP is the currency of the ranked ladder. Everyone starts at 0 RHP
+(Copper 1). You earn RHP by completing content, and you can lose RHP
+by failing a challenge map.
+
+How you GAIN RHP:
+  - Daily maps: beating the daily map gives you RHP based on its stars.
+      RHP = 100 + (stars x 100)
+      e.g. a 5.00-star daily map gives 100 + 500 = 600 RHP.
+  - Challenge maps: beating a ranked map within your rank's rating
+      range awards RHP based on the map's rating and your accuracy.
+
+How you LOSE RHP:
+  - Failing a challenge map (a failed pass recorded on your linked
+      Rhythia profile for that map) costs you RHP.
+      Loss = round(rating x 10)
+      e.g. failing a 2.05-rated map costs about 21 RHP.
+
+RHP never goes below 0, and a failed map only counts once per map
+(the first recorded attempt).
+
+------------------------------------------------
+3. HOW CHALLENGE MAP RATING WORKS
+------------------------------------------------
+Every map on the site has a rating with two decimal places (e.g. 2.05).
+This rating decides WHICH RANKS are allowed to play the map for points.
+
+A typical 5-star Rhythia map is around a 2.05 rating. The conversion
+from Rhythia stars to our rating is:
+
+    Rhythia rating = stars x 0.41  (rounded to 2 decimals)
+
+Each rank may ONLY earn RHP from maps inside its rating band:
+  Copper   -> maps rated 0.00 - 1.49
+  Bronze   -> maps rated 1.50 - 1.99
+  Silver   -> maps rated 2.00 - 2.49
+  Gold     -> maps rated 2.50 - 2.99
+  Platinum -> maps rated 3.00 - 3.49
+  Emerald  -> maps rated 3.50 - 3.99
+  Diamond  -> maps rated 4.00 - 4.49
+  Master   -> maps rated 4.50 - 4.99
+  Unnamed  -> maps rated 5.00 - 9.99
+
+This keeps everyone playing maps at their skill level. A Copper player
+cannot gain points from a Diamond map, and a Diamond player cannot gain
+points from a Bronze map. If you play a map outside your range, you earn
+NOTHING (and it is not submitted for points).
+
+WHO SETS THE RATING:
+  - Submitters suggest a rating when they submit a map.
+  - The map-reviewer confirms (or overrides) the final rating when they
+    approve the map. The reviewer's rating is what actually counts.
+
+------------------------------------------------
+4. RHP WEIGHTING / ACCURACY
+------------------------------------------------
+The amount of RHP you earn from beating a challenge map scales with
+your accuracy, encouraging clean plays:
+
+  Accuracy  >= 98%  -> 100% of base RHP
+  Accuracy  >= 96%  ->  98% of base RHP
+  Accuracy  >= 94%  ->  96% of base RHP
+  Accuracy  <  94%  ->  90% of base RHP
+
+Base RHP for a challenge map:
+    base RHP = round(rating x 40)  (minimum 10 RHP)
+
+Example: beating a 2.05-rated map:
+    base = round(2.05 x 40) = 82 RHP
+    at 98% accuracy  -> 82 RHP
+    at 96% accuracy  -> 80 RHP
+    at 94% accuracy  -> 79 RHP
+    below 94%        -> 74 RHP
+
+------------------------------------------------
+5. THE DAILY MAP
+------------------------------------------------
+Every day at midnight UTC a new daily map is picked FOR EACH RANK. The
+daily map is chosen at random from maps inside that rank's rating range,
+so it is always matched to your skill level.
+
+  - Beating the daily map awards RHP based on its stars.
+  - Each rank gets its own daily map (Copper players see a Copper map,
+    Bronze players see a Bronze map, etc.).
+  - Maps are not repeated within a calendar month, then the pool resets.
+
+STREAKS:
+  Beating the daily map on consecutive days builds a STREAK.
+  - If you beat the map yesterday too, your streak increases by 1.
+  - If you miss a day, your streak resets to 0.
+  - The daily leaderboard ranks players by their streak, within their
+    own rank only.
+
+------------------------------------------------
+6. THE LEADERBOARDS
+------------------------------------------------
+There are two kinds of leaderboard, each split per-rank (a separate
+leaderboard for Copper, Bronze, Silver, etc.):
+
+  DAILY LEADERBOARDS:
+    Ranks players by their daily map STREAK within their rank.
+    A Bronze player with a 50-day streak ranks above a Master with a
+    30-day streak ON THE BRONZE BOARD. Cross-rank comparison does not
+    matter — each leaderboard is only about the players in that rank.
+
+  CHALLENGE LEADERBOARDS:
+    Ranks players by their RHP within their rank. Everyone starts at the
+    bottom of their rank's board and climbs by earning RHP.
+
+Because the ladder goes both up and down, players who stop playing or
+stop progressing settle into the lower ranks instead of hoarding points.
+
+================================================
+  Made by LC727 for Rhythians
+================================================

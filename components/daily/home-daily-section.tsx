@@ -3,6 +3,7 @@ import { ArrowRight, CalendarDays, Download, Link2, LogIn, Star, CheckCircle2 } 
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { getOrCreateDailyMap, getUserDailyStatus, formatDailyDate, rhpForMap } from "@/lib/daily";
+import { getRankInfo } from "@/lib/ranks";
 
 export async function HomeDailySection() {
   const user = await getSessionUser();
@@ -58,9 +59,10 @@ export async function HomeDailySection() {
     );
   }
 
-  const daily = await getOrCreateDailyMap();
-  const status = await getUserDailyStatus(user.id);
   const userRow = await prisma.user.findUnique({ where: { id: user.id }, select: { rhp: true } });
+  const rankInfo = getRankInfo(userRow?.rhp ?? 0);
+  const daily = await getOrCreateDailyMap(rankInfo.index);
+  const status = await getUserDailyStatus(user.id);
 
   return (
     <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">

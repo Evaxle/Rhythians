@@ -56,15 +56,20 @@ export function DailyMapCard({
   dailyMap,
   initialBeat,
   userRhp,
+  streak,
+  rankName,
   randomMaps,
 }: {
   dailyMap: DailyMapData;
   initialBeat: Beat | null;
   userRhp: number;
+  streak: number;
+  rankName: string;
   randomMaps: RandomMap[];
 }) {
   const [beat, setBeat] = useState<Beat | null>(initialBeat);
   const [rhp, setRhp] = useState(userRhp);
+  const [currentStreak, setCurrentStreak] = useState(streak);
   const [state, setState] = useState<"idle" | "checking" | "found" | "not_found">(initialBeat ? "found" : "idle");
   const [message, setMessage] = useState("");
   const [reportOpen, setReportOpen] = useState(false);
@@ -74,7 +79,7 @@ export function DailyMapCard({
   const [randomResult, setRandomResult] = useState<RandomMap | null>(null);
 
   type CheckResult =
-    | { ok: true; status: "beat" | "already" | "not_beat"; points: number }
+    | { ok: true; status: "beat" | "already" | "not_beat"; points: number; streak?: number }
     | { ok: false; error: string };
 
   async function runCheck(): Promise<CheckResult> {
@@ -82,8 +87,8 @@ export function DailyMapCard({
       const response = await fetch("/api/daily/check", { method: "POST" });
       const data = await response.json();
       if (!response.ok) return { ok: false, error: data.error ?? "Unable to check your scores." };
-      if (data.status === "beat") return { ok: true, status: "beat", points: data.points };
-      if (data.status === "already") return { ok: true, status: "already", points: 0 };
+      if (data.status === "beat") return { ok: true, status: "beat", points: data.points, streak: data.streak };
+      if (data.status === "already") return { ok: true, status: "already", points: 0, streak: data.streak };
       if (data.status === "no_profile") return { ok: false, error: "Link your Rhythia account to participate in the daily map." };
       return { ok: true, status: "not_beat", points: 0 };
     } catch {
@@ -100,6 +105,7 @@ export function DailyMapCard({
     if (result.status === "beat") {
       setBeat({ points: result.points, accuracy: null, misses: null });
       setRhp((value) => value + result.points);
+      if (result.streak != null) setCurrentStreak(result.streak);
       setState("found");
       setMessage(`Great job! You earned ${result.points} RHP for beating today's map.`);
     } else if (result.status === "already") {
@@ -166,7 +172,7 @@ export function DailyMapCard({
           <h2 style={{ textAlign: "center", marginTop: 0, color: "#ffffff" }}>Daily Map</h2>
 
           <p style={{ textAlign: "center", color: "#9aa4bf", fontSize: "0.9rem", marginBottom: 16 }}>
-            {dateLabel} · {rhp.toLocaleString()} RHP
+            {dateLabel} · {rhp.toLocaleString()} RHP · {rankName} rank · {currentStreak} day streak
           </p>
 
           <div className="results-grid" style={{ display: "flex", flexDirection: "column", gap: 12 }}>

@@ -29,11 +29,13 @@ export type AggregateUser = {
 export type UserAvgAggregateOutputType = {
   rhp: number | null
   avgMapRating: number | null
+  dailyStreak: number | null
 }
 
 export type UserSumAggregateOutputType = {
   rhp: number | null
   avgMapRating: number | null
+  dailyStreak: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -60,6 +62,8 @@ export type UserMinAggregateOutputType = {
   updatedAt: Date | null
   rhp: number | null
   avgMapRating: number | null
+  dailyStreak: number | null
+  lastDailyBeatAt: Date | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -86,6 +90,8 @@ export type UserMaxAggregateOutputType = {
   updatedAt: Date | null
   rhp: number | null
   avgMapRating: number | null
+  dailyStreak: number | null
+  lastDailyBeatAt: Date | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -113,6 +119,8 @@ export type UserCountAggregateOutputType = {
   updatedAt: number
   rhp: number
   avgMapRating: number
+  dailyStreak: number
+  lastDailyBeatAt: number
   _all: number
 }
 
@@ -120,11 +128,13 @@ export type UserCountAggregateOutputType = {
 export type UserAvgAggregateInputType = {
   rhp?: true
   avgMapRating?: true
+  dailyStreak?: true
 }
 
 export type UserSumAggregateInputType = {
   rhp?: true
   avgMapRating?: true
+  dailyStreak?: true
 }
 
 export type UserMinAggregateInputType = {
@@ -151,6 +161,8 @@ export type UserMinAggregateInputType = {
   updatedAt?: true
   rhp?: true
   avgMapRating?: true
+  dailyStreak?: true
+  lastDailyBeatAt?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -177,6 +189,8 @@ export type UserMaxAggregateInputType = {
   updatedAt?: true
   rhp?: true
   avgMapRating?: true
+  dailyStreak?: true
+  lastDailyBeatAt?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -204,6 +218,8 @@ export type UserCountAggregateInputType = {
   updatedAt?: true
   rhp?: true
   avgMapRating?: true
+  dailyStreak?: true
+  lastDailyBeatAt?: true
   _all?: true
 }
 
@@ -318,6 +334,8 @@ export type UserGroupByOutputType = {
   updatedAt: Date
   rhp: number
   avgMapRating: number | null
+  dailyStreak: number
+  lastDailyBeatAt: Date | null
   _count: UserCountAggregateOutputType | null
   _avg: UserAvgAggregateOutputType | null
   _sum: UserSumAggregateOutputType | null
@@ -368,6 +386,8 @@ export type UserWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   rhp?: Prisma.IntFilter<"User"> | number
   avgMapRating?: Prisma.FloatNullableFilter<"User"> | number | null
+  dailyStreak?: Prisma.IntFilter<"User"> | number
+  lastDailyBeatAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   playerRank?: Prisma.XOR<Prisma.PlayerRankNullableScalarRelationFilter, Prisma.PlayerRankWhereInput> | null
   roles?: Prisma.UserRoleListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
@@ -426,6 +446,8 @@ export type UserOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   rhp?: Prisma.SortOrder
   avgMapRating?: Prisma.SortOrderInput | Prisma.SortOrder
+  dailyStreak?: Prisma.SortOrder
+  lastDailyBeatAt?: Prisma.SortOrderInput | Prisma.SortOrder
   playerRank?: Prisma.PlayerRankOrderByWithRelationInput
   roles?: Prisma.UserRoleOrderByRelationAggregateInput
   sessions?: Prisma.SessionOrderByRelationAggregateInput
@@ -487,6 +509,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   rhp?: Prisma.IntFilter<"User"> | number
   avgMapRating?: Prisma.FloatNullableFilter<"User"> | number | null
+  dailyStreak?: Prisma.IntFilter<"User"> | number
+  lastDailyBeatAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   playerRank?: Prisma.XOR<Prisma.PlayerRankNullableScalarRelationFilter, Prisma.PlayerRankWhereInput> | null
   roles?: Prisma.UserRoleListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
@@ -545,6 +569,8 @@ export type UserOrderByWithAggregationInput = {
   updatedAt?: Prisma.SortOrder
   rhp?: Prisma.SortOrder
   avgMapRating?: Prisma.SortOrderInput | Prisma.SortOrder
+  dailyStreak?: Prisma.SortOrder
+  lastDailyBeatAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -580,6 +606,8 @@ export type UserScalarWhereWithAggregatesInput = {
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   rhp?: Prisma.IntWithAggregatesFilter<"User"> | number
   avgMapRating?: Prisma.FloatNullableWithAggregatesFilter<"User"> | number | null
+  dailyStreak?: Prisma.IntWithAggregatesFilter<"User"> | number
+  lastDailyBeatAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
 }
 
 export type UserCreateInput = {
@@ -606,6 +634,8 @@ export type UserCreateInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -664,6 +694,8 @@ export type UserUncheckedCreateInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -720,6 +752,8 @@ export type UserUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -778,6 +812,8 @@ export type UserUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -835,6 +871,8 @@ export type UserCreateManyInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -861,6 +899,8 @@ export type UserUpdateManyMutationInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -888,6 +928,8 @@ export type UserUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type StringNullableListFilter<$PrismaModel = never> = {
@@ -923,11 +965,14 @@ export type UserCountOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   rhp?: Prisma.SortOrder
   avgMapRating?: Prisma.SortOrder
+  dailyStreak?: Prisma.SortOrder
+  lastDailyBeatAt?: Prisma.SortOrder
 }
 
 export type UserAvgOrderByAggregateInput = {
   rhp?: Prisma.SortOrder
   avgMapRating?: Prisma.SortOrder
+  dailyStreak?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -954,6 +999,8 @@ export type UserMaxOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   rhp?: Prisma.SortOrder
   avgMapRating?: Prisma.SortOrder
+  dailyStreak?: Prisma.SortOrder
+  lastDailyBeatAt?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -980,11 +1027,14 @@ export type UserMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   rhp?: Prisma.SortOrder
   avgMapRating?: Prisma.SortOrder
+  dailyStreak?: Prisma.SortOrder
+  lastDailyBeatAt?: Prisma.SortOrder
 }
 
 export type UserSumOrderByAggregateInput = {
   rhp?: Prisma.SortOrder
   avgMapRating?: Prisma.SortOrder
+  dailyStreak?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -1548,6 +1598,8 @@ export type UserCreateWithoutRhythiaProfileInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -1605,6 +1657,8 @@ export type UserUncheckedCreateWithoutRhythiaProfileInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -1676,6 +1730,8 @@ export type UserUpdateWithoutRhythiaProfileInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -1733,6 +1789,8 @@ export type UserUncheckedUpdateWithoutRhythiaProfileInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -1788,6 +1846,8 @@ export type UserCreateWithoutRhythiaProfileRequestsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -1845,6 +1905,8 @@ export type UserUncheckedCreateWithoutRhythiaProfileRequestsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -1905,6 +1967,8 @@ export type UserCreateWithoutResolvedRhythiaRequestsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -1962,6 +2026,8 @@ export type UserUncheckedCreateWithoutResolvedRhythiaRequestsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -2033,6 +2099,8 @@ export type UserUpdateWithoutRhythiaProfileRequestsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -2090,6 +2158,8 @@ export type UserUncheckedUpdateWithoutRhythiaProfileRequestsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -2156,6 +2226,8 @@ export type UserUpdateWithoutResolvedRhythiaRequestsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -2213,6 +2285,8 @@ export type UserUncheckedUpdateWithoutResolvedRhythiaRequestsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -2268,6 +2342,8 @@ export type UserCreateWithoutWarningsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -2325,6 +2401,8 @@ export type UserUncheckedCreateWithoutWarningsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -2385,6 +2463,8 @@ export type UserCreateWithoutIssuedWarningsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -2442,6 +2522,8 @@ export type UserUncheckedCreateWithoutIssuedWarningsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -2513,6 +2595,8 @@ export type UserUpdateWithoutWarningsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -2570,6 +2654,8 @@ export type UserUncheckedUpdateWithoutWarningsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -2636,6 +2722,8 @@ export type UserUpdateWithoutIssuedWarningsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -2693,6 +2781,8 @@ export type UserUncheckedUpdateWithoutIssuedWarningsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -2748,6 +2838,8 @@ export type UserCreateWithoutSessionsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
@@ -2805,6 +2897,8 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
   reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
@@ -2876,6 +2970,8 @@ export type UserUpdateWithoutSessionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
@@ -2933,6 +3029,8 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
   reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
@@ -2988,6 +3086,8 @@ export type UserCreateWithoutRolesInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
@@ -3045,6 +3145,8 @@ export type UserUncheckedCreateWithoutRolesInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
   reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
@@ -3116,6 +3218,8 @@ export type UserUpdateWithoutRolesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
@@ -3173,6 +3277,8 @@ export type UserUncheckedUpdateWithoutRolesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
   reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
@@ -3228,6 +3334,8 @@ export type UserCreateWithoutPlayerRankInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
@@ -3284,6 +3392,8 @@ export type UserUncheckedCreateWithoutPlayerRankInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -3370,6 +3480,8 @@ export type UserScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   rhp?: Prisma.IntFilter<"User"> | number
   avgMapRating?: Prisma.FloatNullableFilter<"User"> | number | null
+  dailyStreak?: Prisma.IntFilter<"User"> | number
+  lastDailyBeatAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
 }
 
 export type UserCreateWithoutKnowledgeArticlesInput = {
@@ -3396,6 +3508,8 @@ export type UserCreateWithoutKnowledgeArticlesInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -3453,6 +3567,8 @@ export type UserUncheckedCreateWithoutKnowledgeArticlesInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -3524,6 +3640,8 @@ export type UserUpdateWithoutKnowledgeArticlesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -3581,6 +3699,8 @@ export type UserUncheckedUpdateWithoutKnowledgeArticlesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -3636,6 +3756,8 @@ export type UserCreateWithoutUserTagsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -3693,6 +3815,8 @@ export type UserUncheckedCreateWithoutUserTagsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -3764,6 +3888,8 @@ export type UserUpdateWithoutUserTagsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -3821,6 +3947,8 @@ export type UserUncheckedUpdateWithoutUserTagsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -3876,6 +4004,8 @@ export type UserCreateWithoutCoachCommentsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -3933,6 +4063,8 @@ export type UserUncheckedCreateWithoutCoachCommentsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -4004,6 +4136,8 @@ export type UserUpdateWithoutCoachCommentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -4061,6 +4195,8 @@ export type UserUncheckedUpdateWithoutCoachCommentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -4116,6 +4252,8 @@ export type UserCreateWithoutArticleRevisionsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -4173,6 +4311,8 @@ export type UserUncheckedCreateWithoutArticleRevisionsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -4244,6 +4384,8 @@ export type UserUpdateWithoutArticleRevisionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -4301,6 +4443,8 @@ export type UserUncheckedUpdateWithoutArticleRevisionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -4356,6 +4500,8 @@ export type UserCreateWithoutReviewedClipsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -4413,6 +4559,8 @@ export type UserUncheckedCreateWithoutReviewedClipsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -4473,6 +4621,8 @@ export type UserCreateWithoutClipsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -4530,6 +4680,8 @@ export type UserUncheckedCreateWithoutClipsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
@@ -4601,6 +4753,8 @@ export type UserUpdateWithoutReviewedClipsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -4658,6 +4812,8 @@ export type UserUncheckedUpdateWithoutReviewedClipsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -4724,6 +4880,8 @@ export type UserUpdateWithoutClipsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -4781,6 +4939,8 @@ export type UserUncheckedUpdateWithoutClipsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
@@ -4836,6 +4996,8 @@ export type UserCreateWithoutClipLikesInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -4893,6 +5055,8 @@ export type UserUncheckedCreateWithoutClipLikesInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -4964,6 +5128,8 @@ export type UserUpdateWithoutClipLikesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -5021,6 +5187,8 @@ export type UserUncheckedUpdateWithoutClipLikesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -5076,6 +5244,8 @@ export type UserCreateWithoutCommentsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -5133,6 +5303,8 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -5204,6 +5376,8 @@ export type UserUpdateWithoutCommentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -5261,6 +5435,8 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -5316,6 +5492,8 @@ export type UserCreateWithoutReportsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -5373,6 +5551,8 @@ export type UserUncheckedCreateWithoutReportsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -5433,6 +5613,8 @@ export type UserCreateWithoutReportedResolvedByInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -5490,6 +5672,8 @@ export type UserUncheckedCreateWithoutReportedResolvedByInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -5561,6 +5745,8 @@ export type UserUpdateWithoutReportsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -5618,6 +5804,8 @@ export type UserUncheckedUpdateWithoutReportsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -5684,6 +5872,8 @@ export type UserUpdateWithoutReportedResolvedByInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -5741,6 +5931,8 @@ export type UserUncheckedUpdateWithoutReportedResolvedByInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -5796,6 +5988,8 @@ export type UserCreateWithoutAnnouncementsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -5853,6 +6047,8 @@ export type UserUncheckedCreateWithoutAnnouncementsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -5924,6 +6120,8 @@ export type UserUpdateWithoutAnnouncementsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -5981,6 +6179,8 @@ export type UserUncheckedUpdateWithoutAnnouncementsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -6036,6 +6236,8 @@ export type UserCreateWithoutNotificationsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -6093,6 +6295,8 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -6164,6 +6368,8 @@ export type UserUpdateWithoutNotificationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -6221,6 +6427,8 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -6276,6 +6484,8 @@ export type UserCreateWithoutModerationActionsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -6333,6 +6543,8 @@ export type UserUncheckedCreateWithoutModerationActionsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -6404,6 +6616,8 @@ export type UserUpdateWithoutModerationActionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -6461,6 +6675,8 @@ export type UserUncheckedUpdateWithoutModerationActionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -6516,6 +6732,8 @@ export type UserCreateWithoutConversationsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -6573,6 +6791,8 @@ export type UserUncheckedCreateWithoutConversationsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -6644,6 +6864,8 @@ export type UserUpdateWithoutConversationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -6701,6 +6923,8 @@ export type UserUncheckedUpdateWithoutConversationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -6756,6 +6980,8 @@ export type UserCreateWithoutConversationMembershipsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -6813,6 +7039,8 @@ export type UserUncheckedCreateWithoutConversationMembershipsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -6884,6 +7112,8 @@ export type UserUpdateWithoutConversationMembershipsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -6941,6 +7171,8 @@ export type UserUncheckedUpdateWithoutConversationMembershipsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -6996,6 +7228,8 @@ export type UserCreateWithoutMessagesSentInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -7053,6 +7287,8 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -7124,6 +7360,8 @@ export type UserUpdateWithoutMessagesSentInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -7181,6 +7419,8 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -7236,6 +7476,8 @@ export type UserCreateWithoutSentFriendRequestsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -7293,6 +7535,8 @@ export type UserUncheckedCreateWithoutSentFriendRequestsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -7353,6 +7597,8 @@ export type UserCreateWithoutReceivedFriendRequestsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -7410,6 +7656,8 @@ export type UserUncheckedCreateWithoutReceivedFriendRequestsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -7481,6 +7729,8 @@ export type UserUpdateWithoutSentFriendRequestsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -7538,6 +7788,8 @@ export type UserUncheckedUpdateWithoutSentFriendRequestsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -7604,6 +7856,8 @@ export type UserUpdateWithoutReceivedFriendRequestsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -7661,6 +7915,8 @@ export type UserUncheckedUpdateWithoutReceivedFriendRequestsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -7716,6 +7972,8 @@ export type UserCreateWithoutDailyMapBeatsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -7773,6 +8031,8 @@ export type UserUncheckedCreateWithoutDailyMapBeatsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -7844,6 +8104,8 @@ export type UserUpdateWithoutDailyMapBeatsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -7901,6 +8163,8 @@ export type UserUncheckedUpdateWithoutDailyMapBeatsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -7956,6 +8220,8 @@ export type UserCreateWithoutRhpTransactionsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -8013,6 +8279,8 @@ export type UserUncheckedCreateWithoutRhpTransactionsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -8084,6 +8352,8 @@ export type UserUpdateWithoutRhpTransactionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -8141,6 +8411,8 @@ export type UserUncheckedUpdateWithoutRhpTransactionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -8196,6 +8468,8 @@ export type UserCreateWithoutChallengeMapsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -8253,6 +8527,8 @@ export type UserUncheckedCreateWithoutChallengeMapsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -8313,6 +8589,8 @@ export type UserCreateWithoutReviewedChallengeMapsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -8370,6 +8648,8 @@ export type UserUncheckedCreateWithoutReviewedChallengeMapsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -8441,6 +8721,8 @@ export type UserUpdateWithoutChallengeMapsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -8498,6 +8780,8 @@ export type UserUncheckedUpdateWithoutChallengeMapsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -8564,6 +8848,8 @@ export type UserUpdateWithoutReviewedChallengeMapsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -8621,6 +8907,8 @@ export type UserUncheckedUpdateWithoutReviewedChallengeMapsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -8676,6 +8964,8 @@ export type UserCreateWithoutChallengeCompletionsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -8733,6 +9023,8 @@ export type UserUncheckedCreateWithoutChallengeCompletionsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -8804,6 +9096,8 @@ export type UserUpdateWithoutChallengeCompletionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -8861,6 +9155,8 @@ export type UserUncheckedUpdateWithoutChallengeCompletionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -8916,6 +9212,8 @@ export type UserCreateManyPlayerRankInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
 }
 
 export type UserUpdateWithoutPlayerRankInput = {
@@ -8942,6 +9240,8 @@ export type UserUpdateWithoutPlayerRankInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
@@ -8998,6 +9298,8 @@ export type UserUncheckedUpdateWithoutPlayerRankInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -9054,6 +9356,8 @@ export type UserUncheckedUpdateManyWithoutPlayerRankInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -9364,6 +9668,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   updatedAt?: boolean
   rhp?: boolean
   avgMapRating?: boolean
+  dailyStreak?: boolean
+  lastDailyBeatAt?: boolean
   playerRank?: boolean | Prisma.User$playerRankArgs<ExtArgs>
   roles?: boolean | Prisma.User$rolesArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
@@ -9423,6 +9729,8 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   updatedAt?: boolean
   rhp?: boolean
   avgMapRating?: boolean
+  dailyStreak?: boolean
+  lastDailyBeatAt?: boolean
   playerRank?: boolean | Prisma.User$playerRankArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -9451,6 +9759,8 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   updatedAt?: boolean
   rhp?: boolean
   avgMapRating?: boolean
+  dailyStreak?: boolean
+  lastDailyBeatAt?: boolean
   playerRank?: boolean | Prisma.User$playerRankArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -9479,9 +9789,11 @@ export type UserSelectScalar = {
   updatedAt?: boolean
   rhp?: boolean
   avgMapRating?: boolean
+  dailyStreak?: boolean
+  lastDailyBeatAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "discordId" | "username" | "discriminator" | "avatar" | "locale" | "email" | "passwordHash" | "displayName" | "profileHandle" | "discordRoles" | "inGuild" | "onboardingCompleted" | "playerRankId" | "joinedAt" | "bio" | "website" | "isSuspended" | "suspendedUntil" | "mutedUntil" | "createdAt" | "updatedAt" | "rhp" | "avgMapRating", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "discordId" | "username" | "discriminator" | "avatar" | "locale" | "email" | "passwordHash" | "displayName" | "profileHandle" | "discordRoles" | "inGuild" | "onboardingCompleted" | "playerRankId" | "joinedAt" | "bio" | "website" | "isSuspended" | "suspendedUntil" | "mutedUntil" | "createdAt" | "updatedAt" | "rhp" | "avgMapRating" | "dailyStreak" | "lastDailyBeatAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   playerRank?: boolean | Prisma.User$playerRankArgs<ExtArgs>
   roles?: boolean | Prisma.User$rolesArgs<ExtArgs>
@@ -9583,6 +9895,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     updatedAt: Date
     rhp: number
     avgMapRating: number | null
+    dailyStreak: number
+    lastDailyBeatAt: Date | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -10061,6 +10375,8 @@ export interface UserFieldRefs {
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly rhp: Prisma.FieldRef<"User", 'Int'>
   readonly avgMapRating: Prisma.FieldRef<"User", 'Float'>
+  readonly dailyStreak: Prisma.FieldRef<"User", 'Int'>
+  readonly lastDailyBeatAt: Prisma.FieldRef<"User", 'DateTime'>
 }
     
 

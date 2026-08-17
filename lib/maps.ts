@@ -55,10 +55,6 @@ export async function submitChallengeMap(data: {
   });
 }
 
-export function fairRatingFromStars(stars: number): number {
-  return roundRating(stars * 0.41);
-}
-
 export async function getPendingChallengeMaps() {
   return prisma.challengeMap.findMany({
     where: { status: "pending" },
