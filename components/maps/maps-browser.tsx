@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AlertTriangle, CheckCircle2, Download, Map as MapIcon, RefreshCw, Search, XCircle, ChevronDown } from "lucide-react";
 import type { RankInfo } from "@/lib/ranks";
 import { isMapInRankRange, rhpGainForMap } from "@/lib/ranks";
+import { MapLeaderboard } from "@/components/maps/map-leaderboard";
 
 const PAGE_SIZE = 40;
 
@@ -40,6 +41,7 @@ export function MapsBrowser({
   const [query, setQuery] = useState("");
   const [autoChecking, setAutoChecking] = useState(false);
   const [didAutoCheck, setDidAutoCheck] = useState(false);
+  const [leaderboardRefresh, setLeaderboardRefresh] = useState<Record<string, number>>({});
 
   const filtered = useMemo(() => {
     let list = maps;
@@ -100,6 +102,7 @@ export function MapsBrowser({
         if (!isAuto) setMessages((current) => ({ ...current, [id]: { tone: "err", text: data.error ?? "Unable to check your scores." } }));
         return;
       }
+      setLeaderboardRefresh((current) => ({ ...current, [id]: (current[id] ?? 0) + 1 }));
       if (data.status === "beat") {
         setMessages((current) => ({ ...current, [id]: { tone: "ok", text: `You earned ${data.points} RHP! (${data.accuracy != null ? data.accuracy.toFixed(2) + "% accuracy" : "pass"})` } }));
       } else if (data.status === "already") {
@@ -254,6 +257,8 @@ export function MapsBrowser({
                     {message.text}
                   </p>
                 )}
+
+                <MapLeaderboard mapId={map.id} refreshSignal={leaderboardRefresh[map.id] ?? 0} />
               </article>
             );
           })}

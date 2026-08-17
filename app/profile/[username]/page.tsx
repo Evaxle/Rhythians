@@ -13,6 +13,7 @@ import { getRhythiaStatus } from "@/lib/rhythia-status";
 import { RankProgress } from "@/components/rank-progress";
 import { getUserGlobalRank } from "@/lib/maps";
 import { RhythiaVerifiedBadge } from "@/components/rhythia-verified-badge";
+import { CheckAllScoresButton } from "@/components/check-all-scores-button";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,11 @@ export default async function ProfilePage({ params }: Props) {
     where: { profileHandle: username },
     include: {
       clips: { where: { status: "approved" }, orderBy: { createdAt: "desc" }, include: { category: true, reviewedBy: { select: { username: true, displayName: true } } } },
+      challengeMapCompletions: {
+        where: { passed: true },
+        orderBy: { updatedAt: "desc" },
+        include: { challengeMap: true },
+      },
       articleRevisions: true,
       roles: { include: { role: true } },
       playerRank: true,
@@ -111,6 +117,9 @@ export default async function ProfilePage({ params }: Props) {
           <div className="flex flex-col items-stretch gap-3">
             {!isOwnProfile && <FriendButton userId={user.id} />}
             {isOwnProfile && <RhythiaConnect connectedUrl={user.rhythiaProfile?.profileUrl} />}
+            {isOwnProfile && user.rhythiaProfile && (
+              <CheckAllScoresButton label="Refresh recent scores" checkingLabel="Refreshing your scores..." />
+            )}
             {!isOwnProfile && (
               <Link
                 href={`/messages?user=${encodeURIComponent(user.profileHandle)}`}
@@ -142,35 +151,75 @@ export default async function ProfilePage({ params }: Props) {
       {user.rhythiaProfile && <RhythiaStats profile={user.rhythiaProfile} />}
 
       <section className="space-y-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-accent">Clips</p>
-            <h2 className="mt-2 text-2xl font-semibold text-white">Approved clips from this creator</h2>
-          </div>
-          <p className="text-sm text-muted">{user.clips.length} approved clip{user.clips.length === 1 ? "" : "s"}</p>
+        <div>
+          <p className="text-sm uppercase tracking-[0.3em] text-accent">Activity</p>
+          <h2 className="mt-2 text-2xl font-semibold text-white">Clips &amp; completed maps</h2>
         </div>
 
-        {user.clips.length === 0 ? (
-          <div className="rounded-3xl border border-border bg-background/80 p-8 text-sm text-muted">No approved clips are visible yet.</div>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {user.clips.map((clip) => (
-              <Link key={clip.id} href={`/clips/${clip.id}`} className="overflow-hidden rounded-3xl border border-border bg-surface/95 p-5 transition hover:-translate-y-0.5 hover:border-accent/40">
-                <div className="h-40 rounded-3xl bg-white/5" />
-                <div className="mt-4">
-                  <p className="text-sm uppercase tracking-[0.24em] text-accent">{clip.category?.name ?? "Uncategorized"}</p>
-                  <h3 className="mt-3 text-lg font-semibold text-white">{clip.title}</h3>
-                  {clip.reviewedBy && (
-                    <p className="mt-2 text-xs text-muted">
-                      Approved by <span className="font-semibold text-white">{clip.reviewedBy.displayName ?? clip.reviewedBy.username}</span>
-                    </p>
-                  )}
-                  <p className="mt-2 text-sm text-muted">{clip.createdAt.toLocaleDateString()}</p>
-                </div>
-              </Link>
-            ))}
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-white">Approved clips</h3>
+              <p className="text-sm text-muted">{user.clips.length} clip{user.clips.length === 1 ? "" : "s"}</p>
+            </div>
+
+            {user.clips.length === 0 ? (
+              <div className="rounded-3xl border border-border bg-background/80 p-6 text-sm text-muted">No approved clips are visible yet.</div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+                {user.clips.map((clip) => (
+                  <Link key={clip.id} href={`/clips/${clip.id}`} className="overflow-hidden rounded-3xl border border-border bg-surface/95 p-5 transition hover:-translate-y-0.5 hover:border-accent/40">
+                    <div className="h-36 rounded-3xl bg-white/5" />
+                    <div className="mt-4">
+                      <p className="text-sm uppercase tracking-[0.24em] text-accent">{clip.category?.name ?? "Uncategorized"}</p>
+                      <h3 className="mt-3 text-lg font-semibold text-white">{clip.title}</h3>
+                      {clip.reviewedBy && (
+                        <p className="mt-2 text-xs text-muted">
+                          Approved by <span className="font-semibold text-white">{clip.reviewedBy.displayName ?? clip.reviewedBy.username}</span>
+                        </p>
+                      )}
+                      <p className="mt-2 text-sm text-muted">{clip.createdAt.toLocaleDateString()}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-white">Completed maps</h3>
+              <p className="text-sm text-muted">{user.challengeMapCompletions.length} map{user.challengeMapCompletions.length === 1 ? "" : "s"}</p>
+            </div>
+
+            {user.challengeMapCompletions.length === 0 ? (
+              <div className="rounded-3xl border border-border bg-background/80 p-6 text-sm text-muted">No completed maps yet.</div>
+            ) : (
+              <div className="space-y-3">
+                {user.challengeMapCompletions.map((completion) => (
+                  <Link key={completion.id} href="/maps" className="block rounded-3xl border border-border bg-surface/95 p-5 transition hover:-translate-y-0.5 hover:border-accent/40">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-xs text-muted">{completion.challengeMap.artist ?? "Unknown artist"}</p>
+                        <h3 className="mt-1 truncate text-lg font-semibold text-white">{completion.challengeMap.title}</h3>
+                      </div>
+                      <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-400/30 bg-amber-400/10 px-2.5 py-1 text-sm font-semibold text-amber-300">
+                        {completion.challengeMap.rating != null ? completion.challengeMap.rating.toFixed(2) : "—"}
+                      </span>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
+                      <span className={completion.accuracy != null ? "" : "text-muted"}>
+                        {completion.accuracy != null ? `${completion.accuracy.toFixed(2)}% accuracy` : "Passed"}
+                      </span>
+                      <span className="text-emerald-300">+{completion.points} RHP</span>
+                      <span>Completed {completion.updatedAt.toLocaleDateString()}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </section>
     </div>
   );
