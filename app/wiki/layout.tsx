@@ -2,18 +2,18 @@ import Link from "next/link";
 import { Settings2, Grid3X3, Trophy } from "lucide-react";
 
 const navItems = [
-  { href: "/knowledge/ranking", label: "About Ranking", icon: Trophy },
-  { href: "/knowledge/settings", label: "Settings Guide", icon: Settings2 },
-  { href: "/knowledge/patterns", label: "Patterns Wiki", icon: Grid3X3 },
+  { href: "/wiki/ranking", label: "About Ranking", icon: Trophy },
+  { href: "/wiki/settings", label: "Settings Guide", icon: Settings2 },
+  { href: "/wiki/patterns", label: "Patterns Wiki", icon: Grid3X3 },
 ];
 
-export default function KnowledgeLayout({ children }: { children: React.ReactNode }) {
+export default function WikiLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="grid min-h-[calc(100vh-128px)] grid-cols-1 gap-6 lg:grid-cols-[280px_1fr]">
       <aside className="h-fit rounded-3xl border border-border bg-surface/95 p-6 shadow-glow lg:sticky lg:top-8">
         <div className="space-y-6">
           <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-accent">Knowledge</p>
+            <p className="text-sm uppercase tracking-[0.3em] text-accent">Wiki</p>
             <h2 className="mt-3 text-xl font-semibold text-white">Rhythia guides</h2>
           </div>
           <nav className="space-y-2 text-sm">

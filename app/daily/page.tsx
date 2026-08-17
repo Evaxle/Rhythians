@@ -69,7 +69,8 @@ export default async function DailyPage() {
         <p className="text-sm text-muted">
           A daily map matched to your {rankInfo.name} rank ({rankInfo.rangeMin.toFixed(2)}–{rankInfo.rangeMax.toFixed(2)} rating).
           Beat it for Rhythian Points (RHP) — {formatDailyDate(daily.date)}, worth{" "}
-          <span className="font-semibold text-white">{rhpForMap(daily.starRating)} RHP</span>.
+          <span className="font-semibold text-white">{rhpForMap(daily.starRating, rankInfo.index)} RHP</span> at 100% accuracy
+          (scaled by accuracy and speed, based on your {rankInfo.name} rank).
           {status?.streak ? ` Your streak: ${status.streak} day${status.streak === 1 ? "" : "s"}.` : ""}
         </p>
       </section>

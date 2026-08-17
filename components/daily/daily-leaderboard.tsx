@@ -81,9 +81,9 @@ export function DailyLeaderboard({
                   <span
                     className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-bold"
                     style={{ color: row.rankInfo.color, borderColor: `${row.rankInfo.color}55`, backgroundColor: `${row.rankInfo.color}1a` }}
-                    title={`${row.rankInfo.isUnnamed ? "Unnamed" : `${row.rankInfo.name} ${row.rankInfo.tier}`} · tier ${row.rankInfo.tier}`}
+                    title={`${row.rankInfo.isExpert ? "Expert" : `${row.rankInfo.name} ${row.rankInfo.tier}`} · tier ${row.rankInfo.tier}`}
                   >
-                    {row.rankInfo.isUnnamed ? "#" : row.rankInfo.tier}
+                    {row.rankInfo.isExpert ? "#" : row.rankInfo.tier}
                   </span>
                   <div className="min-w-0">
                     <Link href={`/profile/${row.profileHandle}`} className={`truncate text-sm font-semibold hover:text-accent ${isCurrentUser ? "text-accent" : "text-white"}`}>
@@ -91,7 +91,7 @@ export function DailyLeaderboard({
                       {isCurrentUser ? " (you)" : ""}
                     </Link>
                     <p className="text-xs text-muted">
-                      {row.rankInfo.isUnnamed ? "Unnamed" : `${row.rankInfo.name} ${row.rankInfo.tier}`} · {row.rhp.toLocaleString()} RHP
+                      {row.rankInfo.isExpert ? "Expert" : `${row.rankInfo.name} ${row.rankInfo.tier}`} · {row.rhp.toLocaleString()} RHP
                     </p>
                   </div>
                 </div>

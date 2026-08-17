@@ -1,10 +1,12 @@
 import { RANKS, RANK_TIERS, TIER_SPAN } from "@/lib/ranks";
 
 const ACCURACY_TIERS = [
-  { min: 98, label: "100% of base RHP", note: "Perfect / near-perfect clear" },
-  { min: 96, label: "98% of base RHP", note: "Great clear" },
-  { min: 94, label: "96% of base RHP", note: "Solid clear" },
-  { min: 0, label: "90% of base RHP", note: "Passed, rough" },
+  { min: 100, label: "100% of base RHP", note: "Perfect clear" },
+  { min: 99, label: "90% of base RHP", note: "Near-perfect clear" },
+  { min: 98, label: "75% of base RHP", note: "Great clear" },
+  { min: 95, label: "60% of base RHP", note: "Solid clear" },
+  { min: 90, label: "50% of base RHP", note: "Passed, okay" },
+  { min: 0, label: "40% of base RHP", note: "Passed, rough" },
 ];
 
 export default function AboutRankingPage() {
@@ -62,7 +64,7 @@ export default function AboutRankingPage() {
             <li>Copper 5 = 401 – 500 RHP</li>
             <li>Bronze 1 = 501 – 600 RHP (just crossed into Bronze)</li>
             <li>Master 5 = 3501 – 4000 RHP</li>
-            <li>The Unnamed rank shows your global position (#1, #2…) on the badge.</li>
+            <li>The Expert rank shows your global position (#1, #2…) on the badge.</li>
           </ul>
         </div>
       </section>
@@ -77,10 +79,14 @@ export default function AboutRankingPage() {
             <p className="text-sm font-semibold text-emerald-300">How you gain RHP</p>
             <ul className="mt-3 space-y-2 text-sm leading-6 text-muted">
               <li>
-                <span className="text-white">Daily maps:</span> RHP = 100 + (stars × 100). A 5-star daily map gives 600 RHP.
+                <span className="text-white">Daily maps:</span> beating the daily map awards base RHP based on your
+                rank, scaled by accuracy and speed. A Copper daily and a Master daily both reward their own rank&apos;s
+                base.
               </li>
               <li>
-                <span className="text-white">Challenge maps:</span> beating a map in your rank&apos;s rating range awards RHP based on its rating and your accuracy.
+                <span className="text-white">Challenge maps:</span> beating any map inside your rank&apos;s rating range
+                awards base RHP based on your rank (higher ranks award slightly less, keeping the ladder balanced),
+                scaled by your accuracy and speed.
               </li>
             </ul>
           </div>
@@ -88,7 +94,9 @@ export default function AboutRankingPage() {
             <p className="text-sm font-semibold text-red-300">How you lose RHP</p>
             <ul className="mt-3 space-y-2 text-sm leading-6 text-muted">
               <li>
-                <span className="text-white">Failing a challenge map</span> costs RHP. Loss = round(rating × 10), e.g. failing a 2.05 map costs about 21 RHP.
+                <span className="text-white">Failing a challenge map</span> costs RHP based on how many players have
+                beaten the map and the placement your failed attempt would earn. The better your attempt, the less
+                you lose — an attempt with no recorded accuracy is treated as last place.
               </li>
               <li>RHP never drops below 0, and a failed map only counts once per map.</li>
             </ul>
@@ -117,27 +125,51 @@ export default function AboutRankingPage() {
       </section>
 
       <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
-        <h2 className="text-2xl font-semibold text-white">RHP weighting by accuracy</h2>
+        <h2 className="text-2xl font-semibold text-white">RHP weighting by accuracy & speed</h2>
         <p className="mt-2 text-sm leading-7 text-muted">
-          Beating a challenge map earns base RHP of <span className="text-white">round(rating × 40)</span>,
-          scaled by your accuracy to reward clean plays:
+          Beating any challenge map inside your rank&apos;s rating range awards base RHP that depends on your rank —
+          higher ranks earn slightly less so climbing stays balanced. At 100% accuracy with no modifiers:
         </p>
         <div className="mt-5 overflow-hidden rounded-2xl border border-border">
+          <div className="grid grid-cols-2 gap-3 border-b border-border bg-background/40 px-4 py-3 sm:grid-cols-3">
+            {RANKS.map((rank) => (
+              <div key={rank.name}>
+                <p className="text-sm font-semibold" style={{ color: rank.color }}>{rank.name}</p>
+                <p className="text-xs text-muted">{Math.max(10, 20 - rank.index)} RHP</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <p className="mt-4 text-sm leading-7 text-muted">
+          <span className="text-white">Copper</span> is worth 20 RHP, dropping by 2 RHP per rank down to{" "}
+          <span className="text-white">Master at 13 RHP</span>, with <span className="text-white">Expert at 10 RHP</span>.
+          Your accuracy and any speed modifier scale the base:
+        </p>
+        <div className="mt-4 overflow-hidden rounded-2xl border border-border">
           {ACCURACY_TIERS.map((tier, index) => (
             <div key={index} className={`grid grid-cols-2 gap-3 border-b border-border px-4 py-3 last:border-0 ${index % 2 ? "bg-background/60" : "bg-background/40"}`}>
               <div>
                 <p className="text-sm font-semibold text-white">{tier.min}%+ accuracy</p>
                 <p className="text-xs text-muted">{tier.note}</p>
               </div>
-              <p className="text-right text-sm font-semibold" style={{ color: tier.min >= 98 ? "#4ade80" : tier.min >= 94 ? "#facc15" : "#f87171" }}>
+              <p className="text-right text-sm font-semibold" style={{ color: tier.min >= 100 ? "#4ade80" : tier.min >= 98 ? "#facc15" : "#f87171" }}>
                 {tier.label}
               </p>
             </div>
           ))}
         </div>
         <div className="mt-5 rounded-2xl border border-border bg-background/70 p-5 text-sm leading-6 text-muted">
-          Example: beating a 2.05-rated map — base = round(2.05 × 40) = 82 RHP. At 98%+ accuracy you earn 82 RHP,
-          at 96% you earn 80, at 94% you earn 79, and below 94% you earn 74.
+          <p>
+            <span className="text-white">Speed modifier bonus:</span> playing with a speed modifier (anything above
+            1.00x) adds <span className="text-white">25% per 1.00x of extra speed</span>, capped at +50%. A 2.00x
+            perfect clear in Copper earns 20 × 1.25 = 25 RHP.
+          </p>
+        </div>
+        <div className="mt-5 rounded-2xl border border-border bg-background/70 p-5 text-sm leading-6 text-muted">
+          Example: beating any map in your rank&apos;s range — Copper base = 20 RHP. At 100% accuracy you earn 20, at
+          99% you earn 18, at 98% you earn 15, at 95% you earn 12, and below 90% you earn 8. Adding a 2.00x speed
+          modifier bumps a perfect clear to 25. In Master the same play is worth 13 RHP (13 × 1.25 = 16 with the
+          speed mod).
         </div>
       </section>
 
@@ -149,9 +181,10 @@ export default function AboutRankingPage() {
           Each rank sees its own daily map, and maps aren&apos;t repeated within a calendar month.
         </p>
         <p className="mt-3 text-sm leading-7 text-muted">
-          Beating the daily map on consecutive days builds a <span className="text-white">streak</span>. If you
-          miss a day, your streak resets to 0. The daily leaderboard ranks players by their streak, within their
-          own rank only.
+          Beating the daily map on consecutive days builds a <span className="text-white">streak</span>, and rewards
+          the same rank-based RHP as challenge maps (your rank&apos;s base at 100% accuracy), scaled by your accuracy
+          and speed. If you miss a day, your streak resets to 0. The daily leaderboard ranks players by their streak,
+          within their own rank only.
         </p>
       </section>
 
@@ -178,8 +211,9 @@ export default function AboutRankingPage() {
           </div>
         </div>
         <p className="mt-4 text-sm leading-7 text-muted">
-          Because the ladder goes both up and down, players who stop progressing settle into the lower ranks
-          instead of hoarding points.
+          Only <span className="text-white">Rhythia-verified</span> members appear on (or contribute to) the
+          leaderboards — unverified accounts are never listed. Because the ladder goes both up and down, players who
+          stop progressing settle into the lower ranks instead of hoarding points.
         </p>
       </section>
 

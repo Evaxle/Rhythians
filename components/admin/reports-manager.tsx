@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Flag, RefreshCw, Search } from "lucide-react";
+import { fairRatingFromStars } from "@/lib/ranks";
 
 interface ReportItem {
   id: string;
@@ -106,7 +107,7 @@ export function ReportsManager({
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Could not refresh the daily map.");
-      setRefreshMessage(`Daily map refreshed to: ${data.map.title} (${data.map.starRating.toFixed(2)} stars).`);
+      setRefreshMessage(`Daily map refreshed to: ${data.map.title} (${fairRatingFromStars(data.map.starRating).toFixed(2)} rating).`);
       await reload();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not refresh the daily map.");

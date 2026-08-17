@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { Settings2, Grid3X3, Trophy, ArrowRight } from "lucide-react";
 
-export default function KnowledgePage() {
+export default function WikiPage() {
   return (
     <div className="space-y-8">
       <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
-        <p className="text-sm uppercase tracking-[0.3em] text-accent">Knowledge hub</p>
+        <p className="text-sm uppercase tracking-[0.3em] text-accent">Wiki</p>
         <h1 className="mt-3 text-3xl font-semibold text-white">Rhythia settings, patterns & ranking</h1>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
           Learn how the main game settings affect your gameplay and aim, explore the pattern
@@ -16,7 +16,7 @@ export default function KnowledgePage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Link
-          href="/knowledge/ranking"
+          href="/wiki/ranking"
           className="group rounded-3xl border border-border bg-surface/95 p-6 shadow-glow transition hover:border-accent/40 hover:bg-surface/90"
         >
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/15 text-accent">
@@ -33,7 +33,7 @@ export default function KnowledgePage() {
         </Link>
 
         <Link
-          href="/knowledge/settings"
+          href="/wiki/settings"
           className="group rounded-3xl border border-border bg-surface/95 p-6 shadow-glow transition hover:border-accent/40 hover:bg-surface/90"
         >
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/15 text-accent">
@@ -50,7 +50,7 @@ export default function KnowledgePage() {
         </Link>
 
         <Link
-          href="/knowledge/patterns"
+          href="/wiki/patterns"
           className="group rounded-3xl border border-border bg-surface/95 p-6 shadow-glow transition hover:border-accent/40 hover:bg-surface/90"
         >
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/15 text-accent">

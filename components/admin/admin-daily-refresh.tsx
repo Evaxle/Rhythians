@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { RefreshCw } from "lucide-react";
-import { RANKS } from "@/lib/ranks";
+import { RANKS, fairRatingFromStars } from "@/lib/ranks";
 
 export function AdminDailyRefresh() {
   const [busy, setBusy] = useState(false);
@@ -20,7 +20,7 @@ export function AdminDailyRefresh() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Could not refresh the daily map.");
-      setMessage({ tone: "ok", text: `Refreshed ${RANKS[rankIndex].name}! Today's map is now: ${data.map.title} (${data.map.starRating.toFixed(2)} stars)${data.replaced ? "" : " (no change needed)"}.` });
+      setMessage({ tone: "ok", text: `Refreshed ${RANKS[rankIndex].name}! Today's map is now: ${data.map.title} (${fairRatingFromStars(data.map.starRating).toFixed(2)} rating)${data.replaced ? "" : " (no change needed)"}.` });
     } catch (err) {
       setMessage({ tone: "err", text: err instanceof Error ? err.message : "Could not refresh the daily map." });
     } finally {

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { rhythiaRequest } from "@/lib/rhythia";
-import { RANKS, getRankInfo, fairRatingFromStars, type RankInfo } from "@/lib/ranks";
+import { RANKS, getRankInfo, fairRatingFromStars, rhpGainForMap, type RankInfo } from "@/lib/ranks";
 
 const RANKED_SNAPSHOT_KEY = "daily_ranked_maps_snapshot";
 const RANKED_SNAPSHOT_TTL_MS = 24 * 60 * 60 * 1000;
@@ -41,14 +41,15 @@ export type RhythiaScoreEntry = {
   beatmapNotes: number | null;
   accuracy?: number | null;
   created_at?: string | null;
+  speed?: number | null;
 };
 
-export const RHP_BASE_POINTS = 100;
-export const RHP_STAR_MULTIPLIER = 100;
-
-export function rhpForMap(starRating: number): number {
-  const stars = Number.isFinite(starRating) ? starRating : 0;
-  return RHP_BASE_POINTS + Math.round(stars * RHP_STAR_MULTIPLIER);
+// The daily map uses the same balanced gain as challenge maps: a base that
+// depends on your rank (Copper 20 ... Expert 10 at 100% accuracy), scaled by
+// accuracy and speed modifiers at award time.
+export function rhpForMap(starRating: number, rankIndex = 0): number {
+  const rating = fairRatingFromStars(Number.isFinite(starRating) ? starRating : 0);
+  return rhpGainForMap(rating, 100, undefined, rankIndex);
 }
 
 export function startOfDayUTC(value: Date | string = new Date()): Date {
@@ -290,7 +291,7 @@ export async function checkAndAwardDaily(userId: string): Promise<DailyCheckResu
   const hit = findScoreForMap(scores.recent, daily.title) ?? findScoreForMap(scores.top, daily.title);
   if (!hit) return { status: "not_beat", points: 0, streak: user.dailyStreak };
 
-  const points = rhpForMap(daily.starRating);
+  const points = rhpGainForMap(fairRatingFromStars(daily.starRating), hit.accuracy ?? null, hit.speed, rankInfo.index);
   const now = new Date();
 
   // Streak: if the user beat a daily map yesterday (UTC), increment; otherwise reset to 1.
@@ -376,6 +377,7 @@ export async function getDailyLeaderboard(rankIndex: number, limit = 100): Promi
       rhp: maxRhp == null ? { gte: minRhp } : { gte: minRhp, lt: maxRhp },
       dailyStreak: { gt: 0 },
       lastDailyBeatAt: { not: null },
+      rhythiaVerified: true,
       NOT: { profileHandle: "rhythia-imports" },
     },
     select: { id: true, username: true, displayName: true, profileHandle: true, avatar: true, rhp: true, dailyStreak: true, lastDailyBeatAt: true },
