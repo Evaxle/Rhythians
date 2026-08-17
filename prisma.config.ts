@@ -5,12 +5,12 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const configDir = path.dirname(fileURLToPath(import.meta.url));
-loadEnv({ path: path.resolve(configDir, "..", ".env") });
+loadEnv({ path: path.resolve(configDir, ".env") });
 
 export default defineConfig({
-  schema: "schema.prisma",
+  schema: "prisma/schema.prisma",
   migrations: {
-    path: "migrations",
+    path: "prisma/migrations",
   },
   datasource: {
     url: process.env.DATABASE_URL!,
