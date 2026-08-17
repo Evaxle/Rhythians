@@ -1,10 +1,16 @@
 import { ClipModerationQueue } from "@/components/clip-moderation-queue";
 import { ReviewerWelcome } from "@/components/reviewer-welcome";
 import { getPendingClips } from "@/lib/clips";
+import { getSessionUser } from "@/lib/auth";
+import { canAccessApproval } from "@/lib/approval";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default async function ApprovalPage() {
+  const user = await getSessionUser();
+  if (!user || !(await canAccessApproval(user))) redirect("/approval/maps");
+
   const clips = await getPendingClips();
 
   return (

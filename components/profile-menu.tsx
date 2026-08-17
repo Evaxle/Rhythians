@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Trophy } from "lucide-react";
 
 interface ProfileMenuUser {
   avatar: string | null;
@@ -10,6 +10,7 @@ interface ProfileMenuUser {
   username: string;
   displayName: string | null;
   profileHandle: string;
+  rhp: number;
 }
 
 const CLOSE_DELAY_MS = 250;
@@ -78,9 +79,21 @@ export function ProfileMenu({ user }: { user: ProfileMenuUser }) {
           <div className="border-b border-border px-3 py-2">
             <p className="truncate text-sm font-semibold text-white">{user.displayName ?? user.username}</p>
             <p className="truncate text-xs text-muted">@{user.profileHandle}</p>
+            <p className="mt-1 inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 text-xs font-semibold text-accent">
+              <Trophy size={12} /> {user.rhp.toLocaleString()} RHP
+            </p>
           </div>
           <Link href={`/profile/${user.profileHandle}`} className="mt-1 block rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">
             View profile
+          </Link>
+          <Link href="/daily" className="block rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">
+            Daily map
+          </Link>
+          <Link href="/maps" className="block rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">
+            Ranked maps
+          </Link>
+          <Link href="/leaderboards" className="block rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">
+            Leaderboards
           </Link>
           <Link href="/messages" className="block rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">
             Messages

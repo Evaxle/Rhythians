@@ -86,7 +86,12 @@ export const ModelName = {
   Conversation: 'Conversation',
   ConversationMember: 'ConversationMember',
   Message: 'Message',
-  FriendRequest: 'FriendRequest'
+  FriendRequest: 'FriendRequest',
+  DailyMap: 'DailyMap',
+  DailyMapBeat: 'DailyMapBeat',
+  RhpTransaction: 'RhpTransaction',
+  ChallengeMap: 'ChallengeMap',
+  ChallengeMapCompletion: 'ChallengeMapCompletion'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -127,7 +132,9 @@ export const UserScalarFieldEnum = {
   suspendedUntil: 'suspendedUntil',
   mutedUntil: 'mutedUntil',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  rhp: 'rhp',
+  avgMapRating: 'avgMapRating'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -582,6 +589,97 @@ export const FriendRequestScalarFieldEnum = {
 } as const
 
 export type FriendRequestScalarFieldEnum = (typeof FriendRequestScalarFieldEnum)[keyof typeof FriendRequestScalarFieldEnum]
+
+
+export const DailyMapScalarFieldEnum = {
+  id: 'id',
+  date: 'date',
+  beatmapId: 'beatmapId',
+  title: 'title',
+  artist: 'artist',
+  difficulty: 'difficulty',
+  starRating: 'starRating',
+  noteCount: 'noteCount',
+  length: 'length',
+  playcount: 'playcount',
+  mapHash: 'mapHash',
+  downloadUrl: 'downloadUrl',
+  imageUrl: 'imageUrl',
+  mapperName: 'mapperName',
+  createdAt: 'createdAt'
+} as const
+
+export type DailyMapScalarFieldEnum = (typeof DailyMapScalarFieldEnum)[keyof typeof DailyMapScalarFieldEnum]
+
+
+export const DailyMapBeatScalarFieldEnum = {
+  id: 'id',
+  dailyMapId: 'dailyMapId',
+  userId: 'userId',
+  points: 'points',
+  scoreId: 'scoreId',
+  accuracy: 'accuracy',
+  misses: 'misses',
+  createdAt: 'createdAt'
+} as const
+
+export type DailyMapBeatScalarFieldEnum = (typeof DailyMapBeatScalarFieldEnum)[keyof typeof DailyMapBeatScalarFieldEnum]
+
+
+export const RhpTransactionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  amount: 'amount',
+  reason: 'reason',
+  description: 'description',
+  dailyMapBeatId: 'dailyMapBeatId',
+  createdAt: 'createdAt'
+} as const
+
+export type RhpTransactionScalarFieldEnum = (typeof RhpTransactionScalarFieldEnum)[keyof typeof RhpTransactionScalarFieldEnum]
+
+
+export const ChallengeMapScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  artist: 'artist',
+  description: 'description',
+  mapFileUrl: 'mapFileUrl',
+  imageUrl: 'imageUrl',
+  requestedRating: 'requestedRating',
+  rating: 'rating',
+  mapperName: 'mapperName',
+  noteCount: 'noteCount',
+  length: 'length',
+  sourceBeatmapId: 'sourceBeatmapId',
+  sourceUrl: 'sourceUrl',
+  isAutoImported: 'isAutoImported',
+  submittedById: 'submittedById',
+  status: 'status',
+  reviewerNote: 'reviewerNote',
+  reviewedById: 'reviewedById',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChallengeMapScalarFieldEnum = (typeof ChallengeMapScalarFieldEnum)[keyof typeof ChallengeMapScalarFieldEnum]
+
+
+export const ChallengeMapCompletionScalarFieldEnum = {
+  id: 'id',
+  challengeMapId: 'challengeMapId',
+  userId: 'userId',
+  rating: 'rating',
+  accuracy: 'accuracy',
+  passed: 'passed',
+  points: 'points',
+  scoreId: 'scoreId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChallengeMapCompletionScalarFieldEnum = (typeof ChallengeMapCompletionScalarFieldEnum)[keyof typeof ChallengeMapCompletionScalarFieldEnum]
 
 
 export const SortOrder = {

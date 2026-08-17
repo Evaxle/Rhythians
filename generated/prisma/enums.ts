@@ -37,10 +37,24 @@ export const NotificationType = {
   clip_like: 'clip_like',
   article_published: 'article_published',
   announcement: 'announcement',
-  moderation: 'moderation'
+  moderation: 'moderation',
+  rhp_earned: 'rhp_earned',
+  map_approved: 'map_approved',
+  map_rejected: 'map_rejected',
+  rank_change: 'rank_change'
 } as const
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
+
+
+export const ChallengeMapStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'rejected',
+  hidden: 'hidden'
+} as const
+
+export type ChallengeMapStatus = (typeof ChallengeMapStatus)[keyof typeof ChallengeMapStatus]
 
 
 export const ConversationType = {

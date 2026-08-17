@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { X, MessageCircle, BookOpen, Video, ShieldCheck } from "lucide-react";
+import { X, MessageCircle, BookOpen, Video, ShieldCheck, Link2, LogIn } from "lucide-react";
 
 const STORAGE_KEY = "rhythians_welcome_dismissed";
 const DISCORD_INVITE = "https://discord.gg/Q88NM7XhJ";
 
-export function WelcomeModal() {
+export function WelcomeModal({ user, hasLinkedProfile, profileHandle }: { user: boolean; hasLinkedProfile: boolean; profileHandle: string | null }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -51,7 +51,7 @@ export function WelcomeModal() {
         <p className="text-sm uppercase tracking-[0.3em] text-accent">Welcome</p>
         <h1 className="mt-2 text-2xl font-semibold text-white">Welcome to Rhythians!</h1>
         <p className="mt-3 text-sm leading-7 text-muted">
-          A home for the Discord community — knowledge, clips, and everything in between.
+          A home for the Discord community — knowledge, clips, ranked maps, and everything in between.
         </p>
 
         <div className="mt-6 space-y-4">
@@ -95,6 +95,36 @@ export function WelcomeModal() {
               </Link>
             </div>
           </div>
+
+          {user && !hasLinkedProfile && (
+            <div className="rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4">
+              <p className="flex items-center gap-2 text-sm font-semibold text-amber-200">
+                <Link2 size={16} /> Link your Rhythia account
+              </p>
+              <p className="mt-2 text-xs leading-6 text-amber-100/80">
+                Daily maps, ranked maps, and leaderboards are only available with a linked Rhythia profile. Link yours
+                to start earning Rhythian Points.
+              </p>
+              <Link
+                href={profileHandle ? `/profile/${profileHandle}` : "/login"}
+                onClick={dismiss}
+                className="mt-3 inline-flex items-center gap-2 rounded-full bg-amber-400/20 px-4 py-2 text-xs font-semibold text-amber-100 transition hover:bg-amber-400/30"
+              >
+                <Link2 size={14} /> Link your account
+              </Link>
+            </div>
+          )}
+
+          {!user && (
+            <div className="rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4">
+              <p className="flex items-center gap-2 text-sm font-semibold text-amber-200">
+                <LogIn size={16} /> Daily maps & ranked ladder
+              </p>
+              <p className="mt-2 text-xs leading-6 text-amber-100/80">
+                Sign in and link your Rhythia account to play daily maps, ranked challenge maps, and climb the leaderboards.
+              </p>
+            </div>
+          )}
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="rounded-2xl border border-border bg-background/70 p-4">

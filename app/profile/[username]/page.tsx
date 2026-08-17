@@ -10,6 +10,8 @@ import { ReportButton } from "@/components/report-button";
 import { RhythiaConnect } from "@/components/rhythia-connect";
 import { RhythiaStats } from "@/components/rhythia-stats";
 import { getRhythiaStatus } from "@/lib/rhythia-status";
+import { RankProgress } from "@/components/rank-progress";
+import { getUserGlobalRank } from "@/lib/maps";
 
 export const dynamic = "force-dynamic";
 
@@ -38,6 +40,7 @@ export default async function ProfilePage({ params }: Props) {
 
   const isOwnProfile = currentUser?.id === user.id;
   const avatarUrl = getAvatarUrl(user, 256);
+  const globalRank = await getUserGlobalRank(user.id);
 
   let presence: { isOnline: boolean; lastActiveAt: Date | null } | null = null;
   if (user.rhythiaProfile) {
@@ -120,6 +123,15 @@ export default async function ProfilePage({ params }: Props) {
             <div className="rounded-3xl border border-border bg-background/80 px-5 py-4 text-sm text-muted">
               <p>Member since</p>
               <p className="mt-2 text-lg font-semibold text-white">{user.joinedAt.toLocaleDateString()}</p>
+            </div>
+            {user.avgMapRating != null && (
+              <div className="rounded-3xl border border-border bg-background/80 px-5 py-4 text-sm text-muted">
+                <p>Average map rating</p>
+                <p className="mt-2 text-lg font-semibold text-white">{user.avgMapRating.toFixed(2)}</p>
+              </div>
+            )}
+            <div className="rounded-3xl border border-accent/30 bg-accent/10 px-5 py-4">
+              <RankProgress rhp={user.rhp} globalRank={globalRank} />
             </div>
           </div>
         </div>

@@ -22,6 +22,17 @@ export function parseRhythiaUrl(value: string) {
   }
 }
 
+export function parseRhythiaMapUrl(value: string) {
+  try {
+    const url = new URL(value.trim());
+    if (url.protocol !== "https:" || !["rhythia.com", "www.rhythia.com"].includes(url.hostname)) return null;
+    const match = url.pathname.match(/^\/maps\/(\d+)\/?$/);
+    return match ? { id: Number(match[1]), url: `https://www.rhythia.com/maps/${Number(match[1])}` } : null;
+  } catch {
+    return null;
+  }
+}
+
 function titleFor(rhythmPoints: number | null, globalRank: number | null) {
   if (globalRank && globalRank <= 30) return "Grandmaster";
   if ((rhythmPoints ?? 0) > 10000) return "Candidate Grandmaster";
@@ -31,7 +42,7 @@ function titleFor(rhythmPoints: number | null, globalRank: number | null) {
   return "Novice";
 }
 
-async function rhythiaRequest<T>(path: string, body: object): Promise<T> {
+export async function rhythiaRequest<T>(path: string, body: object): Promise<T> {
   const response = await fetch(`${RHYTHIA_API}/${path}`, {
     method: "POST",
     headers: { "content-type": "application/json" },

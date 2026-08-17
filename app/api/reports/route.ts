@@ -35,13 +35,14 @@ export async function POST(request: Request) {
     description?: unknown;
   } | null;
 
-  const targetType = body?.targetType;
+  const targetType = String(body?.targetType ?? "");
   const targetId = typeof body?.targetId === "string" ? body.targetId : "";
   const reason = typeof body?.reason === "string" ? body.reason.trim() : "";
   const description = typeof body?.description === "string" ? body.description.trim().slice(0, 1000) : null;
 
-  if (targetType !== "user" && targetType !== "clip") {
-    return NextResponse.json({ error: "targetType must be user or clip." }, { status: 400 });
+  const validTargetTypes = new Set(["user", "clip", "daily_map", "challenge_map"]);
+  if (!validTargetTypes.has(targetType)) {
+    return NextResponse.json({ error: "Invalid report target." }, { status: 400 });
   }
   if (!targetId) {
     return NextResponse.json({ error: "A report target is required." }, { status: 400 });
@@ -56,9 +57,12 @@ export async function POST(request: Request) {
     if (target.id === reporter.id) {
       return NextResponse.json({ error: "You can't report yourself." }, { status: 400 });
     }
-  } else {
+  } else if (targetType === "clip") {
     const target = await prisma.clip.findUnique({ where: { id: targetId } });
     if (!target) return NextResponse.json({ error: "Clip not found." }, { status: 404 });
+  } else if (targetType === "daily_map" || targetType === "challenge_map") {
+    const target = await prisma.dailyMap.findUnique({ where: { id: targetId } });
+    if (!target) return NextResponse.json({ error: "Daily map not found." }, { status: 404 });
   }
 
   const existing = await prisma.report.findFirst({

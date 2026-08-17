@@ -13,12 +13,16 @@ export default async function AdminReportsPage() {
 
   const userIds = new Set<string>();
   const clipIds = new Set<string>();
+  const dailyMapIds = new Set<string>();
+  const challengeMapIds = new Set<string>();
   for (const report of reports) {
     if (report.targetType === "user") userIds.add(report.targetId);
     if (report.targetType === "clip") clipIds.add(report.targetId);
+    if (report.targetType === "daily_map") dailyMapIds.add(report.targetId);
+    if (report.targetType === "challenge_map") challengeMapIds.add(report.targetId);
   }
 
-  const [targetUsers, targetClips, bannedUsers] = await Promise.all([
+  const [targetUsers, targetClips, targetDailyMaps, targetChallengeMaps, bannedUsers] = await Promise.all([
     userIds.size
       ? prisma.user.findMany({ where: { id: { in: [...userIds] } }, select: { id: true, username: true, discriminator: true, profileHandle: true, isSuspended: true, avatar: true } })
       : [],
@@ -26,6 +30,18 @@ export default async function AdminReportsPage() {
       ? prisma.clip.findMany({
           where: { id: { in: [...clipIds] } },
           select: { id: true, title: true, status: true, uploader: { select: { id: true, username: true } } },
+        })
+      : [],
+    dailyMapIds.size
+      ? prisma.dailyMap.findMany({
+          where: { id: { in: [...dailyMapIds] } },
+          select: { id: true, title: true, starRating: true, beatmapId: true },
+        })
+      : [],
+    challengeMapIds.size
+      ? prisma.challengeMap.findMany({
+          where: { id: { in: [...challengeMapIds] } },
+          select: { id: true, title: true, rating: true, status: true },
         })
       : [],
     prisma.user.findMany({
@@ -37,13 +53,15 @@ export default async function AdminReportsPage() {
 
   const userById = new Map(targetUsers.map((u) => [u.id, u]));
   const clipById = new Map(targetClips.map((c) => [c.id, c]));
+  const dailyMapById = new Map(targetDailyMaps.map((m) => [m.id, m]));
+  const challengeMapById = new Map(targetChallengeMaps.map((m) => [m.id, m]));
 
   return (
     <div className="space-y-8">
       <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
         <div>
           <p className="text-sm uppercase tracking-[0.3em] text-accent">Reports</p>
-          <h1 className="mt-3 text-3xl font-semibold text-white">User and post reports</h1>
+          <h1 className="mt-3 text-3xl font-semibold text-white">User, post, and map reports</h1>
           <p className="mt-3 text-sm leading-7 text-muted">
             Review reports submitted by community members. Warn or ban the reported user, manage banned
             users, or resolve and dismiss reports you&apos;ve handled.
@@ -63,6 +81,15 @@ export default async function AdminReportsPage() {
           reporter: report.reporter,
           targetUser: report.targetType === "user" ? (userById.get(report.targetId) ?? null) : null,
           targetClip: report.targetType === "clip" ? (clipById.get(report.targetId) ?? null) : null,
+          targetMap:
+            report.targetType === "daily_map"
+              ? (() => {
+                  const m = dailyMapById.get(report.targetId);
+                  return m ? { id: m.id, title: m.title, rating: m.starRating, status: "approved" } : null;
+                })()
+              : report.targetType === "challenge_map"
+                ? (challengeMapById.get(report.targetId) ?? null)
+                : null,
         }))}
         initialBannedUsers={bannedUsers.map((user) => ({
           id: user.id,

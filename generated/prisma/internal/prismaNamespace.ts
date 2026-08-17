@@ -432,7 +432,12 @@ export const ModelName = {
   Conversation: 'Conversation',
   ConversationMember: 'ConversationMember',
   Message: 'Message',
-  FriendRequest: 'FriendRequest'
+  FriendRequest: 'FriendRequest',
+  DailyMap: 'DailyMap',
+  DailyMapBeat: 'DailyMapBeat',
+  RhpTransaction: 'RhpTransaction',
+  ChallengeMap: 'ChallengeMap',
+  ChallengeMapCompletion: 'ChallengeMapCompletion'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -448,7 +453,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "rhythiaProfile" | "rhythiaProfileRequest" | "userWarning" | "session" | "role" | "permission" | "rolePermission" | "userRole" | "discordRoleMapping" | "playerRank" | "discordRoleRankMapping" | "rule" | "knowledgeCategory" | "knowledgeArticle" | "tag" | "userTag" | "discordRoleTagMapping" | "coachComment" | "articleTag" | "articleRevision" | "clipCategory" | "clip" | "clipTag" | "clipLike" | "clipView" | "comment" | "report" | "announcement" | "notification" | "moderationAction" | "siteSetting" | "conversation" | "conversationMember" | "message" | "friendRequest"
+    modelProps: "user" | "rhythiaProfile" | "rhythiaProfileRequest" | "userWarning" | "session" | "role" | "permission" | "rolePermission" | "userRole" | "discordRoleMapping" | "playerRank" | "discordRoleRankMapping" | "rule" | "knowledgeCategory" | "knowledgeArticle" | "tag" | "userTag" | "discordRoleTagMapping" | "coachComment" | "articleTag" | "articleRevision" | "clipCategory" | "clip" | "clipTag" | "clipLike" | "clipView" | "comment" | "report" | "announcement" | "notification" | "moderationAction" | "siteSetting" | "conversation" | "conversationMember" | "message" | "friendRequest" | "dailyMap" | "dailyMapBeat" | "rhpTransaction" | "challengeMap" | "challengeMapCompletion"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3116,6 +3121,376 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    DailyMap: {
+      payload: Prisma.$DailyMapPayload<ExtArgs>
+      fields: Prisma.DailyMapFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DailyMapFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMapPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DailyMapFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMapPayload>
+        }
+        findFirst: {
+          args: Prisma.DailyMapFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMapPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DailyMapFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMapPayload>
+        }
+        findMany: {
+          args: Prisma.DailyMapFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMapPayload>[]
+        }
+        create: {
+          args: Prisma.DailyMapCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMapPayload>
+        }
+        createMany: {
+          args: Prisma.DailyMapCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DailyMapCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMapPayload>[]
+        }
+        delete: {
+          args: Prisma.DailyMapDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMapPayload>
+        }
+        update: {
+          args: Prisma.DailyMapUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMapPayload>
+        }
+        deleteMany: {
+          args: Prisma.DailyMapDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DailyMapUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DailyMapUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMapPayload>[]
+        }
+        upsert: {
+          args: Prisma.DailyMapUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMapPayload>
+        }
+        aggregate: {
+          args: Prisma.DailyMapAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDailyMap>
+        }
+        groupBy: {
+          args: Prisma.DailyMapGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DailyMapGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DailyMapCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DailyMapCountAggregateOutputType> | number
+        }
+      }
+    }
+    DailyMapBeat: {
+      payload: Prisma.$DailyMapBeatPayload<ExtArgs>
+      fields: Prisma.DailyMapBeatFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DailyMapBeatFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMapBeatPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DailyMapBeatFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMapBeatPayload>
+        }
+        findFirst: {
+          args: Prisma.DailyMapBeatFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMapBeatPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DailyMapBeatFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMapBeatPayload>
+        }
+        findMany: {
+          args: Prisma.DailyMapBeatFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMapBeatPayload>[]
+        }
+        create: {
+          args: Prisma.DailyMapBeatCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMapBeatPayload>
+        }
+        createMany: {
+          args: Prisma.DailyMapBeatCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DailyMapBeatCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMapBeatPayload>[]
+        }
+        delete: {
+          args: Prisma.DailyMapBeatDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMapBeatPayload>
+        }
+        update: {
+          args: Prisma.DailyMapBeatUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMapBeatPayload>
+        }
+        deleteMany: {
+          args: Prisma.DailyMapBeatDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DailyMapBeatUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DailyMapBeatUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMapBeatPayload>[]
+        }
+        upsert: {
+          args: Prisma.DailyMapBeatUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMapBeatPayload>
+        }
+        aggregate: {
+          args: Prisma.DailyMapBeatAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDailyMapBeat>
+        }
+        groupBy: {
+          args: Prisma.DailyMapBeatGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DailyMapBeatGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DailyMapBeatCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DailyMapBeatCountAggregateOutputType> | number
+        }
+      }
+    }
+    RhpTransaction: {
+      payload: Prisma.$RhpTransactionPayload<ExtArgs>
+      fields: Prisma.RhpTransactionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RhpTransactionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhpTransactionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RhpTransactionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhpTransactionPayload>
+        }
+        findFirst: {
+          args: Prisma.RhpTransactionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhpTransactionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RhpTransactionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhpTransactionPayload>
+        }
+        findMany: {
+          args: Prisma.RhpTransactionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhpTransactionPayload>[]
+        }
+        create: {
+          args: Prisma.RhpTransactionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhpTransactionPayload>
+        }
+        createMany: {
+          args: Prisma.RhpTransactionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RhpTransactionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhpTransactionPayload>[]
+        }
+        delete: {
+          args: Prisma.RhpTransactionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhpTransactionPayload>
+        }
+        update: {
+          args: Prisma.RhpTransactionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhpTransactionPayload>
+        }
+        deleteMany: {
+          args: Prisma.RhpTransactionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RhpTransactionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RhpTransactionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhpTransactionPayload>[]
+        }
+        upsert: {
+          args: Prisma.RhpTransactionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RhpTransactionPayload>
+        }
+        aggregate: {
+          args: Prisma.RhpTransactionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRhpTransaction>
+        }
+        groupBy: {
+          args: Prisma.RhpTransactionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RhpTransactionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RhpTransactionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RhpTransactionCountAggregateOutputType> | number
+        }
+      }
+    }
+    ChallengeMap: {
+      payload: Prisma.$ChallengeMapPayload<ExtArgs>
+      fields: Prisma.ChallengeMapFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ChallengeMapFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMapPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ChallengeMapFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMapPayload>
+        }
+        findFirst: {
+          args: Prisma.ChallengeMapFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMapPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ChallengeMapFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMapPayload>
+        }
+        findMany: {
+          args: Prisma.ChallengeMapFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMapPayload>[]
+        }
+        create: {
+          args: Prisma.ChallengeMapCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMapPayload>
+        }
+        createMany: {
+          args: Prisma.ChallengeMapCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ChallengeMapCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMapPayload>[]
+        }
+        delete: {
+          args: Prisma.ChallengeMapDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMapPayload>
+        }
+        update: {
+          args: Prisma.ChallengeMapUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMapPayload>
+        }
+        deleteMany: {
+          args: Prisma.ChallengeMapDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ChallengeMapUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ChallengeMapUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMapPayload>[]
+        }
+        upsert: {
+          args: Prisma.ChallengeMapUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMapPayload>
+        }
+        aggregate: {
+          args: Prisma.ChallengeMapAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateChallengeMap>
+        }
+        groupBy: {
+          args: Prisma.ChallengeMapGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChallengeMapGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ChallengeMapCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChallengeMapCountAggregateOutputType> | number
+        }
+      }
+    }
+    ChallengeMapCompletion: {
+      payload: Prisma.$ChallengeMapCompletionPayload<ExtArgs>
+      fields: Prisma.ChallengeMapCompletionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ChallengeMapCompletionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMapCompletionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ChallengeMapCompletionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMapCompletionPayload>
+        }
+        findFirst: {
+          args: Prisma.ChallengeMapCompletionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMapCompletionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ChallengeMapCompletionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMapCompletionPayload>
+        }
+        findMany: {
+          args: Prisma.ChallengeMapCompletionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMapCompletionPayload>[]
+        }
+        create: {
+          args: Prisma.ChallengeMapCompletionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMapCompletionPayload>
+        }
+        createMany: {
+          args: Prisma.ChallengeMapCompletionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ChallengeMapCompletionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMapCompletionPayload>[]
+        }
+        delete: {
+          args: Prisma.ChallengeMapCompletionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMapCompletionPayload>
+        }
+        update: {
+          args: Prisma.ChallengeMapCompletionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMapCompletionPayload>
+        }
+        deleteMany: {
+          args: Prisma.ChallengeMapCompletionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ChallengeMapCompletionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ChallengeMapCompletionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMapCompletionPayload>[]
+        }
+        upsert: {
+          args: Prisma.ChallengeMapCompletionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMapCompletionPayload>
+        }
+        aggregate: {
+          args: Prisma.ChallengeMapCompletionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateChallengeMapCompletion>
+        }
+        groupBy: {
+          args: Prisma.ChallengeMapCompletionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChallengeMapCompletionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ChallengeMapCompletionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChallengeMapCompletionCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -3177,7 +3552,9 @@ export const UserScalarFieldEnum = {
   suspendedUntil: 'suspendedUntil',
   mutedUntil: 'mutedUntil',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  rhp: 'rhp',
+  avgMapRating: 'avgMapRating'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -3634,6 +4011,97 @@ export const FriendRequestScalarFieldEnum = {
 export type FriendRequestScalarFieldEnum = (typeof FriendRequestScalarFieldEnum)[keyof typeof FriendRequestScalarFieldEnum]
 
 
+export const DailyMapScalarFieldEnum = {
+  id: 'id',
+  date: 'date',
+  beatmapId: 'beatmapId',
+  title: 'title',
+  artist: 'artist',
+  difficulty: 'difficulty',
+  starRating: 'starRating',
+  noteCount: 'noteCount',
+  length: 'length',
+  playcount: 'playcount',
+  mapHash: 'mapHash',
+  downloadUrl: 'downloadUrl',
+  imageUrl: 'imageUrl',
+  mapperName: 'mapperName',
+  createdAt: 'createdAt'
+} as const
+
+export type DailyMapScalarFieldEnum = (typeof DailyMapScalarFieldEnum)[keyof typeof DailyMapScalarFieldEnum]
+
+
+export const DailyMapBeatScalarFieldEnum = {
+  id: 'id',
+  dailyMapId: 'dailyMapId',
+  userId: 'userId',
+  points: 'points',
+  scoreId: 'scoreId',
+  accuracy: 'accuracy',
+  misses: 'misses',
+  createdAt: 'createdAt'
+} as const
+
+export type DailyMapBeatScalarFieldEnum = (typeof DailyMapBeatScalarFieldEnum)[keyof typeof DailyMapBeatScalarFieldEnum]
+
+
+export const RhpTransactionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  amount: 'amount',
+  reason: 'reason',
+  description: 'description',
+  dailyMapBeatId: 'dailyMapBeatId',
+  createdAt: 'createdAt'
+} as const
+
+export type RhpTransactionScalarFieldEnum = (typeof RhpTransactionScalarFieldEnum)[keyof typeof RhpTransactionScalarFieldEnum]
+
+
+export const ChallengeMapScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  artist: 'artist',
+  description: 'description',
+  mapFileUrl: 'mapFileUrl',
+  imageUrl: 'imageUrl',
+  requestedRating: 'requestedRating',
+  rating: 'rating',
+  mapperName: 'mapperName',
+  noteCount: 'noteCount',
+  length: 'length',
+  sourceBeatmapId: 'sourceBeatmapId',
+  sourceUrl: 'sourceUrl',
+  isAutoImported: 'isAutoImported',
+  submittedById: 'submittedById',
+  status: 'status',
+  reviewerNote: 'reviewerNote',
+  reviewedById: 'reviewedById',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChallengeMapScalarFieldEnum = (typeof ChallengeMapScalarFieldEnum)[keyof typeof ChallengeMapScalarFieldEnum]
+
+
+export const ChallengeMapCompletionScalarFieldEnum = {
+  id: 'id',
+  challengeMapId: 'challengeMapId',
+  userId: 'userId',
+  rating: 'rating',
+  accuracy: 'accuracy',
+  passed: 'passed',
+  points: 'points',
+  scoreId: 'scoreId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChallengeMapCompletionScalarFieldEnum = (typeof ChallengeMapCompletionScalarFieldEnum)[keyof typeof ChallengeMapCompletionScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -3890,6 +4358,20 @@ export type EnumFriendRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputTy
 export type ListEnumFriendRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FriendRequestStatus[]'>
     
 
+
+/**
+ * Reference to a field of type 'ChallengeMapStatus'
+ */
+export type EnumChallengeMapStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChallengeMapStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ChallengeMapStatus[]'
+ */
+export type ListEnumChallengeMapStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChallengeMapStatus[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -4077,6 +4559,11 @@ export type GlobalOmitConfig = {
   conversationMember?: Prisma.ConversationMemberOmit
   message?: Prisma.MessageOmit
   friendRequest?: Prisma.FriendRequestOmit
+  dailyMap?: Prisma.DailyMapOmit
+  dailyMapBeat?: Prisma.DailyMapBeatOmit
+  rhpTransaction?: Prisma.RhpTransactionOmit
+  challengeMap?: Prisma.ChallengeMapOmit
+  challengeMapCompletion?: Prisma.ChallengeMapCompletionOmit
 }
 
 /* Types for Logging */

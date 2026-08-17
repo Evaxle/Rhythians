@@ -21,6 +21,9 @@ export async function SiteHeader() {
           </Link>
           <nav className="hidden items-center gap-4 md:flex">
             <Link href="/" className="text-sm text-muted transition hover:text-white">Home</Link>
+            <Link href="/daily" className="text-sm text-muted transition hover:text-white">Daily</Link>
+            <Link href="/maps" className="text-sm text-muted transition hover:text-white">Maps</Link>
+            <Link href="/leaderboards" className="text-sm text-muted transition hover:text-white">Leaderboards</Link>
             <Link href="/knowledge" className="text-sm text-muted transition hover:text-white">Knowledge</Link>
             <Link href="/clips" className="text-sm text-muted transition hover:text-white">Clips</Link>
             <Link href="/rules" className="text-sm text-muted transition hover:text-white">Rules</Link>

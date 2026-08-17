@@ -1,9 +1,12 @@
 import Link from "next/link";
-import { ArrowRight, Sparkles, MessageCircle, BookOpen, Video, Globe } from "lucide-react";
+import { ArrowRight, Sparkles, MessageCircle, BookOpen, Video, Link2 } from "lucide-react";
 import { prisma } from "@/lib/db";
+import { getSessionUser } from "@/lib/auth";
 import { getPublishedArticleCount } from "@/lib/knowledge";
 import { getOnlineUserCount } from "@/lib/rhythia-status";
 import { WelcomeModal } from "@/components/welcome-modal";
+import { HomeDailySection } from "@/components/daily/home-daily-section";
+import { HomeLeaderboardSection } from "@/components/daily/home-leaderboard-section";
 
 export const dynamic = "force-dynamic";
 
@@ -38,10 +41,14 @@ export default async function HomePage() {
   const stats = await getStats();
   const featuredClips = await getFeaturedClips();
   const announcements = await getLatestAnnouncements();
+  const user = await getSessionUser();
+  const linkedProfile = user
+    ? await prisma.rhythiaProfile.findUnique({ where: { userId: user.id }, select: { id: true } })
+    : null;
 
   return (
     <div className="space-y-10">
-      <WelcomeModal />
+      <WelcomeModal user={Boolean(user)} hasLinkedProfile={Boolean(linkedProfile)} profileHandle={user?.profileHandle ?? null} />
       <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
         <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
           <div className="space-y-6">
@@ -50,11 +57,21 @@ export default async function HomePage() {
             </span>
             <div className="space-y-4">
               <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">Welcome to Rhythians</h1>
-              <p className="max-w-2xl text-lg leading-8 text-muted">A polished home for your Discord community with knowledge, clips, rules, announcements, and member media.</p>
+              <p className="max-w-2xl text-lg leading-8 text-muted">A polished home for your Discord community with knowledge, clips, rules, announcements, ranked maps, and member media.</p>
             </div>
             <div className="flex flex-wrap gap-3">
               <Link href="/community" className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent2">Join Discord</Link>
               <Link href="/knowledge" className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-5 py-3 text-sm text-white transition hover:border-accent/40">Explore Knowledge</Link>
+              {user && !linkedProfile && (
+                <Link href={`/profile/${user.profileHandle}`} className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-5 py-3 text-sm font-semibold text-amber-200 transition hover:bg-amber-400/20">
+                  <Link2 size={16} /> Link your Rhythia account
+                </Link>
+              )}
+              {!user && (
+                <Link href="/login" className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-5 py-3 text-sm text-white transition hover:border-accent/40">
+                  <Link2 size={16} /> Sign in to play
+                </Link>
+              )}
             </div>
           </div>
           <div className="rounded-3xl border border-border bg-background/80 p-6 text-sm text-muted shadow-inner">
@@ -81,6 +98,11 @@ export default async function HomePage() {
             </div>
           </div>
         </div>
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-2">
+        <HomeDailySection />
+        <HomeLeaderboardSection />
       </section>
 
       <section className="grid gap-6 lg:grid-cols-3">

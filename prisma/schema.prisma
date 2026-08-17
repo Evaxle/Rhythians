@@ -30,6 +30,17 @@ enum NotificationType {
   article_published
   announcement
   moderation
+  rhp_earned
+  map_approved
+  map_rejected
+  rank_change
+}
+
+enum ChallengeMapStatus {
+  pending
+  approved
+  rejected
+  hidden
 }
 
 enum ConversationType {
@@ -128,6 +139,13 @@ model User {
   rhythiaProfile  RhythiaProfile?
   rhythiaProfileRequests RhythiaProfileRequest[]
   resolvedRhythiaRequests RhythiaProfileRequest[] @relation("resolvedRhythiaRequests")
+  rhp             Int                  @default(0)
+  avgMapRating    Float?
+  dailyMapBeats   DailyMapBeat[]
+  rhpTransactions RhpTransaction[]
+  challengeMaps   ChallengeMap[]       @relation("challengeMapSubmissions")
+  challengeCompletions ChallengeMapCompletion[]
+  reviewedChallengeMaps ChallengeMap[] @relation("challengeMapReviews")
 }
 
 model RhythiaProfile {
@@ -561,4 +579,103 @@ model FriendRequest {
   @@unique([senderId, receiverId])
   @@index([receiverId])
   @@index([senderId])
+}
+
+model DailyMap {
+  id          String         @id @default(uuid())
+  date        DateTime       @unique
+  beatmapId   Int
+  title       String
+  artist      String?
+  difficulty  Int?
+  starRating  Float
+  noteCount   Int?
+  length      Int?
+  playcount   Int?
+  mapHash     String?
+  downloadUrl String
+  imageUrl    String?
+  mapperName  String?
+  beats       DailyMapBeat[]
+  createdAt   DateTime       @default(now())
+
+  @@index([date])
+}
+
+model DailyMapBeat {
+  id         String   @id @default(uuid())
+  dailyMap   DailyMap @relation(fields: [dailyMapId], references: [id], onDelete: Cascade)
+  dailyMapId String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  points     Int
+  scoreId    Int?
+  accuracy   Float?
+  misses     Int?
+  createdAt  DateTime @default(now())
+
+  @@unique([dailyMapId, userId])
+  @@index([userId])
+}
+
+model RhpTransaction {
+  id             String   @id @default(uuid())
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  amount         Int
+  reason         String
+  description    String?
+  dailyMapBeatId String?
+  createdAt      DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model ChallengeMap {
+  id              String                @id @default(uuid())
+  title           String
+  artist          String?
+  description     String?
+  mapFileUrl      String
+  imageUrl        String?
+  requestedRating Float
+  rating          Float?
+  mapperName      String?
+  noteCount       Int?
+  length          Int?
+  sourceBeatmapId Int?                  @unique
+  sourceUrl       String?
+  isAutoImported  Boolean               @default(false)
+  submittedBy     User                  @relation("challengeMapSubmissions", fields: [submittedById], references: [id])
+  submittedById   String
+  status          ChallengeMapStatus    @default(pending)
+  reviewerNote    String?
+  reviewedBy      User?                 @relation("challengeMapReviews", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedById    String?
+  reviewedAt      DateTime?
+  completions     ChallengeMapCompletion[]
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  @@index([status])
+  @@index([rating])
+}
+
+model ChallengeMapCompletion {
+  id              String       @id @default(uuid())
+  challengeMap    ChallengeMap @relation(fields: [challengeMapId], references: [id], onDelete: Cascade)
+  challengeMapId  String
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
+  rating          Float
+  accuracy        Float?
+  passed          Boolean
+  points          Int
+  scoreId         Int?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@unique([challengeMapId, userId])
+  @@index([userId])
 }

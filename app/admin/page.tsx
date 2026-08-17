@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AdminDailyRefresh } from "@/components/admin/admin-daily-refresh";
 
 export default function AdminDashboardPage() {
   return (
@@ -18,6 +19,7 @@ export default function AdminDashboardPage() {
           ))}
         </div>
       </section>
+      <AdminDailyRefresh />
       <div className="grid gap-6 lg:grid-cols-3">
         <Link href="/admin/clips" className="rounded-3xl border border-border bg-surface/95 p-6 text-sm text-white transition hover:border-accent/40">
           Review clips
@@ -30,6 +32,12 @@ export default function AdminDashboardPage() {
         </Link>
         <Link href="/admin/discord" className="rounded-3xl border border-border bg-surface/95 p-6 text-sm text-white transition hover:border-accent/40">
           Discord integration
+        </Link>
+        <Link href="/admin/reports" className="rounded-3xl border border-border bg-surface/95 p-6 text-sm text-white transition hover:border-accent/40">
+          Reports
+        </Link>
+        <Link href="/approval/maps" className="rounded-3xl border border-border bg-surface/95 p-6 text-sm text-white transition hover:border-accent/40">
+          Review maps
         </Link>
       </div>
     </div>

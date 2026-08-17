@@ -14,6 +14,8 @@
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "db:cleanup": "tsx scripts/db-cleanup.ts",
+    "daily:sync": "tsx scripts/sync-daily-maps.ts",
+    "maps:import": "tsx scripts/import-ranked-maps.ts",
     "test:profanity": "tsx scripts/test-profanity.ts",
     "bot:start": "tsx discord-bot/index.ts"
   },

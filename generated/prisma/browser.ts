@@ -197,3 +197,28 @@ export type Message = Prisma.MessageModel
  * 
  */
 export type FriendRequest = Prisma.FriendRequestModel
+/**
+ * Model DailyMap
+ * 
+ */
+export type DailyMap = Prisma.DailyMapModel
+/**
+ * Model DailyMapBeat
+ * 
+ */
+export type DailyMapBeat = Prisma.DailyMapBeatModel
+/**
+ * Model RhpTransaction
+ * 
+ */
+export type RhpTransaction = Prisma.RhpTransactionModel
+/**
+ * Model ChallengeMap
+ * 
+ */
+export type ChallengeMap = Prisma.ChallengeMapModel
+/**
+ * Model ChallengeMapCompletion
+ * 
+ */
+export type ChallengeMapCompletion = Prisma.ChallengeMapCompletionModel
