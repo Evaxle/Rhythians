@@ -10,6 +10,7 @@ import { DiscordSyncButton } from "@/components/discord-sync-button";
 import { AvatarUploader } from "@/components/avatar-uploader";
 import { OnboardingForm } from "@/components/onboarding-form";
 import { CursorSettings } from "@/components/cursor-settings";
+import { CheckAllScoresButton } from "@/components/check-all-scores-button";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,7 @@ export default async function SettingsPage() {
 
   const fullUser = await prisma.user.findUnique({
     where: { id: user.id },
-    include: { userTags: { include: { tag: true } } },
+    include: { userTags: { include: { tag: true } }, rhythiaProfile: true },
   });
 
   if (!fullUser) redirect("/login");
@@ -57,6 +58,20 @@ export default async function SettingsPage() {
           <AvatarUploader avatarUrl={avatarUrl} username={fullUser.username} />
         </div>
       </section>
+
+      {fullUser.rhythiaProfile && (
+        <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+          <p className="text-sm uppercase tracking-[0.3em] text-accent">Rhythia scores</p>
+          <h2 className="mt-2 text-2xl font-semibold text-white">Import your old scores</h2>
+          <p className="mt-2 text-sm leading-7 text-muted">
+            Your past Rhythia scores are imported automatically when you link your account. If you&apos;ve played more
+            ranked maps since then, run the scan again to claim the RHP for any new completions.
+          </p>
+          <div className="mt-6 border-t border-border pt-6">
+            <CheckAllScoresButton />
+          </div>
+        </section>
+      )}
 
       <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
         <p className="text-sm uppercase tracking-[0.3em] text-accent">Roles &amp; tags</p>

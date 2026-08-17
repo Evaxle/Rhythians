@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { fetchRhythiaProfile, namesMatch, parseRhythiaUrl } from "@/lib/rhythia";
+import { checkAndAwardAllChallengeMaps } from "@/lib/maps";
 
 export async function POST(request: Request) {
   const user = await getSessionUser();
@@ -35,6 +36,15 @@ export async function POST(request: Request) {
       await tx.user.update({ where: { id: user.id }, data: { rhythiaVerified: true } });
       return profileRow;
     });
+
+    if (!user.scoreImportDone) {
+      try {
+        await checkAndAwardAllChallengeMaps(user.id);
+      } catch {
+        // The profile is linked either way; the user can import scores later from settings.
+      }
+    }
+
     return NextResponse.json({ profile: saved });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to load that Rhythia profile." }, { status: 502 });

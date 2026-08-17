@@ -141,6 +141,7 @@ model User {
   resolvedRhythiaRequests RhythiaProfileRequest[] @relation("resolvedRhythiaRequests")
   rhp             Int                  @default(0)
   avgMapRating    Float?
+  scoreImportDone Boolean              @default(false)
   dailyStreak     Int                  @default(0)
   lastDailyBeatAt DateTime?
   rhythiaVerified Boolean              @default(false)

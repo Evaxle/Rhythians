@@ -13,7 +13,6 @@ import { getRhythiaStatus } from "@/lib/rhythia-status";
 import { RankProgress } from "@/components/rank-progress";
 import { getUserGlobalRank } from "@/lib/maps";
 import { RhythiaVerifiedBadge } from "@/components/rhythia-verified-badge";
-import { CheckAllScoresButton } from "@/components/check-all-scores-button";
 
 export const dynamic = "force-dynamic";
 
@@ -112,7 +111,6 @@ export default async function ProfilePage({ params }: Props) {
           <div className="flex flex-col items-stretch gap-3">
             {!isOwnProfile && <FriendButton userId={user.id} />}
             {isOwnProfile && <RhythiaConnect connectedUrl={user.rhythiaProfile?.profileUrl} />}
-            {isOwnProfile && user.rhythiaProfile && <CheckAllScoresButton />}
             {!isOwnProfile && (
               <Link
                 href={`/messages?user=${encodeURIComponent(user.profileHandle)}`}

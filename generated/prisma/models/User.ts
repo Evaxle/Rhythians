@@ -62,6 +62,7 @@ export type UserMinAggregateOutputType = {
   updatedAt: Date | null
   rhp: number | null
   avgMapRating: number | null
+  scoreImportDone: boolean | null
   dailyStreak: number | null
   lastDailyBeatAt: Date | null
   rhythiaVerified: boolean | null
@@ -91,6 +92,7 @@ export type UserMaxAggregateOutputType = {
   updatedAt: Date | null
   rhp: number | null
   avgMapRating: number | null
+  scoreImportDone: boolean | null
   dailyStreak: number | null
   lastDailyBeatAt: Date | null
   rhythiaVerified: boolean | null
@@ -121,6 +123,7 @@ export type UserCountAggregateOutputType = {
   updatedAt: number
   rhp: number
   avgMapRating: number
+  scoreImportDone: number
   dailyStreak: number
   lastDailyBeatAt: number
   rhythiaVerified: number
@@ -164,6 +167,7 @@ export type UserMinAggregateInputType = {
   updatedAt?: true
   rhp?: true
   avgMapRating?: true
+  scoreImportDone?: true
   dailyStreak?: true
   lastDailyBeatAt?: true
   rhythiaVerified?: true
@@ -193,6 +197,7 @@ export type UserMaxAggregateInputType = {
   updatedAt?: true
   rhp?: true
   avgMapRating?: true
+  scoreImportDone?: true
   dailyStreak?: true
   lastDailyBeatAt?: true
   rhythiaVerified?: true
@@ -223,6 +228,7 @@ export type UserCountAggregateInputType = {
   updatedAt?: true
   rhp?: true
   avgMapRating?: true
+  scoreImportDone?: true
   dailyStreak?: true
   lastDailyBeatAt?: true
   rhythiaVerified?: true
@@ -340,6 +346,7 @@ export type UserGroupByOutputType = {
   updatedAt: Date
   rhp: number
   avgMapRating: number | null
+  scoreImportDone: boolean
   dailyStreak: number
   lastDailyBeatAt: Date | null
   rhythiaVerified: boolean
@@ -393,6 +400,7 @@ export type UserWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   rhp?: Prisma.IntFilter<"User"> | number
   avgMapRating?: Prisma.FloatNullableFilter<"User"> | number | null
+  scoreImportDone?: Prisma.BoolFilter<"User"> | boolean
   dailyStreak?: Prisma.IntFilter<"User"> | number
   lastDailyBeatAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   rhythiaVerified?: Prisma.BoolFilter<"User"> | boolean
@@ -454,6 +462,7 @@ export type UserOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   rhp?: Prisma.SortOrder
   avgMapRating?: Prisma.SortOrderInput | Prisma.SortOrder
+  scoreImportDone?: Prisma.SortOrder
   dailyStreak?: Prisma.SortOrder
   lastDailyBeatAt?: Prisma.SortOrderInput | Prisma.SortOrder
   rhythiaVerified?: Prisma.SortOrder
@@ -518,6 +527,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   rhp?: Prisma.IntFilter<"User"> | number
   avgMapRating?: Prisma.FloatNullableFilter<"User"> | number | null
+  scoreImportDone?: Prisma.BoolFilter<"User"> | boolean
   dailyStreak?: Prisma.IntFilter<"User"> | number
   lastDailyBeatAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   rhythiaVerified?: Prisma.BoolFilter<"User"> | boolean
@@ -579,6 +589,7 @@ export type UserOrderByWithAggregationInput = {
   updatedAt?: Prisma.SortOrder
   rhp?: Prisma.SortOrder
   avgMapRating?: Prisma.SortOrderInput | Prisma.SortOrder
+  scoreImportDone?: Prisma.SortOrder
   dailyStreak?: Prisma.SortOrder
   lastDailyBeatAt?: Prisma.SortOrderInput | Prisma.SortOrder
   rhythiaVerified?: Prisma.SortOrder
@@ -617,6 +628,7 @@ export type UserScalarWhereWithAggregatesInput = {
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   rhp?: Prisma.IntWithAggregatesFilter<"User"> | number
   avgMapRating?: Prisma.FloatNullableWithAggregatesFilter<"User"> | number | null
+  scoreImportDone?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   dailyStreak?: Prisma.IntWithAggregatesFilter<"User"> | number
   lastDailyBeatAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   rhythiaVerified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
@@ -646,6 +658,7 @@ export type UserCreateInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -707,6 +720,7 @@ export type UserUncheckedCreateInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -766,6 +780,7 @@ export type UserUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -827,6 +842,7 @@ export type UserUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -887,6 +903,7 @@ export type UserCreateManyInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -916,6 +933,7 @@ export type UserUpdateManyMutationInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -946,6 +964,7 @@ export type UserUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -984,6 +1003,7 @@ export type UserCountOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   rhp?: Prisma.SortOrder
   avgMapRating?: Prisma.SortOrder
+  scoreImportDone?: Prisma.SortOrder
   dailyStreak?: Prisma.SortOrder
   lastDailyBeatAt?: Prisma.SortOrder
   rhythiaVerified?: Prisma.SortOrder
@@ -1019,6 +1039,7 @@ export type UserMaxOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   rhp?: Prisma.SortOrder
   avgMapRating?: Prisma.SortOrder
+  scoreImportDone?: Prisma.SortOrder
   dailyStreak?: Prisma.SortOrder
   lastDailyBeatAt?: Prisma.SortOrder
   rhythiaVerified?: Prisma.SortOrder
@@ -1048,6 +1069,7 @@ export type UserMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   rhp?: Prisma.SortOrder
   avgMapRating?: Prisma.SortOrder
+  scoreImportDone?: Prisma.SortOrder
   dailyStreak?: Prisma.SortOrder
   lastDailyBeatAt?: Prisma.SortOrder
   rhythiaVerified?: Prisma.SortOrder
@@ -1620,6 +1642,7 @@ export type UserCreateWithoutRhythiaProfileInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -1680,6 +1703,7 @@ export type UserUncheckedCreateWithoutRhythiaProfileInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -1754,6 +1778,7 @@ export type UserUpdateWithoutRhythiaProfileInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1814,6 +1839,7 @@ export type UserUncheckedUpdateWithoutRhythiaProfileInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1872,6 +1898,7 @@ export type UserCreateWithoutRhythiaProfileRequestsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -1932,6 +1959,7 @@ export type UserUncheckedCreateWithoutRhythiaProfileRequestsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -1995,6 +2023,7 @@ export type UserCreateWithoutResolvedRhythiaRequestsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -2055,6 +2084,7 @@ export type UserUncheckedCreateWithoutResolvedRhythiaRequestsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -2129,6 +2159,7 @@ export type UserUpdateWithoutRhythiaProfileRequestsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2189,6 +2220,7 @@ export type UserUncheckedUpdateWithoutRhythiaProfileRequestsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2258,6 +2290,7 @@ export type UserUpdateWithoutResolvedRhythiaRequestsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2318,6 +2351,7 @@ export type UserUncheckedUpdateWithoutResolvedRhythiaRequestsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2376,6 +2410,7 @@ export type UserCreateWithoutWarningsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -2436,6 +2471,7 @@ export type UserUncheckedCreateWithoutWarningsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -2499,6 +2535,7 @@ export type UserCreateWithoutIssuedWarningsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -2559,6 +2596,7 @@ export type UserUncheckedCreateWithoutIssuedWarningsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -2633,6 +2671,7 @@ export type UserUpdateWithoutWarningsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2693,6 +2732,7 @@ export type UserUncheckedUpdateWithoutWarningsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2762,6 +2802,7 @@ export type UserUpdateWithoutIssuedWarningsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2822,6 +2863,7 @@ export type UserUncheckedUpdateWithoutIssuedWarningsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2880,6 +2922,7 @@ export type UserCreateWithoutSessionsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -2940,6 +2983,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -3014,6 +3058,7 @@ export type UserUpdateWithoutSessionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3074,6 +3119,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3132,6 +3178,7 @@ export type UserCreateWithoutRolesInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -3192,6 +3239,7 @@ export type UserUncheckedCreateWithoutRolesInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -3266,6 +3314,7 @@ export type UserUpdateWithoutRolesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3326,6 +3375,7 @@ export type UserUncheckedUpdateWithoutRolesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3384,6 +3434,7 @@ export type UserCreateWithoutPlayerRankInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -3443,6 +3494,7 @@ export type UserUncheckedCreateWithoutPlayerRankInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -3532,6 +3584,7 @@ export type UserScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   rhp?: Prisma.IntFilter<"User"> | number
   avgMapRating?: Prisma.FloatNullableFilter<"User"> | number | null
+  scoreImportDone?: Prisma.BoolFilter<"User"> | boolean
   dailyStreak?: Prisma.IntFilter<"User"> | number
   lastDailyBeatAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   rhythiaVerified?: Prisma.BoolFilter<"User"> | boolean
@@ -3561,6 +3614,7 @@ export type UserCreateWithoutKnowledgeArticlesInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -3621,6 +3675,7 @@ export type UserUncheckedCreateWithoutKnowledgeArticlesInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -3695,6 +3750,7 @@ export type UserUpdateWithoutKnowledgeArticlesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3755,6 +3811,7 @@ export type UserUncheckedUpdateWithoutKnowledgeArticlesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3813,6 +3870,7 @@ export type UserCreateWithoutUserTagsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -3873,6 +3931,7 @@ export type UserUncheckedCreateWithoutUserTagsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -3947,6 +4006,7 @@ export type UserUpdateWithoutUserTagsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4007,6 +4067,7 @@ export type UserUncheckedUpdateWithoutUserTagsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4065,6 +4126,7 @@ export type UserCreateWithoutCoachCommentsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -4125,6 +4187,7 @@ export type UserUncheckedCreateWithoutCoachCommentsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -4199,6 +4262,7 @@ export type UserUpdateWithoutCoachCommentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4259,6 +4323,7 @@ export type UserUncheckedUpdateWithoutCoachCommentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4317,6 +4382,7 @@ export type UserCreateWithoutArticleRevisionsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -4377,6 +4443,7 @@ export type UserUncheckedCreateWithoutArticleRevisionsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -4451,6 +4518,7 @@ export type UserUpdateWithoutArticleRevisionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4511,6 +4579,7 @@ export type UserUncheckedUpdateWithoutArticleRevisionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4569,6 +4638,7 @@ export type UserCreateWithoutReviewedClipsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -4629,6 +4699,7 @@ export type UserUncheckedCreateWithoutReviewedClipsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -4692,6 +4763,7 @@ export type UserCreateWithoutClipsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -4752,6 +4824,7 @@ export type UserUncheckedCreateWithoutClipsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -4826,6 +4899,7 @@ export type UserUpdateWithoutReviewedClipsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4886,6 +4960,7 @@ export type UserUncheckedUpdateWithoutReviewedClipsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4955,6 +5030,7 @@ export type UserUpdateWithoutClipsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5015,6 +5091,7 @@ export type UserUncheckedUpdateWithoutClipsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5073,6 +5150,7 @@ export type UserCreateWithoutClipLikesInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -5133,6 +5211,7 @@ export type UserUncheckedCreateWithoutClipLikesInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -5207,6 +5286,7 @@ export type UserUpdateWithoutClipLikesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5267,6 +5347,7 @@ export type UserUncheckedUpdateWithoutClipLikesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5325,6 +5406,7 @@ export type UserCreateWithoutCommentsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -5385,6 +5467,7 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -5459,6 +5542,7 @@ export type UserUpdateWithoutCommentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5519,6 +5603,7 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5577,6 +5662,7 @@ export type UserCreateWithoutReportsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -5637,6 +5723,7 @@ export type UserUncheckedCreateWithoutReportsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -5700,6 +5787,7 @@ export type UserCreateWithoutReportedResolvedByInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -5760,6 +5848,7 @@ export type UserUncheckedCreateWithoutReportedResolvedByInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -5834,6 +5923,7 @@ export type UserUpdateWithoutReportsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5894,6 +5984,7 @@ export type UserUncheckedUpdateWithoutReportsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5963,6 +6054,7 @@ export type UserUpdateWithoutReportedResolvedByInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6023,6 +6115,7 @@ export type UserUncheckedUpdateWithoutReportedResolvedByInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6081,6 +6174,7 @@ export type UserCreateWithoutAnnouncementsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -6141,6 +6235,7 @@ export type UserUncheckedCreateWithoutAnnouncementsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -6215,6 +6310,7 @@ export type UserUpdateWithoutAnnouncementsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6275,6 +6371,7 @@ export type UserUncheckedUpdateWithoutAnnouncementsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6333,6 +6430,7 @@ export type UserCreateWithoutNotificationsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -6393,6 +6491,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -6467,6 +6566,7 @@ export type UserUpdateWithoutNotificationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6527,6 +6627,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6585,6 +6686,7 @@ export type UserCreateWithoutModerationActionsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -6645,6 +6747,7 @@ export type UserUncheckedCreateWithoutModerationActionsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -6719,6 +6822,7 @@ export type UserUpdateWithoutModerationActionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6779,6 +6883,7 @@ export type UserUncheckedUpdateWithoutModerationActionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6837,6 +6942,7 @@ export type UserCreateWithoutConversationsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -6897,6 +7003,7 @@ export type UserUncheckedCreateWithoutConversationsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -6971,6 +7078,7 @@ export type UserUpdateWithoutConversationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7031,6 +7139,7 @@ export type UserUncheckedUpdateWithoutConversationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7089,6 +7198,7 @@ export type UserCreateWithoutConversationMembershipsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -7149,6 +7259,7 @@ export type UserUncheckedCreateWithoutConversationMembershipsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -7223,6 +7334,7 @@ export type UserUpdateWithoutConversationMembershipsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7283,6 +7395,7 @@ export type UserUncheckedUpdateWithoutConversationMembershipsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7341,6 +7454,7 @@ export type UserCreateWithoutMessagesSentInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -7401,6 +7515,7 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -7475,6 +7590,7 @@ export type UserUpdateWithoutMessagesSentInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7535,6 +7651,7 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7593,6 +7710,7 @@ export type UserCreateWithoutSentFriendRequestsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -7653,6 +7771,7 @@ export type UserUncheckedCreateWithoutSentFriendRequestsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -7716,6 +7835,7 @@ export type UserCreateWithoutReceivedFriendRequestsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -7776,6 +7896,7 @@ export type UserUncheckedCreateWithoutReceivedFriendRequestsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -7850,6 +7971,7 @@ export type UserUpdateWithoutSentFriendRequestsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7910,6 +8032,7 @@ export type UserUncheckedUpdateWithoutSentFriendRequestsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -7979,6 +8102,7 @@ export type UserUpdateWithoutReceivedFriendRequestsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8039,6 +8163,7 @@ export type UserUncheckedUpdateWithoutReceivedFriendRequestsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8097,6 +8222,7 @@ export type UserCreateWithoutDailyMapBeatsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -8157,6 +8283,7 @@ export type UserUncheckedCreateWithoutDailyMapBeatsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -8231,6 +8358,7 @@ export type UserUpdateWithoutDailyMapBeatsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8291,6 +8419,7 @@ export type UserUncheckedUpdateWithoutDailyMapBeatsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8349,6 +8478,7 @@ export type UserCreateWithoutRhpTransactionsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -8409,6 +8539,7 @@ export type UserUncheckedCreateWithoutRhpTransactionsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -8483,6 +8614,7 @@ export type UserUpdateWithoutRhpTransactionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8543,6 +8675,7 @@ export type UserUncheckedUpdateWithoutRhpTransactionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8601,6 +8734,7 @@ export type UserCreateWithoutChallengeMapsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -8661,6 +8795,7 @@ export type UserUncheckedCreateWithoutChallengeMapsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -8724,6 +8859,7 @@ export type UserCreateWithoutReviewedChallengeMapsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -8784,6 +8920,7 @@ export type UserUncheckedCreateWithoutReviewedChallengeMapsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -8858,6 +8995,7 @@ export type UserUpdateWithoutChallengeMapsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8918,6 +9056,7 @@ export type UserUncheckedUpdateWithoutChallengeMapsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -8987,6 +9126,7 @@ export type UserUpdateWithoutReviewedChallengeMapsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9047,6 +9187,7 @@ export type UserUncheckedUpdateWithoutReviewedChallengeMapsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9105,6 +9246,7 @@ export type UserCreateWithoutChallengeCompletionsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -9165,6 +9307,7 @@ export type UserUncheckedCreateWithoutChallengeCompletionsInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -9239,6 +9382,7 @@ export type UserUpdateWithoutChallengeCompletionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9299,6 +9443,7 @@ export type UserUncheckedUpdateWithoutChallengeCompletionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9357,6 +9502,7 @@ export type UserCreateManyPlayerRankInput = {
   updatedAt?: Date | string
   rhp?: number
   avgMapRating?: number | null
+  scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
   rhythiaVerified?: boolean
@@ -9386,6 +9532,7 @@ export type UserUpdateWithoutPlayerRankInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9445,6 +9592,7 @@ export type UserUncheckedUpdateWithoutPlayerRankInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9504,6 +9652,7 @@ export type UserUncheckedUpdateManyWithoutPlayerRankInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rhp?: Prisma.IntFieldUpdateOperationsInput | number
   avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -9817,6 +9966,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   updatedAt?: boolean
   rhp?: boolean
   avgMapRating?: boolean
+  scoreImportDone?: boolean
   dailyStreak?: boolean
   lastDailyBeatAt?: boolean
   rhythiaVerified?: boolean
@@ -9879,6 +10029,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   updatedAt?: boolean
   rhp?: boolean
   avgMapRating?: boolean
+  scoreImportDone?: boolean
   dailyStreak?: boolean
   lastDailyBeatAt?: boolean
   rhythiaVerified?: boolean
@@ -9910,6 +10061,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   updatedAt?: boolean
   rhp?: boolean
   avgMapRating?: boolean
+  scoreImportDone?: boolean
   dailyStreak?: boolean
   lastDailyBeatAt?: boolean
   rhythiaVerified?: boolean
@@ -9941,12 +10093,13 @@ export type UserSelectScalar = {
   updatedAt?: boolean
   rhp?: boolean
   avgMapRating?: boolean
+  scoreImportDone?: boolean
   dailyStreak?: boolean
   lastDailyBeatAt?: boolean
   rhythiaVerified?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "discordId" | "username" | "discriminator" | "avatar" | "locale" | "email" | "passwordHash" | "displayName" | "profileHandle" | "discordRoles" | "inGuild" | "onboardingCompleted" | "playerRankId" | "joinedAt" | "bio" | "website" | "isSuspended" | "suspendedUntil" | "mutedUntil" | "createdAt" | "updatedAt" | "rhp" | "avgMapRating" | "dailyStreak" | "lastDailyBeatAt" | "rhythiaVerified", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "discordId" | "username" | "discriminator" | "avatar" | "locale" | "email" | "passwordHash" | "displayName" | "profileHandle" | "discordRoles" | "inGuild" | "onboardingCompleted" | "playerRankId" | "joinedAt" | "bio" | "website" | "isSuspended" | "suspendedUntil" | "mutedUntil" | "createdAt" | "updatedAt" | "rhp" | "avgMapRating" | "scoreImportDone" | "dailyStreak" | "lastDailyBeatAt" | "rhythiaVerified", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   playerRank?: boolean | Prisma.User$playerRankArgs<ExtArgs>
   roles?: boolean | Prisma.User$rolesArgs<ExtArgs>
@@ -10048,6 +10201,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     updatedAt: Date
     rhp: number
     avgMapRating: number | null
+    scoreImportDone: boolean
     dailyStreak: number
     lastDailyBeatAt: Date | null
     rhythiaVerified: boolean
@@ -10529,6 +10683,7 @@ export interface UserFieldRefs {
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly rhp: Prisma.FieldRef<"User", 'Int'>
   readonly avgMapRating: Prisma.FieldRef<"User", 'Float'>
+  readonly scoreImportDone: Prisma.FieldRef<"User", 'Boolean'>
   readonly dailyStreak: Prisma.FieldRef<"User", 'Int'>
   readonly lastDailyBeatAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly rhythiaVerified: Prisma.FieldRef<"User", 'Boolean'>
