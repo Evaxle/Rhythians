@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { UserTags } from "@/components/user-tags";
+import { FlagIcon } from "@/components/flag-icon";
 import { RichText } from "@/components/rich-text";
 
 interface CoachComment {
@@ -13,6 +14,8 @@ interface CoachComment {
     username: string;
     discriminator: string;
     avatar?: string | null;
+    country?: string | null;
+    flag?: string | null;
     userTags: Array<{ tag: { name: string; slug: string } }>;
   };
 }
@@ -113,7 +116,10 @@ export function CoachComments({ clipId, comments: initialComments, isCoach, isAu
                 )}
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-white">{comment.author.username}</span>
+                    <span className="flex items-center gap-1.5 font-medium text-white">
+                      {comment.author.username}
+                      <FlagIcon flag={comment.author.flag} country={comment.author.country} />
+                    </span>
                     <UserTags tags={comment.author.userTags} size="sm" />
                   </div>
                   <RichText className="mt-1 text-sm text-muted" text={comment.text} />

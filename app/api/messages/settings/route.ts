@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
-import { isOwner } from "@/lib/auth";
+import { canAccessAdmin } from "@/lib/admin-access";
 import { getMessageRetentionDays, setMessageRetentionDays, pruneExpiredMessages } from "@/lib/settings";
 
 export async function GET() {
@@ -18,8 +18,8 @@ export async function PATCH(request: Request) {
   if (!user) {
     return NextResponse.json({ error: "Authentication required" }, { status: 401 });
   }
-  if (!isOwner(user)) {
-    return NextResponse.json({ error: "Only the site owner can change message settings." }, { status: 403 });
+  if (!(await canAccessAdmin(user))) {
+    return NextResponse.json({ error: "Only admins can change message settings." }, { status: 403 });
   }
 
   const body = await request.json().catch(() => null) as { retentionDays?: unknown; prune?: unknown } | null;

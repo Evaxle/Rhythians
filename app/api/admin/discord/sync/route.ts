@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUser, isOwner } from "@/lib/auth";
+import { getSessionUser } from "@/lib/auth";
+import { canAccessAdmin } from "@/lib/admin-access";
 import { syncAllGuildMembers } from "@/lib/discord-sync";
 import { checkRateLimit } from "@/lib/security";
 
@@ -21,7 +22,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!isOwner(sessionUser)) {
+  if (!(await canAccessAdmin(sessionUser))) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

@@ -42,6 +42,8 @@ export type UserMinAggregateOutputType = {
   bio: string | null
   website: string | null
   isSuspended: boolean | null
+  suspendedUntil: Date | null
+  mutedUntil: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -64,6 +66,8 @@ export type UserMaxAggregateOutputType = {
   bio: string | null
   website: string | null
   isSuspended: boolean | null
+  suspendedUntil: Date | null
+  mutedUntil: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -87,6 +91,8 @@ export type UserCountAggregateOutputType = {
   bio: number
   website: number
   isSuspended: number
+  suspendedUntil: number
+  mutedUntil: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -111,6 +117,8 @@ export type UserMinAggregateInputType = {
   bio?: true
   website?: true
   isSuspended?: true
+  suspendedUntil?: true
+  mutedUntil?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -133,6 +141,8 @@ export type UserMaxAggregateInputType = {
   bio?: true
   website?: true
   isSuspended?: true
+  suspendedUntil?: true
+  mutedUntil?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -156,6 +166,8 @@ export type UserCountAggregateInputType = {
   bio?: true
   website?: true
   isSuspended?: true
+  suspendedUntil?: true
+  mutedUntil?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -252,6 +264,8 @@ export type UserGroupByOutputType = {
   bio: string | null
   website: string | null
   isSuspended: boolean
+  suspendedUntil: Date | null
+  mutedUntil: Date | null
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
@@ -296,6 +310,8 @@ export type UserWhereInput = {
   bio?: Prisma.StringNullableFilter<"User"> | string | null
   website?: Prisma.StringNullableFilter<"User"> | string | null
   isSuspended?: Prisma.BoolFilter<"User"> | boolean
+  suspendedUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  mutedUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   playerRank?: Prisma.XOR<Prisma.PlayerRankNullableScalarRelationFilter, Prisma.PlayerRankWhereInput> | null
@@ -319,6 +335,8 @@ export type UserWhereInput = {
   messagesSent?: Prisma.MessageListRelationFilter
   sentFriendRequests?: Prisma.FriendRequestListRelationFilter
   receivedFriendRequests?: Prisma.FriendRequestListRelationFilter
+  warnings?: Prisma.UserWarningListRelationFilter
+  issuedWarnings?: Prisma.UserWarningListRelationFilter
   rhythiaProfile?: Prisma.XOR<Prisma.RhythiaProfileNullableScalarRelationFilter, Prisma.RhythiaProfileWhereInput> | null
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestListRelationFilter
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestListRelationFilter
@@ -343,6 +361,8 @@ export type UserOrderByWithRelationInput = {
   bio?: Prisma.SortOrderInput | Prisma.SortOrder
   website?: Prisma.SortOrderInput | Prisma.SortOrder
   isSuspended?: Prisma.SortOrder
+  suspendedUntil?: Prisma.SortOrderInput | Prisma.SortOrder
+  mutedUntil?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   playerRank?: Prisma.PlayerRankOrderByWithRelationInput
@@ -366,6 +386,8 @@ export type UserOrderByWithRelationInput = {
   messagesSent?: Prisma.MessageOrderByRelationAggregateInput
   sentFriendRequests?: Prisma.FriendRequestOrderByRelationAggregateInput
   receivedFriendRequests?: Prisma.FriendRequestOrderByRelationAggregateInput
+  warnings?: Prisma.UserWarningOrderByRelationAggregateInput
+  issuedWarnings?: Prisma.UserWarningOrderByRelationAggregateInput
   rhythiaProfile?: Prisma.RhythiaProfileOrderByWithRelationInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestOrderByRelationAggregateInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestOrderByRelationAggregateInput
@@ -393,6 +415,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   bio?: Prisma.StringNullableFilter<"User"> | string | null
   website?: Prisma.StringNullableFilter<"User"> | string | null
   isSuspended?: Prisma.BoolFilter<"User"> | boolean
+  suspendedUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  mutedUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   playerRank?: Prisma.XOR<Prisma.PlayerRankNullableScalarRelationFilter, Prisma.PlayerRankWhereInput> | null
@@ -416,6 +440,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   messagesSent?: Prisma.MessageListRelationFilter
   sentFriendRequests?: Prisma.FriendRequestListRelationFilter
   receivedFriendRequests?: Prisma.FriendRequestListRelationFilter
+  warnings?: Prisma.UserWarningListRelationFilter
+  issuedWarnings?: Prisma.UserWarningListRelationFilter
   rhythiaProfile?: Prisma.XOR<Prisma.RhythiaProfileNullableScalarRelationFilter, Prisma.RhythiaProfileWhereInput> | null
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestListRelationFilter
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestListRelationFilter
@@ -440,6 +466,8 @@ export type UserOrderByWithAggregationInput = {
   bio?: Prisma.SortOrderInput | Prisma.SortOrder
   website?: Prisma.SortOrderInput | Prisma.SortOrder
   isSuspended?: Prisma.SortOrder
+  suspendedUntil?: Prisma.SortOrderInput | Prisma.SortOrder
+  mutedUntil?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
@@ -469,6 +497,8 @@ export type UserScalarWhereWithAggregatesInput = {
   bio?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   website?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   isSuspended?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  suspendedUntil?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  mutedUntil?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
@@ -491,6 +521,8 @@ export type UserCreateInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -514,6 +546,8 @@ export type UserCreateInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
@@ -538,6 +572,8 @@ export type UserUncheckedCreateInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -560,6 +596,8 @@ export type UserUncheckedCreateInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
@@ -583,6 +621,8 @@ export type UserUpdateInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -606,6 +646,8 @@ export type UserUpdateInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
@@ -630,6 +672,8 @@ export type UserUncheckedUpdateInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -652,6 +696,8 @@ export type UserUncheckedUpdateInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
@@ -676,6 +722,8 @@ export type UserCreateManyInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -698,6 +746,8 @@ export type UserUpdateManyMutationInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -721,6 +771,8 @@ export type UserUncheckedUpdateManyInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -752,6 +804,8 @@ export type UserCountOrderByAggregateInput = {
   bio?: Prisma.SortOrder
   website?: Prisma.SortOrder
   isSuspended?: Prisma.SortOrder
+  suspendedUntil?: Prisma.SortOrder
+  mutedUntil?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -774,6 +828,8 @@ export type UserMaxOrderByAggregateInput = {
   bio?: Prisma.SortOrder
   website?: Prisma.SortOrder
   isSuspended?: Prisma.SortOrder
+  suspendedUntil?: Prisma.SortOrder
+  mutedUntil?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -796,6 +852,8 @@ export type UserMinOrderByAggregateInput = {
   bio?: Prisma.SortOrder
   website?: Prisma.SortOrder
   isSuspended?: Prisma.SortOrder
+  suspendedUntil?: Prisma.SortOrder
+  mutedUntil?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -845,6 +903,10 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
 export type UserCreateNestedOneWithoutRhythiaProfileInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutRhythiaProfileInput, Prisma.UserUncheckedCreateWithoutRhythiaProfileInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutRhythiaProfileInput
@@ -887,6 +949,34 @@ export type UserUpdateOneWithoutResolvedRhythiaRequestsNestedInput = {
   delete?: Prisma.UserWhereInput | boolean
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutResolvedRhythiaRequestsInput, Prisma.UserUpdateWithoutResolvedRhythiaRequestsInput>, Prisma.UserUncheckedUpdateWithoutResolvedRhythiaRequestsInput>
+}
+
+export type UserCreateNestedOneWithoutWarningsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutWarningsInput, Prisma.UserUncheckedCreateWithoutWarningsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWarningsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutIssuedWarningsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutIssuedWarningsInput, Prisma.UserUncheckedCreateWithoutIssuedWarningsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutIssuedWarningsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutWarningsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutWarningsInput, Prisma.UserUncheckedCreateWithoutWarningsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWarningsInput
+  upsert?: Prisma.UserUpsertWithoutWarningsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutWarningsInput, Prisma.UserUpdateWithoutWarningsInput>, Prisma.UserUncheckedUpdateWithoutWarningsInput>
+}
+
+export type UserUpdateOneRequiredWithoutIssuedWarningsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutIssuedWarningsInput, Prisma.UserUncheckedCreateWithoutIssuedWarningsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutIssuedWarningsInput
+  upsert?: Prisma.UserUpsertWithoutIssuedWarningsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutIssuedWarningsInput, Prisma.UserUpdateWithoutIssuedWarningsInput>, Prisma.UserUncheckedUpdateWithoutIssuedWarningsInput>
 }
 
 export type UserCreateNestedOneWithoutSessionsInput = {
@@ -1235,6 +1325,8 @@ export type UserCreateWithoutRhythiaProfileInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -1258,6 +1350,8 @@ export type UserCreateWithoutRhythiaProfileInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
@@ -1281,6 +1375,8 @@ export type UserUncheckedCreateWithoutRhythiaProfileInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -1303,6 +1399,8 @@ export type UserUncheckedCreateWithoutRhythiaProfileInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
@@ -1341,6 +1439,8 @@ export type UserUpdateWithoutRhythiaProfileInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -1364,6 +1464,8 @@ export type UserUpdateWithoutRhythiaProfileInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
@@ -1387,6 +1489,8 @@ export type UserUncheckedUpdateWithoutRhythiaProfileInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -1409,6 +1513,8 @@ export type UserUncheckedUpdateWithoutRhythiaProfileInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
@@ -1431,6 +1537,8 @@ export type UserCreateWithoutRhythiaProfileRequestsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -1454,6 +1562,8 @@ export type UserCreateWithoutRhythiaProfileRequestsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
 }
@@ -1477,6 +1587,8 @@ export type UserUncheckedCreateWithoutRhythiaProfileRequestsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -1499,6 +1611,8 @@ export type UserUncheckedCreateWithoutRhythiaProfileRequestsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
 }
@@ -1526,6 +1640,8 @@ export type UserCreateWithoutResolvedRhythiaRequestsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -1549,6 +1665,8 @@ export type UserCreateWithoutResolvedRhythiaRequestsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
 }
@@ -1572,6 +1690,8 @@ export type UserUncheckedCreateWithoutResolvedRhythiaRequestsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -1594,6 +1714,8 @@ export type UserUncheckedCreateWithoutResolvedRhythiaRequestsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1632,6 +1754,8 @@ export type UserUpdateWithoutRhythiaProfileRequestsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -1655,6 +1779,8 @@ export type UserUpdateWithoutRhythiaProfileRequestsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
 }
@@ -1678,6 +1804,8 @@ export type UserUncheckedUpdateWithoutRhythiaProfileRequestsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -1700,6 +1828,8 @@ export type UserUncheckedUpdateWithoutRhythiaProfileRequestsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
@@ -1733,6 +1863,8 @@ export type UserUpdateWithoutResolvedRhythiaRequestsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -1756,6 +1888,8 @@ export type UserUpdateWithoutResolvedRhythiaRequestsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
 }
@@ -1779,6 +1913,8 @@ export type UserUncheckedUpdateWithoutResolvedRhythiaRequestsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -1801,8 +1937,434 @@ export type UserUncheckedUpdateWithoutResolvedRhythiaRequestsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutWarningsInput = {
+  id?: string
+  discordId?: string | null
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  passwordHash?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  onboardingCompleted?: boolean
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
+  roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionCreateNestedManyWithoutActorInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
+  receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
+}
+
+export type UserUncheckedCreateWithoutWarningsInput = {
+  id?: string
+  discordId?: string | null
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  passwordHash?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  onboardingCompleted?: boolean
+  playerRankId?: string | null
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportUncheckedCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutActorInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
+  receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
+}
+
+export type UserCreateOrConnectWithoutWarningsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutWarningsInput, Prisma.UserUncheckedCreateWithoutWarningsInput>
+}
+
+export type UserCreateWithoutIssuedWarningsInput = {
+  id?: string
+  discordId?: string | null
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  passwordHash?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  onboardingCompleted?: boolean
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
+  roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionCreateNestedManyWithoutActorInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
+  receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
+}
+
+export type UserUncheckedCreateWithoutIssuedWarningsInput = {
+  id?: string
+  discordId?: string | null
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  passwordHash?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  onboardingCompleted?: boolean
+  playerRankId?: string | null
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportUncheckedCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutActorInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
+  receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
+}
+
+export type UserCreateOrConnectWithoutIssuedWarningsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutIssuedWarningsInput, Prisma.UserUncheckedCreateWithoutIssuedWarningsInput>
+}
+
+export type UserUpsertWithoutWarningsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutWarningsInput, Prisma.UserUncheckedUpdateWithoutWarningsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutWarningsInput, Prisma.UserUncheckedCreateWithoutWarningsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutWarningsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutWarningsInput, Prisma.UserUncheckedUpdateWithoutWarningsInput>
+}
+
+export type UserUpdateWithoutWarningsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
+  roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUpdateManyWithoutActorNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
+  receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutWarningsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUncheckedUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUncheckedUpdateManyWithoutActorNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
+  receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
+}
+
+export type UserUpsertWithoutIssuedWarningsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutIssuedWarningsInput, Prisma.UserUncheckedUpdateWithoutIssuedWarningsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutIssuedWarningsInput, Prisma.UserUncheckedCreateWithoutIssuedWarningsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutIssuedWarningsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutIssuedWarningsInput, Prisma.UserUncheckedUpdateWithoutIssuedWarningsInput>
+}
+
+export type UserUpdateWithoutIssuedWarningsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
+  roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUpdateManyWithoutActorNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
+  receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutIssuedWarningsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUncheckedUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUncheckedUpdateManyWithoutActorNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
+  receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -1823,6 +2385,8 @@ export type UserCreateWithoutSessionsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -1845,6 +2409,8 @@ export type UserCreateWithoutSessionsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
@@ -1869,6 +2435,8 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -1890,6 +2458,8 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
@@ -1929,6 +2499,8 @@ export type UserUpdateWithoutSessionsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -1951,6 +2523,8 @@ export type UserUpdateWithoutSessionsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
@@ -1975,6 +2549,8 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -1996,6 +2572,8 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
@@ -2019,6 +2597,8 @@ export type UserCreateWithoutRolesInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -2041,6 +2621,8 @@ export type UserCreateWithoutRolesInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
@@ -2065,6 +2647,8 @@ export type UserUncheckedCreateWithoutRolesInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -2086,6 +2670,8 @@ export type UserUncheckedCreateWithoutRolesInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
@@ -2125,6 +2711,8 @@ export type UserUpdateWithoutRolesInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -2147,6 +2735,8 @@ export type UserUpdateWithoutRolesInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
@@ -2171,6 +2761,8 @@ export type UserUncheckedUpdateWithoutRolesInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -2192,6 +2784,8 @@ export type UserUncheckedUpdateWithoutRolesInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
@@ -2215,6 +2809,8 @@ export type UserCreateWithoutPlayerRankInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -2237,6 +2833,8 @@ export type UserCreateWithoutPlayerRankInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
@@ -2260,6 +2858,8 @@ export type UserUncheckedCreateWithoutPlayerRankInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -2282,6 +2882,8 @@ export type UserUncheckedCreateWithoutPlayerRankInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
@@ -2335,6 +2937,8 @@ export type UserScalarWhereInput = {
   bio?: Prisma.StringNullableFilter<"User"> | string | null
   website?: Prisma.StringNullableFilter<"User"> | string | null
   isSuspended?: Prisma.BoolFilter<"User"> | boolean
+  suspendedUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  mutedUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
 }
@@ -2357,6 +2961,8 @@ export type UserCreateWithoutKnowledgeArticlesInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -2379,6 +2985,8 @@ export type UserCreateWithoutKnowledgeArticlesInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
@@ -2403,6 +3011,8 @@ export type UserUncheckedCreateWithoutKnowledgeArticlesInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -2424,6 +3034,8 @@ export type UserUncheckedCreateWithoutKnowledgeArticlesInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
@@ -2463,6 +3075,8 @@ export type UserUpdateWithoutKnowledgeArticlesInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -2485,6 +3099,8 @@ export type UserUpdateWithoutKnowledgeArticlesInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
@@ -2509,6 +3125,8 @@ export type UserUncheckedUpdateWithoutKnowledgeArticlesInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -2530,6 +3148,8 @@ export type UserUncheckedUpdateWithoutKnowledgeArticlesInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
@@ -2553,6 +3173,8 @@ export type UserCreateWithoutUserTagsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -2575,6 +3197,8 @@ export type UserCreateWithoutUserTagsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
@@ -2599,6 +3223,8 @@ export type UserUncheckedCreateWithoutUserTagsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -2620,6 +3246,8 @@ export type UserUncheckedCreateWithoutUserTagsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
@@ -2659,6 +3287,8 @@ export type UserUpdateWithoutUserTagsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -2681,6 +3311,8 @@ export type UserUpdateWithoutUserTagsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
@@ -2705,6 +3337,8 @@ export type UserUncheckedUpdateWithoutUserTagsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -2726,6 +3360,8 @@ export type UserUncheckedUpdateWithoutUserTagsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
@@ -2749,6 +3385,8 @@ export type UserCreateWithoutCoachCommentsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -2771,6 +3409,8 @@ export type UserCreateWithoutCoachCommentsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
@@ -2795,6 +3435,8 @@ export type UserUncheckedCreateWithoutCoachCommentsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -2816,6 +3458,8 @@ export type UserUncheckedCreateWithoutCoachCommentsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
@@ -2855,6 +3499,8 @@ export type UserUpdateWithoutCoachCommentsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -2877,6 +3523,8 @@ export type UserUpdateWithoutCoachCommentsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
@@ -2901,6 +3549,8 @@ export type UserUncheckedUpdateWithoutCoachCommentsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -2922,6 +3572,8 @@ export type UserUncheckedUpdateWithoutCoachCommentsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
@@ -2945,6 +3597,8 @@ export type UserCreateWithoutArticleRevisionsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -2967,6 +3621,8 @@ export type UserCreateWithoutArticleRevisionsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
@@ -2991,6 +3647,8 @@ export type UserUncheckedCreateWithoutArticleRevisionsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -3012,6 +3670,8 @@ export type UserUncheckedCreateWithoutArticleRevisionsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
@@ -3051,6 +3711,8 @@ export type UserUpdateWithoutArticleRevisionsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -3073,6 +3735,8 @@ export type UserUpdateWithoutArticleRevisionsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
@@ -3097,6 +3761,8 @@ export type UserUncheckedUpdateWithoutArticleRevisionsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -3118,6 +3784,8 @@ export type UserUncheckedUpdateWithoutArticleRevisionsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
@@ -3141,6 +3809,8 @@ export type UserCreateWithoutReviewedClipsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -3163,6 +3833,8 @@ export type UserCreateWithoutReviewedClipsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
@@ -3187,6 +3859,8 @@ export type UserUncheckedCreateWithoutReviewedClipsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -3208,6 +3882,8 @@ export type UserUncheckedCreateWithoutReviewedClipsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
@@ -3236,6 +3912,8 @@ export type UserCreateWithoutClipsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -3258,6 +3936,8 @@ export type UserCreateWithoutClipsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
@@ -3282,6 +3962,8 @@ export type UserUncheckedCreateWithoutClipsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -3303,6 +3985,8 @@ export type UserUncheckedCreateWithoutClipsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
@@ -3342,6 +4026,8 @@ export type UserUpdateWithoutReviewedClipsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -3364,6 +4050,8 @@ export type UserUpdateWithoutReviewedClipsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
@@ -3388,6 +4076,8 @@ export type UserUncheckedUpdateWithoutReviewedClipsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -3409,6 +4099,8 @@ export type UserUncheckedUpdateWithoutReviewedClipsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
@@ -3443,6 +4135,8 @@ export type UserUpdateWithoutClipsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -3465,6 +4159,8 @@ export type UserUpdateWithoutClipsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
@@ -3489,6 +4185,8 @@ export type UserUncheckedUpdateWithoutClipsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -3510,6 +4208,8 @@ export type UserUncheckedUpdateWithoutClipsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
@@ -3533,6 +4233,8 @@ export type UserCreateWithoutClipLikesInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -3555,6 +4257,8 @@ export type UserCreateWithoutClipLikesInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
@@ -3579,6 +4283,8 @@ export type UserUncheckedCreateWithoutClipLikesInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -3600,6 +4306,8 @@ export type UserUncheckedCreateWithoutClipLikesInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
@@ -3639,6 +4347,8 @@ export type UserUpdateWithoutClipLikesInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -3661,6 +4371,8 @@ export type UserUpdateWithoutClipLikesInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
@@ -3685,6 +4397,8 @@ export type UserUncheckedUpdateWithoutClipLikesInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -3706,6 +4420,8 @@ export type UserUncheckedUpdateWithoutClipLikesInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
@@ -3729,6 +4445,8 @@ export type UserCreateWithoutCommentsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -3751,6 +4469,8 @@ export type UserCreateWithoutCommentsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
@@ -3775,6 +4495,8 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -3796,6 +4518,8 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
@@ -3835,6 +4559,8 @@ export type UserUpdateWithoutCommentsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -3857,6 +4583,8 @@ export type UserUpdateWithoutCommentsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
@@ -3881,6 +4609,8 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -3902,6 +4632,8 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
@@ -3925,6 +4657,8 @@ export type UserCreateWithoutReportsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -3947,6 +4681,8 @@ export type UserCreateWithoutReportsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
@@ -3971,6 +4707,8 @@ export type UserUncheckedCreateWithoutReportsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -3992,6 +4730,8 @@ export type UserUncheckedCreateWithoutReportsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
@@ -4020,6 +4760,8 @@ export type UserCreateWithoutReportedResolvedByInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -4042,6 +4784,8 @@ export type UserCreateWithoutReportedResolvedByInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
@@ -4066,6 +4810,8 @@ export type UserUncheckedCreateWithoutReportedResolvedByInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -4087,6 +4833,8 @@ export type UserUncheckedCreateWithoutReportedResolvedByInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
@@ -4126,6 +4874,8 @@ export type UserUpdateWithoutReportsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -4148,6 +4898,8 @@ export type UserUpdateWithoutReportsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
@@ -4172,6 +4924,8 @@ export type UserUncheckedUpdateWithoutReportsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -4193,6 +4947,8 @@ export type UserUncheckedUpdateWithoutReportsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
@@ -4227,6 +4983,8 @@ export type UserUpdateWithoutReportedResolvedByInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -4249,6 +5007,8 @@ export type UserUpdateWithoutReportedResolvedByInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
@@ -4273,6 +5033,8 @@ export type UserUncheckedUpdateWithoutReportedResolvedByInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -4294,6 +5056,8 @@ export type UserUncheckedUpdateWithoutReportedResolvedByInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
@@ -4317,6 +5081,8 @@ export type UserCreateWithoutAnnouncementsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -4339,6 +5105,8 @@ export type UserCreateWithoutAnnouncementsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
@@ -4363,6 +5131,8 @@ export type UserUncheckedCreateWithoutAnnouncementsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -4384,6 +5154,8 @@ export type UserUncheckedCreateWithoutAnnouncementsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
@@ -4423,6 +5195,8 @@ export type UserUpdateWithoutAnnouncementsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -4445,6 +5219,8 @@ export type UserUpdateWithoutAnnouncementsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
@@ -4469,6 +5245,8 @@ export type UserUncheckedUpdateWithoutAnnouncementsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -4490,6 +5268,8 @@ export type UserUncheckedUpdateWithoutAnnouncementsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
@@ -4513,6 +5293,8 @@ export type UserCreateWithoutNotificationsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -4535,6 +5317,8 @@ export type UserCreateWithoutNotificationsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
@@ -4559,6 +5343,8 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -4580,6 +5366,8 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
@@ -4619,6 +5407,8 @@ export type UserUpdateWithoutNotificationsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -4641,6 +5431,8 @@ export type UserUpdateWithoutNotificationsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
@@ -4665,6 +5457,8 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -4686,6 +5480,8 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
@@ -4709,6 +5505,8 @@ export type UserCreateWithoutModerationActionsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -4731,6 +5529,8 @@ export type UserCreateWithoutModerationActionsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
@@ -4755,6 +5555,8 @@ export type UserUncheckedCreateWithoutModerationActionsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -4776,6 +5578,8 @@ export type UserUncheckedCreateWithoutModerationActionsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
@@ -4815,6 +5619,8 @@ export type UserUpdateWithoutModerationActionsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -4837,6 +5643,8 @@ export type UserUpdateWithoutModerationActionsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
@@ -4861,6 +5669,8 @@ export type UserUncheckedUpdateWithoutModerationActionsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -4882,6 +5692,8 @@ export type UserUncheckedUpdateWithoutModerationActionsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
@@ -4905,6 +5717,8 @@ export type UserCreateWithoutConversationsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -4927,6 +5741,8 @@ export type UserCreateWithoutConversationsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
@@ -4951,6 +5767,8 @@ export type UserUncheckedCreateWithoutConversationsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -4972,6 +5790,8 @@ export type UserUncheckedCreateWithoutConversationsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
@@ -5011,6 +5831,8 @@ export type UserUpdateWithoutConversationsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -5033,6 +5855,8 @@ export type UserUpdateWithoutConversationsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
@@ -5057,6 +5881,8 @@ export type UserUncheckedUpdateWithoutConversationsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -5078,6 +5904,8 @@ export type UserUncheckedUpdateWithoutConversationsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
@@ -5101,6 +5929,8 @@ export type UserCreateWithoutConversationMembershipsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -5123,6 +5953,8 @@ export type UserCreateWithoutConversationMembershipsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
@@ -5147,6 +5979,8 @@ export type UserUncheckedCreateWithoutConversationMembershipsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -5168,6 +6002,8 @@ export type UserUncheckedCreateWithoutConversationMembershipsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
@@ -5207,6 +6043,8 @@ export type UserUpdateWithoutConversationMembershipsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -5229,6 +6067,8 @@ export type UserUpdateWithoutConversationMembershipsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
@@ -5253,6 +6093,8 @@ export type UserUncheckedUpdateWithoutConversationMembershipsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -5274,6 +6116,8 @@ export type UserUncheckedUpdateWithoutConversationMembershipsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
@@ -5297,6 +6141,8 @@ export type UserCreateWithoutMessagesSentInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -5319,6 +6165,8 @@ export type UserCreateWithoutMessagesSentInput = {
   conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
@@ -5343,6 +6191,8 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -5364,6 +6214,8 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
@@ -5403,6 +6255,8 @@ export type UserUpdateWithoutMessagesSentInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -5425,6 +6279,8 @@ export type UserUpdateWithoutMessagesSentInput = {
   conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
@@ -5449,6 +6305,8 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -5470,6 +6328,8 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
@@ -5493,6 +6353,8 @@ export type UserCreateWithoutSentFriendRequestsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -5515,6 +6377,8 @@ export type UserCreateWithoutSentFriendRequestsInput = {
   conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
@@ -5539,6 +6403,8 @@ export type UserUncheckedCreateWithoutSentFriendRequestsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -5560,6 +6426,8 @@ export type UserUncheckedCreateWithoutSentFriendRequestsInput = {
   conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
@@ -5588,6 +6456,8 @@ export type UserCreateWithoutReceivedFriendRequestsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
@@ -5610,6 +6480,8 @@ export type UserCreateWithoutReceivedFriendRequestsInput = {
   conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
@@ -5634,6 +6506,8 @@ export type UserUncheckedCreateWithoutReceivedFriendRequestsInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -5655,6 +6529,8 @@ export type UserUncheckedCreateWithoutReceivedFriendRequestsInput = {
   conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
@@ -5694,6 +6570,8 @@ export type UserUpdateWithoutSentFriendRequestsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -5716,6 +6594,8 @@ export type UserUpdateWithoutSentFriendRequestsInput = {
   conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
@@ -5740,6 +6620,8 @@ export type UserUncheckedUpdateWithoutSentFriendRequestsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -5761,6 +6643,8 @@ export type UserUncheckedUpdateWithoutSentFriendRequestsInput = {
   conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
@@ -5795,6 +6679,8 @@ export type UserUpdateWithoutReceivedFriendRequestsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
@@ -5817,6 +6703,8 @@ export type UserUpdateWithoutReceivedFriendRequestsInput = {
   conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
@@ -5841,6 +6729,8 @@ export type UserUncheckedUpdateWithoutReceivedFriendRequestsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -5862,6 +6752,8 @@ export type UserUncheckedUpdateWithoutReceivedFriendRequestsInput = {
   conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
@@ -5885,6 +6777,8 @@ export type UserCreateManyPlayerRankInput = {
   bio?: string | null
   website?: string | null
   isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -5907,6 +6801,8 @@ export type UserUpdateWithoutPlayerRankInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -5929,6 +6825,8 @@ export type UserUpdateWithoutPlayerRankInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
@@ -5952,6 +6850,8 @@ export type UserUncheckedUpdateWithoutPlayerRankInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -5974,6 +6874,8 @@ export type UserUncheckedUpdateWithoutPlayerRankInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
   receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
   rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
   rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
   resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
@@ -5997,6 +6899,8 @@ export type UserUncheckedUpdateManyWithoutPlayerRankInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -6027,6 +6931,8 @@ export type UserCountOutputType = {
   messagesSent: number
   sentFriendRequests: number
   receivedFriendRequests: number
+  warnings: number
+  issuedWarnings: number
   rhythiaProfileRequests: number
   resolvedRhythiaRequests: number
 }
@@ -6052,6 +6958,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   messagesSent?: boolean | UserCountOutputTypeCountMessagesSentArgs
   sentFriendRequests?: boolean | UserCountOutputTypeCountSentFriendRequestsArgs
   receivedFriendRequests?: boolean | UserCountOutputTypeCountReceivedFriendRequestsArgs
+  warnings?: boolean | UserCountOutputTypeCountWarningsArgs
+  issuedWarnings?: boolean | UserCountOutputTypeCountIssuedWarningsArgs
   rhythiaProfileRequests?: boolean | UserCountOutputTypeCountRhythiaProfileRequestsArgs
   resolvedRhythiaRequests?: boolean | UserCountOutputTypeCountResolvedRhythiaRequestsArgs
 }
@@ -6209,6 +7117,20 @@ export type UserCountOutputTypeCountReceivedFriendRequestsArgs<ExtArgs extends r
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountWarningsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserWarningWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountIssuedWarningsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserWarningWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountRhythiaProfileRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.RhythiaProfileRequestWhereInput
 }
@@ -6240,6 +7162,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   bio?: boolean
   website?: boolean
   isSuspended?: boolean
+  suspendedUntil?: boolean
+  mutedUntil?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   playerRank?: boolean | Prisma.User$playerRankArgs<ExtArgs>
@@ -6263,6 +7187,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   messagesSent?: boolean | Prisma.User$messagesSentArgs<ExtArgs>
   sentFriendRequests?: boolean | Prisma.User$sentFriendRequestsArgs<ExtArgs>
   receivedFriendRequests?: boolean | Prisma.User$receivedFriendRequestsArgs<ExtArgs>
+  warnings?: boolean | Prisma.User$warningsArgs<ExtArgs>
+  issuedWarnings?: boolean | Prisma.User$issuedWarningsArgs<ExtArgs>
   rhythiaProfile?: boolean | Prisma.User$rhythiaProfileArgs<ExtArgs>
   rhythiaProfileRequests?: boolean | Prisma.User$rhythiaProfileRequestsArgs<ExtArgs>
   resolvedRhythiaRequests?: boolean | Prisma.User$resolvedRhythiaRequestsArgs<ExtArgs>
@@ -6288,6 +7214,8 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   bio?: boolean
   website?: boolean
   isSuspended?: boolean
+  suspendedUntil?: boolean
+  mutedUntil?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   playerRank?: boolean | Prisma.User$playerRankArgs<ExtArgs>
@@ -6312,6 +7240,8 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   bio?: boolean
   website?: boolean
   isSuspended?: boolean
+  suspendedUntil?: boolean
+  mutedUntil?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   playerRank?: boolean | Prisma.User$playerRankArgs<ExtArgs>
@@ -6336,11 +7266,13 @@ export type UserSelectScalar = {
   bio?: boolean
   website?: boolean
   isSuspended?: boolean
+  suspendedUntil?: boolean
+  mutedUntil?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "discordId" | "username" | "discriminator" | "avatar" | "locale" | "email" | "passwordHash" | "displayName" | "profileHandle" | "discordRoles" | "inGuild" | "onboardingCompleted" | "playerRankId" | "joinedAt" | "bio" | "website" | "isSuspended" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "discordId" | "username" | "discriminator" | "avatar" | "locale" | "email" | "passwordHash" | "displayName" | "profileHandle" | "discordRoles" | "inGuild" | "onboardingCompleted" | "playerRankId" | "joinedAt" | "bio" | "website" | "isSuspended" | "suspendedUntil" | "mutedUntil" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   playerRank?: boolean | Prisma.User$playerRankArgs<ExtArgs>
   roles?: boolean | Prisma.User$rolesArgs<ExtArgs>
@@ -6363,6 +7295,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   messagesSent?: boolean | Prisma.User$messagesSentArgs<ExtArgs>
   sentFriendRequests?: boolean | Prisma.User$sentFriendRequestsArgs<ExtArgs>
   receivedFriendRequests?: boolean | Prisma.User$receivedFriendRequestsArgs<ExtArgs>
+  warnings?: boolean | Prisma.User$warningsArgs<ExtArgs>
+  issuedWarnings?: boolean | Prisma.User$issuedWarningsArgs<ExtArgs>
   rhythiaProfile?: boolean | Prisma.User$rhythiaProfileArgs<ExtArgs>
   rhythiaProfileRequests?: boolean | Prisma.User$rhythiaProfileRequestsArgs<ExtArgs>
   resolvedRhythiaRequests?: boolean | Prisma.User$resolvedRhythiaRequestsArgs<ExtArgs>
@@ -6399,6 +7333,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     messagesSent: Prisma.$MessagePayload<ExtArgs>[]
     sentFriendRequests: Prisma.$FriendRequestPayload<ExtArgs>[]
     receivedFriendRequests: Prisma.$FriendRequestPayload<ExtArgs>[]
+    warnings: Prisma.$UserWarningPayload<ExtArgs>[]
+    issuedWarnings: Prisma.$UserWarningPayload<ExtArgs>[]
     rhythiaProfile: Prisma.$RhythiaProfilePayload<ExtArgs> | null
     rhythiaProfileRequests: Prisma.$RhythiaProfileRequestPayload<ExtArgs>[]
     resolvedRhythiaRequests: Prisma.$RhythiaProfileRequestPayload<ExtArgs>[]
@@ -6422,6 +7358,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     bio: string | null
     website: string | null
     isSuspended: boolean
+    suspendedUntil: Date | null
+    mutedUntil: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["user"]>
@@ -6839,6 +7777,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   messagesSent<T extends Prisma.User$messagesSentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$messagesSentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sentFriendRequests<T extends Prisma.User$sentFriendRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sentFriendRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FriendRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   receivedFriendRequests<T extends Prisma.User$receivedFriendRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$receivedFriendRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FriendRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  warnings<T extends Prisma.User$warningsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$warningsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserWarningPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  issuedWarnings<T extends Prisma.User$issuedWarningsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$issuedWarningsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserWarningPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   rhythiaProfile<T extends Prisma.User$rhythiaProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$rhythiaProfileArgs<ExtArgs>>): Prisma.Prisma__RhythiaProfileClient<runtime.Types.Result.GetResult<Prisma.$RhythiaProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   rhythiaProfileRequests<T extends Prisma.User$rhythiaProfileRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$rhythiaProfileRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RhythiaProfileRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   resolvedRhythiaRequests<T extends Prisma.User$resolvedRhythiaRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$resolvedRhythiaRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RhythiaProfileRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -6889,6 +7829,8 @@ export interface UserFieldRefs {
   readonly bio: Prisma.FieldRef<"User", 'String'>
   readonly website: Prisma.FieldRef<"User", 'String'>
   readonly isSuspended: Prisma.FieldRef<"User", 'Boolean'>
+  readonly suspendedUntil: Prisma.FieldRef<"User", 'DateTime'>
+  readonly mutedUntil: Prisma.FieldRef<"User", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
 }
@@ -7788,6 +8730,54 @@ export type User$receivedFriendRequestsArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.FriendRequestScalarFieldEnum | Prisma.FriendRequestScalarFieldEnum[]
+}
+
+/**
+ * User.warnings
+ */
+export type User$warningsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserWarning
+   */
+  select?: Prisma.UserWarningSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserWarning
+   */
+  omit?: Prisma.UserWarningOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserWarningInclude<ExtArgs> | null
+  where?: Prisma.UserWarningWhereInput
+  orderBy?: Prisma.UserWarningOrderByWithRelationInput | Prisma.UserWarningOrderByWithRelationInput[]
+  cursor?: Prisma.UserWarningWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserWarningScalarFieldEnum | Prisma.UserWarningScalarFieldEnum[]
+}
+
+/**
+ * User.issuedWarnings
+ */
+export type User$issuedWarningsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserWarning
+   */
+  select?: Prisma.UserWarningSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserWarning
+   */
+  omit?: Prisma.UserWarningOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserWarningInclude<ExtArgs> | null
+  where?: Prisma.UserWarningWhereInput
+  orderBy?: Prisma.UserWarningOrderByWithRelationInput | Prisma.UserWarningOrderByWithRelationInput[]
+  cursor?: Prisma.UserWarningWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserWarningScalarFieldEnum | Prisma.UserWarningScalarFieldEnum[]
 }
 
 /**

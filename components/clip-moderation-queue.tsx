@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { cameraModeLabel, cameraModeEmoji } from "@/lib/camera-mode";
+import { ClipPlayer } from "@/components/clip-player";
 
 type PendingClip = {
   id: string;
@@ -133,7 +134,7 @@ export function ClipModerationQueue({
                 )}
               </div>
               <div className="overflow-hidden rounded-2xl bg-black">
-                {clip.videoUrl ? <video controls className="aspect-video h-full w-full object-contain" src={clip.videoUrl} /> : <div className="flex aspect-video items-center justify-center px-4 text-center text-sm text-muted">Preview unavailable. Review the submitted storage path: {clip.storagePath}</div>}
+                {clip.videoUrl ? <ClipPlayer src={clip.videoUrl} /> : <div className="flex aspect-video items-center justify-center px-4 text-center text-sm text-muted">Preview unavailable. Review the submitted storage path: {clip.storagePath}</div>}
               </div>
             </div>
           </article>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
-import { getSessionUser, isOwner } from "@/lib/auth";
+import { getSessionUser } from "@/lib/auth";
+import { canAccessAdmin } from "@/lib/admin-access";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +12,7 @@ export default async function AnnouncementsPage() {
     select: { id: true, title: true, slug: true, pinned: true, createdAt: true },
   });
   const sessionUser = await getSessionUser();
-  const canManage = isOwner(sessionUser);
+  const canManage = sessionUser ? await canAccessAdmin(sessionUser) : false;
 
   return (
     <div className="space-y-8">

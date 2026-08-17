@@ -11,6 +11,7 @@
 export type * from './models/User'
 export type * from './models/RhythiaProfile'
 export type * from './models/RhythiaProfileRequest'
+export type * from './models/UserWarning'
 export type * from './models/Session'
 export type * from './models/Role'
 export type * from './models/Permission'

@@ -400,6 +400,7 @@ export const ModelName = {
   User: 'User',
   RhythiaProfile: 'RhythiaProfile',
   RhythiaProfileRequest: 'RhythiaProfileRequest',
+  UserWarning: 'UserWarning',
   Session: 'Session',
   Role: 'Role',
   Permission: 'Permission',
@@ -447,7 +448,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "rhythiaProfile" | "rhythiaProfileRequest" | "session" | "role" | "permission" | "rolePermission" | "userRole" | "discordRoleMapping" | "playerRank" | "discordRoleRankMapping" | "rule" | "knowledgeCategory" | "knowledgeArticle" | "tag" | "userTag" | "discordRoleTagMapping" | "coachComment" | "articleTag" | "articleRevision" | "clipCategory" | "clip" | "clipTag" | "clipLike" | "clipView" | "comment" | "report" | "announcement" | "notification" | "moderationAction" | "siteSetting" | "conversation" | "conversationMember" | "message" | "friendRequest"
+    modelProps: "user" | "rhythiaProfile" | "rhythiaProfileRequest" | "userWarning" | "session" | "role" | "permission" | "rolePermission" | "userRole" | "discordRoleMapping" | "playerRank" | "discordRoleRankMapping" | "rule" | "knowledgeCategory" | "knowledgeArticle" | "tag" | "userTag" | "discordRoleTagMapping" | "coachComment" | "articleTag" | "articleRevision" | "clipCategory" | "clip" | "clipTag" | "clipLike" | "clipView" | "comment" | "report" | "announcement" | "notification" | "moderationAction" | "siteSetting" | "conversation" | "conversationMember" | "message" | "friendRequest"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -670,6 +671,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.RhythiaProfileRequestCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.RhythiaProfileRequestCountAggregateOutputType> | number
+        }
+      }
+    }
+    UserWarning: {
+      payload: Prisma.$UserWarningPayload<ExtArgs>
+      fields: Prisma.UserWarningFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserWarningFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserWarningPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserWarningFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserWarningPayload>
+        }
+        findFirst: {
+          args: Prisma.UserWarningFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserWarningPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserWarningFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserWarningPayload>
+        }
+        findMany: {
+          args: Prisma.UserWarningFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserWarningPayload>[]
+        }
+        create: {
+          args: Prisma.UserWarningCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserWarningPayload>
+        }
+        createMany: {
+          args: Prisma.UserWarningCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserWarningCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserWarningPayload>[]
+        }
+        delete: {
+          args: Prisma.UserWarningDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserWarningPayload>
+        }
+        update: {
+          args: Prisma.UserWarningUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserWarningPayload>
+        }
+        deleteMany: {
+          args: Prisma.UserWarningDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserWarningUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserWarningUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserWarningPayload>[]
+        }
+        upsert: {
+          args: Prisma.UserWarningUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserWarningPayload>
+        }
+        aggregate: {
+          args: Prisma.UserWarningAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserWarning>
+        }
+        groupBy: {
+          args: Prisma.UserWarningGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserWarningGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserWarningCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserWarningCountAggregateOutputType> | number
         }
       }
     }
@@ -3099,6 +3174,8 @@ export const UserScalarFieldEnum = {
   bio: 'bio',
   website: 'website',
   isSuspended: 'isSuspended',
+  suspendedUntil: 'suspendedUntil',
+  mutedUntil: 'mutedUntil',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -3119,6 +3196,9 @@ export const RhythiaProfileScalarFieldEnum = {
   rhythmPoints: 'rhythmPoints',
   title: 'title',
   scores: 'scores',
+  isOnline: 'isOnline',
+  lastActiveAt: 'lastActiveAt',
+  statusCheckedAt: 'statusCheckedAt',
   syncedAt: 'syncedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -3142,6 +3222,17 @@ export const RhythiaProfileRequestScalarFieldEnum = {
 } as const
 
 export type RhythiaProfileRequestScalarFieldEnum = (typeof RhythiaProfileRequestScalarFieldEnum)[keyof typeof RhythiaProfileRequestScalarFieldEnum]
+
+
+export const UserWarningScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  actorId: 'actorId',
+  reason: 'reason',
+  createdAt: 'createdAt'
+} as const
+
+export type UserWarningScalarFieldEnum = (typeof UserWarningScalarFieldEnum)[keyof typeof UserWarningScalarFieldEnum]
 
 
 export const SessionScalarFieldEnum = {
@@ -3953,6 +4044,7 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   rhythiaProfile?: Prisma.RhythiaProfileOmit
   rhythiaProfileRequest?: Prisma.RhythiaProfileRequestOmit
+  userWarning?: Prisma.UserWarningOmit
   session?: Prisma.SessionOmit
   role?: Prisma.RoleOmit
   permission?: Prisma.PermissionOmit

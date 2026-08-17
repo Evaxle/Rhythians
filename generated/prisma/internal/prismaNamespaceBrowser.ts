@@ -54,6 +54,7 @@ export const ModelName = {
   User: 'User',
   RhythiaProfile: 'RhythiaProfile',
   RhythiaProfileRequest: 'RhythiaProfileRequest',
+  UserWarning: 'UserWarning',
   Session: 'Session',
   Role: 'Role',
   Permission: 'Permission',
@@ -123,6 +124,8 @@ export const UserScalarFieldEnum = {
   bio: 'bio',
   website: 'website',
   isSuspended: 'isSuspended',
+  suspendedUntil: 'suspendedUntil',
+  mutedUntil: 'mutedUntil',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -143,6 +146,9 @@ export const RhythiaProfileScalarFieldEnum = {
   rhythmPoints: 'rhythmPoints',
   title: 'title',
   scores: 'scores',
+  isOnline: 'isOnline',
+  lastActiveAt: 'lastActiveAt',
+  statusCheckedAt: 'statusCheckedAt',
   syncedAt: 'syncedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -166,6 +172,17 @@ export const RhythiaProfileRequestScalarFieldEnum = {
 } as const
 
 export type RhythiaProfileRequestScalarFieldEnum = (typeof RhythiaProfileRequestScalarFieldEnum)[keyof typeof RhythiaProfileRequestScalarFieldEnum]
+
+
+export const UserWarningScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  actorId: 'actorId',
+  reason: 'reason',
+  createdAt: 'createdAt'
+} as const
+
+export type UserWarningScalarFieldEnum = (typeof UserWarningScalarFieldEnum)[keyof typeof UserWarningScalarFieldEnum]
 
 
 export const SessionScalarFieldEnum = {

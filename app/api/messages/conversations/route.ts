@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { getFriendStatus } from "@/lib/friends";
+import { isCurrentlyMuted } from "@/lib/user-moderation";
 
 const PUBLIC_USER_FIELDS = {
   id: true,
@@ -81,6 +82,13 @@ export async function POST(request: Request) {
   const user = await getSessionUser();
   if (!user) {
     return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
+
+  if (isCurrentlyMuted(user)) {
+    return NextResponse.json(
+      { error: `You are muted and cannot start conversations until ${user.mutedUntil!.toLocaleString()}.` },
+      { status: 403 }
+    );
   }
 
   const body = await request.json().catch(() => null) as

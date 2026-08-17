@@ -4,10 +4,12 @@ import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { getAvatarUrl } from "@/lib/avatar";
 import { UserTags } from "@/components/user-tags";
+import { FlagIcon } from "@/components/flag-icon";
 import { FriendButton } from "@/components/friend-button";
 import { ReportButton } from "@/components/report-button";
 import { RhythiaConnect } from "@/components/rhythia-connect";
 import { RhythiaStats } from "@/components/rhythia-stats";
+import { getRhythiaStatus } from "@/lib/rhythia-status";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +39,24 @@ export default async function ProfilePage({ params }: Props) {
   const isOwnProfile = currentUser?.id === user.id;
   const avatarUrl = getAvatarUrl(user, 256);
 
+  let presence: { isOnline: boolean; lastActiveAt: Date | null } | null = null;
+  if (user.rhythiaProfile) {
+    presence = await getRhythiaStatus(user.rhythiaProfile);
+  }
+
+  let presenceLabel = "Offline";
+  if (presence?.lastActiveAt) {
+    // eslint-disable-next-line react-hooks/purity
+    const seconds = Math.floor((Date.now() - presence.lastActiveAt.getTime()) / 1000);
+    if (seconds < 60) presenceLabel = "Active now";
+    else if (seconds < 3600) presenceLabel = `Active ${Math.floor(seconds / 60)}m ago`;
+    else if (seconds < 86400) presenceLabel = `Active ${Math.floor(seconds / 3600)}h ago`;
+    else if (seconds < 2592000) presenceLabel = `Active ${Math.floor(seconds / 86400)}d ago`;
+    else presenceLabel = `Last seen ${presence.lastActiveAt.toLocaleDateString()}`;
+  } else {
+    presenceLabel = "Never seen online";
+  }
+
   return (
     <div className="space-y-8">
       <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
@@ -55,7 +75,23 @@ export default async function ProfilePage({ params }: Props) {
             )}
             <div>
               <p className="text-sm uppercase tracking-[0.3em] text-accent">Profile</p>
-              <h1 className="mt-2 text-3xl font-semibold text-white">{user.displayName ?? user.username}</h1>
+              <h1 className="mt-2 flex items-center gap-3 text-3xl font-semibold text-white">
+                {user.displayName ?? user.username}
+                <FlagIcon flag={user.rhythiaProfile?.flag} country={user.rhythiaProfile?.country} size="md" />
+{user.rhythiaProfile && presence && (
+                  <span
+                    title={presenceLabel}
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${
+                      presence.isOnline
+                        ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-300"
+                        : "border-red-400/40 bg-red-400/10 text-red-300"
+                    }`}
+                  >
+                    <span className={`h-2 w-2 rounded-full ${presence.isOnline ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" : "bg-red-400/70"}`} />
+                    {presence.isOnline ? "Online" : "Offline"}
+                  </span>
+                )}
+              </h1>
               <p className="mt-1 text-sm text-muted">@{user.profileHandle}</p>
               {user.userTags.length > 0 && (
                 <div className="mt-4">

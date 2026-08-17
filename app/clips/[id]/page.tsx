@@ -1,13 +1,17 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { supabaseAdmin } from "@/lib/supabase";
-import { getSessionUser, isOwner } from "@/lib/auth";
+import { getSessionUser } from "@/lib/auth";
+import { canAccessAdmin } from "@/lib/admin-access";
 import { getAvatarUrl } from "@/lib/avatar";
 import { cameraModeLabel, cameraModeEmoji } from "@/lib/camera-mode";
 import { ClipComments } from "@/components/clip-comments";
 import { CoachComments } from "@/components/coach-comments";
+import { ClipPlayer } from "@/components/clip-player";
+import { getRhythiaStatus } from "@/lib/rhythia-status";
 import { LikeButton } from "@/components/like-button";
 import { UserTags } from "@/components/user-tags";
+import { FlagIcon } from "@/components/flag-icon";
 import { ReportButton } from "@/components/report-button";
 import { CopyClipId } from "@/components/copy-clip-id";
 
@@ -38,6 +42,7 @@ export default async function ClipPage({ params }: Props) {
           userTags: {
             include: { tag: true },
           },
+          rhythiaProfile: { select: { id: true, profileId: true, country: true, flag: true, isOnline: true, lastActiveAt: true, statusCheckedAt: true } },
         },
       },
       reviewedBy: { select: { username: true, discriminator: true, displayName: true } },
@@ -50,6 +55,7 @@ export default async function ClipPage({ params }: Props) {
               userTags: {
                 include: { tag: true },
               },
+              rhythiaProfile: { select: { country: true, flag: true } },
             },
           },
         },
@@ -62,6 +68,7 @@ export default async function ClipPage({ params }: Props) {
               userTags: {
                 include: { tag: true },
               },
+              rhythiaProfile: { select: { country: true, flag: true } },
             },
           },
         },
@@ -79,13 +86,18 @@ export default async function ClipPage({ params }: Props) {
     (Boolean(sessionUser) &&
       (sessionUser!.id === clip.uploaderId ||
         clip.reviewedById === sessionUser!.id ||
-        isOwner(sessionUser)));
+        (await canAccessAdmin(sessionUser))));
 
   if (!canViewClip) {
     return notFound();
   }
 
   const videoUrl = await getPublicUrl(clip.storagePath);
+
+  let uploaderPresence: { isOnline: boolean; lastActiveAt: Date | null } | null = null;
+  if (clip.uploader.rhythiaProfile) {
+    uploaderPresence = await getRhythiaStatus(clip.uploader.rhythiaProfile);
+  }
 
   let isLiked = false;
   let isCoach = false;
@@ -110,11 +122,7 @@ export default async function ClipPage({ params }: Props) {
       <div className="rounded-3xl border border-border bg-surface/95 shadow-glow">
         <div className="aspect-video bg-black">
           {videoUrl ? (
-            <video
-              controls
-              className="h-full w-full object-cover"
-              src={videoUrl}
-            />
+            <ClipPlayer src={videoUrl} />
           ) : (
             <div className="flex h-full items-center justify-center text-sm text-muted">
               Video preview is unavailable.
@@ -144,8 +152,21 @@ export default async function ClipPage({ params }: Props) {
                 </div>
               )}
               <div>
-                <p className="text-sm font-medium text-white">
+                <p className="flex items-center gap-2 text-sm font-medium text-white">
                   {clip.uploader.username}#{clip.uploader.discriminator}
+                  {clip.uploader.rhythiaProfile && (
+                    <FlagIcon flag={clip.uploader.rhythiaProfile.flag} country={clip.uploader.rhythiaProfile.country} />
+                  )}
+                  {uploaderPresence && (
+                    <span
+                      title={uploaderPresence.isOnline ? "Online" : "Offline"}
+                      className={`inline-block h-2 w-2 rounded-full ${
+                        uploaderPresence.isOnline
+                          ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]"
+                          : "bg-red-400/70"
+                      }`}
+                    />
+                  )}
                 </p>
                 <p className="text-xs text-muted">
                   {clip.createdAt.toLocaleDateString()}
@@ -217,6 +238,8 @@ export default async function ClipPage({ params }: Props) {
                 author: {
                   username: comment.author.username,
                   discriminator: comment.author.discriminator,
+                  country: comment.author.rhythiaProfile?.country ?? null,
+                  flag: comment.author.rhythiaProfile?.flag ?? null,
                   userTags: comment.author.userTags.map((ut) => ({
                     tag: { name: ut.tag.name, slug: ut.tag.slug },
                   })),
@@ -239,6 +262,8 @@ export default async function ClipPage({ params }: Props) {
                   username: comment.author.username,
                   discriminator: comment.author.discriminator,
                   avatar: comment.author.avatar,
+                  country: comment.author.rhythiaProfile?.country ?? null,
+                  flag: comment.author.rhythiaProfile?.flag ?? null,
                   userTags: comment.author.userTags.map((ut) => ({
                     tag: { name: ut.tag.name, slug: ut.tag.slug },
                   })),

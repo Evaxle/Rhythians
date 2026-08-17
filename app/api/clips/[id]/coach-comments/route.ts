@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { censorProfanity } from "@/lib/profanity";
+import { isCurrentlyMuted } from "@/lib/user-moderation";
 
 export async function POST(
   request: Request,
@@ -11,6 +12,13 @@ export async function POST(
 
   if (!sessionUser) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (isCurrentlyMuted(sessionUser)) {
+    return NextResponse.json(
+      { error: `You are muted and cannot comment until ${sessionUser.mutedUntil!.toLocaleString()}.` },
+      { status: 403 }
+    );
   }
 
   const { id: clipId } = await params;
@@ -61,6 +69,7 @@ export async function POST(
     include: {
       author: {
         include: {
+          rhythiaProfile: { select: { country: true, flag: true } },
           userTags: {
             include: { tag: true },
           },

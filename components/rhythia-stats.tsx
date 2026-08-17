@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { RhythiaScore } from "@/lib/rhythia";
+import { FlagIcon } from "@/components/flag-icon";
 
 const titles = ["Novice", "Expert", "Candidate Master", "Master", "Candidate Grandmaster", "Grandmaster"];
 
@@ -21,7 +22,7 @@ export function RhythiaStats({ profile }: { profile: { profileId: number; profil
           <Link href={profile.profileUrl} target="_blank" rel="noreferrer" className="mt-1 block text-sm text-muted hover:text-accent">View on Rhythia ↗</Link>
         </div>
         <div className="flex items-center gap-2 rounded-full border border-border bg-background/70 px-3 py-2 text-sm text-white">
-          {profile.flag && <img src={`https://production.rhythia.com/flags/${profile.flag}.svg`} alt={`${profile.country ?? profile.flag} flag`} className="h-4 w-6 rounded-sm object-cover" />}
+          <FlagIcon flag={profile.flag} country={profile.country} />
           {profile.country ?? "Unknown country"}
         </div>
       </div>

@@ -9,6 +9,7 @@ import { UserTags } from "@/components/user-tags";
 import { DiscordSyncButton } from "@/components/discord-sync-button";
 import { AvatarUploader } from "@/components/avatar-uploader";
 import { OnboardingForm } from "@/components/onboarding-form";
+import { CursorSettings } from "@/components/cursor-settings";
 
 export const dynamic = "force-dynamic";
 
@@ -82,6 +83,17 @@ export default async function SettingsPage() {
             Onboarding questions are configured in Discord. Once added, they&apos;ll appear here.
           </p>
         )}
+      </section>
+
+      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+        <p className="text-sm uppercase tracking-[0.3em] text-accent">Customization</p>
+        <h2 className="mt-2 text-2xl font-semibold text-white">Cursor</h2>
+        <p className="mt-2 text-sm leading-7 text-muted">
+          Toggle the Rhythia-style custom cursor and its trail.
+        </p>
+        <div className="mt-6 border-t border-border pt-6">
+          <CursorSettings />
+        </div>
       </section>
 
       <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">

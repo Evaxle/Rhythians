@@ -3,6 +3,8 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
 import { TailwindIndicator } from "@/components/tailwind-indicator";
+import { CursorFX } from "@/components/cursor-fx";
+import { WarningPopups } from "@/components/warning-popups";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -53,6 +55,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </footer>
           <TailwindIndicator />
+          <CursorFX />
+          <WarningPopups />
         </div>
       </body>
     </html>

@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { UserTags } from "@/components/user-tags";
+import { FlagIcon } from "@/components/flag-icon";
 import { RichText } from "@/components/rich-text";
 
 type CommentItem = {
@@ -12,6 +13,8 @@ type CommentItem = {
   author: {
     username: string;
     discriminator: string;
+    country?: string | null;
+    flag?: string | null;
     userTags?: Array<{ tag: { name: string; slug: string } }>;
   };
 };
@@ -87,8 +90,9 @@ export function ClipComments({
           {comments.map((comment) => (
             <article key={comment.id} className="rounded-3xl border border-border bg-background/70 p-5">
               <div className="flex items-center gap-2">
-                <p className="text-sm font-semibold text-white">
+                <p className="flex items-center gap-1.5 text-sm font-semibold text-white">
                   {comment.author.username}#{comment.author.discriminator}
+                  <FlagIcon flag={comment.author.flag} country={comment.author.country} />
                 </p>
                 {comment.author.userTags && comment.author.userTags.length > 0 && (
                   <UserTags tags={comment.author.userTags} size="sm" />

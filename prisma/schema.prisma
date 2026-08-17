@@ -99,6 +99,8 @@ model User {
   bio             String?
   website         String?
   isSuspended     Boolean            @default(false)
+  suspendedUntil  DateTime?
+  mutedUntil      DateTime?
   roles           UserRole[]
   sessions        Session[]
   clips           Clip[]             @relation("uploadedClips")
@@ -119,6 +121,8 @@ model User {
   messagesSent    Message[]
   sentFriendRequests FriendRequest[] @relation("sentFriendRequests")
   receivedFriendRequests FriendRequest[] @relation("receivedFriendRequests")
+  warnings        UserWarning[]      @relation("warnedUser")
+  issuedWarnings  UserWarning[]      @relation("warningActor")
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
   rhythiaProfile  RhythiaProfile?
@@ -140,6 +144,9 @@ model RhythiaProfile {
   rhythmPoints  Float?
   title         String
   scores        Json
+  isOnline      Boolean?
+  lastActiveAt  DateTime?
+  statusCheckedAt DateTime?
   syncedAt      DateTime @default(now())
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -161,6 +168,18 @@ model RhythiaProfileRequest {
   resolvedByUser  User?                       @relation("resolvedRhythiaRequests", fields: [resolvedBy], references: [id], onDelete: SetNull)
 
   @@index([status])
+}
+
+model UserWarning {
+  id        String   @id @default(uuid())
+  user      User     @relation("warnedUser", fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  actor     User     @relation("warningActor", fields: [actorId], references: [id])
+  actorId   String
+  reason    String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model Session {

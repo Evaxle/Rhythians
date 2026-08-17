@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUser, isOwner } from "@/lib/auth";
+import { getSessionUser } from "@/lib/auth";
+import { canAccessAdmin } from "@/lib/admin-access";
 
 export async function PATCH(
   request: Request,
@@ -12,7 +13,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!isOwner(sessionUser)) {
+  if (!(await canAccessAdmin(sessionUser))) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

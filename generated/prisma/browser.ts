@@ -33,6 +33,11 @@ export type RhythiaProfile = Prisma.RhythiaProfileModel
  */
 export type RhythiaProfileRequest = Prisma.RhythiaProfileRequestModel
 /**
+ * Model UserWarning
+ * 
+ */
+export type UserWarning = Prisma.UserWarningModel
+/**
  * Model Session
  * 
  */

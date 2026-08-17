@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUser, isOwner } from "@/lib/auth";
+import { getSessionUser } from "@/lib/auth";
+import { canAccessAdmin } from "@/lib/admin-access";
 
 export const dynamic = "force-dynamic";
 
@@ -9,7 +10,7 @@ type Props = { params: Promise<{ id: string }> };
 export async function PATCH(_request: Request, { params }: Props) {
   const admin = await getSessionUser();
   if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (!isOwner(admin)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!(await canAccessAdmin(admin))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { id } = await params;
   const user = await prisma.user.findUnique({ where: { id } });

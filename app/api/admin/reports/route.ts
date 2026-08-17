@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUser, isOwner } from "@/lib/auth";
+import { getSessionUser } from "@/lib/auth";
+import { canAccessAdmin } from "@/lib/admin-access";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   const sessionUser = await getSessionUser();
   if (!sessionUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (!isOwner(sessionUser)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!(await canAccessAdmin(sessionUser))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const reports = await prisma.report.findMany({
     orderBy: [{ status: "asc" }, { createdAt: "desc" }],

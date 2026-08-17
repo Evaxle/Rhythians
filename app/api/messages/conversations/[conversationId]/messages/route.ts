@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { canSendMessageToConversation } from "@/lib/friends";
 import { censorProfanity } from "@/lib/profanity";
+import { isCurrentlyMuted } from "@/lib/user-moderation";
 
 type Props = { params: Promise<{ conversationId: string }> };
 
@@ -10,6 +11,13 @@ export async function POST(request: Request, { params }: Props) {
   const user = await getSessionUser();
   if (!user) {
     return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
+
+  if (isCurrentlyMuted(user)) {
+    return NextResponse.json(
+      { error: `You are muted and cannot send messages until ${user.mutedUntil!.toLocaleString()}.` },
+      { status: 403 }
+    );
   }
 
   const { conversationId } = await params;

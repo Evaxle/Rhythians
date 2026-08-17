@@ -20,6 +20,7 @@ const AVAILABLE_TAGS = [
   "tester",
   "post-reviewer",
   "mentor",
+  "admin",
   "camera-lock",
   "camera-spin",
   "camera-vr",

@@ -14,6 +14,7 @@ export async function getSessionUser() {
   });
   if (!session || session.expiresAt < new Date()) return null;
   if (session.user.isSuspended) return null;
+  if (session.user.suspendedUntil && session.user.suspendedUntil > new Date()) return null;
   return session.user;
 }
 

@@ -42,6 +42,20 @@ export function NotificationsBell() {
     return () => clearInterval(interval);
   }, [load]);
 
+  const markAllRead = useCallback(async () => {
+    try {
+      await fetch("/api/notifications/read", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      setNotifications((current) => current.map((n) => ({ ...n, read: true })));
+      setUnread(0);
+    } catch {
+      // ignore
+    }
+  }, []);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (ref.current && !ref.current.contains(event.target as Node)) {
@@ -52,10 +66,20 @@ export function NotificationsBell() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const toggleOpen = () => {
+    setOpen((current) => {
+      const next = !current;
+      if (next) {
+        void markAllRead();
+      }
+      return next;
+    });
+  };
+
   return (
     <div ref={ref} className="relative">
       <button
-        onClick={() => setOpen((current) => !current)}
+        onClick={toggleOpen}
         aria-label="Notifications"
         className="relative inline-flex items-center justify-center rounded-full border border-border bg-white/5 p-2 text-muted transition hover:border-accent/40 hover:text-white"
       >
@@ -88,9 +112,7 @@ export function NotificationsBell() {
                   key={notification.id}
                   href={notification.url ?? "/notifications"}
                   onClick={() => setOpen(false)}
-                  className={`block rounded-xl px-3 py-2.5 transition hover:bg-white/5 ${
-                    notification.read ? "" : "bg-accent/10"
-                  }`}
+                  className="block rounded-xl px-3 py-2.5 transition hover:bg-white/5"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <p className="text-sm font-medium text-white">{notification.title}</p>

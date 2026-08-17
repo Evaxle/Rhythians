@@ -2,17 +2,19 @@ import Link from "next/link";
 import { ArrowRight, Sparkles, MessageCircle, BookOpen, Video, Globe } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getPublishedArticleCount } from "@/lib/knowledge";
+import { getOnlineUserCount } from "@/lib/rhythia-status";
 import { WelcomeModal } from "@/components/welcome-modal";
 
 export const dynamic = "force-dynamic";
 
 async function getStats() {
-  const [members, clips] = await Promise.all([
+  const [members, clips, online] = await Promise.all([
     prisma.user.count(),
     prisma.clip.count({ where: { status: "approved" } }),
+    getOnlineUserCount(),
   ]);
   const articles = getPublishedArticleCount();
-  return { members, articles, clips, online: undefined };
+  return { members, articles, clips, online };
 }
 
 async function getFeaturedClips() {
@@ -65,7 +67,7 @@ export default async function HomePage() {
                 </div>
                 <div className="rounded-3xl border border-border bg-surface p-5">
                   <p className="text-sm text-muted">Online</p>
-                  <p className="mt-2 text-3xl font-semibold">{stats.online ?? "—"}</p>
+                  <p className="mt-2 text-3xl font-semibold">{stats.online}</p>
                 </div>
                 <div className="rounded-3xl border border-border bg-surface p-5">
                   <p className="text-sm text-muted">Articles</p>

@@ -52,6 +52,9 @@ export type RhythiaProfileMinAggregateOutputType = {
   countryRank: number | null
   rhythmPoints: number | null
   title: string | null
+  isOnline: boolean | null
+  lastActiveAt: Date | null
+  statusCheckedAt: Date | null
   syncedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -69,6 +72,9 @@ export type RhythiaProfileMaxAggregateOutputType = {
   countryRank: number | null
   rhythmPoints: number | null
   title: string | null
+  isOnline: boolean | null
+  lastActiveAt: Date | null
+  statusCheckedAt: Date | null
   syncedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -87,6 +93,9 @@ export type RhythiaProfileCountAggregateOutputType = {
   rhythmPoints: number
   title: number
   scores: number
+  isOnline: number
+  lastActiveAt: number
+  statusCheckedAt: number
   syncedAt: number
   createdAt: number
   updatedAt: number
@@ -120,6 +129,9 @@ export type RhythiaProfileMinAggregateInputType = {
   countryRank?: true
   rhythmPoints?: true
   title?: true
+  isOnline?: true
+  lastActiveAt?: true
+  statusCheckedAt?: true
   syncedAt?: true
   createdAt?: true
   updatedAt?: true
@@ -137,6 +149,9 @@ export type RhythiaProfileMaxAggregateInputType = {
   countryRank?: true
   rhythmPoints?: true
   title?: true
+  isOnline?: true
+  lastActiveAt?: true
+  statusCheckedAt?: true
   syncedAt?: true
   createdAt?: true
   updatedAt?: true
@@ -155,6 +170,9 @@ export type RhythiaProfileCountAggregateInputType = {
   rhythmPoints?: true
   title?: true
   scores?: true
+  isOnline?: true
+  lastActiveAt?: true
+  statusCheckedAt?: true
   syncedAt?: true
   createdAt?: true
   updatedAt?: true
@@ -260,6 +278,9 @@ export type RhythiaProfileGroupByOutputType = {
   rhythmPoints: number | null
   title: string
   scores: runtime.JsonValue
+  isOnline: boolean | null
+  lastActiveAt: Date | null
+  statusCheckedAt: Date | null
   syncedAt: Date
   createdAt: Date
   updatedAt: Date
@@ -301,6 +322,9 @@ export type RhythiaProfileWhereInput = {
   rhythmPoints?: Prisma.FloatNullableFilter<"RhythiaProfile"> | number | null
   title?: Prisma.StringFilter<"RhythiaProfile"> | string
   scores?: Prisma.JsonFilter<"RhythiaProfile">
+  isOnline?: Prisma.BoolNullableFilter<"RhythiaProfile"> | boolean | null
+  lastActiveAt?: Prisma.DateTimeNullableFilter<"RhythiaProfile"> | Date | string | null
+  statusCheckedAt?: Prisma.DateTimeNullableFilter<"RhythiaProfile"> | Date | string | null
   syncedAt?: Prisma.DateTimeFilter<"RhythiaProfile"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"RhythiaProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"RhythiaProfile"> | Date | string
@@ -320,6 +344,9 @@ export type RhythiaProfileOrderByWithRelationInput = {
   rhythmPoints?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
   scores?: Prisma.SortOrder
+  isOnline?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastActiveAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  statusCheckedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   syncedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -342,6 +369,9 @@ export type RhythiaProfileWhereUniqueInput = Prisma.AtLeast<{
   rhythmPoints?: Prisma.FloatNullableFilter<"RhythiaProfile"> | number | null
   title?: Prisma.StringFilter<"RhythiaProfile"> | string
   scores?: Prisma.JsonFilter<"RhythiaProfile">
+  isOnline?: Prisma.BoolNullableFilter<"RhythiaProfile"> | boolean | null
+  lastActiveAt?: Prisma.DateTimeNullableFilter<"RhythiaProfile"> | Date | string | null
+  statusCheckedAt?: Prisma.DateTimeNullableFilter<"RhythiaProfile"> | Date | string | null
   syncedAt?: Prisma.DateTimeFilter<"RhythiaProfile"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"RhythiaProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"RhythiaProfile"> | Date | string
@@ -361,6 +391,9 @@ export type RhythiaProfileOrderByWithAggregationInput = {
   rhythmPoints?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
   scores?: Prisma.SortOrder
+  isOnline?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastActiveAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  statusCheckedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   syncedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -387,6 +420,9 @@ export type RhythiaProfileScalarWhereWithAggregatesInput = {
   rhythmPoints?: Prisma.FloatNullableWithAggregatesFilter<"RhythiaProfile"> | number | null
   title?: Prisma.StringWithAggregatesFilter<"RhythiaProfile"> | string
   scores?: Prisma.JsonWithAggregatesFilter<"RhythiaProfile">
+  isOnline?: Prisma.BoolNullableWithAggregatesFilter<"RhythiaProfile"> | boolean | null
+  lastActiveAt?: Prisma.DateTimeNullableWithAggregatesFilter<"RhythiaProfile"> | Date | string | null
+  statusCheckedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"RhythiaProfile"> | Date | string | null
   syncedAt?: Prisma.DateTimeWithAggregatesFilter<"RhythiaProfile"> | Date | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"RhythiaProfile"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"RhythiaProfile"> | Date | string
@@ -404,6 +440,9 @@ export type RhythiaProfileCreateInput = {
   rhythmPoints?: number | null
   title: string
   scores: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isOnline?: boolean | null
+  lastActiveAt?: Date | string | null
+  statusCheckedAt?: Date | string | null
   syncedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -423,6 +462,9 @@ export type RhythiaProfileUncheckedCreateInput = {
   rhythmPoints?: number | null
   title: string
   scores: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isOnline?: boolean | null
+  lastActiveAt?: Date | string | null
+  statusCheckedAt?: Date | string | null
   syncedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -440,6 +482,9 @@ export type RhythiaProfileUpdateInput = {
   rhythmPoints?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   scores?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isOnline?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  statusCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   syncedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -459,6 +504,9 @@ export type RhythiaProfileUncheckedUpdateInput = {
   rhythmPoints?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   scores?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isOnline?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  statusCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   syncedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -477,6 +525,9 @@ export type RhythiaProfileCreateManyInput = {
   rhythmPoints?: number | null
   title: string
   scores: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isOnline?: boolean | null
+  lastActiveAt?: Date | string | null
+  statusCheckedAt?: Date | string | null
   syncedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -494,6 +545,9 @@ export type RhythiaProfileUpdateManyMutationInput = {
   rhythmPoints?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   scores?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isOnline?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  statusCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   syncedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -512,6 +566,9 @@ export type RhythiaProfileUncheckedUpdateManyInput = {
   rhythmPoints?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   scores?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isOnline?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  statusCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   syncedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -535,6 +592,9 @@ export type RhythiaProfileCountOrderByAggregateInput = {
   rhythmPoints?: Prisma.SortOrder
   title?: Prisma.SortOrder
   scores?: Prisma.SortOrder
+  isOnline?: Prisma.SortOrder
+  lastActiveAt?: Prisma.SortOrder
+  statusCheckedAt?: Prisma.SortOrder
   syncedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -559,6 +619,9 @@ export type RhythiaProfileMaxOrderByAggregateInput = {
   countryRank?: Prisma.SortOrder
   rhythmPoints?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  isOnline?: Prisma.SortOrder
+  lastActiveAt?: Prisma.SortOrder
+  statusCheckedAt?: Prisma.SortOrder
   syncedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -576,6 +639,9 @@ export type RhythiaProfileMinOrderByAggregateInput = {
   countryRank?: Prisma.SortOrder
   rhythmPoints?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  isOnline?: Prisma.SortOrder
+  lastActiveAt?: Prisma.SortOrder
+  statusCheckedAt?: Prisma.SortOrder
   syncedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -644,6 +710,10 @@ export type NullableFloatFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type NullableBoolFieldUpdateOperationsInput = {
+  set?: boolean | null
+}
+
 export type RhythiaProfileCreateWithoutUserInput = {
   id?: string
   profileId: number
@@ -656,6 +726,9 @@ export type RhythiaProfileCreateWithoutUserInput = {
   rhythmPoints?: number | null
   title: string
   scores: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isOnline?: boolean | null
+  lastActiveAt?: Date | string | null
+  statusCheckedAt?: Date | string | null
   syncedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -673,6 +746,9 @@ export type RhythiaProfileUncheckedCreateWithoutUserInput = {
   rhythmPoints?: number | null
   title: string
   scores: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isOnline?: boolean | null
+  lastActiveAt?: Date | string | null
+  statusCheckedAt?: Date | string | null
   syncedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -706,6 +782,9 @@ export type RhythiaProfileUpdateWithoutUserInput = {
   rhythmPoints?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   scores?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isOnline?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  statusCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   syncedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -723,6 +802,9 @@ export type RhythiaProfileUncheckedUpdateWithoutUserInput = {
   rhythmPoints?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   scores?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isOnline?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  statusCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   syncedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -743,6 +825,9 @@ export type RhythiaProfileSelect<ExtArgs extends runtime.Types.Extensions.Intern
   rhythmPoints?: boolean
   title?: boolean
   scores?: boolean
+  isOnline?: boolean
+  lastActiveAt?: boolean
+  statusCheckedAt?: boolean
   syncedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -762,6 +847,9 @@ export type RhythiaProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   rhythmPoints?: boolean
   title?: boolean
   scores?: boolean
+  isOnline?: boolean
+  lastActiveAt?: boolean
+  statusCheckedAt?: boolean
   syncedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -781,6 +869,9 @@ export type RhythiaProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   rhythmPoints?: boolean
   title?: boolean
   scores?: boolean
+  isOnline?: boolean
+  lastActiveAt?: boolean
+  statusCheckedAt?: boolean
   syncedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -800,12 +891,15 @@ export type RhythiaProfileSelectScalar = {
   rhythmPoints?: boolean
   title?: boolean
   scores?: boolean
+  isOnline?: boolean
+  lastActiveAt?: boolean
+  statusCheckedAt?: boolean
   syncedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type RhythiaProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "profileId" | "profileUrl" | "username" | "country" | "flag" | "globalRank" | "countryRank" | "rhythmPoints" | "title" | "scores" | "syncedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["rhythiaProfile"]>
+export type RhythiaProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "profileId" | "profileUrl" | "username" | "country" | "flag" | "globalRank" | "countryRank" | "rhythmPoints" | "title" | "scores" | "isOnline" | "lastActiveAt" | "statusCheckedAt" | "syncedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["rhythiaProfile"]>
 export type RhythiaProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -834,6 +928,9 @@ export type $RhythiaProfilePayload<ExtArgs extends runtime.Types.Extensions.Inte
     rhythmPoints: number | null
     title: string
     scores: runtime.JsonValue
+    isOnline: boolean | null
+    lastActiveAt: Date | null
+    statusCheckedAt: Date | null
     syncedAt: Date
     createdAt: Date
     updatedAt: Date
@@ -1273,6 +1370,9 @@ export interface RhythiaProfileFieldRefs {
   readonly rhythmPoints: Prisma.FieldRef<"RhythiaProfile", 'Float'>
   readonly title: Prisma.FieldRef<"RhythiaProfile", 'String'>
   readonly scores: Prisma.FieldRef<"RhythiaProfile", 'Json'>
+  readonly isOnline: Prisma.FieldRef<"RhythiaProfile", 'Boolean'>
+  readonly lastActiveAt: Prisma.FieldRef<"RhythiaProfile", 'DateTime'>
+  readonly statusCheckedAt: Prisma.FieldRef<"RhythiaProfile", 'DateTime'>
   readonly syncedAt: Prisma.FieldRef<"RhythiaProfile", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"RhythiaProfile", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"RhythiaProfile", 'DateTime'>

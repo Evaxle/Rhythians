@@ -583,10 +583,6 @@ export type EnumRhythiaProfileRequestStatusFieldUpdateOperationsInput = {
   set?: $Enums.RhythiaProfileRequestStatus
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type RhythiaProfileRequestCreateWithoutUserInput = {
   id?: string
   profileId: number
