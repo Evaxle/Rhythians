@@ -3,7 +3,13 @@
 import { useState } from "react";
 import { RefreshCw } from "lucide-react";
 
-export function CheckAllScoresButton() {
+export function CheckAllScoresButton({
+  label = "Check entire score database",
+  checkingLabel = "Scanning your scores...",
+}: {
+  label?: string;
+  checkingLabel?: string;
+}) {
   const [checking, setChecking] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
@@ -37,7 +43,7 @@ export function CheckAllScoresButton() {
         className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent/80 disabled:opacity-50"
       >
         <RefreshCw size={16} className={checking ? "animate-spin" : ""} />
-        {checking ? "Scanning your scores..." : "Check entire score database"}
+        {checking ? checkingLabel : label}
       </button>
       {message && (
         <p className={`text-sm ${message.type === "success" ? "text-accent" : "text-red-300"}`}>{message.text}</p>

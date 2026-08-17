@@ -149,7 +149,18 @@ export async function checkAndAwardChallengeMap(userId: string, challengeMapId: 
   const existing = await prisma.challengeMapCompletion.findUnique({
     where: { challengeMapId_userId: { challengeMapId: map.id, userId } },
   });
-  if (existing?.passed) return { status: "already", points: existing.points };
+  if (existing?.passed) {
+    if (passHit) {
+      const newAccuracy = passHit.accuracy ?? accuracyFromMisses(passHit.beatmapNotes, passHit.misses);
+      if (newAccuracy != null && (existing.accuracy == null || newAccuracy > existing.accuracy)) {
+        await prisma.challengeMapCompletion.update({
+          where: { id: existing.id },
+          data: { accuracy: newAccuracy },
+        });
+      }
+    }
+    return { status: "already", points: existing.points };
+  }
 
   const accuracy = passHit
     ? passHit.accuracy ?? accuracyFromMisses(passHit.beatmapNotes, passHit.misses)
@@ -324,6 +335,108 @@ export async function getApprovedMaps(includeAll: boolean, userId: string | null
   };
 }
 
+export type MapLeaderboardEntry = {
+  position: number;
+  userId: string;
+  username: string;
+  displayName: string | null;
+  profileHandle: string;
+  avatar: string | null;
+  discordId: string | null;
+  accuracy: number | null;
+  points: number;
+  rhp: number;
+  rankInfo: RankInfo;
+};
+
+export type MapLeaderboardResult = {
+  mapId: string;
+  title: string;
+  rating: number;
+  rankIndex: number;
+  rankName: string;
+  rankColor: string;
+  rankMinRating: number;
+  rankMaxRating: number;
+  entries: MapLeaderboardEntry[];
+  viewer: { position: number; accuracy: number | null; points: number } | null;
+  viewerRemoved: boolean;
+};
+
+export function rankIndexForRating(rating: number): number {
+  const index = RANKS.findIndex((rank) => rating >= rank.rangeMin && rating <= rank.rangeMax);
+  return index >= 0 ? index : RANKS.length - 1;
+}
+
+export async function getMapLeaderboard(mapId: string, viewerUserId?: string | null): Promise<MapLeaderboardResult | null> {
+  const map = await prisma.challengeMap.findUnique({ where: { id: mapId } });
+  if (!map || map.status !== "approved" || map.rating == null) return null;
+
+  const rankIndex = rankIndexForRating(map.rating);
+  const rank = RANKS[rankIndex];
+
+  const completions = await prisma.challengeMapCompletion.findMany({
+    where: { challengeMapId: mapId, passed: true },
+    select: { userId: true, accuracy: true, points: true },
+  });
+
+  const users = await prisma.user.findMany({
+    where: { id: { in: completions.map((entry) => entry.userId) }, NOT: { profileHandle: "rhythia-imports" } },
+    select: { id: true, username: true, displayName: true, profileHandle: true, avatar: true, discordId: true, rhp: true },
+  });
+  const userMap = new Map(users.map((entry) => [entry.id, entry]));
+
+  const rows = completions
+    .map((completion) => {
+      const user = userMap.get(completion.userId);
+      if (!user) return null;
+      if (!isMapInRankRange(map.rating as number, getRankInfo(user.rhp).index)) return null;
+      return { ...completion, user };
+    })
+    .filter((row): row is NonNullable<typeof row> => row != null)
+    .sort((a, b) => (b.accuracy ?? -1) - (a.accuracy ?? -1) || b.points - a.points);
+
+  const entries: MapLeaderboardEntry[] = rows.slice(0, 10).map((row, index) => ({
+    position: index + 1,
+    userId: row.userId,
+    username: row.user.username,
+    displayName: row.user.displayName,
+    profileHandle: row.user.profileHandle,
+    avatar: row.user.avatar,
+    discordId: row.user.discordId,
+    accuracy: row.accuracy,
+    points: row.points,
+    rhp: row.user.rhp,
+    rankInfo: getRankInfo(row.user.rhp),
+  }));
+
+  let viewer: MapLeaderboardResult["viewer"] = null;
+  let viewerRemoved = false;
+  if (viewerUserId) {
+    const viewerIndex = rows.findIndex((row) => row.userId === viewerUserId);
+    if (viewerIndex >= 0) {
+      const completion = completions.find((entry) => entry.userId === viewerUserId);
+      viewer = { position: viewerIndex + 1, accuracy: completion?.accuracy ?? null, points: completion?.points ?? 0 };
+    } else if (completions.some((entry) => entry.userId === viewerUserId)) {
+      viewerRemoved = true;
+    }
+  }
+
+  return {
+    mapId,
+    title: map.title,
+    rating: map.rating,
+    rankIndex,
+    rankName: rank.name,
+    rankColor: rank.color,
+    rankMinRating: rank.rangeMin,
+    rankMaxRating: rank.rangeMax,
+    entries,
+    viewer,
+    viewerRemoved,
+  };
+}
+
 export type CheckAllResult = {
   checked: number;
   newlyCompleted: number;
@@ -360,7 +473,7 @@ export async function checkAndAwardAllChallengeMaps(userId: string): Promise<Che
 
   const existing = await prisma.challengeMapCompletion.findMany({
     where: { userId, challengeMapId: { in: maps.map((map) => map.id) } },
-    select: { challengeMapId: true, passed: true },
+    select: { id: true, challengeMapId: true, passed: true, accuracy: true },
   });
   const existingMap = new Map(existing.map((entry) => [entry.challengeMapId, entry]));
 
@@ -387,6 +500,16 @@ export async function checkAndAwardAllChallengeMaps(userId: string): Promise<Che
     const rating = map.rating as number;
     const prior = existingMap.get(map.id);
     if (prior?.passed) {
+      const score = bestScores.get(normalizeTitle(map.title));
+      if (score) {
+        const newAccuracy = score.accuracy ?? accuracyFromMisses(score.beatmapNotes, score.misses);
+        if (newAccuracy != null && (prior.accuracy == null || newAccuracy > prior.accuracy)) {
+          await prisma.challengeMapCompletion.update({
+            where: { id: prior.id },
+            data: { accuracy: newAccuracy },
+          });
+        }
+      }
       result.alreadyCompleted += 1;
       continue;
     }
