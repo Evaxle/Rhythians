@@ -143,6 +143,7 @@ model User {
   avgMapRating    Float?
   dailyStreak     Int                  @default(0)
   lastDailyBeatAt DateTime?
+  rhythiaVerified Boolean              @default(false)
   dailyMapBeats   DailyMapBeat[]
   rhpTransactions RhpTransaction[]
   challengeMaps   ChallengeMap[]       @relation("challengeMapSubmissions")

@@ -20,7 +20,8 @@ type MapEntry = {
   noteCount: number | null;
   length: number | null;
   completion: { passed: boolean; points: number } | null;
-  submittedBy: { displayName: string | null; username: string } | null;
+  submittedBy: { displayName: string | null; username: string; profileHandle: string } | null;
+  reviewedBy: { displayName: string | null; username: string; profileHandle: string } | null;
 };
 
 export function MapsBrowser({
@@ -141,6 +142,15 @@ export function MapsBrowser({
                   {lengthLabel && <span className="rounded-full border border-border bg-background/60 px-2.5 py-1">{lengthLabel}</span>}
                   <span className="rounded-full border border-border bg-background/60 px-2.5 py-1">Rating: {map.rating != null ? map.rating.toFixed(2) : "—"}</span>
                 </div>
+
+                {map.reviewedBy && (
+                  <p className="mt-3 text-xs text-muted">
+                    Approved by{" "}
+                    <Link href={`/profile/${map.reviewedBy.profileHandle}`} className="font-semibold text-white hover:text-accent">
+                      {map.reviewedBy.displayName ?? map.reviewedBy.username}
+                    </Link>
+                  </p>
+                )}
 
                 {map.completion?.passed ? (
                   <div className="mt-4 flex items-center gap-2 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm font-semibold text-emerald-300">

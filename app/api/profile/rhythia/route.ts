@@ -26,10 +26,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const saved = await prisma.rhythiaProfile.upsert({
-      where: { userId: user.id },
-      create: { userId: user.id, profileUrl: parsed.url, ...profile },
-      update: { profileUrl: parsed.url, ...profile, syncedAt: new Date() },
+    const saved = await prisma.$transaction(async (tx) => {
+      const profileRow = await tx.rhythiaProfile.upsert({
+        where: { userId: user.id },
+        create: { userId: user.id, profileUrl: parsed.url, ...profile },
+        update: { profileUrl: parsed.url, ...profile, syncedAt: new Date() },
+      });
+      await tx.user.update({ where: { id: user.id }, data: { rhythiaVerified: true } });
+      return profileRow;
     });
     return NextResponse.json({ profile: saved });
   } catch (error) {

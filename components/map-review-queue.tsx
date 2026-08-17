@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Download, Map as MapIcon } from "lucide-react";
+import Link from "next/link";
+import { Download, Map as MapIcon, Star, Link2, User as UserIcon } from "lucide-react";
 
 type PendingMap = {
   id: string;
@@ -9,12 +10,14 @@ type PendingMap = {
   artist: string | null;
   description: string | null;
   mapFileUrl: string;
+  imageUrl: string | null;
+  sourceUrl: string | null;
   requestedRating: number;
   mapperName: string | null;
   noteCount: number | null;
   length: number | null;
   createdAt: string;
-  submittedBy: { username: string; displayName: string | null; profileHandle: string };
+  submittedBy: { username: string; displayName: string | null; profileHandle: string; avatar: string | null };
 };
 
 export function MapReviewQueue({ initialMaps }: { initialMaps: PendingMap[] }) {
@@ -63,9 +66,10 @@ export function MapReviewQueue({ initialMaps }: { initialMaps: PendingMap[] }) {
         const lengthLabel = map.length != null
           ? `${Math.floor(map.length / 60_000)}:${String(Math.round((map.length % 60_000) / 1000)).padStart(2, "0")}`
           : null;
+        const submitterName = map.submittedBy.displayName ?? map.submittedBy.username;
         return (
           <article key={map.id} className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
-            <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-accent/15 text-accent">
@@ -75,28 +79,72 @@ export function MapReviewQueue({ initialMaps }: { initialMaps: PendingMap[] }) {
                 </div>
                 <h2 className="mt-3 text-2xl font-semibold text-white">{map.title}</h2>
                 <p className="mt-1 text-sm text-muted">
-                  {map.artist ?? "Unknown artist"} · Mapped by {map.mapperName ?? map.submittedBy.displayName ?? map.submittedBy.username}
+                  {map.artist ?? "Unknown artist"} · Mapped by {map.mapperName ?? submitterName}
                 </p>
-                <p className="mt-3 text-sm leading-7 text-muted">{map.description || "No description provided."}</p>
+
+                <div className="mt-4 flex items-center gap-3 rounded-2xl border border-border bg-background/60 p-3">
+                  {map.submittedBy.avatar ? (
+                    <img src={map.submittedBy.avatar} alt={submitterName} className="h-9 w-9 rounded-full border border-accent/30" />
+                  ) : (
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent/15 text-accent">
+                      <UserIcon size={16} />
+                    </span>
+                  )}
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-white">
+                      Submitted by{" "}
+                      <Link href={`/profile/${map.submittedBy.profileHandle}`} className="hover:text-accent">{submitterName}</Link>
+                    </p>
+                    <p className="text-xs text-muted">@{map.submittedBy.profileHandle} · {new Date(map.createdAt).toLocaleDateString()}</p>
+                  </div>
+                </div>
+
+                <p className="mt-4 text-sm leading-7 text-muted">{map.description || "No description provided."}</p>
+
                 <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted">
-                  <span className="rounded-full border border-accent/30 bg-accent/10 px-3 py-1 font-semibold text-accent">
-                    Requested rating: {map.requestedRating.toFixed(2)}
+                  <span className="inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 font-semibold text-accent">
+                    <Star className="h-3 w-3" fill="currentColor" /> Requested rating: {map.requestedRating.toFixed(2)}
                   </span>
                   {map.noteCount != null && <span className="rounded-full border border-border bg-background/60 px-3 py-1">{map.noteCount.toLocaleString()} notes</span>}
                   {lengthLabel && <span className="rounded-full border border-border bg-background/60 px-3 py-1">{lengthLabel}</span>}
                 </div>
-                <p className="mt-4 text-xs text-muted">
-                  Submitted by {map.submittedBy.displayName ?? map.submittedBy.username} on {new Date(map.createdAt).toLocaleDateString()}
-                </p>
+
+                <div className="mt-5 flex flex-wrap gap-2">
+                  <a
+                    href={map.mapFileUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent/20"
+                  >
+                    <Download size={15} /> Map file
+                  </a>
+                  {map.sourceUrl && (
+                    <a
+                      href={map.sourceUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:border-accent/40"
+                    >
+                      <Link2 size={15} /> Rhythia link
+                    </a>
+                  )}
+                </div>
               </div>
-              <a
-                href={map.mapFileUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex shrink-0 items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent/20"
-              >
-                <Download size={15} /> Download map file
-              </a>
+
+              <div className="flex flex-col gap-3">
+                {map.imageUrl ? (
+                  <img
+                    src={map.imageUrl}
+                    alt={map.title}
+                    className="aspect-video w-full rounded-2xl border border-border object-cover"
+                    onError={(event) => ((event.currentTarget as HTMLImageElement).style.display = "none")}
+                  />
+                ) : (
+                  <div className="flex aspect-video w-full items-center justify-center rounded-2xl border border-dashed border-border bg-background/40 text-sm text-muted">
+                    No thumbnail provided
+                  </div>
+                )}
+              </div>
             </div>
 
             {isRejecting ? (

@@ -59,7 +59,7 @@ export async function getPendingChallengeMaps() {
   return prisma.challengeMap.findMany({
     where: { status: "pending" },
     orderBy: { createdAt: "asc" },
-    include: { submittedBy: { select: { username: true, displayName: true, profileHandle: true } } },
+    include: { submittedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } } },
   });
 }
 
@@ -260,7 +260,10 @@ export async function getApprovedMaps(includeAll: boolean, userId: string | null
   const maps = await prisma.challengeMap.findMany({
     where: { status: "approved", rating: { not: null } },
     orderBy: [{ rating: "asc" }, { createdAt: "desc" }],
-    include: { submittedBy: { select: { username: true, displayName: true, profileHandle: true } } },
+    include: {
+      submittedBy: { select: { username: true, displayName: true, profileHandle: true } },
+      reviewedBy: { select: { username: true, displayName: true, profileHandle: true } },
+    },
   });
 
   const user = userId ? await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } }) : null;
@@ -290,6 +293,7 @@ export async function getApprovedMaps(includeAll: boolean, userId: string | null
       noteCount: map.noteCount,
       length: map.length,
       submittedBy: map.submittedBy,
+      reviewedBy: map.reviewedBy,
       completion: stateMap.get(map.id) ?? null,
     })),
   };

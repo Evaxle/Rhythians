@@ -136,7 +136,8 @@ export const UserScalarFieldEnum = {
   rhp: 'rhp',
   avgMapRating: 'avgMapRating',
   dailyStreak: 'dailyStreak',
-  lastDailyBeatAt: 'lastDailyBeatAt'
+  lastDailyBeatAt: 'lastDailyBeatAt',
+  rhythiaVerified: 'rhythiaVerified'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]

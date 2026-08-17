@@ -55,6 +55,7 @@ export async function PATCH(request: Request, { params }: Props) {
       create: { userId: requestRecord.userId, profileUrl: requestRecord.profileUrl, ...profileData },
       update: { profileUrl: requestRecord.profileUrl, ...profileData, syncedAt: now },
     });
+    await prisma.user.update({ where: { id: requestRecord.userId }, data: { rhythiaVerified: true } });
     await prisma.rhythiaProfileRequest.update({
       where: { id },
       data: { status: "approved", adminNote: message || null, resolvedAt: now, resolvedBy: admin.id },

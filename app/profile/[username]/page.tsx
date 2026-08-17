@@ -12,6 +12,7 @@ import { RhythiaStats } from "@/components/rhythia-stats";
 import { getRhythiaStatus } from "@/lib/rhythia-status";
 import { RankProgress } from "@/components/rank-progress";
 import { getUserGlobalRank } from "@/lib/maps";
+import { RhythiaVerifiedBadge } from "@/components/rhythia-verified-badge";
 
 export const dynamic = "force-dynamic";
 
@@ -80,7 +81,8 @@ export default async function ProfilePage({ params }: Props) {
               <p className="text-sm uppercase tracking-[0.3em] text-accent">Profile</p>
               <h1 className="mt-2 flex items-center gap-3 text-3xl font-semibold text-white">
                 {user.displayName ?? user.username}
-                <FlagIcon flag={user.rhythiaProfile?.flag} country={user.rhythiaProfile?.country} size="md" />
+                {user.rhythiaProfile?.flag && <FlagIcon flag={user.rhythiaProfile?.flag} country={user.rhythiaProfile?.country} size="md" />}
+                {user.rhythiaVerified && <RhythiaVerifiedBadge size="sm" />}
 {user.rhythiaProfile && presence && (
                   <span
                     title={presenceLabel}
