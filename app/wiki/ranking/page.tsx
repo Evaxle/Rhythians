@@ -94,11 +94,11 @@ export default function AboutRankingPage() {
             <p className="text-sm font-semibold text-red-300">How you lose RHP</p>
             <ul className="mt-3 space-y-2 text-sm leading-6 text-muted">
               <li>
-                <span className="text-white">Failing a challenge map</span> costs RHP based on how many players have
-                beaten the map and the placement your failed attempt would earn. The better your attempt, the less
-                you lose — an attempt with no recorded accuracy is treated as last place.
+                <span className="text-white">Your placement gives you</span>RHP based on how many players have
+                beaten the map and the placement. The higher your placement, the less
+                you lose.
               </li>
-              <li>RHP never drops below 0, and a failed map only counts once per map.</li>
+              <li>RHP never drops below 0.</li>
             </ul>
           </div>
         </div>
