@@ -20,6 +20,10 @@ const TAG_COLORS: Record<string, string> = {
   "camera-lock": "bg-slate-500/20 text-slate-300 border-slate-500/30",
   "camera-spin": "bg-teal-500/20 text-teal-300 border-teal-500/30",
   "camera-vr": "bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/30",
+  "map-reviewer": "bg-rose-500/20 text-rose-300 border-rose-500/30",
+  mapper: "bg-lime-500/20 text-lime-300 border-lime-500/30",
+  developer: "bg-violet-500/20 text-violet-300 border-violet-500/30",
+  owner: "bg-amber-600/20 text-amber-400 border-amber-600/40",
 };
 
 export function UserTags({ tags, size = "sm" }: UserTagsProps) {

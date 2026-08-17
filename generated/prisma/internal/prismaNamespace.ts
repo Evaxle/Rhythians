@@ -3834,6 +3834,7 @@ export const ClipScalarFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
+  songName: 'songName',
   status: 'status',
   featuredOrder: 'featuredOrder',
   cameraMode: 'cameraMode',

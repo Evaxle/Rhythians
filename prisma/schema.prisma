@@ -401,6 +401,7 @@ model Clip {
   id             String         @id @default(uuid())
   title          String
   description    String
+  songName       String?
   status         ClipStatus     @default(pending)
   featuredOrder  Int?
   cameraMode     CameraMode?
