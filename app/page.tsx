@@ -12,17 +12,20 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 async function getStats() {
-  try {
-    const [members, clips, online] = await Promise.all([
-      prisma.user.count(),
-      prisma.clip.count({ where: { status: "approved" } }),
-      getOnlineUserCount(),
-    ]);
-    return { members, articles: getPublishedArticleCount(), clips, online };
-  } catch (error) {
-    console.error("Homepage stats unavailable:", error);
-    return { members: 0, articles: 0, clips: 0, online: 0 };
-  }
+  const [members, clips, online] = await Promise.allSettled([
+    prisma.user.count(),
+    prisma.clip.count({ where: { status: "approved" } }),
+    getOnlineUserCount(),
+  ]);
+  if (members.status === "rejected") console.error("Member count unavailable:", members.reason);
+  if (clips.status === "rejected") console.error("Clip count unavailable:", clips.reason);
+  if (online.status === "rejected") console.error("Online count unavailable:", online.reason);
+  return {
+    members: members.status === "fulfilled" ? members.value : 0,
+    articles: getPublishedArticleCount(),
+    clips: clips.status === "fulfilled" ? clips.value : 0,
+    online: online.status === "fulfilled" ? online.value : 0,
+  };
 }
 
 async function getFeaturedClips() {

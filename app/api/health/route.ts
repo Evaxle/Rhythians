@@ -6,11 +6,16 @@ export const runtime = "nodejs";
 
 export async function GET() {
   try {
+    await prisma.$connect();
     await prisma.$queryRaw`SELECT 1`;
-    const [users, clips] = await Promise.all([prisma.user.count(), prisma.clip.count()]);
+    const users = await prisma.user.count();
+    const clips = await prisma.clip.count();
     return NextResponse.json({ ok: true, database: "connected", users, clips });
   } catch (error) {
     console.error("Database health check failed", error);
-    return NextResponse.json({ ok: false, database: "unavailable" }, { status: 503 });
+    const message = error instanceof Error ? error.message : "Unknown database error";
+    const code = typeof error === "object" && error !== null && "code" in error ? String(error.code) : undefined;
+    const category = code === "P1001" || /connect|reach|timeout|ECONN/i.test(message) ? "connection" : "schema_or_query";
+    return NextResponse.json({ ok: false, database: "unavailable", category, code }, { status: 503 });
   }
 }
