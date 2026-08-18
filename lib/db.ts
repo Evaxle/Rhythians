@@ -48,7 +48,8 @@ function normalizeDatabaseUrl(value: string | undefined): string | undefined {
   const raw = value.trim().replace(/^['"]|['"]$/g, "");
   const schemeEnd = raw.indexOf("://");
   const authorityStart = schemeEnd + 3;
-  const authorityEnd = raw.search(/[/?#]/, authorityStart);
+  const suffixIndex = raw.slice(authorityStart).search(/[/?#]/);
+  const authorityEnd = suffixIndex === -1 ? -1 : authorityStart + suffixIndex;
   const authority = raw.slice(authorityStart, authorityEnd === -1 ? raw.length : authorityEnd);
   const hasUnescapedAtInPassword = authority.indexOf("@") !== authority.lastIndexOf("@");
 
