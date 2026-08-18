@@ -1,0 +1,143 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  background-color: #0b0f19;
+  color: #edf2ff;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: radial-gradient(circle at top, rgba(114, 137, 218, 0.08), transparent 30%),
+    linear-gradient(180deg, #0b0f19 0%, #090d16 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+::selection {
+  background-color: rgba(114, 137, 218, 0.35);
+  color: white;
+}
+
+::placeholder {
+  color: #7b8aaf;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+a {
+  transition: color 0.15s ease;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-rise-in {
+  animation: rise-in 0.25s ease-out both;
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-modal-in {
+  animation: modal-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+:root {
+  --plyr-color-main: #7289da;
+  --plyr-video-background: #000;
+  --plyr-menu-background: #12182c;
+  --plyr-menu-color: #edf2ff;
+  --plyr-menu-background-hover: rgba(255, 255, 255, 0.08);
+  --plyr-tooltip-background: #12182c;
+  --plyr-tooltip-color: #edf2ff;
+  --plyr-control-spacing: 12px;
+}
+
+html.cursor-fx-active,
+html.cursor-fx-active * {
+  cursor: none !important;
+}
+
+.cursor-fx-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: rgba(114, 137, 218, 0.95);
+  box-shadow:
+    0 0 8px rgba(114, 137, 218, 0.95),
+    0 0 18px rgba(114, 137, 218, 0.55);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.cursor-fx-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99998;
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  border: 2px solid rgba(114, 137, 218, 0.65);
+  box-shadow:
+    0 0 14px rgba(114, 137, 218, 0.35),
+    inset 0 0 14px rgba(114, 137, 218, 0.15);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.cursor-fx-trail {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99997;
+  border-radius: 9999px;
+  background: rgba(66, 185, 131, 0.45);
+  box-shadow: 0 0 6px rgba(66, 185, 131, 0.45);
+  pointer-events: none;
+  will-change: transform;
+}

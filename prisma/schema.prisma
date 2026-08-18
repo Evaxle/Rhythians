@@ -1,0 +1,690 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ClipStatus {
+  pending
+  approved
+  rejected
+  hidden
+  deleted
+}
+
+enum ReportStatus {
+  open
+  reviewing
+  resolved
+  dismissed
+}
+
+enum NotificationType {
+  clip_approved
+  clip_rejected
+  comment_reply
+  clip_like
+  article_published
+  announcement
+  moderation
+  rhp_earned
+  map_approved
+  map_rejected
+  rank_change
+}
+
+enum ChallengeMapStatus {
+  pending
+  approved
+  rejected
+  hidden
+}
+
+enum ConversationType {
+  direct
+  group
+}
+
+enum FriendRequestStatus {
+  pending
+  accepted
+  declined
+}
+
+enum TagSource {
+  discord
+  manual
+  onboarding
+}
+
+enum CameraMode {
+  lock
+  spin
+  vr
+}
+
+enum RhythiaProfileRequestStatus {
+  pending
+  approved
+  denied
+}
+
+enum PermissionName {
+  knowledge_read
+  knowledge_create
+  knowledge_edit
+  knowledge_publish
+  knowledge_delete
+  clips_submit
+  clips_comment
+  clips_moderate
+  clips_delete
+  users_view
+  users_moderate
+  settings_manage
+  announcements_create
+  announcements_delete
+  admin_access
+}
+
+model User {
+  id                  String             @id @default(uuid())
+  discordId           String?            @unique
+  username            String
+  discriminator       String
+  avatar              String?
+  locale              String?
+  email               String?            @unique
+  passwordHash        String?
+  displayName         String?
+  profileHandle       String             @unique
+  discordRoles        String[]           @default([])
+  inGuild             Boolean            @default(false)
+  onboardingCompleted Boolean            @default(false)
+  playerRank      PlayerRank?        @relation(fields: [playerRankId], references: [id])
+  playerRankId    String?
+  joinedAt        DateTime           @default(now())
+  bio             String?
+  website         String?
+  isSuspended     Boolean            @default(false)
+  suspendedUntil  DateTime?
+  mutedUntil      DateTime?
+  roles           UserRole[]
+  sessions        Session[]
+  clips           Clip[]             @relation("uploadedClips")
+  reviewedClips   Clip[]             @relation("clipReviewer")
+  comments        Comment[]
+  coachComments   CoachComment[]
+  clipLikes       ClipLike[]
+  userTags        UserTag[]
+  announcements   Announcement[]     @relation("announcementAuthor")
+  notifications   Notification[]
+  articleRevisions ArticleRevision[]
+  knowledgeArticles KnowledgeArticle[] @relation("articleAuthor")
+  reports         Report[]           @relation("reporter")
+  reportedResolvedBy Report[]        @relation("resolver")
+  moderationActions ModerationAction[]
+  conversations   Conversation[]     @relation("createdConversations")
+  conversationMemberships ConversationMember[]
+  messagesSent    Message[]
+  sentFriendRequests FriendRequest[] @relation("sentFriendRequests")
+  receivedFriendRequests FriendRequest[] @relation("receivedFriendRequests")
+  warnings        UserWarning[]      @relation("warnedUser")
+  issuedWarnings  UserWarning[]      @relation("warningActor")
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  rhythiaProfile  RhythiaProfile?
+  rhythiaProfileRequests RhythiaProfileRequest[]
+  resolvedRhythiaRequests RhythiaProfileRequest[] @relation("resolvedRhythiaRequests")
+  rhp             Int                  @default(0)
+  avgMapRating    Float?
+  scoreImportDone Boolean              @default(false)
+  dailyStreak     Int                  @default(0)
+  lastDailyBeatAt DateTime?
+  lastRhythiaRpCheckAt DateTime?
+  rhythiaVerified Boolean              @default(false)
+  dailyMapBeats   DailyMapBeat[]
+  rhpTransactions RhpTransaction[]
+  challengeMaps   ChallengeMap[]       @relation("challengeMapSubmissions")
+  challengeCompletions ChallengeMapCompletion[]
+  reviewedChallengeMaps ChallengeMap[] @relation("challengeMapReviews")
+}
+
+model RhythiaProfile {
+  id            String   @id @default(uuid())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String   @unique
+  profileId     Int      @unique
+  profileUrl    String
+  username      String?
+  country       String?
+  flag          String?
+  globalRank    Int?
+  countryRank   Int?
+  rhythmPoints  Float?
+  title         String
+  scores        Json
+  isOnline      Boolean?
+  lastActiveAt  DateTime?
+  statusCheckedAt DateTime?
+  syncedAt      DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model RhythiaProfileRequest {
+  id              String                      @id @default(uuid())
+  user            User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
+  profileId       Int
+  profileUrl      String
+  rhythiaUsername String
+  claimedUsername String
+  status          RhythiaProfileRequestStatus @default(pending)
+  adminNote       String?
+  createdAt       DateTime                    @default(now())
+  resolvedAt      DateTime?
+  resolvedBy      String?
+  resolvedByUser  User?                       @relation("resolvedRhythiaRequests", fields: [resolvedBy], references: [id], onDelete: SetNull)
+
+  @@index([status])
+}
+
+model UserWarning {
+  id        String   @id @default(uuid())
+  user      User     @relation("warnedUser", fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  actor     User     @relation("warningActor", fields: [actorId], references: [id])
+  actorId   String
+  reason    String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Session {
+  id         String   @id @default(uuid())
+  token      String   @unique
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+}
+
+model Role {
+  id            String            @id @default(uuid())
+  name          String            @unique
+  description   String?
+  isDefault     Boolean           @default(false)
+  users         UserRole[]
+  permissions   RolePermission[]
+  discordMappings DiscordRoleMapping[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+model Permission {
+  id          String            @id @default(uuid())
+  name        PermissionName    @unique
+  description String?
+  rolePermissions RolePermission[]
+}
+
+model RolePermission {
+  id           String      @id @default(uuid())
+  role         Role        @relation(fields: [roleId], references: [id])
+  roleId       String
+  permission   Permission  @relation(fields: [permissionId], references: [id])
+  permissionId String
+}
+
+model UserRole {
+  id     String  @id @default(uuid())
+  user   User    @relation(fields: [userId], references: [id])
+  userId String
+  role   Role    @relation(fields: [roleId], references: [id])
+  roleId String
+}
+
+model DiscordRoleMapping {
+  id            String   @id @default(uuid())
+  discordRoleId String   @unique
+  role          Role     @relation(fields: [roleId], references: [id])
+  roleId        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model PlayerRank {
+  id          String         @id @default(uuid())
+  name        String         @unique
+  slug        String         @unique
+  description String?
+  icon        String?
+  color       String?        @default("#7289da")
+  displayOrder Int           @default(0)
+  enabled     Boolean        @default(true)
+  users       User[]
+  discordRoleRankMappings DiscordRoleRankMapping[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model DiscordRoleRankMapping {
+  id            String     @id @default(uuid())
+  discordRoleId String     @unique
+  playerRank    PlayerRank @relation(fields: [playerRankId], references: [id])
+  playerRankId  String
+  priority      Int        @default(0)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Rule {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  description String?
+  content     String
+  order       Int      @default(0)
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model KnowledgeCategory {
+  id          String            @id @default(uuid())
+  name        String            @unique
+  slug        String            @unique
+  description String?
+  order       Int               @default(0)
+  articles    KnowledgeArticle[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+model KnowledgeArticle {
+  id           String            @id @default(uuid())
+  title        String
+  slug         String            @unique
+  description  String
+  content      String
+  published    Boolean           @default(false)
+  featured     Boolean           @default(false)
+  viewCount    Int               @default(0)
+  author       User              @relation("articleAuthor", fields: [authorId], references: [id])
+  authorId     String
+  category     KnowledgeCategory @relation(fields: [categoryId], references: [id])
+  categoryId   String
+  tags         ArticleTag[]
+  revisions    ArticleRevision[]
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+}
+
+model Tag {
+  id        String                 @id @default(uuid())
+  name      String                 @unique
+  slug      String                 @unique
+  clips     ClipTag[]
+  articles  ArticleTag[]
+  users     UserTag[]
+  discordRoleTagMappings DiscordRoleTagMapping[]
+  createdAt DateTime               @default(now())
+}
+
+model UserTag {
+  id        String    @id @default(uuid())
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String
+  tag       Tag       @relation(fields: [tagId], references: [id])
+  tagId     String
+  source    TagSource @default(discord)
+  createdAt DateTime  @default(now())
+  @@unique([userId, tagId])
+}
+
+model DiscordRoleTagMapping {
+  id            String   @id @default(uuid())
+  discordRoleId String   @unique
+  tag           Tag      @relation(fields: [tagId], references: [id])
+  tagId         String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model CoachComment {
+  id         String   @id @default(uuid())
+  text       String
+  clip       Clip     @relation(fields: [clipId], references: [id])
+  clipId     String
+  author     User     @relation(fields: [authorId], references: [id])
+  authorId   String
+  isEdited   Boolean  @default(false)
+  isDeleted  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model ArticleTag {
+  id         String           @id @default(uuid())
+  article    KnowledgeArticle @relation(fields: [articleId], references: [id])
+  articleId  String
+  tag        Tag              @relation(fields: [tagId], references: [id])
+  tagId      String
+}
+
+model ArticleRevision {
+  id         String           @id @default(uuid())
+  article    KnowledgeArticle @relation(fields: [articleId], references: [id])
+  articleId  String
+  author     User             @relation(fields: [authorId], references: [id])
+  authorId   String
+  title      String
+  content    String
+  createdAt  DateTime         @default(now())
+}
+
+model ClipCategory {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  order       Int      @default(0)
+  clips       Clip[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Clip {
+  id             String         @id @default(uuid())
+  title          String
+  description    String
+  songName       String?
+  status         ClipStatus     @default(pending)
+  featuredOrder  Int?
+  cameraMode     CameraMode?
+  storagePath    String
+  thumbnailPath  String?
+  rejectionReason String?
+  reviewedById   String?
+  reviewedAt     DateTime?
+  reviewedBy     User?          @relation("clipReviewer", fields: [reviewedById], references: [id])
+  uploader       User           @relation("uploadedClips", fields: [uploaderId], references: [id])
+  uploaderId     String
+  category       ClipCategory?  @relation(fields: [categoryId], references: [id])
+  categoryId     String?
+  tags           ClipTag[]
+  likes          ClipLike[]
+  views          ClipView[]
+  comments       Comment[]
+  coachComments  CoachComment[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model ClipTag {
+  id      String  @id @default(uuid())
+  clip    Clip    @relation(fields: [clipId], references: [id])
+  clipId  String
+  tag     Tag     @relation(fields: [tagId], references: [id])
+  tagId   String
+}
+
+model ClipLike {
+  id        String @id @default(uuid())
+  clip      Clip   @relation(fields: [clipId], references: [id])
+  clipId    String
+  user      User   @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+  @@unique([clipId, userId])
+}
+
+model ClipView {
+  id        String   @id @default(uuid())
+  clip      Clip     @relation(fields: [clipId], references: [id])
+  clipId    String
+  recordedAt DateTime @default(now())
+  session   String?
+}
+
+model Comment {
+  id         String   @id @default(uuid())
+  text       String
+  clip       Clip     @relation(fields: [clipId], references: [id])
+  clipId     String
+  author     User     @relation(fields: [authorId], references: [id])
+  authorId   String
+  isEdited   Boolean  @default(false)
+  isDeleted  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([clipId, createdAt])
+}
+
+model Report {
+  id           String       @id @default(uuid())
+  reason       String
+  description  String?
+  targetType   String
+  targetId     String
+  status       ReportStatus @default(open)
+  reporter     User         @relation("reporter", fields: [reporterId], references: [id])
+  reporterId   String
+  resolver     User?        @relation("resolver", fields: [resolverId], references: [id])
+  resolverId   String?
+  createdAt    DateTime     @default(now())
+  resolvedAt   DateTime?
+}
+
+model Announcement {
+  id         String   @id @default(uuid())
+  title      String
+  slug       String   @unique
+  content    String
+  published  Boolean  @default(false)
+  pinned     Boolean  @default(false)
+  author     User     @relation("announcementAuthor", fields: [authorId], references: [id])
+  authorId   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Notification {
+  id        String            @id @default(uuid())
+  user      User              @relation(fields: [userId], references: [id])
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  url       String?
+  read      Boolean           @default(false)
+  createdAt DateTime          @default(now())
+
+  @@index([userId, read])
+}
+
+model ModerationAction {
+  id         String   @id @default(uuid())
+  actor      User     @relation(fields: [actorId], references: [id])
+  actorId    String
+  action     String
+  targetType String
+  targetId   String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+}
+
+model SiteSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Conversation {
+  id          String               @id @default(uuid())
+  type        ConversationType     @default(direct)
+  name        String?
+  createdBy   User?                @relation("createdConversations", fields: [createdById], references: [id])
+  createdById String?
+  members     ConversationMember[]
+  messages    Message[]
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  @@index([createdById])
+}
+
+model ConversationMember {
+  id             String       @id @default(uuid())
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId String
+  user           User         @relation(fields: [userId], references: [id])
+  userId         String
+  role           String       @default("member")
+  lastReadAt     DateTime?
+  joinedAt       DateTime     @default(now())
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId String
+  sender         User         @relation(fields: [senderId], references: [id])
+  senderId       String
+  content        String
+  isEdited       Boolean      @default(false)
+  isDeleted      Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([conversationId, createdAt])
+}
+
+model FriendRequest {
+  id          String             @id @default(uuid())
+  sender      User               @relation("sentFriendRequests", fields: [senderId], references: [id])
+  senderId    String
+  receiver    User               @relation("receivedFriendRequests", fields: [receiverId], references: [id])
+  receiverId  String
+  status      FriendRequestStatus @default(pending)
+  createdAt   DateTime           @default(now())
+  respondedAt DateTime?
+
+  @@unique([senderId, receiverId])
+  @@index([receiverId])
+  @@index([senderId])
+}
+
+model DailyMap {
+  id          String         @id @default(uuid())
+  date        DateTime
+  rankIndex   Int            @default(0)
+  beatmapId   Int
+  title       String
+  artist      String?
+  difficulty  Int?
+  starRating  Float
+  noteCount   Int?
+  length      Int?
+  playcount   Int?
+  mapHash     String?
+  downloadUrl String
+  imageUrl    String?
+  mapperName  String?
+  beats       DailyMapBeat[]
+  createdAt   DateTime       @default(now())
+
+  @@unique([date, rankIndex])
+  @@index([date])
+  @@index([rankIndex])
+}
+
+model DailyMapBeat {
+  id         String   @id @default(uuid())
+  dailyMap   DailyMap @relation(fields: [dailyMapId], references: [id], onDelete: Cascade)
+  dailyMapId String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  points     Int
+  scoreId    Int?
+  accuracy   Float?
+  misses     Int?
+  createdAt  DateTime @default(now())
+
+  @@unique([dailyMapId, userId])
+  @@index([userId])
+}
+
+model RhpTransaction {
+  id             String   @id @default(uuid())
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  amount         Int
+  reason         String
+  description    String?
+  dailyMapBeatId String?
+  createdAt      DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model ChallengeMap {
+  id              String                @id @default(uuid())
+  title           String
+  artist          String?
+  description     String?
+  mapFileUrl      String
+  imageUrl        String?
+  requestedRating Float
+  rating          Float?
+  mapperName      String?
+  noteCount       Int?
+  length          Int?
+  sourceBeatmapId Int?                  @unique
+  sourceUrl       String?
+  isAutoImported  Boolean               @default(false)
+  submittedBy     User                  @relation("challengeMapSubmissions", fields: [submittedById], references: [id])
+  submittedById   String
+  status          ChallengeMapStatus    @default(pending)
+  reviewerNote    String?
+  reviewedBy      User?                 @relation("challengeMapReviews", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedById    String?
+  reviewedAt      DateTime?
+  completions     ChallengeMapCompletion[]
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  @@index([status])
+  @@index([rating])
+}
+
+model ChallengeMapCompletion {
+  id              String       @id @default(uuid())
+  challengeMap    ChallengeMap @relation(fields: [challengeMapId], references: [id], onDelete: Cascade)
+  challengeMapId  String
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
+  rating          Float
+  accuracy        Float?
+  passed          Boolean
+  points          Int
+  scoreId         Int?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@unique([challengeMapId, userId])
+  @@index([userId])
+}

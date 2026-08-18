@@ -1,0 +1,26 @@
+import { redirect } from "next/navigation";
+import { getSessionUser } from "@/lib/auth";
+import { MessagesApp } from "@/components/messages/messages-app";
+
+export const dynamic = "force-dynamic";
+
+export default async function MessagesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ user?: string; conversation?: string }>;
+}) {
+  const user = await getSessionUser();
+  if (!user) {
+    redirect("/login");
+  }
+
+  const { user: targetHandle, conversation } = await searchParams;
+
+  return (
+    <MessagesApp
+      currentUserId={user.id}
+      initialTargetHandle={targetHandle}
+      initialConversationId={conversation}
+    />
+  );
+}
