@@ -28,7 +28,13 @@ export function RegisterForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
-      const data = await response.json();
+      const text = await response.text();
+      let data: { error?: string; redirectTo?: string } = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        throw new Error(`Registration request failed (${response.status}).`);
+      }
       if (!response.ok) throw new Error(data.error ?? "Could not create your account.");
       router.push(data.redirectTo ?? "/onboarding");
       router.refresh();

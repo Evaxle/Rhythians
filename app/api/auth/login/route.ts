@@ -4,11 +4,9 @@ import { createSession, setSessionCookie } from "@/lib/auth";
 import { verifyPassword } from "@/lib/password";
 import { checkRateLimit } from "@/lib/security";
 
-export const runtime = "nodejs";
-
 const DISCORD_AUTH_URL = "https://discord.com/api/oauth2/authorize";
-const CLIENT_ID = process.env.DISCORD_CLIENT_ID?.trim();
-const REDIRECT_URI = process.env.DISCORD_REDIRECT_URI?.trim();
+const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
+const REDIRECT_URI = process.env.DISCORD_REDIRECT_URI;
 const SCOPE = "identify email guilds guilds.members.read";
 
 export async function GET() {

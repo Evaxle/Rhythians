@@ -17,10 +17,14 @@ export async function verifyPassword(
   password: string,
   stored: string
 ): Promise<boolean> {
-  const [salt, hash] = stored.split(":");
-  if (!salt || !hash) return false;
-  const derivedKey = await scrypt(password, salt, 64);
-  const hashBuffer = Buffer.from(hash, "hex");
-  if (hashBuffer.length !== derivedKey.length) return false;
-  return timingSafeEqual(hashBuffer, derivedKey);
+  try {
+    const [salt, hash] = stored.split(":");
+    if (!salt || !hash || !/^[0-9a-f]+$/i.test(hash)) return false;
+    const hashBuffer = Buffer.from(hash, "hex");
+    if (hashBuffer.length !== 64) return false;
+    const derivedKey = await scrypt(password, salt, 64);
+    return timingSafeEqual(hashBuffer, derivedKey);
+  } catch {
+    return false;
+  }
 }
