@@ -48,34 +48,39 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Username or email and password are required." }, { status: 400 });
   }
 
-  const user = await prisma.user.findFirst({
-    where: {
-      OR: [
-        { email: identifier.toLowerCase() },
-        { username: identifier },
-      ],
-    },
-  });
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: identifier.toLowerCase() },
+          { username: identifier },
+        ],
+      },
+    });
 
-  if (!user || !user.passwordHash) {
-    return NextResponse.json({ error: "Invalid credentials." }, { status: 401 });
+    if (!user || !user.passwordHash) {
+      return NextResponse.json({ error: "Invalid credentials." }, { status: 401 });
+    }
+
+    const valid = await verifyPassword(password, user.passwordHash);
+    if (!valid) {
+      return NextResponse.json({ error: "Invalid credentials." }, { status: 401 });
+    }
+
+    if (user.isSuspended) {
+      return NextResponse.json({ error: "This account has been suspended." }, { status: 403 });
+    }
+
+    const token = await createSession(user.id);
+    const response = NextResponse.json({
+      user: { id: user.id, username: user.username, profileHandle: user.profileHandle, onboardingCompleted: user.onboardingCompleted },
+      redirectTo: user.onboardingCompleted ? "/" : "/onboarding",
+    });
+    setSessionCookie(response, token);
+
+    return response;
+  } catch (error) {
+    console.error("Password login failed:", error);
+    return NextResponse.json({ error: "Login service is temporarily unavailable." }, { status: 503 });
   }
-
-  const valid = await verifyPassword(password, user.passwordHash);
-  if (!valid) {
-    return NextResponse.json({ error: "Invalid credentials." }, { status: 401 });
-  }
-
-  if (user.isSuspended) {
-    return NextResponse.json({ error: "This account has been suspended." }, { status: 403 });
-  }
-
-  const token = await createSession(user.id);
-  const response = NextResponse.json({
-    user: { id: user.id, username: user.username, profileHandle: user.profileHandle, onboardingCompleted: user.onboardingCompleted },
-    redirectTo: user.onboardingCompleted ? "/" : "/onboarding",
-  });
-  setSessionCookie(response, token);
-
-  return response;
 }

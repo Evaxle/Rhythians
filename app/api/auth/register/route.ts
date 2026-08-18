@@ -39,10 +39,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Password must be at least 8 characters long." }, { status: 400 });
   }
 
-  const existingEmail = await prisma.user.findUnique({ where: { email } });
-  if (existingEmail) {
-    return NextResponse.json({ error: "An account with this email already exists." }, { status: 409 });
-  }
+  try {
+    const existingEmail = await prisma.user.findUnique({ where: { email } });
+    if (existingEmail) {
+      return NextResponse.json({ error: "An account with this email already exists." }, { status: 409 });
+    }
 
   const baseHandle = username.toLowerCase().replace(/\s+/g, "-");
   let profileHandle = baseHandle;
@@ -71,5 +72,9 @@ export async function POST(request: Request) {
   });
   setSessionCookie(response, token);
 
-  return response;
+    return response;
+  } catch (error) {
+    console.error("Account registration failed:", error);
+    return NextResponse.json({ error: "Registration service is temporarily unavailable." }, { status: 503 });
+  }
 }

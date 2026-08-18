@@ -4,9 +4,13 @@ import { getSessionUser } from "@/lib/auth";
 import { LoginForm } from "@/components/login-form";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export default async function LoginPage() {
-  const user = await getSessionUser();
+  const user = await getSessionUser().catch((error) => {
+    console.error("Unable to read login session:", error);
+    return null;
+  });
   if (user) redirect("/");
 
   return (

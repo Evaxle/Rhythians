@@ -51,7 +51,9 @@ export async function GET(request: Request) {
   });
 
   if (!tokenResponse.ok) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    const detail = await tokenResponse.text().catch(() => "");
+    console.error("Discord token exchange failed:", tokenResponse.status, detail.slice(0, 300));
+    return NextResponse.redirect(new URL("/login?error=discord_token", request.url));
   }
 
   const tokenData = await tokenResponse.json();
@@ -62,7 +64,8 @@ export async function GET(request: Request) {
   });
 
   if (!userResponse.ok) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    console.error("Discord user lookup failed:", userResponse.status);
+    return NextResponse.redirect(new URL("/login?error=discord_user", request.url));
   }
 
   const discordUser = await userResponse.json();
