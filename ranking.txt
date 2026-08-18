@@ -82,6 +82,40 @@ How you LOSE RHP:
 RHP never goes below 0, and a failed map only counts once per map
 (the first recorded attempt).
 
+STARTING RHP FROM YOUR RHYTHIA SKILL:
+  When you first link your Rhythia account you get a one-time RHP credit
+  based on your Rhythia RP (skill points), so a highly skilled player
+  starts in a rank that matches their ability instead of grinding from
+  Copper 1. The credit is your RP times a weight that shrinks as your RP
+  grows (diminishing returns):
+
+    weight = 0.8 - 0.05 per 500 RP
+    once the weight would drop below 0.4, it drops by 0.02 per 500 RP
+    instead, and it never goes below 0.3.
+
+  Examples:
+    500 RP   x 0.75 = 375 RHP   (Copper 4)
+    1000 RP  x 0.70 = 700 RHP   (Bronze 3)
+    2000 RP  x 0.60 = 1200 RHP  (Silver 3)
+    5000 RP  x 0.36 = 1800 RHP  (Gold 3)
+    10000 RP x 0.30 = 3000 RHP  (Diamond 1)
+    20000 RP x 0.30 = 6000 RHP  (Expert)
+
+  So a low-skill player is never boosted into a high rank, and a very
+  high-RP player gets a meaningful but not overwhelming starting rank.
+  The credit is awarded once and never again (reconnecting or refreshing
+  your profile does not double-credit).
+
+  DAILY RP RE-WEIGHT:
+  Once every 24 hours the system re-checks your connected Rhythia
+  profile. If your RP has grown, the whole credit is recomputed with the
+  current formula and you are paid the difference. Example: you linked at
+  10,000 RP and received the credit for that amount; a week later you are
+  at 11,000 RP, so the total credit is recomputed for 11,000 RP and you
+  receive the extra RHP. RP drops never take RHP back — only gains pay
+  out. The check runs automatically (a daily cron plus a check whenever
+  you visit your profile or settings), so you never have to do anything.
+
 ------------------------------------------------
 3. HOW CHALLENGE MAP RATING WORKS
 ------------------------------------------------
@@ -115,7 +149,7 @@ WHO SETS THE RATING:
     approve the map. The reviewer's rating is what actually counts.
 
 ------------------------------------------------
-4. RHP GAIN — ACCURACY & SPEED
+4. RHP GAIN — DIFFICULTY, ACCURACY & SPEED
 ------------------------------------------------
 The base RHP for a challenge map or daily map depends on YOUR RANK:
 
@@ -129,9 +163,20 @@ The base RHP for a challenge map or daily map depends on YOUR RANK:
     Master   -> 13 RHP
     Expert   -> 10 RHP
 
-It does NOT scale with the map's rating — a map at the bottom of your
-range is worth the same as a map at the top. Higher ranks earn slightly
-less so the ladder stays balanced at every level.
+Higher ranks earn less so the ladder stays balanced — the more RHP you
+have, the less each map is worth (diminishing returns as you climb).
+
+The base is then scaled by how hard the map is WITHIN your rank's
+rating range. A map at the very bottom of the range is worth 0.6x the
+rank base, a map at the very top is worth 1.4x:
+
+    difficulty factor = 0.6 + 0.8 x position in range
+
+So a lower rated map pays less and a higher rated map pays more, while
+staying fair inside the rank. Examples (Copper, base 20 RHP):
+   0.00-rated map (bottom of range) -> 12 RHP
+   0.75-rated map (middle of range) -> 20 RHP
+   1.49-rated map (top of range)    -> 28 RHP
 
 Your accuracy scales the base:
   Accuracy  >= 100%  -> 100% of base RHP
@@ -150,8 +195,8 @@ Example (Copper, base 20 RHP):
 
 Playing with a SPEED MODIFIER (anything above 1.00x) adds a bonus:
   +25% of the base per 1.00x of extra speed, capped at +50%.
-  A Copper 2.00x perfect clear earns 20 x 1.25 = 25 RHP.
-  A Master 2.00x perfect clear earns 13 x 1.25 = 16 RHP.
+  A mid-range Copper 2.00x perfect clear earns 20 x 1.25 = 25 RHP.
+  A mid-range Master 2.00x perfect clear earns 13 x 1.25 = 16 RHP.
   A 3.00x+ clear earns up to 1.5x the base.
 
 ------------------------------------------------
