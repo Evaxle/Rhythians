@@ -27,7 +27,7 @@ if (process.env.NODE_ENV === "production") {
 
 const STATE_CHANGING = new Set(["POST", "PATCH", "PUT", "DELETE"]);
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Block cross-origin state-changing requests to API routes (CSRF defense-in-depth).
