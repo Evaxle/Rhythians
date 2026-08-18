@@ -33,7 +33,9 @@ export function RhythiaRpCheckButton() {
   }, []);
 
   useEffect(() => {
-    void loadStatus();
+    (async () => {
+      await loadStatus();
+    })();
   }, [loadStatus]);
 
   const handleCheck = async () => {
