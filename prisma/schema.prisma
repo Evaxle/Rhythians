@@ -144,7 +144,6 @@ model User {
   scoreImportDone Boolean              @default(false)
   dailyStreak     Int                  @default(0)
   lastDailyBeatAt DateTime?
-  lastRhythiaRpCheckAt DateTime?
   rhythiaVerified Boolean              @default(false)
   dailyMapBeats   DailyMapBeat[]
   rhpTransactions RhpTransaction[]

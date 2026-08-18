@@ -87,7 +87,6 @@ export default async function MapsPage() {
           }))}
           rankInfo={data.rankInfo}
           userRhp={userRow?.rhp ?? 0}
-          currentUserId={user.id}
         />
       ) : (
         <p className="rounded-3xl border border-border bg-surface/95 p-8 text-sm text-muted">Unable to load your rank.</p>

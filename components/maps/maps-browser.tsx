@@ -2,10 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, CheckCircle2, Download, Map as MapIcon, RefreshCw, Search, Trophy, XCircle, ChevronDown } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Download, Map as MapIcon, RefreshCw, Search, XCircle, ChevronDown } from "lucide-react";
 import type { RankInfo } from "@/lib/ranks";
 import { isMapInRankRange, rhpGainForMap } from "@/lib/ranks";
-import { MapLeaderboard } from "@/components/maps/map-leaderboard";
 
 const PAGE_SIZE = 40;
 
@@ -29,12 +28,10 @@ export function MapsBrowser({
   maps,
   rankInfo,
   userRhp,
-  currentUserId,
 }: {
   maps: MapEntry[];
   rankInfo: RankInfo;
   userRhp: number;
-  currentUserId: string | null;
 }) {
   const [showAll, setShowAll] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -43,7 +40,6 @@ export function MapsBrowser({
   const [query, setQuery] = useState("");
   const [autoChecking, setAutoChecking] = useState(false);
   const [didAutoCheck, setDidAutoCheck] = useState(false);
-  const [leaderboardId, setLeaderboardId] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     let list = maps;
@@ -251,27 +247,12 @@ export function MapsBrowser({
                     <RefreshCw size={15} className={busyId === map.id ? "animate-spin" : ""} />
                     {busyId === map.id ? "Checking..." : "Check my score"}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setLeaderboardId((current) => (current === map.id ? null : map.id))}
-                    className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${
-                      leaderboardId === map.id
-                        ? "border-accent/60 bg-accent/20 text-white"
-                        : "border-accent/40 bg-accent/10 text-white hover:bg-accent/20"
-                    }`}
-                  >
-                    <Trophy size={15} /> Leaderboard
-                  </button>
                 </div>
 
                 {message && (
                   <p className={`mt-3 rounded-2xl border p-3 text-sm ${message.tone === "ok" ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200" : message.tone === "warn" ? "border-amber-400/30 bg-amber-400/10 text-amber-200" : "border-red-400/30 bg-red-400/10 text-red-200"}`}>
                     {message.text}
                   </p>
-                )}
-
-                {leaderboardId === map.id && (
-                  <MapLeaderboard mapId={map.id} currentUserId={currentUserId} onClose={() => setLeaderboardId(null)} />
                 )}
               </article>
             );

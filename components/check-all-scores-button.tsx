@@ -37,7 +37,7 @@ export function CheckAllScoresButton() {
         className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent/80 disabled:opacity-50"
       >
         <RefreshCw size={16} className={checking ? "animate-spin" : ""} />
-        {checking ? "Scanning your scores..." : "Check scores in my rank range"}
+        {checking ? "Scanning your scores..." : "Check entire score database"}
       </button>
       {message && (
         <p className={`text-sm ${message.type === "success" ? "text-accent" : "text-red-300"}`}>{message.text}</p>
