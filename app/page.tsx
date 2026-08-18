@@ -9,6 +9,7 @@ import { HomeDailySection } from "@/components/daily/home-daily-section";
 import { HomeLeaderboardSection } from "@/components/daily/home-leaderboard-section";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 async function getStats() {
   try {

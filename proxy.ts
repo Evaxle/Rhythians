@@ -35,7 +35,7 @@ export function proxy(request: NextRequest) {
   // forged requests outright. Requests without an Origin header (server-side, cron) are allowed.
   if (pathname.startsWith("/api/") && STATE_CHANGING.has(request.method)) {
     const origin = request.headers.get("origin");
-    const host = request.headers.get("host");
+    const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
     if (origin && host) {
       let originHost: string;
       try {
@@ -43,7 +43,11 @@ export function proxy(request: NextRequest) {
       } catch {
         return new NextResponse("Bad Request", { status: 400 });
       }
-      if (originHost !== host) {
+      const allowedHosts = new Set([
+        host,
+        process.env.NEXT_PUBLIC_SITE_URL ? new URL(process.env.NEXT_PUBLIC_SITE_URL).host : "",
+      ]);
+      if (!allowedHosts.has(originHost)) {
         return new NextResponse("Forbidden", { status: 403 });
       }
     }

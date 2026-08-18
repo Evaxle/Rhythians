@@ -32,9 +32,9 @@ export const prisma =
     adapter,
   });
 
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
-}
+// Reuse one client per warm Vercel instance. Creating a new pg connection pool
+// for every request quickly exhausts Supabase connections in serverless runs.
+globalForPrisma.prisma = prisma;
 
 /**
  * Vercel environment variables are sometimes pasted with an unescaped `@`

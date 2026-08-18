@@ -4,6 +4,8 @@ import { createSession, setSessionCookie } from "@/lib/auth";
 import { getGuildMember } from "@/lib/discord";
 import { syncUserTagsFromDiscord } from "@/lib/discord-sync";
 
+export const runtime = "nodejs";
+
 const DISCORD_TOKEN_URL = "https://discord.com/api/oauth2/token";
 const DISCORD_USER_URL = "https://discord.com/api/users/@me";
 
