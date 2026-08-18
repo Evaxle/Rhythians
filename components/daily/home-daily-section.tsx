@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { ArrowRight, CalendarDays, Download, Link2, LogIn, Star, CheckCircle2 } from "lucide-react";
+import { ArrowRight, CalendarDays, Download, Link2, LogIn, CheckCircle2 } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { getOrCreateDailyMap, getUserDailyStatus, formatDailyDate, rhpForMap } from "@/lib/daily";
+import { getRankInfo, fairRatingFromStars } from "@/lib/ranks";
 
 export async function HomeDailySection() {
   const user = await getSessionUser();
@@ -58,9 +59,10 @@ export async function HomeDailySection() {
     );
   }
 
-  const daily = await getOrCreateDailyMap();
-  const status = await getUserDailyStatus(user.id);
   const userRow = await prisma.user.findUnique({ where: { id: user.id }, select: { rhp: true } });
+  const rankInfo = getRankInfo(userRow?.rhp ?? 0);
+  const daily = await getOrCreateDailyMap(rankInfo.index);
+  const status = await getUserDailyStatus(user.id);
 
   return (
     <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
@@ -83,12 +85,12 @@ export async function HomeDailySection() {
           <h3 className="mt-1 truncate text-xl font-semibold text-white">{daily.title}</h3>
           <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-muted">
             <span className="inline-flex items-center gap-1 font-semibold text-white">
-              <Star className="h-4 w-4 text-amber-400" fill="currentColor" /> {daily.starRating.toFixed(2)}
+              {fairRatingFromStars(daily.starRating).toFixed(2)} rating
             </span>
             <span>·</span>
             <span>Mapped by {daily.mapperName ?? "Unknown"}</span>
             <span>·</span>
-            <span className="font-semibold text-accent">{rhpForMap(daily.starRating)} RHP</span>
+            <span className="font-semibold text-accent">{rhpForMap(daily.starRating, rankInfo.index)} RHP</span>
           </div>
           {status?.beat && (
             <p className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-300">

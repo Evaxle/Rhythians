@@ -38,6 +38,7 @@ export type ClipMinAggregateOutputType = {
   id: string | null
   title: string | null
   description: string | null
+  songName: string | null
   status: $Enums.ClipStatus | null
   featuredOrder: number | null
   cameraMode: $Enums.CameraMode | null
@@ -56,6 +57,7 @@ export type ClipMaxAggregateOutputType = {
   id: string | null
   title: string | null
   description: string | null
+  songName: string | null
   status: $Enums.ClipStatus | null
   featuredOrder: number | null
   cameraMode: $Enums.CameraMode | null
@@ -74,6 +76,7 @@ export type ClipCountAggregateOutputType = {
   id: number
   title: number
   description: number
+  songName: number
   status: number
   featuredOrder: number
   cameraMode: number
@@ -102,6 +105,7 @@ export type ClipMinAggregateInputType = {
   id?: true
   title?: true
   description?: true
+  songName?: true
   status?: true
   featuredOrder?: true
   cameraMode?: true
@@ -120,6 +124,7 @@ export type ClipMaxAggregateInputType = {
   id?: true
   title?: true
   description?: true
+  songName?: true
   status?: true
   featuredOrder?: true
   cameraMode?: true
@@ -138,6 +143,7 @@ export type ClipCountAggregateInputType = {
   id?: true
   title?: true
   description?: true
+  songName?: true
   status?: true
   featuredOrder?: true
   cameraMode?: true
@@ -243,6 +249,7 @@ export type ClipGroupByOutputType = {
   id: string
   title: string
   description: string
+  songName: string | null
   status: $Enums.ClipStatus
   featuredOrder: number | null
   cameraMode: $Enums.CameraMode | null
@@ -284,6 +291,7 @@ export type ClipWhereInput = {
   id?: Prisma.StringFilter<"Clip"> | string
   title?: Prisma.StringFilter<"Clip"> | string
   description?: Prisma.StringFilter<"Clip"> | string
+  songName?: Prisma.StringNullableFilter<"Clip"> | string | null
   status?: Prisma.EnumClipStatusFilter<"Clip"> | $Enums.ClipStatus
   featuredOrder?: Prisma.IntNullableFilter<"Clip"> | number | null
   cameraMode?: Prisma.EnumCameraModeNullableFilter<"Clip"> | $Enums.CameraMode | null
@@ -310,6 +318,7 @@ export type ClipOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  songName?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   featuredOrder?: Prisma.SortOrderInput | Prisma.SortOrder
   cameraMode?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -339,6 +348,7 @@ export type ClipWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ClipWhereInput | Prisma.ClipWhereInput[]
   title?: Prisma.StringFilter<"Clip"> | string
   description?: Prisma.StringFilter<"Clip"> | string
+  songName?: Prisma.StringNullableFilter<"Clip"> | string | null
   status?: Prisma.EnumClipStatusFilter<"Clip"> | $Enums.ClipStatus
   featuredOrder?: Prisma.IntNullableFilter<"Clip"> | number | null
   cameraMode?: Prisma.EnumCameraModeNullableFilter<"Clip"> | $Enums.CameraMode | null
@@ -365,6 +375,7 @@ export type ClipOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  songName?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   featuredOrder?: Prisma.SortOrderInput | Prisma.SortOrder
   cameraMode?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -391,6 +402,7 @@ export type ClipScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Clip"> | string
   title?: Prisma.StringWithAggregatesFilter<"Clip"> | string
   description?: Prisma.StringWithAggregatesFilter<"Clip"> | string
+  songName?: Prisma.StringNullableWithAggregatesFilter<"Clip"> | string | null
   status?: Prisma.EnumClipStatusWithAggregatesFilter<"Clip"> | $Enums.ClipStatus
   featuredOrder?: Prisma.IntNullableWithAggregatesFilter<"Clip"> | number | null
   cameraMode?: Prisma.EnumCameraModeNullableWithAggregatesFilter<"Clip"> | $Enums.CameraMode | null
@@ -409,6 +421,7 @@ export type ClipCreateInput = {
   id?: string
   title: string
   description: string
+  songName?: string | null
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
   cameraMode?: $Enums.CameraMode | null
@@ -432,6 +445,7 @@ export type ClipUncheckedCreateInput = {
   id?: string
   title: string
   description: string
+  songName?: string | null
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
   cameraMode?: $Enums.CameraMode | null
@@ -455,6 +469,7 @@ export type ClipUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -478,6 +493,7 @@ export type ClipUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -501,6 +517,7 @@ export type ClipCreateManyInput = {
   id?: string
   title: string
   description: string
+  songName?: string | null
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
   cameraMode?: $Enums.CameraMode | null
@@ -519,6 +536,7 @@ export type ClipUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -534,6 +552,7 @@ export type ClipUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -567,6 +586,7 @@ export type ClipCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  songName?: Prisma.SortOrder
   status?: Prisma.SortOrder
   featuredOrder?: Prisma.SortOrder
   cameraMode?: Prisma.SortOrder
@@ -589,6 +609,7 @@ export type ClipMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  songName?: Prisma.SortOrder
   status?: Prisma.SortOrder
   featuredOrder?: Prisma.SortOrder
   cameraMode?: Prisma.SortOrder
@@ -607,6 +628,7 @@ export type ClipMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  songName?: Prisma.SortOrder
   status?: Prisma.SortOrder
   featuredOrder?: Prisma.SortOrder
   cameraMode?: Prisma.SortOrder
@@ -833,6 +855,7 @@ export type ClipCreateWithoutUploaderInput = {
   id?: string
   title: string
   description: string
+  songName?: string | null
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
   cameraMode?: $Enums.CameraMode | null
@@ -855,6 +878,7 @@ export type ClipUncheckedCreateWithoutUploaderInput = {
   id?: string
   title: string
   description: string
+  songName?: string | null
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
   cameraMode?: $Enums.CameraMode | null
@@ -887,6 +911,7 @@ export type ClipCreateWithoutReviewedByInput = {
   id?: string
   title: string
   description: string
+  songName?: string | null
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
   cameraMode?: $Enums.CameraMode | null
@@ -909,6 +934,7 @@ export type ClipUncheckedCreateWithoutReviewedByInput = {
   id?: string
   title: string
   description: string
+  songName?: string | null
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
   cameraMode?: $Enums.CameraMode | null
@@ -960,6 +986,7 @@ export type ClipScalarWhereInput = {
   id?: Prisma.StringFilter<"Clip"> | string
   title?: Prisma.StringFilter<"Clip"> | string
   description?: Prisma.StringFilter<"Clip"> | string
+  songName?: Prisma.StringNullableFilter<"Clip"> | string | null
   status?: Prisma.EnumClipStatusFilter<"Clip"> | $Enums.ClipStatus
   featuredOrder?: Prisma.IntNullableFilter<"Clip"> | number | null
   cameraMode?: Prisma.EnumCameraModeNullableFilter<"Clip"> | $Enums.CameraMode | null
@@ -994,6 +1021,7 @@ export type ClipCreateWithoutCoachCommentsInput = {
   id?: string
   title: string
   description: string
+  songName?: string | null
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
   cameraMode?: $Enums.CameraMode | null
@@ -1016,6 +1044,7 @@ export type ClipUncheckedCreateWithoutCoachCommentsInput = {
   id?: string
   title: string
   description: string
+  songName?: string | null
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
   cameraMode?: $Enums.CameraMode | null
@@ -1054,6 +1083,7 @@ export type ClipUpdateWithoutCoachCommentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -1076,6 +1106,7 @@ export type ClipUncheckedUpdateWithoutCoachCommentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -1098,6 +1129,7 @@ export type ClipCreateWithoutCategoryInput = {
   id?: string
   title: string
   description: string
+  songName?: string | null
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
   cameraMode?: $Enums.CameraMode | null
@@ -1120,6 +1152,7 @@ export type ClipUncheckedCreateWithoutCategoryInput = {
   id?: string
   title: string
   description: string
+  songName?: string | null
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
   cameraMode?: $Enums.CameraMode | null
@@ -1168,6 +1201,7 @@ export type ClipCreateWithoutTagsInput = {
   id?: string
   title: string
   description: string
+  songName?: string | null
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
   cameraMode?: $Enums.CameraMode | null
@@ -1190,6 +1224,7 @@ export type ClipUncheckedCreateWithoutTagsInput = {
   id?: string
   title: string
   description: string
+  songName?: string | null
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
   cameraMode?: $Enums.CameraMode | null
@@ -1228,6 +1263,7 @@ export type ClipUpdateWithoutTagsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -1250,6 +1286,7 @@ export type ClipUncheckedUpdateWithoutTagsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -1272,6 +1309,7 @@ export type ClipCreateWithoutLikesInput = {
   id?: string
   title: string
   description: string
+  songName?: string | null
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
   cameraMode?: $Enums.CameraMode | null
@@ -1294,6 +1332,7 @@ export type ClipUncheckedCreateWithoutLikesInput = {
   id?: string
   title: string
   description: string
+  songName?: string | null
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
   cameraMode?: $Enums.CameraMode | null
@@ -1332,6 +1371,7 @@ export type ClipUpdateWithoutLikesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -1354,6 +1394,7 @@ export type ClipUncheckedUpdateWithoutLikesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -1376,6 +1417,7 @@ export type ClipCreateWithoutViewsInput = {
   id?: string
   title: string
   description: string
+  songName?: string | null
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
   cameraMode?: $Enums.CameraMode | null
@@ -1398,6 +1440,7 @@ export type ClipUncheckedCreateWithoutViewsInput = {
   id?: string
   title: string
   description: string
+  songName?: string | null
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
   cameraMode?: $Enums.CameraMode | null
@@ -1436,6 +1479,7 @@ export type ClipUpdateWithoutViewsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -1458,6 +1502,7 @@ export type ClipUncheckedUpdateWithoutViewsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -1480,6 +1525,7 @@ export type ClipCreateWithoutCommentsInput = {
   id?: string
   title: string
   description: string
+  songName?: string | null
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
   cameraMode?: $Enums.CameraMode | null
@@ -1502,6 +1548,7 @@ export type ClipUncheckedCreateWithoutCommentsInput = {
   id?: string
   title: string
   description: string
+  songName?: string | null
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
   cameraMode?: $Enums.CameraMode | null
@@ -1540,6 +1587,7 @@ export type ClipUpdateWithoutCommentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -1562,6 +1610,7 @@ export type ClipUncheckedUpdateWithoutCommentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -1584,6 +1633,7 @@ export type ClipCreateManyUploaderInput = {
   id?: string
   title: string
   description: string
+  songName?: string | null
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
   cameraMode?: $Enums.CameraMode | null
@@ -1601,6 +1651,7 @@ export type ClipCreateManyReviewedByInput = {
   id?: string
   title: string
   description: string
+  songName?: string | null
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
   cameraMode?: $Enums.CameraMode | null
@@ -1618,6 +1669,7 @@ export type ClipUpdateWithoutUploaderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -1640,6 +1692,7 @@ export type ClipUncheckedUpdateWithoutUploaderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -1662,6 +1715,7 @@ export type ClipUncheckedUpdateManyWithoutUploaderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -1679,6 +1733,7 @@ export type ClipUpdateWithoutReviewedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -1701,6 +1756,7 @@ export type ClipUncheckedUpdateWithoutReviewedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -1723,6 +1779,7 @@ export type ClipUncheckedUpdateManyWithoutReviewedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -1740,6 +1797,7 @@ export type ClipCreateManyCategoryInput = {
   id?: string
   title: string
   description: string
+  songName?: string | null
   status?: $Enums.ClipStatus
   featuredOrder?: number | null
   cameraMode?: $Enums.CameraMode | null
@@ -1757,6 +1815,7 @@ export type ClipUpdateWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -1779,6 +1838,7 @@ export type ClipUncheckedUpdateWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -1801,6 +1861,7 @@ export type ClipUncheckedUpdateManyWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  songName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumClipStatusFieldUpdateOperationsInput | $Enums.ClipStatus
   featuredOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cameraMode?: Prisma.NullableEnumCameraModeFieldUpdateOperationsInput | $Enums.CameraMode | null
@@ -1885,6 +1946,7 @@ export type ClipSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   id?: boolean
   title?: boolean
   description?: boolean
+  songName?: boolean
   status?: boolean
   featuredOrder?: boolean
   cameraMode?: boolean
@@ -1912,6 +1974,7 @@ export type ClipSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   title?: boolean
   description?: boolean
+  songName?: boolean
   status?: boolean
   featuredOrder?: boolean
   cameraMode?: boolean
@@ -1933,6 +1996,7 @@ export type ClipSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   title?: boolean
   description?: boolean
+  songName?: boolean
   status?: boolean
   featuredOrder?: boolean
   cameraMode?: boolean
@@ -1954,6 +2018,7 @@ export type ClipSelectScalar = {
   id?: boolean
   title?: boolean
   description?: boolean
+  songName?: boolean
   status?: boolean
   featuredOrder?: boolean
   cameraMode?: boolean
@@ -1968,7 +2033,7 @@ export type ClipSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ClipOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "status" | "featuredOrder" | "cameraMode" | "storagePath" | "thumbnailPath" | "rejectionReason" | "reviewedById" | "reviewedAt" | "uploaderId" | "categoryId" | "createdAt" | "updatedAt", ExtArgs["result"]["clip"]>
+export type ClipOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "songName" | "status" | "featuredOrder" | "cameraMode" | "storagePath" | "thumbnailPath" | "rejectionReason" | "reviewedById" | "reviewedAt" | "uploaderId" | "categoryId" | "createdAt" | "updatedAt", ExtArgs["result"]["clip"]>
 export type ClipInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   reviewedBy?: boolean | Prisma.Clip$reviewedByArgs<ExtArgs>
   uploader?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -2007,6 +2072,7 @@ export type $ClipPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     id: string
     title: string
     description: string
+    songName: string | null
     status: $Enums.ClipStatus
     featuredOrder: number | null
     cameraMode: $Enums.CameraMode | null
@@ -2453,6 +2519,7 @@ export interface ClipFieldRefs {
   readonly id: Prisma.FieldRef<"Clip", 'String'>
   readonly title: Prisma.FieldRef<"Clip", 'String'>
   readonly description: Prisma.FieldRef<"Clip", 'String'>
+  readonly songName: Prisma.FieldRef<"Clip", 'String'>
   readonly status: Prisma.FieldRef<"Clip", 'ClipStatus'>
   readonly featuredOrder: Prisma.FieldRef<"Clip", 'Int'>
   readonly cameraMode: Prisma.FieldRef<"Clip", 'CameraMode'>

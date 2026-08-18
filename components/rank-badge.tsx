@@ -14,8 +14,8 @@ export function RankBadge({
   const sizeClass = size === "lg" ? "px-4 py-1.5 text-base gap-2" : size === "sm" ? "px-2 py-0.5 text-[11px] gap-1" : "px-3 py-1 text-sm gap-1.5";
   const dotClass = size === "lg" ? "h-3 w-3" : size === "sm" ? "h-2 w-2" : "h-2.5 w-2.5";
 
-  const label = rank.isUnnamed ? "Unnamed" : `${rank.name} ${rank.tier}`;
-  const sub = rank.isUnnamed && globalRank != null ? ` #${globalRank.toLocaleString()}` : "";
+  const label = rank.isExpert ? "Expert" : `${rank.name} ${rank.tier}`;
+  const sub = rank.isExpert && globalRank != null ? ` #${globalRank.toLocaleString()}` : "";
 
   return (
     <span
@@ -28,7 +28,7 @@ export function RankBadge({
         {label}
         {sub}
       </span>
-      {!rank.isUnnamed && showTier && (
+      {!rank.isExpert && showTier && (
         <span className="opacity-70" title={`Tier ${rank.tier} of 5`}>
           · {rank.tier}/5
         </span>

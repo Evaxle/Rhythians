@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Link2, LogIn, Trophy } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
-import { getDailyLeaderboard, startOfMonthUTC } from "@/lib/daily";
+import { getDailyLeaderboard } from "@/lib/daily";
 import { getChallengeLeaderboard } from "@/lib/maps";
 import { LeaderboardTabs } from "@/components/daily/leaderboard-tabs";
 
@@ -52,10 +52,9 @@ export default async function LeaderboardsPage() {
     );
   }
 
-  const monthStart = startOfMonthUTC();
-  const monthEnd = new Date(Date.UTC(monthStart.getUTCFullYear(), monthStart.getUTCMonth() + 1, 1));
-  const monthLabel = monthStart.toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
-  const dailyRows = await getDailyLeaderboard(monthStart, monthEnd, 100);
+  const dailyLeaderboards = await Promise.all(
+    [0, 1, 2, 3, 4, 5, 6, 7, 8].map((rankIndex) => getDailyLeaderboard(rankIndex, 100))
+  );
   const challengeLeaderboards = await Promise.all(
     [0, 1, 2, 3, 4, 5, 6, 7, 8].map((rankIndex) => getChallengeLeaderboard(rankIndex, 100))
   );
@@ -69,12 +68,12 @@ export default async function LeaderboardsPage() {
         <h1 className="text-3xl font-semibold text-white">Rhythian standings</h1>
         <p className="text-sm text-muted">
           Earn Rhythian Points (RHP) by beating daily maps and ranked challenge maps to climb the ladder.
+          Daily leaderboards track your daily map streak within your rank.
         </p>
       </section>
 
       <LeaderboardTabs
-        dailyRows={dailyRows}
-        monthLabel={`${monthLabel} daily map standings`}
+        dailyLeaderboards={dailyLeaderboards}
         challengeLeaderboards={challengeLeaderboards}
         currentUserId={user.id}
       />

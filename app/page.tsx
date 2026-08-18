@@ -9,32 +9,50 @@ import { HomeDailySection } from "@/components/daily/home-daily-section";
 import { HomeLeaderboardSection } from "@/components/daily/home-leaderboard-section";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 async function getStats() {
-  const [members, clips, online] = await Promise.all([
+  const [members, clips, online] = await Promise.allSettled([
     prisma.user.count(),
     prisma.clip.count({ where: { status: "approved" } }),
     getOnlineUserCount(),
   ]);
-  const articles = getPublishedArticleCount();
-  return { members, articles, clips, online };
+  if (members.status === "rejected") console.error("Member count unavailable:", members.reason);
+  if (clips.status === "rejected") console.error("Clip count unavailable:", clips.reason);
+  if (online.status === "rejected") console.error("Online count unavailable:", online.reason);
+  return {
+    members: members.status === "fulfilled" ? members.value : 0,
+    articles: getPublishedArticleCount(),
+    clips: clips.status === "fulfilled" ? clips.value : 0,
+    online: online.status === "fulfilled" ? online.value : 0,
+  };
 }
 
 async function getFeaturedClips() {
-  return prisma.clip.findMany({
-    where: { status: "approved", featuredOrder: { not: null } },
-    orderBy: { featuredOrder: "asc" },
-    include: { uploader: { select: { username: true } }, category: { select: { name: true } } },
-  });
+  try {
+    return await prisma.clip.findMany({
+      where: { status: "approved", featuredOrder: { not: null } },
+      orderBy: { featuredOrder: "asc" },
+      include: { uploader: { select: { username: true } }, category: { select: { name: true } } },
+    });
+  } catch (error) {
+    console.error("Featured clips unavailable:", error);
+    return [];
+  }
 }
 
 async function getLatestAnnouncements() {
-  return prisma.announcement.findMany({
-    where: { published: true },
-    orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
-    take: 3,
-    select: { id: true, title: true, slug: true, createdAt: true },
-  });
+  try {
+    return await prisma.announcement.findMany({
+      where: { published: true },
+      orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
+      take: 3,
+      select: { id: true, title: true, slug: true, createdAt: true },
+    });
+  } catch (error) {
+    console.error("Announcements unavailable:", error);
+    return [];
+  }
 }
 
 export default async function HomePage() {
@@ -43,7 +61,7 @@ export default async function HomePage() {
   const announcements = await getLatestAnnouncements();
   const user = await getSessionUser();
   const linkedProfile = user
-    ? await prisma.rhythiaProfile.findUnique({ where: { userId: user.id }, select: { id: true } })
+    ? await prisma.rhythiaProfile.findUnique({ where: { userId: user.id }, select: { id: true } }).catch(() => null)
     : null;
 
   return (
@@ -61,7 +79,7 @@ export default async function HomePage() {
             </div>
             <div className="flex flex-wrap gap-3">
               <Link href="/community" className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent2">Join Discord</Link>
-              <Link href="/knowledge" className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-5 py-3 text-sm text-white transition hover:border-accent/40">Explore Knowledge</Link>
+              <Link href="/wiki" className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-5 py-3 text-sm text-white transition hover:border-accent/40">Explore Wiki</Link>
               {user && !linkedProfile && (
                 <Link href={`/profile/${user.profileHandle}`} className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-5 py-3 text-sm font-semibold text-amber-200 transition hover:bg-amber-400/20">
                   <Link2 size={16} /> Link your Rhythia account
@@ -110,9 +128,9 @@ export default async function HomePage() {
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/15 text-accent">
             <BookOpen size={24} />
           </div>
-          <h2 className="mt-4 text-xl font-semibold text-white">Knowledge</h2>
+          <h2 className="mt-4 text-xl font-semibold text-white">Wiki</h2>
           <p className="mt-2 text-sm leading-6 text-muted">Explore the wiki, guides, FAQs, and resources curated for the community.</p>
-          <Link href="/knowledge" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-accent transition hover:text-white">
+          <Link href="/wiki" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-accent transition hover:text-white">
             View articles <ArrowRight size={16} />
           </Link>
         </article>

@@ -2,14 +2,32 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { getThumbnailUrl } from "@/lib/clips";
 import { cameraModeLabel, cameraModeEmoji } from "@/lib/camera-mode";
+import { Music, Tag as TagIcon } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
-export default async function ClipsPage() {
+export default async function ClipsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ song?: string; tag?: string }>;
+}) {
+  const params = await searchParams;
+  const song = typeof params?.song === "string" ? params.song.trim() : "";
+  const tag = typeof params?.tag === "string" ? params.tag.trim() : "";
+
+  const where: Record<string, unknown> = { status: "approved" };
+  if (song) where.songName = { contains: song, mode: "insensitive" };
+  if (tag) where.tags = { some: { tag: { slug: tag } } };
+
   const clips = await prisma.clip.findMany({
-    where: { status: "approved" },
+    where,
     orderBy: { createdAt: "desc" },
-    include: { uploader: true, category: true, reviewedBy: { select: { username: true, discriminator: true, displayName: true } } },
+    include: {
+      uploader: true,
+      category: true,
+      reviewedBy: { select: { username: true, discriminator: true, displayName: true } },
+      tags: { include: { tag: true } },
+    },
     take: 12,
   });
 
@@ -19,6 +37,8 @@ export default async function ClipsPage() {
       thumbnailUrl: await getThumbnailUrl(clip.thumbnailPath),
     }))
   );
+
+  const filterLabel = song ? `filtered by song "${song}"` : tag ? `filtered by tag "${tag}"` : "";
 
   return (
     <div className="space-y-8">
@@ -31,7 +51,13 @@ export default async function ClipsPage() {
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-muted">
               Watch the latest approved submissions from the community.
+              {filterLabel && <span className="text-white"> {filterLabel}.</span>}
             </p>
+            {(song || tag) && (
+              <Link href="/clips" className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-accent hover:text-white">
+                Clear filter
+              </Link>
+            )}
           </div>
           <Link
             href="/clips/submit"
@@ -44,7 +70,7 @@ export default async function ClipsPage() {
 
       {clipsWithThumbs.length === 0 ? (
         <div className="rounded-3xl border border-border bg-background/80 p-8 text-sm text-muted">
-          No approved clips are available yet.
+          {song || tag ? "No clips match that filter yet." : "No approved clips are available yet."}
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -83,6 +109,20 @@ export default async function ClipsPage() {
                   <h2 className="mt-4 text-lg font-semibold text-white">
                     {clip.title}
                   </h2>
+                  {clip.songName && (
+                    <p className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-2.5 py-0.5 text-xs font-semibold text-accent">
+                      <Music size={12} /> {clip.songName}
+                    </p>
+                  )}
+                  {clip.tags.length > 0 && (
+                    <p className="mt-2 flex flex-wrap gap-1.5">
+                      {clip.tags.slice(0, 3).map(({ tag }) => (
+                        <span key={tag.id} className="inline-flex items-center gap-1 rounded-full border border-border bg-background/60 px-2 py-0.5 text-[11px] font-medium text-muted">
+                          <TagIcon className="h-3 w-3" /> {tag.name}
+                        </span>
+                      ))}
+                    </p>
+                  )}
                   {clip.reviewedBy && (
                     <p className="mt-2 text-xs text-muted">
                       Approved by <span className="font-semibold text-white">{clip.reviewedBy.displayName ?? clip.reviewedBy.username}</span>

@@ -11,9 +11,9 @@ export function RankProgress({ rhp, globalRank }: { rhp: number; globalRank: num
         <span className="text-lg font-semibold text-white">{rhp.toLocaleString()} RHP</span>
       </div>
 
-      {rank.isUnnamed ? (
+      {rank.isExpert ? (
         <p className="text-sm leading-6 text-muted">
-          You are in the <span style={{ color: rank.color }} className="font-semibold">Unnamed</span> rank — the peak of
+          You are in the <span style={{ color: rank.color }} className="font-semibold">Expert</span> rank — the peak of
           the ladder. Your global position:{" "}
           <span className="font-semibold text-white">{globalRank != null ? `#${globalRank.toLocaleString()}` : "—"}</span>
         </p>

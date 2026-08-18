@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { canAccessAdmin } from "@/lib/admin-access";
 import { fetchRhythiaProfile } from "@/lib/rhythia";
+import { awardRhythiaRpCredit, checkAndAwardAllChallengeMaps } from "@/lib/maps";
 
 export const dynamic = "force-dynamic";
 
@@ -55,6 +56,7 @@ export async function PATCH(request: Request, { params }: Props) {
       create: { userId: requestRecord.userId, profileUrl: requestRecord.profileUrl, ...profileData },
       update: { profileUrl: requestRecord.profileUrl, ...profileData, syncedAt: now },
     });
+    await prisma.user.update({ where: { id: requestRecord.userId }, data: { rhythiaVerified: true } });
     await prisma.rhythiaProfileRequest.update({
       where: { id },
       data: { status: "approved", adminNote: message || null, resolvedAt: now, resolvedBy: admin.id },
@@ -68,6 +70,27 @@ export async function PATCH(request: Request, { params }: Props) {
         url: `/profile/${requestRecord.user.profileHandle}`,
       },
     });
+
+    // On first connect: import historical passes (only maps in the user's rank
+    // range award RHP), then weigh their total Rhythia RP into RHP. Importing
+    // first lets the user climb through every rank they have passes for; the RP
+    // credit then places them at their true skill rank.
+    const approvedUser = await prisma.user.findUnique({
+      where: { id: requestRecord.userId },
+      select: { scoreImportDone: true },
+    });
+    if (!approvedUser?.scoreImportDone) {
+      try {
+        await checkAndAwardAllChallengeMaps(requestRecord.userId);
+      } catch {
+        // The profile is linked either way; the user can import scores later from settings.
+      }
+    }
+    try {
+      await awardRhythiaRpCredit(requestRecord.userId, profileData.rhythmPoints);
+    } catch {
+      // The RP credit is best-effort; the profile is linked either way.
+    }
   } else {
     await prisma.rhythiaProfileRequest.update({
       where: { id },
