@@ -32,37 +32,53 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (!process.env.DISCORD_CLIENT_ID || !process.env.DISCORD_CLIENT_SECRET || !process.env.DISCORD_REDIRECT_URI) {
+  const clientId = process.env.DISCORD_CLIENT_ID?.trim();
+  const clientSecret = process.env.DISCORD_CLIENT_SECRET?.trim();
+  const redirectUri = process.env.DISCORD_REDIRECT_URI?.trim();
+  if (!clientId || !clientSecret || !redirectUri) {
     return NextResponse.json({ error: "Discord OAuth not configured" }, { status: 500 });
   }
 
   const tokenBody = new URLSearchParams({
-    client_id: process.env.DISCORD_CLIENT_ID,
-    client_secret: process.env.DISCORD_CLIENT_SECRET,
+    client_id: clientId,
+    client_secret: clientSecret,
     grant_type: "authorization_code",
     code,
-    redirect_uri: process.env.DISCORD_REDIRECT_URI,
+    redirect_uri: redirectUri,
   });
 
-  const tokenResponse = await fetch(DISCORD_TOKEN_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: tokenBody,
-  });
+  let tokenResponse: Response;
+  try {
+    tokenResponse = await fetch(DISCORD_TOKEN_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: tokenBody,
+      cache: "no-store",
+    });
+  } catch (error) {
+    console.error("Discord token request failed:", error);
+    return NextResponse.redirect(new URL("/login?error=discord_network", request.url));
+  }
 
   if (!tokenResponse.ok) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    const detail = await tokenResponse.text().catch(() => "");
+    console.error("Discord token exchange failed:", tokenResponse.status, detail.slice(0, 300));
+    return NextResponse.redirect(new URL("/login?error=discord_config", request.url));
   }
 
   const tokenData = await tokenResponse.json();
   const accessToken = tokenData.access_token;
+  if (typeof accessToken !== "string" || !accessToken) {
+    return NextResponse.redirect(new URL("/login?error=discord_token", request.url));
+  }
 
   const userResponse = await fetch(DISCORD_USER_URL, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
 
   if (!userResponse.ok) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    console.error("Discord user lookup failed:", userResponse.status);
+    return NextResponse.redirect(new URL("/login?error=discord_user", request.url));
   }
 
   const discordUser = await userResponse.json();

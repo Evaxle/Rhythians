@@ -4,10 +4,21 @@ import { getSessionUser } from "@/lib/auth";
 import { LoginForm } from "@/components/login-form";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
-export default async function LoginPage() {
-  const user = await getSessionUser();
+export default async function LoginPage({ searchParams }: { searchParams?: Promise<{ error?: string }> }) {
+  const user = await getSessionUser().catch(() => null);
   if (user) redirect("/");
+  const error = (await searchParams)?.error;
+  const errorMessage = error === "discord_config"
+    ? "Discord rejected the OAuth configuration. Check the client secret and exact redirect URI."
+    : error === "discord_network"
+      ? "Discord could not be reached. Try again shortly."
+      : error === "discord_user" || error === "discord_token"
+        ? "Discord authentication did not return a valid account. Try again."
+        : error === "oauth_failed"
+          ? "Discord sign-in failed while saving your account. Try again."
+          : null;
 
   return (
     <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
@@ -32,6 +43,7 @@ export default async function LoginPage() {
           Use your Rhythians username or email and password.
         </p>
         <div className="mt-6">
+          {errorMessage && <p className="mb-4 rounded-xl border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-200">{errorMessage}</p>}
           <LoginForm />
         </div>
       </section>
