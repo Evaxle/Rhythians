@@ -21,13 +21,7 @@ export function LoginForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ identifier, password }),
       });
-      const text = await response.text();
-      let data: { error?: string; redirectTo?: string } = {};
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch {
-        throw new Error(`Authentication request failed (${response.status}).`);
-      }
+      const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Could not sign in.");
       router.push(data.redirectTo ?? "/");
       router.refresh();
@@ -42,7 +36,7 @@ export function LoginForm() {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label htmlFor="identifier" className="mb-1.5 block text-sm font-medium text-white">
-          Username
+          Username or email
         </label>
         <input
           id="identifier"

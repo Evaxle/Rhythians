@@ -57,26 +57,6 @@ export const ChallengeMapStatus = {
 export type ChallengeMapStatus = (typeof ChallengeMapStatus)[keyof typeof ChallengeMapStatus]
 
 
-export const CategoryType = {
-  jumps: 'jumps',
-  stream: 'stream',
-  tech: 'tech',
-  off_grid: 'off_grid'
-} as const
-
-export type CategoryType = (typeof CategoryType)[keyof typeof CategoryType]
-
-
-export const CategoryMapStatus = {
-  pending: 'pending',
-  approved: 'approved',
-  rejected: 'rejected',
-  hidden: 'hidden'
-} as const
-
-export type CategoryMapStatus = (typeof CategoryMapStatus)[keyof typeof CategoryMapStatus]
-
-
 export const ConversationType = {
   direct: 'direct',
   group: 'group'

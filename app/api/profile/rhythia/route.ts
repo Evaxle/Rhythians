@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { fetchRhythiaProfile, namesMatch, parseRhythiaUrl } from "@/lib/rhythia";
-import { awardRhythiaRpCredit, checkAndAwardAllChallengeMaps } from "@/lib/maps";
 
 export async function POST(request: Request) {
   const user = await getSessionUser();
@@ -36,24 +35,6 @@ export async function POST(request: Request) {
       await tx.user.update({ where: { id: user.id }, data: { rhythiaVerified: true } });
       return profileRow;
     });
-
-    // On first connect: import historical passes (only maps in the user's rank
-    // range award RHP), then weigh their total Rhythia RP into RHP. Importing
-    // first lets the user climb through every rank they have passes for; the RP
-    // credit then places them at their true skill rank.
-    if (!user.scoreImportDone) {
-      try {
-        await checkAndAwardAllChallengeMaps(user.id);
-      } catch {
-        // The profile is linked either way; the user can import scores later from settings.
-      }
-    }
-    try {
-      await awardRhythiaRpCredit(user.id, profile.rhythmPoints);
-    } catch {
-      // The RP credit is best-effort; the profile is linked either way.
-    }
-
     return NextResponse.json({ profile: saved });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to load that Rhythia profile." }, { status: 502 });

@@ -7,6 +7,7 @@ import Link from "next/link";
 export function RegisterForm() {
   const router = useRouter();
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
@@ -26,15 +27,9 @@ export function RegisterForm() {
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, email, password }),
       });
-      const text = await response.text();
-      let data: { error?: string; redirectTo?: string } = {};
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch {
-        throw new Error(`Registration request failed (${response.status}).`);
-      }
+      const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Could not create your account.");
       router.push(data.redirectTo ?? "/onboarding");
       router.refresh();
@@ -58,6 +53,20 @@ export function RegisterForm() {
           required
           autoComplete="username"
           placeholder="e.g. RhythmHero"
+          className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-white outline-none transition focus:border-accent"
+        />
+      </div>
+      <div>
+        <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-white">
+          Email
+        </label>
+        <input
+          id="email"
+          type="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          required
+          autoComplete="email"
           className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-white outline-none transition focus:border-accent"
         />
       </div>

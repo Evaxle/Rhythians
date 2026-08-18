@@ -612,14 +612,6 @@ ON CONFLICT ("slug") DO NOTHING;
 `;
 
 export async function GET(request: Request) {
-  return NextResponse.json(
-    {
-      error: "This setup endpoint is retired. Deploy the Prisma migrations with npm run db:migrate instead.",
-    },
-    { status: 410 }
-  );
-
-  /*
   const url = new URL(request.url);
   const secret = url.searchParams.get("secret");
 
@@ -657,5 +649,4 @@ export async function GET(request: Request) {
     const message = err instanceof Error ? err.message : "Unknown error";
     return NextResponse.json({ error: message }, { status: 500 });
   }
-  */
 }

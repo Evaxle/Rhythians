@@ -541,40 +541,6 @@ export type EnumChallengeMapStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumChallengeMapStatusFilter<$PrismaModel>
 }
 
-export type EnumCategoryTypeFilter<$PrismaModel = never> = {
-  equals?: $Enums.CategoryType | Prisma.EnumCategoryTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.CategoryType[] | Prisma.ListEnumCategoryTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.CategoryType[] | Prisma.ListEnumCategoryTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumCategoryTypeFilter<$PrismaModel> | $Enums.CategoryType
-}
-
-export type EnumCategoryMapStatusFilter<$PrismaModel = never> = {
-  equals?: $Enums.CategoryMapStatus | Prisma.EnumCategoryMapStatusFieldRefInput<$PrismaModel>
-  in?: $Enums.CategoryMapStatus[] | Prisma.ListEnumCategoryMapStatusFieldRefInput<$PrismaModel>
-  notIn?: $Enums.CategoryMapStatus[] | Prisma.ListEnumCategoryMapStatusFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumCategoryMapStatusFilter<$PrismaModel> | $Enums.CategoryMapStatus
-}
-
-export type EnumCategoryTypeWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.CategoryType | Prisma.EnumCategoryTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.CategoryType[] | Prisma.ListEnumCategoryTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.CategoryType[] | Prisma.ListEnumCategoryTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumCategoryTypeWithAggregatesFilter<$PrismaModel> | $Enums.CategoryType
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumCategoryTypeFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumCategoryTypeFilter<$PrismaModel>
-}
-
-export type EnumCategoryMapStatusWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.CategoryMapStatus | Prisma.EnumCategoryMapStatusFieldRefInput<$PrismaModel>
-  in?: $Enums.CategoryMapStatus[] | Prisma.ListEnumCategoryMapStatusFieldRefInput<$PrismaModel>
-  notIn?: $Enums.CategoryMapStatus[] | Prisma.ListEnumCategoryMapStatusFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumCategoryMapStatusWithAggregatesFilter<$PrismaModel> | $Enums.CategoryMapStatus
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumCategoryMapStatusFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumCategoryMapStatusFilter<$PrismaModel>
-}
-
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -1037,40 +1003,6 @@ export type NestedEnumChallengeMapStatusWithAggregatesFilter<$PrismaModel = neve
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumChallengeMapStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumChallengeMapStatusFilter<$PrismaModel>
-}
-
-export type NestedEnumCategoryTypeFilter<$PrismaModel = never> = {
-  equals?: $Enums.CategoryType | Prisma.EnumCategoryTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.CategoryType[] | Prisma.ListEnumCategoryTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.CategoryType[] | Prisma.ListEnumCategoryTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumCategoryTypeFilter<$PrismaModel> | $Enums.CategoryType
-}
-
-export type NestedEnumCategoryMapStatusFilter<$PrismaModel = never> = {
-  equals?: $Enums.CategoryMapStatus | Prisma.EnumCategoryMapStatusFieldRefInput<$PrismaModel>
-  in?: $Enums.CategoryMapStatus[] | Prisma.ListEnumCategoryMapStatusFieldRefInput<$PrismaModel>
-  notIn?: $Enums.CategoryMapStatus[] | Prisma.ListEnumCategoryMapStatusFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumCategoryMapStatusFilter<$PrismaModel> | $Enums.CategoryMapStatus
-}
-
-export type NestedEnumCategoryTypeWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.CategoryType | Prisma.EnumCategoryTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.CategoryType[] | Prisma.ListEnumCategoryTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.CategoryType[] | Prisma.ListEnumCategoryTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumCategoryTypeWithAggregatesFilter<$PrismaModel> | $Enums.CategoryType
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumCategoryTypeFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumCategoryTypeFilter<$PrismaModel>
-}
-
-export type NestedEnumCategoryMapStatusWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.CategoryMapStatus | Prisma.EnumCategoryMapStatusFieldRefInput<$PrismaModel>
-  in?: $Enums.CategoryMapStatus[] | Prisma.ListEnumCategoryMapStatusFieldRefInput<$PrismaModel>
-  notIn?: $Enums.CategoryMapStatus[] | Prisma.ListEnumCategoryMapStatusFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumCategoryMapStatusWithAggregatesFilter<$PrismaModel> | $Enums.CategoryMapStatus
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumCategoryMapStatusFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumCategoryMapStatusFilter<$PrismaModel>
 }
 
 

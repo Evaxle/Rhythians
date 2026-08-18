@@ -9,50 +9,32 @@ import { HomeDailySection } from "@/components/daily/home-daily-section";
 import { HomeLeaderboardSection } from "@/components/daily/home-leaderboard-section";
 
 export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
 
 async function getStats() {
-  const [members, clips, online] = await Promise.allSettled([
+  const [members, clips, online] = await Promise.all([
     prisma.user.count(),
     prisma.clip.count({ where: { status: "approved" } }),
     getOnlineUserCount(),
   ]);
-  if (members.status === "rejected") console.error("Member count unavailable:", members.reason);
-  if (clips.status === "rejected") console.error("Clip count unavailable:", clips.reason);
-  if (online.status === "rejected") console.error("Online count unavailable:", online.reason);
-  return {
-    members: members.status === "fulfilled" ? members.value : 0,
-    articles: getPublishedArticleCount(),
-    clips: clips.status === "fulfilled" ? clips.value : 0,
-    online: online.status === "fulfilled" ? online.value : 0,
-  };
+  const articles = getPublishedArticleCount();
+  return { members, articles, clips, online };
 }
 
 async function getFeaturedClips() {
-  try {
-    return await prisma.clip.findMany({
-      where: { status: "approved", featuredOrder: { not: null } },
-      orderBy: { featuredOrder: "asc" },
-      include: { uploader: { select: { username: true } }, category: { select: { name: true } } },
-    });
-  } catch (error) {
-    console.error("Featured clips unavailable:", error);
-    return [];
-  }
+  return prisma.clip.findMany({
+    where: { status: "approved", featuredOrder: { not: null } },
+    orderBy: { featuredOrder: "asc" },
+    include: { uploader: { select: { username: true } }, category: { select: { name: true } } },
+  });
 }
 
 async function getLatestAnnouncements() {
-  try {
-    return await prisma.announcement.findMany({
-      where: { published: true },
-      orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
-      take: 3,
-      select: { id: true, title: true, slug: true, createdAt: true },
-    });
-  } catch (error) {
-    console.error("Announcements unavailable:", error);
-    return [];
-  }
+  return prisma.announcement.findMany({
+    where: { published: true },
+    orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
+    take: 3,
+    select: { id: true, title: true, slug: true, createdAt: true },
+  });
 }
 
 export default async function HomePage() {
@@ -61,7 +43,7 @@ export default async function HomePage() {
   const announcements = await getLatestAnnouncements();
   const user = await getSessionUser();
   const linkedProfile = user
-    ? await prisma.rhythiaProfile.findUnique({ where: { userId: user.id }, select: { id: true } }).catch(() => null)
+    ? await prisma.rhythiaProfile.findUnique({ where: { userId: user.id }, select: { id: true } })
     : null;
 
   return (

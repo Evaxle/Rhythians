@@ -8,16 +8,10 @@ export async function getSessionUser() {
   const cookieStore = await cookies();
   const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
   if (!sessionToken) return null;
-  let session;
-  try {
-    session = await prisma.session.findUnique({
-      where: { token: sessionToken },
-      include: { user: { include: { roles: { include: { role: { include: { permissions: { include: { permission: true } } } } } } } } },
-    });
-  } catch (error) {
-    console.error("Session lookup failed:", error);
-    return null;
-  }
+  const session = await prisma.session.findUnique({
+    where: { token: sessionToken },
+    include: { user: { include: { roles: { include: { role: { include: { permissions: { include: { permission: true } } } } } } } } },
+  });
   if (!session || session.expiresAt < new Date()) return null;
   if (session.user.isSuspended) return null;
   if (session.user.suspendedUntil && session.user.suspendedUntil > new Date()) return null;

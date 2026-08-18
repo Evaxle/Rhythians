@@ -18,8 +18,9 @@ export function CheckAllScoresButton() {
       }
       const parts: string[] = [];
       parts.push(`Checked ${body.checked} map${body.checked === 1 ? "" : "s"}`);
-      if (body.newlyCompleted > 0) parts.push(`earned ${body.totalPoints} RHP from ${body.newlyCompleted} previous score${body.newlyCompleted === 1 ? "" : "s"}`);
+      if (body.newlyCompleted > 0) parts.push(`earned ${body.totalPoints} RHP from ${body.newlyCompleted} new score${body.newlyCompleted === 1 ? "" : "s"}`);
       if (body.alreadyCompleted > 0) parts.push(`${body.alreadyCompleted} already completed`);
+      if (body.failed > 0) parts.push(`${body.failed} attempt${body.failed === 1 ? "" : "s"} recorded`);
       setMessage({ type: "success", text: `${parts.join(" · ")}.` });
     } catch (err) {
       setMessage({ type: "error", text: err instanceof Error ? err.message : "Unable to check your scores." });
@@ -37,7 +38,7 @@ export function CheckAllScoresButton() {
         className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent/80 disabled:opacity-50"
       >
         <RefreshCw size={16} className={checking ? "animate-spin" : ""} />
-        {checking ? "Scanning your scores..." : "Check scores in my rank range"}
+        {checking ? "Checking recent scores..." : "Check all recent scores"}
       </button>
       {message && (
         <p className={`text-sm ${message.type === "success" ? "text-accent" : "text-red-300"}`}>{message.text}</p>

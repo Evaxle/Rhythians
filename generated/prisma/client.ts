@@ -246,18 +246,3 @@ export type ChallengeMap = Prisma.ChallengeMapModel
  * 
  */
 export type ChallengeMapCompletion = Prisma.ChallengeMapCompletionModel
-/**
- * Model CategoryMap
- * 
- */
-export type CategoryMap = Prisma.CategoryMapModel
-/**
- * Model CategoryMapCompletion
- * 
- */
-export type CategoryMapCompletion = Prisma.CategoryMapCompletionModel
-/**
- * Model UserCategoryLevel
- * 
- */
-export type UserCategoryLevel = Prisma.UserCategoryLevelModel

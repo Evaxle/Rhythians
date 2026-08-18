@@ -43,20 +43,6 @@ enum ChallengeMapStatus {
   hidden
 }
 
-enum CategoryType {
-  jumps
-  stream
-  tech
-  off_grid
-}
-
-enum CategoryMapStatus {
-  pending
-  approved
-  rejected
-  hidden
-}
-
 enum ConversationType {
   direct
   group
@@ -155,20 +141,14 @@ model User {
   resolvedRhythiaRequests RhythiaProfileRequest[] @relation("resolvedRhythiaRequests")
   rhp             Int                  @default(0)
   avgMapRating    Float?
-  scoreImportDone Boolean              @default(false)
   dailyStreak     Int                  @default(0)
   lastDailyBeatAt DateTime?
-  lastRhythiaRpCheckAt DateTime?
   rhythiaVerified Boolean              @default(false)
   dailyMapBeats   DailyMapBeat[]
   rhpTransactions RhpTransaction[]
   challengeMaps   ChallengeMap[]       @relation("challengeMapSubmissions")
   challengeCompletions ChallengeMapCompletion[]
   reviewedChallengeMaps ChallengeMap[] @relation("challengeMapReviews")
-  categoryMaps    CategoryMap[]        @relation("categoryMapSubmissions")
-  reviewedCategoryMaps CategoryMap[]   @relation("categoryMapReviews")
-  categoryCompletions CategoryMapCompletion[]
-  categoryLevels  UserCategoryLevel[]
 }
 
 model RhythiaProfile {
@@ -705,59 +685,4 @@ model ChallengeMapCompletion {
 
   @@unique([challengeMapId, userId])
   @@index([userId])
-}
-
-model CategoryMap {
-  id              String            @id @default(uuid())
-  category        CategoryType
-  level           Int
-  title           String
-  artist          String?
-  description     String?
-  mapFileUrl      String
-  imageUrl        String?
-  mapperName      String?
-  noteCount       Int?
-  length          Int?
-  sourceBeatmapId Int?              @unique
-  sourceUrl       String?
-  submittedBy     User              @relation("categoryMapSubmissions", fields: [submittedById], references: [id])
-  submittedById   String
-  status          CategoryMapStatus @default(pending)
-  reviewerNote    String?
-  reviewedBy      User?             @relation("categoryMapReviews", fields: [reviewedById], references: [id], onDelete: SetNull)
-  reviewedById    String?
-  reviewedAt      DateTime?
-  completions     CategoryMapCompletion[]
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-
-  @@index([category, level])
-  @@index([status])
-}
-
-model CategoryMapCompletion {
-  id             String      @id @default(uuid())
-  categoryMap    CategoryMap @relation(fields: [categoryMapId], references: [id], onDelete: Cascade)
-  categoryMapId  String
-  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId         String
-  passed         Boolean
-  accuracy       Float?
-  scoreId        Int?
-  createdAt      DateTime    @default(now())
-
-  @@unique([categoryMapId, userId])
-  @@index([userId])
-}
-
-model UserCategoryLevel {
-  id         String       @id @default(uuid())
-  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     String
-  category   CategoryType
-  level      Int          @default(0)
-  updatedAt  DateTime     @updatedAt
-
-  @@unique([userId, category])
 }
