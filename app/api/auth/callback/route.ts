@@ -55,8 +55,7 @@ export async function GET(request: Request) {
       body: tokenBody,
       cache: "no-store",
     });
-  } catch (error) {
-    console.error("Discord token request failed:", error);
+  } catch {
     return NextResponse.redirect(new URL("/login?error=discord_network", request.url));
   }
 
@@ -76,19 +75,14 @@ export async function GET(request: Request) {
   });
 
   if (!userResponse.ok) {
-    console.error("Discord user lookup failed:", userResponse.status);
-    return NextResponse.redirect(new URL("/login?error=discord_user", request.url));
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   const discordUser = await userResponse.json();
   const discordId = typeof discordUser.id === "string" ? discordUser.id : "";
   const username = typeof discordUser.username === "string" ? discordUser.username.trim() : "";
-  if (!discordId || !username) {
-    return NextResponse.redirect(new URL("/login?error=discord_user", request.url));
-  }
-  const discriminator = typeof discordUser.discriminator === "string" && discordUser.discriminator
-    ? discordUser.discriminator
-    : "0";
+  if (!discordId || !username) return NextResponse.redirect(new URL("/login?error=discord_user", request.url));
+  const discriminator = typeof discordUser.discriminator === "string" && discordUser.discriminator ? discordUser.discriminator : "0";
 
   const guildMember = await getGuildMember(accessToken);
   const inGuild = guildMember !== null;
@@ -98,25 +92,10 @@ export async function GET(request: Request) {
     let user = await prisma.user.findUnique({ where: { discordId } });
     if (!user) {
       const profileHandle = await generateUniqueHandle(username, discordId);
-      user = await prisma.user.create({
-        data: {
-          discordId,
-          username,
-          discriminator,
-          avatar: discordUser.avatar,
-          locale: discordUser.locale,
-          profileHandle,
-          discordRoles,
-          inGuild,
-        },
-      });
+      user = await prisma.user.create({ data: { discordId, username, discriminator, avatar: discordUser.avatar, locale: discordUser.locale, profileHandle, discordRoles, inGuild } });
     } else {
-      user = await prisma.user.update({
-        where: { id: user.id },
-        data: { username, discriminator, avatar: discordUser.avatar, locale: discordUser.locale, discordRoles, inGuild },
-      });
+      user = await prisma.user.update({ where: { id: user.id }, data: { username, discriminator, avatar: discordUser.avatar, locale: discordUser.locale, discordRoles, inGuild } });
     }
-
     try {
       await ensureTagsExist();
       if (inGuild) await syncUserTagsFromDiscord(prisma, user.id, discordRoles);
@@ -124,7 +103,6 @@ export async function GET(request: Request) {
     } catch (error) {
       console.error("Discord tag sync skipped:", error);
     }
-
     const token = await createSession(user.id);
     const response = NextResponse.redirect(new URL("/", request.url));
     setSessionCookie(response, token);
@@ -140,10 +118,9 @@ export async function GET(request: Request) {
 async function generateUniqueHandle(username: string, discordId: string): Promise<string> {
   const base = username.toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "user";
   const root = `${base}-${discordId.slice(-8)}`;
-  let handle = root;
   for (let attempt = 0; attempt < 10; attempt++) {
+    const handle = attempt === 0 ? root : `${root}-${Math.random().toString(36).slice(2, 7)}`;
     if (!(await prisma.user.findUnique({ where: { profileHandle: handle } }))) return handle;
-    handle = `${root}-${Math.random().toString(36).slice(2, 7)}`;
   }
   throw new Error("Unable to create a unique profile handle");
 }
