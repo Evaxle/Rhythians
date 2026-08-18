@@ -144,26 +144,35 @@ export async function GET(request: Request) {
       });
     }
 
-    await ensureTagsExist();
-
-    if (inGuild) {
-      await syncUserTagsFromDiscord(prisma, user.id, discordRoles);
-    } else {
-      await prisma.userTag.deleteMany({ where: { userId: user.id, source: "discord" } });
+    // Tags, Discord-role synchronization, and default-role repair are optional.
+    // They must never prevent a valid Discord account from receiving a session.
+    try {
+      await ensureTagsExist();
+      if (inGuild) {
+        await syncUserTagsFromDiscord(prisma, user.id, discordRoles);
+      } else {
+        await prisma.userTag.deleteMany({ where: { userId: user.id, source: "discord" } });
+      }
+    } catch (error) {
+      console.error("Discord role/tag sync skipped:", error);
     }
 
-    if ((await prisma.role.count()) === 0) {
-      const permissions = await prisma.permission.findMany({ select: { id: true } });
-      const adminRole = await prisma.role.create({
-        data: {
-          name: "Admin",
-          description: "Full access to community administration.",
-          permissions: {
-            create: permissions.map(({ id }) => ({ permissionId: id })),
+    try {
+      if ((await prisma.role.count()) === 0) {
+        const permissions = await prisma.permission.findMany({ select: { id: true } });
+        const adminRole = await prisma.role.create({
+          data: {
+            name: "Admin",
+            description: "Full access to community administration.",
+            permissions: {
+              create: permissions.map(({ id }) => ({ permissionId: id })),
+            },
           },
-        },
-      });
-      await prisma.userRole.create({ data: { userId: user.id, roleId: adminRole.id } });
+        });
+        await prisma.userRole.create({ data: { userId: user.id, roleId: adminRole.id } });
+      }
+    } catch (error) {
+      console.error("Default role repair skipped:", error);
     }
 
     const token = await createSession(user.id);
