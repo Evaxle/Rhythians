@@ -91,7 +91,10 @@ export const ModelName = {
   DailyMapBeat: 'DailyMapBeat',
   RhpTransaction: 'RhpTransaction',
   ChallengeMap: 'ChallengeMap',
-  ChallengeMapCompletion: 'ChallengeMapCompletion'
+  ChallengeMapCompletion: 'ChallengeMapCompletion',
+  CategoryMap: 'CategoryMap',
+  CategoryMapCompletion: 'CategoryMapCompletion',
+  UserCategoryLevel: 'UserCategoryLevel'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -138,6 +141,7 @@ export const UserScalarFieldEnum = {
   scoreImportDone: 'scoreImportDone',
   dailyStreak: 'dailyStreak',
   lastDailyBeatAt: 'lastDailyBeatAt',
+  lastRhythiaRpCheckAt: 'lastRhythiaRpCheckAt',
   rhythiaVerified: 'rhythiaVerified'
 } as const
 
@@ -686,6 +690,56 @@ export const ChallengeMapCompletionScalarFieldEnum = {
 } as const
 
 export type ChallengeMapCompletionScalarFieldEnum = (typeof ChallengeMapCompletionScalarFieldEnum)[keyof typeof ChallengeMapCompletionScalarFieldEnum]
+
+
+export const CategoryMapScalarFieldEnum = {
+  id: 'id',
+  category: 'category',
+  level: 'level',
+  title: 'title',
+  artist: 'artist',
+  description: 'description',
+  mapFileUrl: 'mapFileUrl',
+  imageUrl: 'imageUrl',
+  mapperName: 'mapperName',
+  noteCount: 'noteCount',
+  length: 'length',
+  sourceBeatmapId: 'sourceBeatmapId',
+  sourceUrl: 'sourceUrl',
+  submittedById: 'submittedById',
+  status: 'status',
+  reviewerNote: 'reviewerNote',
+  reviewedById: 'reviewedById',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CategoryMapScalarFieldEnum = (typeof CategoryMapScalarFieldEnum)[keyof typeof CategoryMapScalarFieldEnum]
+
+
+export const CategoryMapCompletionScalarFieldEnum = {
+  id: 'id',
+  categoryMapId: 'categoryMapId',
+  userId: 'userId',
+  passed: 'passed',
+  accuracy: 'accuracy',
+  scoreId: 'scoreId',
+  createdAt: 'createdAt'
+} as const
+
+export type CategoryMapCompletionScalarFieldEnum = (typeof CategoryMapCompletionScalarFieldEnum)[keyof typeof CategoryMapCompletionScalarFieldEnum]
+
+
+export const UserCategoryLevelScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  category: 'category',
+  level: 'level',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserCategoryLevelScalarFieldEnum = (typeof UserCategoryLevelScalarFieldEnum)[keyof typeof UserCategoryLevelScalarFieldEnum]
 
 
 export const SortOrder = {

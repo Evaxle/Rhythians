@@ -15,6 +15,7 @@ import { getUserGlobalRank } from "@/lib/maps";
 import { RhythiaVerifiedBadge } from "@/components/rhythia-verified-badge";
 import { ProfileScoreRefresh } from "@/components/profile-score-refresh";
 import { RhythiaRpGainCheck } from "@/components/rhythia-rp-gain-check";
+import { getUserCategoryLevels } from "@/lib/categories";
 
 export const dynamic = "force-dynamic";
 
@@ -44,6 +45,7 @@ export default async function ProfilePage({ params }: Props) {
   const isOwnProfile = currentUser?.id === user.id;
   const avatarUrl = getAvatarUrl(user, 256);
   const globalRank = await getUserGlobalRank(user.id);
+  const categoryLevels = await getUserCategoryLevels(user.id);
 
   let presence: { isOnline: boolean; lastActiveAt: Date | null } | null = null;
   if (user.rhythiaProfile) {
@@ -150,6 +152,26 @@ export default async function ProfilePage({ params }: Props) {
       </section>
 
       {user.rhythiaProfile && <RhythiaStats profile={user.rhythiaProfile} />}
+
+      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm uppercase tracking-[0.3em] text-accent">Categories</p>
+            <h2 className="mt-2 text-2xl font-semibold text-white">Skill category levels</h2>
+          </div>
+          <Link href="/categories" className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent/20">
+            View categories
+          </Link>
+        </div>
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {categoryLevels.map(({ category, level }) => (
+            <div key={category} className="rounded-2xl border border-border bg-background/60 p-4">
+              <p className="text-xs uppercase tracking-[0.2em] text-accent">{category === "off_grid" ? "Off Grid" : category.charAt(0).toUpperCase() + category.slice(1)}</p>
+              <p className="mt-2 text-2xl font-semibold text-white">Level {level}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <section className="space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

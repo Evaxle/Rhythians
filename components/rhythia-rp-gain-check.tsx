@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // Fires the 24-hour Rhythia RP gain check once on mount. The server gates the
 // actual re-weight to once per day, so this is cheap on every other visit. If a
@@ -8,11 +8,11 @@ import { useEffect, useState } from "react";
 // nothing (the notification bell also reports the gain).
 export function RhythiaRpGainCheck() {
   const [message, setMessage] = useState<string | null>(null);
-  const [done, setDone] = useState(false);
+  const firedRef = useRef(false);
 
   useEffect(() => {
-    if (done) return;
-    setDone(true);
+    if (firedRef.current) return;
+    firedRef.current = true;
     (async () => {
       try {
         const response = await fetch("/api/rhythia/rp-check", { method: "POST" });
@@ -24,7 +24,7 @@ export function RhythiaRpGainCheck() {
         // Best-effort; the daily cron and next visit will retry.
       }
     })();
-  }, [done]);
+  }, []);
 
   if (!message) return null;
   return <p className="text-xs font-semibold text-accent">{message}</p>;

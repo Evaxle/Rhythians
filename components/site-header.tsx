@@ -23,6 +23,7 @@ export async function SiteHeader() {
             <Link href="/" className="text-sm text-muted transition hover:text-white">Home</Link>
             <Link href="/daily" className="text-sm text-muted transition hover:text-white">Daily</Link>
             <Link href="/maps" className="text-sm text-muted transition hover:text-white">Maps</Link>
+            <Link href="/categories" className="text-sm text-muted transition hover:text-white">Categories</Link>
             <Link href="/leaderboards" className="text-sm text-muted transition hover:text-white">Leaderboards</Link>
             <Link href="/wiki" className="text-sm text-muted transition hover:text-white">Wiki</Link>
             <Link href="/clips" className="text-sm text-muted transition hover:text-white">Clips</Link>

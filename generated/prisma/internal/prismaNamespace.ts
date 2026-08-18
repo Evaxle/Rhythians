@@ -437,7 +437,10 @@ export const ModelName = {
   DailyMapBeat: 'DailyMapBeat',
   RhpTransaction: 'RhpTransaction',
   ChallengeMap: 'ChallengeMap',
-  ChallengeMapCompletion: 'ChallengeMapCompletion'
+  ChallengeMapCompletion: 'ChallengeMapCompletion',
+  CategoryMap: 'CategoryMap',
+  CategoryMapCompletion: 'CategoryMapCompletion',
+  UserCategoryLevel: 'UserCategoryLevel'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -453,7 +456,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "rhythiaProfile" | "rhythiaProfileRequest" | "userWarning" | "session" | "role" | "permission" | "rolePermission" | "userRole" | "discordRoleMapping" | "playerRank" | "discordRoleRankMapping" | "rule" | "knowledgeCategory" | "knowledgeArticle" | "tag" | "userTag" | "discordRoleTagMapping" | "coachComment" | "articleTag" | "articleRevision" | "clipCategory" | "clip" | "clipTag" | "clipLike" | "clipView" | "comment" | "report" | "announcement" | "notification" | "moderationAction" | "siteSetting" | "conversation" | "conversationMember" | "message" | "friendRequest" | "dailyMap" | "dailyMapBeat" | "rhpTransaction" | "challengeMap" | "challengeMapCompletion"
+    modelProps: "user" | "rhythiaProfile" | "rhythiaProfileRequest" | "userWarning" | "session" | "role" | "permission" | "rolePermission" | "userRole" | "discordRoleMapping" | "playerRank" | "discordRoleRankMapping" | "rule" | "knowledgeCategory" | "knowledgeArticle" | "tag" | "userTag" | "discordRoleTagMapping" | "coachComment" | "articleTag" | "articleRevision" | "clipCategory" | "clip" | "clipTag" | "clipLike" | "clipView" | "comment" | "report" | "announcement" | "notification" | "moderationAction" | "siteSetting" | "conversation" | "conversationMember" | "message" | "friendRequest" | "dailyMap" | "dailyMapBeat" | "rhpTransaction" | "challengeMap" | "challengeMapCompletion" | "categoryMap" | "categoryMapCompletion" | "userCategoryLevel"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3491,6 +3494,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    CategoryMap: {
+      payload: Prisma.$CategoryMapPayload<ExtArgs>
+      fields: Prisma.CategoryMapFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CategoryMapFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMapPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CategoryMapFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMapPayload>
+        }
+        findFirst: {
+          args: Prisma.CategoryMapFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMapPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CategoryMapFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMapPayload>
+        }
+        findMany: {
+          args: Prisma.CategoryMapFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMapPayload>[]
+        }
+        create: {
+          args: Prisma.CategoryMapCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMapPayload>
+        }
+        createMany: {
+          args: Prisma.CategoryMapCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CategoryMapCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMapPayload>[]
+        }
+        delete: {
+          args: Prisma.CategoryMapDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMapPayload>
+        }
+        update: {
+          args: Prisma.CategoryMapUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMapPayload>
+        }
+        deleteMany: {
+          args: Prisma.CategoryMapDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CategoryMapUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CategoryMapUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMapPayload>[]
+        }
+        upsert: {
+          args: Prisma.CategoryMapUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMapPayload>
+        }
+        aggregate: {
+          args: Prisma.CategoryMapAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCategoryMap>
+        }
+        groupBy: {
+          args: Prisma.CategoryMapGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CategoryMapGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CategoryMapCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CategoryMapCountAggregateOutputType> | number
+        }
+      }
+    }
+    CategoryMapCompletion: {
+      payload: Prisma.$CategoryMapCompletionPayload<ExtArgs>
+      fields: Prisma.CategoryMapCompletionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CategoryMapCompletionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMapCompletionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CategoryMapCompletionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMapCompletionPayload>
+        }
+        findFirst: {
+          args: Prisma.CategoryMapCompletionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMapCompletionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CategoryMapCompletionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMapCompletionPayload>
+        }
+        findMany: {
+          args: Prisma.CategoryMapCompletionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMapCompletionPayload>[]
+        }
+        create: {
+          args: Prisma.CategoryMapCompletionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMapCompletionPayload>
+        }
+        createMany: {
+          args: Prisma.CategoryMapCompletionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CategoryMapCompletionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMapCompletionPayload>[]
+        }
+        delete: {
+          args: Prisma.CategoryMapCompletionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMapCompletionPayload>
+        }
+        update: {
+          args: Prisma.CategoryMapCompletionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMapCompletionPayload>
+        }
+        deleteMany: {
+          args: Prisma.CategoryMapCompletionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CategoryMapCompletionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CategoryMapCompletionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMapCompletionPayload>[]
+        }
+        upsert: {
+          args: Prisma.CategoryMapCompletionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMapCompletionPayload>
+        }
+        aggregate: {
+          args: Prisma.CategoryMapCompletionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCategoryMapCompletion>
+        }
+        groupBy: {
+          args: Prisma.CategoryMapCompletionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CategoryMapCompletionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CategoryMapCompletionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CategoryMapCompletionCountAggregateOutputType> | number
+        }
+      }
+    }
+    UserCategoryLevel: {
+      payload: Prisma.$UserCategoryLevelPayload<ExtArgs>
+      fields: Prisma.UserCategoryLevelFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserCategoryLevelFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserCategoryLevelPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserCategoryLevelFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserCategoryLevelPayload>
+        }
+        findFirst: {
+          args: Prisma.UserCategoryLevelFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserCategoryLevelPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserCategoryLevelFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserCategoryLevelPayload>
+        }
+        findMany: {
+          args: Prisma.UserCategoryLevelFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserCategoryLevelPayload>[]
+        }
+        create: {
+          args: Prisma.UserCategoryLevelCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserCategoryLevelPayload>
+        }
+        createMany: {
+          args: Prisma.UserCategoryLevelCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserCategoryLevelCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserCategoryLevelPayload>[]
+        }
+        delete: {
+          args: Prisma.UserCategoryLevelDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserCategoryLevelPayload>
+        }
+        update: {
+          args: Prisma.UserCategoryLevelUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserCategoryLevelPayload>
+        }
+        deleteMany: {
+          args: Prisma.UserCategoryLevelDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserCategoryLevelUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserCategoryLevelUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserCategoryLevelPayload>[]
+        }
+        upsert: {
+          args: Prisma.UserCategoryLevelUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserCategoryLevelPayload>
+        }
+        aggregate: {
+          args: Prisma.UserCategoryLevelAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserCategoryLevel>
+        }
+        groupBy: {
+          args: Prisma.UserCategoryLevelGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserCategoryLevelGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserCategoryLevelCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserCategoryLevelCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -3558,6 +3783,7 @@ export const UserScalarFieldEnum = {
   scoreImportDone: 'scoreImportDone',
   dailyStreak: 'dailyStreak',
   lastDailyBeatAt: 'lastDailyBeatAt',
+  lastRhythiaRpCheckAt: 'lastRhythiaRpCheckAt',
   rhythiaVerified: 'rhythiaVerified'
 } as const
 
@@ -4108,6 +4334,56 @@ export const ChallengeMapCompletionScalarFieldEnum = {
 export type ChallengeMapCompletionScalarFieldEnum = (typeof ChallengeMapCompletionScalarFieldEnum)[keyof typeof ChallengeMapCompletionScalarFieldEnum]
 
 
+export const CategoryMapScalarFieldEnum = {
+  id: 'id',
+  category: 'category',
+  level: 'level',
+  title: 'title',
+  artist: 'artist',
+  description: 'description',
+  mapFileUrl: 'mapFileUrl',
+  imageUrl: 'imageUrl',
+  mapperName: 'mapperName',
+  noteCount: 'noteCount',
+  length: 'length',
+  sourceBeatmapId: 'sourceBeatmapId',
+  sourceUrl: 'sourceUrl',
+  submittedById: 'submittedById',
+  status: 'status',
+  reviewerNote: 'reviewerNote',
+  reviewedById: 'reviewedById',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CategoryMapScalarFieldEnum = (typeof CategoryMapScalarFieldEnum)[keyof typeof CategoryMapScalarFieldEnum]
+
+
+export const CategoryMapCompletionScalarFieldEnum = {
+  id: 'id',
+  categoryMapId: 'categoryMapId',
+  userId: 'userId',
+  passed: 'passed',
+  accuracy: 'accuracy',
+  scoreId: 'scoreId',
+  createdAt: 'createdAt'
+} as const
+
+export type CategoryMapCompletionScalarFieldEnum = (typeof CategoryMapCompletionScalarFieldEnum)[keyof typeof CategoryMapCompletionScalarFieldEnum]
+
+
+export const UserCategoryLevelScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  category: 'category',
+  level: 'level',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserCategoryLevelScalarFieldEnum = (typeof UserCategoryLevelScalarFieldEnum)[keyof typeof UserCategoryLevelScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -4378,6 +4654,34 @@ export type EnumChallengeMapStatusFieldRefInput<$PrismaModel> = FieldRefInputTyp
 export type ListEnumChallengeMapStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChallengeMapStatus[]'>
     
 
+
+/**
+ * Reference to a field of type 'CategoryType'
+ */
+export type EnumCategoryTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CategoryType'>
+    
+
+
+/**
+ * Reference to a field of type 'CategoryType[]'
+ */
+export type ListEnumCategoryTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CategoryType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CategoryMapStatus'
+ */
+export type EnumCategoryMapStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CategoryMapStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CategoryMapStatus[]'
+ */
+export type ListEnumCategoryMapStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CategoryMapStatus[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -4570,6 +4874,9 @@ export type GlobalOmitConfig = {
   rhpTransaction?: Prisma.RhpTransactionOmit
   challengeMap?: Prisma.ChallengeMapOmit
   challengeMapCompletion?: Prisma.ChallengeMapCompletionOmit
+  categoryMap?: Prisma.CategoryMapOmit
+  categoryMapCompletion?: Prisma.CategoryMapCompletionOmit
+  userCategoryLevel?: Prisma.UserCategoryLevelOmit
 }
 
 /* Types for Logging */

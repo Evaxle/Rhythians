@@ -65,6 +65,7 @@ export type UserMinAggregateOutputType = {
   scoreImportDone: boolean | null
   dailyStreak: number | null
   lastDailyBeatAt: Date | null
+  lastRhythiaRpCheckAt: Date | null
   rhythiaVerified: boolean | null
 }
 
@@ -95,6 +96,7 @@ export type UserMaxAggregateOutputType = {
   scoreImportDone: boolean | null
   dailyStreak: number | null
   lastDailyBeatAt: Date | null
+  lastRhythiaRpCheckAt: Date | null
   rhythiaVerified: boolean | null
 }
 
@@ -126,6 +128,7 @@ export type UserCountAggregateOutputType = {
   scoreImportDone: number
   dailyStreak: number
   lastDailyBeatAt: number
+  lastRhythiaRpCheckAt: number
   rhythiaVerified: number
   _all: number
 }
@@ -170,6 +173,7 @@ export type UserMinAggregateInputType = {
   scoreImportDone?: true
   dailyStreak?: true
   lastDailyBeatAt?: true
+  lastRhythiaRpCheckAt?: true
   rhythiaVerified?: true
 }
 
@@ -200,6 +204,7 @@ export type UserMaxAggregateInputType = {
   scoreImportDone?: true
   dailyStreak?: true
   lastDailyBeatAt?: true
+  lastRhythiaRpCheckAt?: true
   rhythiaVerified?: true
 }
 
@@ -231,6 +236,7 @@ export type UserCountAggregateInputType = {
   scoreImportDone?: true
   dailyStreak?: true
   lastDailyBeatAt?: true
+  lastRhythiaRpCheckAt?: true
   rhythiaVerified?: true
   _all?: true
 }
@@ -349,6 +355,7 @@ export type UserGroupByOutputType = {
   scoreImportDone: boolean
   dailyStreak: number
   lastDailyBeatAt: Date | null
+  lastRhythiaRpCheckAt: Date | null
   rhythiaVerified: boolean
   _count: UserCountAggregateOutputType | null
   _avg: UserAvgAggregateOutputType | null
@@ -403,6 +410,7 @@ export type UserWhereInput = {
   scoreImportDone?: Prisma.BoolFilter<"User"> | boolean
   dailyStreak?: Prisma.IntFilter<"User"> | number
   lastDailyBeatAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   rhythiaVerified?: Prisma.BoolFilter<"User"> | boolean
   playerRank?: Prisma.XOR<Prisma.PlayerRankNullableScalarRelationFilter, Prisma.PlayerRankWhereInput> | null
   roles?: Prisma.UserRoleListRelationFilter
@@ -435,6 +443,10 @@ export type UserWhereInput = {
   challengeMaps?: Prisma.ChallengeMapListRelationFilter
   challengeCompletions?: Prisma.ChallengeMapCompletionListRelationFilter
   reviewedChallengeMaps?: Prisma.ChallengeMapListRelationFilter
+  categoryMaps?: Prisma.CategoryMapListRelationFilter
+  reviewedCategoryMaps?: Prisma.CategoryMapListRelationFilter
+  categoryCompletions?: Prisma.CategoryMapCompletionListRelationFilter
+  categoryLevels?: Prisma.UserCategoryLevelListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -465,6 +477,7 @@ export type UserOrderByWithRelationInput = {
   scoreImportDone?: Prisma.SortOrder
   dailyStreak?: Prisma.SortOrder
   lastDailyBeatAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastRhythiaRpCheckAt?: Prisma.SortOrderInput | Prisma.SortOrder
   rhythiaVerified?: Prisma.SortOrder
   playerRank?: Prisma.PlayerRankOrderByWithRelationInput
   roles?: Prisma.UserRoleOrderByRelationAggregateInput
@@ -497,6 +510,10 @@ export type UserOrderByWithRelationInput = {
   challengeMaps?: Prisma.ChallengeMapOrderByRelationAggregateInput
   challengeCompletions?: Prisma.ChallengeMapCompletionOrderByRelationAggregateInput
   reviewedChallengeMaps?: Prisma.ChallengeMapOrderByRelationAggregateInput
+  categoryMaps?: Prisma.CategoryMapOrderByRelationAggregateInput
+  reviewedCategoryMaps?: Prisma.CategoryMapOrderByRelationAggregateInput
+  categoryCompletions?: Prisma.CategoryMapCompletionOrderByRelationAggregateInput
+  categoryLevels?: Prisma.UserCategoryLevelOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -530,6 +547,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   scoreImportDone?: Prisma.BoolFilter<"User"> | boolean
   dailyStreak?: Prisma.IntFilter<"User"> | number
   lastDailyBeatAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   rhythiaVerified?: Prisma.BoolFilter<"User"> | boolean
   playerRank?: Prisma.XOR<Prisma.PlayerRankNullableScalarRelationFilter, Prisma.PlayerRankWhereInput> | null
   roles?: Prisma.UserRoleListRelationFilter
@@ -562,6 +580,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   challengeMaps?: Prisma.ChallengeMapListRelationFilter
   challengeCompletions?: Prisma.ChallengeMapCompletionListRelationFilter
   reviewedChallengeMaps?: Prisma.ChallengeMapListRelationFilter
+  categoryMaps?: Prisma.CategoryMapListRelationFilter
+  reviewedCategoryMaps?: Prisma.CategoryMapListRelationFilter
+  categoryCompletions?: Prisma.CategoryMapCompletionListRelationFilter
+  categoryLevels?: Prisma.UserCategoryLevelListRelationFilter
 }, "id" | "discordId" | "email" | "profileHandle">
 
 export type UserOrderByWithAggregationInput = {
@@ -592,6 +614,7 @@ export type UserOrderByWithAggregationInput = {
   scoreImportDone?: Prisma.SortOrder
   dailyStreak?: Prisma.SortOrder
   lastDailyBeatAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastRhythiaRpCheckAt?: Prisma.SortOrderInput | Prisma.SortOrder
   rhythiaVerified?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _avg?: Prisma.UserAvgOrderByAggregateInput
@@ -631,6 +654,7 @@ export type UserScalarWhereWithAggregatesInput = {
   scoreImportDone?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   dailyStreak?: Prisma.IntWithAggregatesFilter<"User"> | number
   lastDailyBeatAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   rhythiaVerified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
 }
 
@@ -661,6 +685,7 @@ export type UserCreateInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -693,6 +718,10 @@ export type UserCreateInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -723,6 +752,7 @@ export type UserUncheckedCreateInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -754,6 +784,10 @@ export type UserUncheckedCreateInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -783,6 +817,7 @@ export type UserUpdateInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -815,6 +850,10 @@ export type UserUpdateInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -845,6 +884,7 @@ export type UserUncheckedUpdateInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -876,6 +916,10 @@ export type UserUncheckedUpdateInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -906,6 +950,7 @@ export type UserCreateManyInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
 }
 
@@ -936,6 +981,7 @@ export type UserUpdateManyMutationInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
@@ -967,6 +1013,7 @@ export type UserUncheckedUpdateManyInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
@@ -1006,6 +1053,7 @@ export type UserCountOrderByAggregateInput = {
   scoreImportDone?: Prisma.SortOrder
   dailyStreak?: Prisma.SortOrder
   lastDailyBeatAt?: Prisma.SortOrder
+  lastRhythiaRpCheckAt?: Prisma.SortOrder
   rhythiaVerified?: Prisma.SortOrder
 }
 
@@ -1042,6 +1090,7 @@ export type UserMaxOrderByAggregateInput = {
   scoreImportDone?: Prisma.SortOrder
   dailyStreak?: Prisma.SortOrder
   lastDailyBeatAt?: Prisma.SortOrder
+  lastRhythiaRpCheckAt?: Prisma.SortOrder
   rhythiaVerified?: Prisma.SortOrder
 }
 
@@ -1072,6 +1121,7 @@ export type UserMinOrderByAggregateInput = {
   scoreImportDone?: Prisma.SortOrder
   dailyStreak?: Prisma.SortOrder
   lastDailyBeatAt?: Prisma.SortOrder
+  lastRhythiaRpCheckAt?: Prisma.SortOrder
   rhythiaVerified?: Prisma.SortOrder
 }
 
@@ -1618,6 +1668,64 @@ export type UserUpdateOneRequiredWithoutChallengeCompletionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutChallengeCompletionsInput, Prisma.UserUpdateWithoutChallengeCompletionsInput>, Prisma.UserUncheckedUpdateWithoutChallengeCompletionsInput>
 }
 
+export type UserCreateNestedOneWithoutCategoryMapsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCategoryMapsInput, Prisma.UserUncheckedCreateWithoutCategoryMapsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCategoryMapsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutReviewedCategoryMapsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReviewedCategoryMapsInput, Prisma.UserUncheckedCreateWithoutReviewedCategoryMapsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReviewedCategoryMapsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutCategoryMapsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCategoryMapsInput, Prisma.UserUncheckedCreateWithoutCategoryMapsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCategoryMapsInput
+  upsert?: Prisma.UserUpsertWithoutCategoryMapsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCategoryMapsInput, Prisma.UserUpdateWithoutCategoryMapsInput>, Prisma.UserUncheckedUpdateWithoutCategoryMapsInput>
+}
+
+export type UserUpdateOneWithoutReviewedCategoryMapsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReviewedCategoryMapsInput, Prisma.UserUncheckedCreateWithoutReviewedCategoryMapsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReviewedCategoryMapsInput
+  upsert?: Prisma.UserUpsertWithoutReviewedCategoryMapsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReviewedCategoryMapsInput, Prisma.UserUpdateWithoutReviewedCategoryMapsInput>, Prisma.UserUncheckedUpdateWithoutReviewedCategoryMapsInput>
+}
+
+export type UserCreateNestedOneWithoutCategoryCompletionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCategoryCompletionsInput, Prisma.UserUncheckedCreateWithoutCategoryCompletionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCategoryCompletionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutCategoryCompletionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCategoryCompletionsInput, Prisma.UserUncheckedCreateWithoutCategoryCompletionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCategoryCompletionsInput
+  upsert?: Prisma.UserUpsertWithoutCategoryCompletionsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCategoryCompletionsInput, Prisma.UserUpdateWithoutCategoryCompletionsInput>, Prisma.UserUncheckedUpdateWithoutCategoryCompletionsInput>
+}
+
+export type UserCreateNestedOneWithoutCategoryLevelsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCategoryLevelsInput, Prisma.UserUncheckedCreateWithoutCategoryLevelsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCategoryLevelsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutCategoryLevelsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCategoryLevelsInput, Prisma.UserUncheckedCreateWithoutCategoryLevelsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCategoryLevelsInput
+  upsert?: Prisma.UserUpsertWithoutCategoryLevelsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCategoryLevelsInput, Prisma.UserUpdateWithoutCategoryLevelsInput>, Prisma.UserUncheckedUpdateWithoutCategoryLevelsInput>
+}
+
 export type UserCreateWithoutRhythiaProfileInput = {
   id?: string
   discordId?: string | null
@@ -1645,6 +1753,7 @@ export type UserCreateWithoutRhythiaProfileInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -1676,6 +1785,10 @@ export type UserCreateWithoutRhythiaProfileInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRhythiaProfileInput = {
@@ -1706,6 +1819,7 @@ export type UserUncheckedCreateWithoutRhythiaProfileInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -1736,6 +1850,10 @@ export type UserUncheckedCreateWithoutRhythiaProfileInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRhythiaProfileInput = {
@@ -1781,6 +1899,7 @@ export type UserUpdateWithoutRhythiaProfileInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -1812,6 +1931,10 @@ export type UserUpdateWithoutRhythiaProfileInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRhythiaProfileInput = {
@@ -1842,6 +1965,7 @@ export type UserUncheckedUpdateWithoutRhythiaProfileInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -1872,6 +1996,10 @@ export type UserUncheckedUpdateWithoutRhythiaProfileInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRhythiaProfileRequestsInput = {
@@ -1901,6 +2029,7 @@ export type UserCreateWithoutRhythiaProfileRequestsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -1932,6 +2061,10 @@ export type UserCreateWithoutRhythiaProfileRequestsInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRhythiaProfileRequestsInput = {
@@ -1962,6 +2095,7 @@ export type UserUncheckedCreateWithoutRhythiaProfileRequestsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -1992,6 +2126,10 @@ export type UserUncheckedCreateWithoutRhythiaProfileRequestsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRhythiaProfileRequestsInput = {
@@ -2026,6 +2164,7 @@ export type UserCreateWithoutResolvedRhythiaRequestsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -2057,6 +2196,10 @@ export type UserCreateWithoutResolvedRhythiaRequestsInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutResolvedRhythiaRequestsInput = {
@@ -2087,6 +2230,7 @@ export type UserUncheckedCreateWithoutResolvedRhythiaRequestsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -2117,6 +2261,10 @@ export type UserUncheckedCreateWithoutResolvedRhythiaRequestsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutResolvedRhythiaRequestsInput = {
@@ -2162,6 +2310,7 @@ export type UserUpdateWithoutRhythiaProfileRequestsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -2193,6 +2342,10 @@ export type UserUpdateWithoutRhythiaProfileRequestsInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRhythiaProfileRequestsInput = {
@@ -2223,6 +2376,7 @@ export type UserUncheckedUpdateWithoutRhythiaProfileRequestsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -2253,6 +2407,10 @@ export type UserUncheckedUpdateWithoutRhythiaProfileRequestsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutResolvedRhythiaRequestsInput = {
@@ -2293,6 +2451,7 @@ export type UserUpdateWithoutResolvedRhythiaRequestsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -2324,6 +2483,10 @@ export type UserUpdateWithoutResolvedRhythiaRequestsInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutResolvedRhythiaRequestsInput = {
@@ -2354,6 +2517,7 @@ export type UserUncheckedUpdateWithoutResolvedRhythiaRequestsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -2384,6 +2548,10 @@ export type UserUncheckedUpdateWithoutResolvedRhythiaRequestsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutWarningsInput = {
@@ -2413,6 +2581,7 @@ export type UserCreateWithoutWarningsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -2444,6 +2613,10 @@ export type UserCreateWithoutWarningsInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutWarningsInput = {
@@ -2474,6 +2647,7 @@ export type UserUncheckedCreateWithoutWarningsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -2504,6 +2678,10 @@ export type UserUncheckedCreateWithoutWarningsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutWarningsInput = {
@@ -2538,6 +2716,7 @@ export type UserCreateWithoutIssuedWarningsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -2569,6 +2748,10 @@ export type UserCreateWithoutIssuedWarningsInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutIssuedWarningsInput = {
@@ -2599,6 +2782,7 @@ export type UserUncheckedCreateWithoutIssuedWarningsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -2629,6 +2813,10 @@ export type UserUncheckedCreateWithoutIssuedWarningsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutIssuedWarningsInput = {
@@ -2674,6 +2862,7 @@ export type UserUpdateWithoutWarningsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -2705,6 +2894,10 @@ export type UserUpdateWithoutWarningsInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWarningsInput = {
@@ -2735,6 +2928,7 @@ export type UserUncheckedUpdateWithoutWarningsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -2765,6 +2959,10 @@ export type UserUncheckedUpdateWithoutWarningsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutIssuedWarningsInput = {
@@ -2805,6 +3003,7 @@ export type UserUpdateWithoutIssuedWarningsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -2836,6 +3035,10 @@ export type UserUpdateWithoutIssuedWarningsInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutIssuedWarningsInput = {
@@ -2866,6 +3069,7 @@ export type UserUncheckedUpdateWithoutIssuedWarningsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -2896,6 +3100,10 @@ export type UserUncheckedUpdateWithoutIssuedWarningsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -2925,6 +3133,7 @@ export type UserCreateWithoutSessionsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -2956,6 +3165,10 @@ export type UserCreateWithoutSessionsInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -2986,6 +3199,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -3016,6 +3230,10 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -3061,6 +3279,7 @@ export type UserUpdateWithoutSessionsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -3092,6 +3311,10 @@ export type UserUpdateWithoutSessionsInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -3122,6 +3345,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -3152,6 +3376,10 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRolesInput = {
@@ -3181,6 +3409,7 @@ export type UserCreateWithoutRolesInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -3212,6 +3441,10 @@ export type UserCreateWithoutRolesInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRolesInput = {
@@ -3242,6 +3475,7 @@ export type UserUncheckedCreateWithoutRolesInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
@@ -3272,6 +3506,10 @@ export type UserUncheckedCreateWithoutRolesInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRolesInput = {
@@ -3317,6 +3555,7 @@ export type UserUpdateWithoutRolesInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -3348,6 +3587,10 @@ export type UserUpdateWithoutRolesInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRolesInput = {
@@ -3378,6 +3621,7 @@ export type UserUncheckedUpdateWithoutRolesInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
@@ -3408,6 +3652,10 @@ export type UserUncheckedUpdateWithoutRolesInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPlayerRankInput = {
@@ -3437,6 +3685,7 @@ export type UserCreateWithoutPlayerRankInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -3468,6 +3717,10 @@ export type UserCreateWithoutPlayerRankInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPlayerRankInput = {
@@ -3497,6 +3750,7 @@ export type UserUncheckedCreateWithoutPlayerRankInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -3528,6 +3782,10 @@ export type UserUncheckedCreateWithoutPlayerRankInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPlayerRankInput = {
@@ -3587,6 +3845,7 @@ export type UserScalarWhereInput = {
   scoreImportDone?: Prisma.BoolFilter<"User"> | boolean
   dailyStreak?: Prisma.IntFilter<"User"> | number
   lastDailyBeatAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   rhythiaVerified?: Prisma.BoolFilter<"User"> | boolean
 }
 
@@ -3617,6 +3876,7 @@ export type UserCreateWithoutKnowledgeArticlesInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -3648,6 +3908,10 @@ export type UserCreateWithoutKnowledgeArticlesInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutKnowledgeArticlesInput = {
@@ -3678,6 +3942,7 @@ export type UserUncheckedCreateWithoutKnowledgeArticlesInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -3708,6 +3973,10 @@ export type UserUncheckedCreateWithoutKnowledgeArticlesInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutKnowledgeArticlesInput = {
@@ -3753,6 +4022,7 @@ export type UserUpdateWithoutKnowledgeArticlesInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -3784,6 +4054,10 @@ export type UserUpdateWithoutKnowledgeArticlesInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutKnowledgeArticlesInput = {
@@ -3814,6 +4088,7 @@ export type UserUncheckedUpdateWithoutKnowledgeArticlesInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -3844,6 +4119,10 @@ export type UserUncheckedUpdateWithoutKnowledgeArticlesInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutUserTagsInput = {
@@ -3873,6 +4152,7 @@ export type UserCreateWithoutUserTagsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -3904,6 +4184,10 @@ export type UserCreateWithoutUserTagsInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutUserTagsInput = {
@@ -3934,6 +4218,7 @@ export type UserUncheckedCreateWithoutUserTagsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -3964,6 +4249,10 @@ export type UserUncheckedCreateWithoutUserTagsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutUserTagsInput = {
@@ -4009,6 +4298,7 @@ export type UserUpdateWithoutUserTagsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -4040,6 +4330,10 @@ export type UserUpdateWithoutUserTagsInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUserTagsInput = {
@@ -4070,6 +4364,7 @@ export type UserUncheckedUpdateWithoutUserTagsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -4100,6 +4395,10 @@ export type UserUncheckedUpdateWithoutUserTagsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCoachCommentsInput = {
@@ -4129,6 +4428,7 @@ export type UserCreateWithoutCoachCommentsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -4160,6 +4460,10 @@ export type UserCreateWithoutCoachCommentsInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCoachCommentsInput = {
@@ -4190,6 +4494,7 @@ export type UserUncheckedCreateWithoutCoachCommentsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -4220,6 +4525,10 @@ export type UserUncheckedCreateWithoutCoachCommentsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCoachCommentsInput = {
@@ -4265,6 +4574,7 @@ export type UserUpdateWithoutCoachCommentsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -4296,6 +4606,10 @@ export type UserUpdateWithoutCoachCommentsInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCoachCommentsInput = {
@@ -4326,6 +4640,7 @@ export type UserUncheckedUpdateWithoutCoachCommentsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -4356,6 +4671,10 @@ export type UserUncheckedUpdateWithoutCoachCommentsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutArticleRevisionsInput = {
@@ -4385,6 +4704,7 @@ export type UserCreateWithoutArticleRevisionsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -4416,6 +4736,10 @@ export type UserCreateWithoutArticleRevisionsInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutArticleRevisionsInput = {
@@ -4446,6 +4770,7 @@ export type UserUncheckedCreateWithoutArticleRevisionsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -4476,6 +4801,10 @@ export type UserUncheckedCreateWithoutArticleRevisionsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutArticleRevisionsInput = {
@@ -4521,6 +4850,7 @@ export type UserUpdateWithoutArticleRevisionsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -4552,6 +4882,10 @@ export type UserUpdateWithoutArticleRevisionsInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutArticleRevisionsInput = {
@@ -4582,6 +4916,7 @@ export type UserUncheckedUpdateWithoutArticleRevisionsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -4612,6 +4947,10 @@ export type UserUncheckedUpdateWithoutArticleRevisionsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReviewedClipsInput = {
@@ -4641,6 +4980,7 @@ export type UserCreateWithoutReviewedClipsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -4672,6 +5012,10 @@ export type UserCreateWithoutReviewedClipsInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReviewedClipsInput = {
@@ -4702,6 +5046,7 @@ export type UserUncheckedCreateWithoutReviewedClipsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -4732,6 +5077,10 @@ export type UserUncheckedCreateWithoutReviewedClipsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReviewedClipsInput = {
@@ -4766,6 +5115,7 @@ export type UserCreateWithoutClipsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -4797,6 +5147,10 @@ export type UserCreateWithoutClipsInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutClipsInput = {
@@ -4827,6 +5181,7 @@ export type UserUncheckedCreateWithoutClipsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -4857,6 +5212,10 @@ export type UserUncheckedCreateWithoutClipsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutClipsInput = {
@@ -4902,6 +5261,7 @@ export type UserUpdateWithoutReviewedClipsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -4933,6 +5293,10 @@ export type UserUpdateWithoutReviewedClipsInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewedClipsInput = {
@@ -4963,6 +5327,7 @@ export type UserUncheckedUpdateWithoutReviewedClipsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -4993,6 +5358,10 @@ export type UserUncheckedUpdateWithoutReviewedClipsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutClipsInput = {
@@ -5033,6 +5402,7 @@ export type UserUpdateWithoutClipsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -5064,6 +5434,10 @@ export type UserUpdateWithoutClipsInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutClipsInput = {
@@ -5094,6 +5468,7 @@ export type UserUncheckedUpdateWithoutClipsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -5124,6 +5499,10 @@ export type UserUncheckedUpdateWithoutClipsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutClipLikesInput = {
@@ -5153,6 +5532,7 @@ export type UserCreateWithoutClipLikesInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -5184,6 +5564,10 @@ export type UserCreateWithoutClipLikesInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutClipLikesInput = {
@@ -5214,6 +5598,7 @@ export type UserUncheckedCreateWithoutClipLikesInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -5244,6 +5629,10 @@ export type UserUncheckedCreateWithoutClipLikesInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutClipLikesInput = {
@@ -5289,6 +5678,7 @@ export type UserUpdateWithoutClipLikesInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -5320,6 +5710,10 @@ export type UserUpdateWithoutClipLikesInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutClipLikesInput = {
@@ -5350,6 +5744,7 @@ export type UserUncheckedUpdateWithoutClipLikesInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -5380,6 +5775,10 @@ export type UserUncheckedUpdateWithoutClipLikesInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCommentsInput = {
@@ -5409,6 +5808,7 @@ export type UserCreateWithoutCommentsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -5440,6 +5840,10 @@ export type UserCreateWithoutCommentsInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCommentsInput = {
@@ -5470,6 +5874,7 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -5500,6 +5905,10 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCommentsInput = {
@@ -5545,6 +5954,7 @@ export type UserUpdateWithoutCommentsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -5576,6 +5986,10 @@ export type UserUpdateWithoutCommentsInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentsInput = {
@@ -5606,6 +6020,7 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -5636,6 +6051,10 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReportsInput = {
@@ -5665,6 +6084,7 @@ export type UserCreateWithoutReportsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -5696,6 +6116,10 @@ export type UserCreateWithoutReportsInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReportsInput = {
@@ -5726,6 +6150,7 @@ export type UserUncheckedCreateWithoutReportsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -5756,6 +6181,10 @@ export type UserUncheckedCreateWithoutReportsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReportsInput = {
@@ -5790,6 +6219,7 @@ export type UserCreateWithoutReportedResolvedByInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -5821,6 +6251,10 @@ export type UserCreateWithoutReportedResolvedByInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReportedResolvedByInput = {
@@ -5851,6 +6285,7 @@ export type UserUncheckedCreateWithoutReportedResolvedByInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -5881,6 +6316,10 @@ export type UserUncheckedCreateWithoutReportedResolvedByInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReportedResolvedByInput = {
@@ -5926,6 +6365,7 @@ export type UserUpdateWithoutReportsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -5957,6 +6397,10 @@ export type UserUpdateWithoutReportsInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportsInput = {
@@ -5987,6 +6431,7 @@ export type UserUncheckedUpdateWithoutReportsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -6017,6 +6462,10 @@ export type UserUncheckedUpdateWithoutReportsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutReportedResolvedByInput = {
@@ -6057,6 +6506,7 @@ export type UserUpdateWithoutReportedResolvedByInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -6088,6 +6538,10 @@ export type UserUpdateWithoutReportedResolvedByInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportedResolvedByInput = {
@@ -6118,6 +6572,7 @@ export type UserUncheckedUpdateWithoutReportedResolvedByInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -6148,6 +6603,10 @@ export type UserUncheckedUpdateWithoutReportedResolvedByInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAnnouncementsInput = {
@@ -6177,6 +6636,7 @@ export type UserCreateWithoutAnnouncementsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -6208,6 +6668,10 @@ export type UserCreateWithoutAnnouncementsInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAnnouncementsInput = {
@@ -6238,6 +6702,7 @@ export type UserUncheckedCreateWithoutAnnouncementsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -6268,6 +6733,10 @@ export type UserUncheckedCreateWithoutAnnouncementsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAnnouncementsInput = {
@@ -6313,6 +6782,7 @@ export type UserUpdateWithoutAnnouncementsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -6344,6 +6814,10 @@ export type UserUpdateWithoutAnnouncementsInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAnnouncementsInput = {
@@ -6374,6 +6848,7 @@ export type UserUncheckedUpdateWithoutAnnouncementsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -6404,6 +6879,10 @@ export type UserUncheckedUpdateWithoutAnnouncementsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutNotificationsInput = {
@@ -6433,6 +6912,7 @@ export type UserCreateWithoutNotificationsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -6464,6 +6944,10 @@ export type UserCreateWithoutNotificationsInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -6494,6 +6978,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -6524,6 +7009,10 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -6569,6 +7058,7 @@ export type UserUpdateWithoutNotificationsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -6600,6 +7090,10 @@ export type UserUpdateWithoutNotificationsInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -6630,6 +7124,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -6660,6 +7155,10 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutModerationActionsInput = {
@@ -6689,6 +7188,7 @@ export type UserCreateWithoutModerationActionsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -6720,6 +7220,10 @@ export type UserCreateWithoutModerationActionsInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutModerationActionsInput = {
@@ -6750,6 +7254,7 @@ export type UserUncheckedCreateWithoutModerationActionsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -6780,6 +7285,10 @@ export type UserUncheckedCreateWithoutModerationActionsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutModerationActionsInput = {
@@ -6825,6 +7334,7 @@ export type UserUpdateWithoutModerationActionsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -6856,6 +7366,10 @@ export type UserUpdateWithoutModerationActionsInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutModerationActionsInput = {
@@ -6886,6 +7400,7 @@ export type UserUncheckedUpdateWithoutModerationActionsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -6916,6 +7431,10 @@ export type UserUncheckedUpdateWithoutModerationActionsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutConversationsInput = {
@@ -6945,6 +7464,7 @@ export type UserCreateWithoutConversationsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -6976,6 +7496,10 @@ export type UserCreateWithoutConversationsInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutConversationsInput = {
@@ -7006,6 +7530,7 @@ export type UserUncheckedCreateWithoutConversationsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -7036,6 +7561,10 @@ export type UserUncheckedCreateWithoutConversationsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutConversationsInput = {
@@ -7081,6 +7610,7 @@ export type UserUpdateWithoutConversationsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -7112,6 +7642,10 @@ export type UserUpdateWithoutConversationsInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversationsInput = {
@@ -7142,6 +7676,7 @@ export type UserUncheckedUpdateWithoutConversationsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -7172,6 +7707,10 @@ export type UserUncheckedUpdateWithoutConversationsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutConversationMembershipsInput = {
@@ -7201,6 +7740,7 @@ export type UserCreateWithoutConversationMembershipsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -7232,6 +7772,10 @@ export type UserCreateWithoutConversationMembershipsInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutConversationMembershipsInput = {
@@ -7262,6 +7806,7 @@ export type UserUncheckedCreateWithoutConversationMembershipsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -7292,6 +7837,10 @@ export type UserUncheckedCreateWithoutConversationMembershipsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutConversationMembershipsInput = {
@@ -7337,6 +7886,7 @@ export type UserUpdateWithoutConversationMembershipsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -7368,6 +7918,10 @@ export type UserUpdateWithoutConversationMembershipsInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversationMembershipsInput = {
@@ -7398,6 +7952,7 @@ export type UserUncheckedUpdateWithoutConversationMembershipsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -7428,6 +7983,10 @@ export type UserUncheckedUpdateWithoutConversationMembershipsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMessagesSentInput = {
@@ -7457,6 +8016,7 @@ export type UserCreateWithoutMessagesSentInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -7488,6 +8048,10 @@ export type UserCreateWithoutMessagesSentInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMessagesSentInput = {
@@ -7518,6 +8082,7 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -7548,6 +8113,10 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMessagesSentInput = {
@@ -7593,6 +8162,7 @@ export type UserUpdateWithoutMessagesSentInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -7624,6 +8194,10 @@ export type UserUpdateWithoutMessagesSentInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessagesSentInput = {
@@ -7654,6 +8228,7 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -7684,6 +8259,10 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSentFriendRequestsInput = {
@@ -7713,6 +8292,7 @@ export type UserCreateWithoutSentFriendRequestsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -7744,6 +8324,10 @@ export type UserCreateWithoutSentFriendRequestsInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSentFriendRequestsInput = {
@@ -7774,6 +8358,7 @@ export type UserUncheckedCreateWithoutSentFriendRequestsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -7804,6 +8389,10 @@ export type UserUncheckedCreateWithoutSentFriendRequestsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSentFriendRequestsInput = {
@@ -7838,6 +8427,7 @@ export type UserCreateWithoutReceivedFriendRequestsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -7869,6 +8459,10 @@ export type UserCreateWithoutReceivedFriendRequestsInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReceivedFriendRequestsInput = {
@@ -7899,6 +8493,7 @@ export type UserUncheckedCreateWithoutReceivedFriendRequestsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -7929,6 +8524,10 @@ export type UserUncheckedCreateWithoutReceivedFriendRequestsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReceivedFriendRequestsInput = {
@@ -7974,6 +8573,7 @@ export type UserUpdateWithoutSentFriendRequestsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -8005,6 +8605,10 @@ export type UserUpdateWithoutSentFriendRequestsInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSentFriendRequestsInput = {
@@ -8035,6 +8639,7 @@ export type UserUncheckedUpdateWithoutSentFriendRequestsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -8065,6 +8670,10 @@ export type UserUncheckedUpdateWithoutSentFriendRequestsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutReceivedFriendRequestsInput = {
@@ -8105,6 +8714,7 @@ export type UserUpdateWithoutReceivedFriendRequestsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -8136,6 +8746,10 @@ export type UserUpdateWithoutReceivedFriendRequestsInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReceivedFriendRequestsInput = {
@@ -8166,6 +8780,7 @@ export type UserUncheckedUpdateWithoutReceivedFriendRequestsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -8196,6 +8811,10 @@ export type UserUncheckedUpdateWithoutReceivedFriendRequestsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutDailyMapBeatsInput = {
@@ -8225,6 +8844,7 @@ export type UserCreateWithoutDailyMapBeatsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -8256,6 +8876,10 @@ export type UserCreateWithoutDailyMapBeatsInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDailyMapBeatsInput = {
@@ -8286,6 +8910,7 @@ export type UserUncheckedCreateWithoutDailyMapBeatsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -8316,6 +8941,10 @@ export type UserUncheckedCreateWithoutDailyMapBeatsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutDailyMapBeatsInput = {
@@ -8361,6 +8990,7 @@ export type UserUpdateWithoutDailyMapBeatsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -8392,6 +9022,10 @@ export type UserUpdateWithoutDailyMapBeatsInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDailyMapBeatsInput = {
@@ -8422,6 +9056,7 @@ export type UserUncheckedUpdateWithoutDailyMapBeatsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -8452,6 +9087,10 @@ export type UserUncheckedUpdateWithoutDailyMapBeatsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRhpTransactionsInput = {
@@ -8481,6 +9120,7 @@ export type UserCreateWithoutRhpTransactionsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -8512,6 +9152,10 @@ export type UserCreateWithoutRhpTransactionsInput = {
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRhpTransactionsInput = {
@@ -8542,6 +9186,7 @@ export type UserUncheckedCreateWithoutRhpTransactionsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -8572,6 +9217,10 @@ export type UserUncheckedCreateWithoutRhpTransactionsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRhpTransactionsInput = {
@@ -8617,6 +9266,7 @@ export type UserUpdateWithoutRhpTransactionsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -8648,6 +9298,10 @@ export type UserUpdateWithoutRhpTransactionsInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRhpTransactionsInput = {
@@ -8678,6 +9332,7 @@ export type UserUncheckedUpdateWithoutRhpTransactionsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -8708,6 +9363,10 @@ export type UserUncheckedUpdateWithoutRhpTransactionsInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutChallengeMapsInput = {
@@ -8737,6 +9396,7 @@ export type UserCreateWithoutChallengeMapsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -8768,6 +9428,10 @@ export type UserCreateWithoutChallengeMapsInput = {
   rhpTransactions?: Prisma.RhpTransactionCreateNestedManyWithoutUserInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutChallengeMapsInput = {
@@ -8798,6 +9462,7 @@ export type UserUncheckedCreateWithoutChallengeMapsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -8828,6 +9493,10 @@ export type UserUncheckedCreateWithoutChallengeMapsInput = {
   rhpTransactions?: Prisma.RhpTransactionUncheckedCreateNestedManyWithoutUserInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutChallengeMapsInput = {
@@ -8862,6 +9531,7 @@ export type UserCreateWithoutReviewedChallengeMapsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -8893,6 +9563,10 @@ export type UserCreateWithoutReviewedChallengeMapsInput = {
   rhpTransactions?: Prisma.RhpTransactionCreateNestedManyWithoutUserInput
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReviewedChallengeMapsInput = {
@@ -8923,6 +9597,7 @@ export type UserUncheckedCreateWithoutReviewedChallengeMapsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -8953,6 +9628,10 @@ export type UserUncheckedCreateWithoutReviewedChallengeMapsInput = {
   rhpTransactions?: Prisma.RhpTransactionUncheckedCreateNestedManyWithoutUserInput
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReviewedChallengeMapsInput = {
@@ -8998,6 +9677,7 @@ export type UserUpdateWithoutChallengeMapsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -9029,6 +9709,10 @@ export type UserUpdateWithoutChallengeMapsInput = {
   rhpTransactions?: Prisma.RhpTransactionUpdateManyWithoutUserNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChallengeMapsInput = {
@@ -9059,6 +9743,7 @@ export type UserUncheckedUpdateWithoutChallengeMapsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -9089,6 +9774,10 @@ export type UserUncheckedUpdateWithoutChallengeMapsInput = {
   rhpTransactions?: Prisma.RhpTransactionUncheckedUpdateManyWithoutUserNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutReviewedChallengeMapsInput = {
@@ -9129,6 +9818,7 @@ export type UserUpdateWithoutReviewedChallengeMapsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -9160,6 +9850,10 @@ export type UserUpdateWithoutReviewedChallengeMapsInput = {
   rhpTransactions?: Prisma.RhpTransactionUpdateManyWithoutUserNestedInput
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewedChallengeMapsInput = {
@@ -9190,6 +9884,7 @@ export type UserUncheckedUpdateWithoutReviewedChallengeMapsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -9220,6 +9915,10 @@ export type UserUncheckedUpdateWithoutReviewedChallengeMapsInput = {
   rhpTransactions?: Prisma.RhpTransactionUncheckedUpdateManyWithoutUserNestedInput
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutChallengeCompletionsInput = {
@@ -9249,6 +9948,7 @@ export type UserCreateWithoutChallengeCompletionsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
   roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -9280,6 +9980,10 @@ export type UserCreateWithoutChallengeCompletionsInput = {
   rhpTransactions?: Prisma.RhpTransactionCreateNestedManyWithoutUserInput
   challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
   reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutChallengeCompletionsInput = {
@@ -9310,6 +10014,7 @@ export type UserUncheckedCreateWithoutChallengeCompletionsInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
   roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -9340,6 +10045,10 @@ export type UserUncheckedCreateWithoutChallengeCompletionsInput = {
   rhpTransactions?: Prisma.RhpTransactionUncheckedCreateNestedManyWithoutUserInput
   challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutChallengeCompletionsInput = {
@@ -9385,6 +10094,7 @@ export type UserUpdateWithoutChallengeCompletionsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -9416,6 +10126,10 @@ export type UserUpdateWithoutChallengeCompletionsInput = {
   rhpTransactions?: Prisma.RhpTransactionUpdateManyWithoutUserNestedInput
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChallengeCompletionsInput = {
@@ -9446,6 +10160,7 @@ export type UserUncheckedUpdateWithoutChallengeCompletionsInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -9476,9 +10191,13 @@ export type UserUncheckedUpdateWithoutChallengeCompletionsInput = {
   rhpTransactions?: Prisma.RhpTransactionUncheckedUpdateManyWithoutUserNestedInput
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
-export type UserCreateManyPlayerRankInput = {
+export type UserCreateWithoutCategoryMapsInput = {
   id?: string
   discordId?: string | null
   username: string
@@ -9505,10 +10224,261 @@ export type UserCreateManyPlayerRankInput = {
   scoreImportDone?: boolean
   dailyStreak?: number
   lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
   rhythiaVerified?: boolean
+  playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
+  roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionCreateNestedManyWithoutActorInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
+  receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
+  dailyMapBeats?: Prisma.DailyMapBeatCreateNestedManyWithoutUserInput
+  rhpTransactions?: Prisma.RhpTransactionCreateNestedManyWithoutUserInput
+  challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
+  challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
+  reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
 }
 
-export type UserUpdateWithoutPlayerRankInput = {
+export type UserUncheckedCreateWithoutCategoryMapsInput = {
+  id?: string
+  discordId?: string | null
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  passwordHash?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  onboardingCompleted?: boolean
+  playerRankId?: string | null
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  rhp?: number
+  avgMapRating?: number | null
+  scoreImportDone?: boolean
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
+  rhythiaVerified?: boolean
+  roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportUncheckedCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutActorInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
+  receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
+  dailyMapBeats?: Prisma.DailyMapBeatUncheckedCreateNestedManyWithoutUserInput
+  rhpTransactions?: Prisma.RhpTransactionUncheckedCreateNestedManyWithoutUserInput
+  challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutCategoryMapsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCategoryMapsInput, Prisma.UserUncheckedCreateWithoutCategoryMapsInput>
+}
+
+export type UserCreateWithoutReviewedCategoryMapsInput = {
+  id?: string
+  discordId?: string | null
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  passwordHash?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  onboardingCompleted?: boolean
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  rhp?: number
+  avgMapRating?: number | null
+  scoreImportDone?: boolean
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
+  rhythiaVerified?: boolean
+  playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
+  roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionCreateNestedManyWithoutActorInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
+  receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
+  dailyMapBeats?: Prisma.DailyMapBeatCreateNestedManyWithoutUserInput
+  rhpTransactions?: Prisma.RhpTransactionCreateNestedManyWithoutUserInput
+  challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
+  challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
+  reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutReviewedCategoryMapsInput = {
+  id?: string
+  discordId?: string | null
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  passwordHash?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  onboardingCompleted?: boolean
+  playerRankId?: string | null
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  rhp?: number
+  avgMapRating?: number | null
+  scoreImportDone?: boolean
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
+  rhythiaVerified?: boolean
+  roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportUncheckedCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutActorInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
+  receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
+  dailyMapBeats?: Prisma.DailyMapBeatUncheckedCreateNestedManyWithoutUserInput
+  rhpTransactions?: Prisma.RhpTransactionUncheckedCreateNestedManyWithoutUserInput
+  challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutReviewedCategoryMapsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReviewedCategoryMapsInput, Prisma.UserUncheckedCreateWithoutReviewedCategoryMapsInput>
+}
+
+export type UserUpsertWithoutCategoryMapsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCategoryMapsInput, Prisma.UserUncheckedUpdateWithoutCategoryMapsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCategoryMapsInput, Prisma.UserUncheckedCreateWithoutCategoryMapsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCategoryMapsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCategoryMapsInput, Prisma.UserUncheckedUpdateWithoutCategoryMapsInput>
+}
+
+export type UserUpdateWithoutCategoryMapsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
@@ -9535,7 +10505,9 @@ export type UserUpdateWithoutPlayerRankInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
   roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
@@ -9566,9 +10538,12 @@ export type UserUpdateWithoutPlayerRankInput = {
   challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
 }
 
-export type UserUncheckedUpdateWithoutPlayerRankInput = {
+export type UserUncheckedUpdateWithoutCategoryMapsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.StringFieldUpdateOperationsInput | string
@@ -9582,6 +10557,7 @@ export type UserUncheckedUpdateWithoutPlayerRankInput = {
   discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
   inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
   onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9595,6 +10571,7 @@ export type UserUncheckedUpdateWithoutPlayerRankInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -9626,6 +10603,863 @@ export type UserUncheckedUpdateWithoutPlayerRankInput = {
   challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
   challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
   reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUpsertWithoutReviewedCategoryMapsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReviewedCategoryMapsInput, Prisma.UserUncheckedUpdateWithoutReviewedCategoryMapsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReviewedCategoryMapsInput, Prisma.UserUncheckedCreateWithoutReviewedCategoryMapsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReviewedCategoryMapsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReviewedCategoryMapsInput, Prisma.UserUncheckedUpdateWithoutReviewedCategoryMapsInput>
+}
+
+export type UserUpdateWithoutReviewedCategoryMapsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rhp?: Prisma.IntFieldUpdateOperationsInput | number
+  avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
+  roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUpdateManyWithoutActorNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
+  receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
+  dailyMapBeats?: Prisma.DailyMapBeatUpdateManyWithoutUserNestedInput
+  rhpTransactions?: Prisma.RhpTransactionUpdateManyWithoutUserNestedInput
+  challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
+  challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
+  reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReviewedCategoryMapsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rhp?: Prisma.IntFieldUpdateOperationsInput | number
+  avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUncheckedUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUncheckedUpdateManyWithoutActorNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
+  receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
+  dailyMapBeats?: Prisma.DailyMapBeatUncheckedUpdateManyWithoutUserNestedInput
+  rhpTransactions?: Prisma.RhpTransactionUncheckedUpdateManyWithoutUserNestedInput
+  challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutCategoryCompletionsInput = {
+  id?: string
+  discordId?: string | null
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  passwordHash?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  onboardingCompleted?: boolean
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  rhp?: number
+  avgMapRating?: number | null
+  scoreImportDone?: boolean
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
+  rhythiaVerified?: boolean
+  playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
+  roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionCreateNestedManyWithoutActorInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
+  receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
+  dailyMapBeats?: Prisma.DailyMapBeatCreateNestedManyWithoutUserInput
+  rhpTransactions?: Prisma.RhpTransactionCreateNestedManyWithoutUserInput
+  challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
+  challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
+  reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryLevels?: Prisma.UserCategoryLevelCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutCategoryCompletionsInput = {
+  id?: string
+  discordId?: string | null
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  passwordHash?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  onboardingCompleted?: boolean
+  playerRankId?: string | null
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  rhp?: number
+  avgMapRating?: number | null
+  scoreImportDone?: boolean
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
+  rhythiaVerified?: boolean
+  roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportUncheckedCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutActorInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
+  receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
+  dailyMapBeats?: Prisma.DailyMapBeatUncheckedCreateNestedManyWithoutUserInput
+  rhpTransactions?: Prisma.RhpTransactionUncheckedCreateNestedManyWithoutUserInput
+  challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutCategoryCompletionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCategoryCompletionsInput, Prisma.UserUncheckedCreateWithoutCategoryCompletionsInput>
+}
+
+export type UserUpsertWithoutCategoryCompletionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCategoryCompletionsInput, Prisma.UserUncheckedUpdateWithoutCategoryCompletionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCategoryCompletionsInput, Prisma.UserUncheckedCreateWithoutCategoryCompletionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCategoryCompletionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCategoryCompletionsInput, Prisma.UserUncheckedUpdateWithoutCategoryCompletionsInput>
+}
+
+export type UserUpdateWithoutCategoryCompletionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rhp?: Prisma.IntFieldUpdateOperationsInput | number
+  avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
+  roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUpdateManyWithoutActorNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
+  receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
+  dailyMapBeats?: Prisma.DailyMapBeatUpdateManyWithoutUserNestedInput
+  rhpTransactions?: Prisma.RhpTransactionUpdateManyWithoutUserNestedInput
+  challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
+  challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
+  reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCategoryCompletionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rhp?: Prisma.IntFieldUpdateOperationsInput | number
+  avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUncheckedUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUncheckedUpdateManyWithoutActorNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
+  receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
+  dailyMapBeats?: Prisma.DailyMapBeatUncheckedUpdateManyWithoutUserNestedInput
+  rhpTransactions?: Prisma.RhpTransactionUncheckedUpdateManyWithoutUserNestedInput
+  challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutCategoryLevelsInput = {
+  id?: string
+  discordId?: string | null
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  passwordHash?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  onboardingCompleted?: boolean
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  rhp?: number
+  avgMapRating?: number | null
+  scoreImportDone?: boolean
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
+  rhythiaVerified?: boolean
+  playerRank?: Prisma.PlayerRankCreateNestedOneWithoutUsersInput
+  roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipCreateNestedManyWithoutReviewedByInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionCreateNestedManyWithoutActorInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  sentFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutSenderInput
+  receivedFriendRequests?: Prisma.FriendRequestCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningCreateNestedManyWithoutActorInput
+  rhythiaProfile?: Prisma.RhythiaProfileCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestCreateNestedManyWithoutResolvedByUserInput
+  dailyMapBeats?: Prisma.DailyMapBeatCreateNestedManyWithoutUserInput
+  rhpTransactions?: Prisma.RhpTransactionCreateNestedManyWithoutUserInput
+  challengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutSubmittedByInput
+  challengeCompletions?: Prisma.ChallengeMapCompletionCreateNestedManyWithoutUserInput
+  reviewedChallengeMaps?: Prisma.ChallengeMapCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutCategoryLevelsInput = {
+  id?: string
+  discordId?: string | null
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  passwordHash?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  onboardingCompleted?: boolean
+  playerRankId?: string | null
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  rhp?: number
+  avgMapRating?: number | null
+  scoreImportDone?: boolean
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
+  rhythiaVerified?: boolean
+  roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  clips?: Prisma.ClipUncheckedCreateNestedManyWithoutUploaderInput
+  reviewedClips?: Prisma.ClipUncheckedCreateNestedManyWithoutReviewedByInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  coachComments?: Prisma.CoachCommentUncheckedCreateNestedManyWithoutAuthorInput
+  clipLikes?: Prisma.ClipLikeUncheckedCreateNestedManyWithoutUserInput
+  userTags?: Prisma.UserTagUncheckedCreateNestedManyWithoutUserInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedCreateNestedManyWithoutAuthorInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedCreateNestedManyWithoutAuthorInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportedResolvedBy?: Prisma.ReportUncheckedCreateNestedManyWithoutResolverInput
+  moderationActions?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutActorInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutCreatedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  sentFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutSenderInput
+  receivedFriendRequests?: Prisma.FriendRequestUncheckedCreateNestedManyWithoutReceiverInput
+  warnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutUserInput
+  issuedWarnings?: Prisma.UserWarningUncheckedCreateNestedManyWithoutActorInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedCreateNestedOneWithoutUserInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutUserInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedCreateNestedManyWithoutResolvedByUserInput
+  dailyMapBeats?: Prisma.DailyMapBeatUncheckedCreateNestedManyWithoutUserInput
+  rhpTransactions?: Prisma.RhpTransactionUncheckedCreateNestedManyWithoutUserInput
+  challengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedCreateNestedManyWithoutUserInput
+  reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutSubmittedByInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedCreateNestedManyWithoutReviewedByInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutCategoryLevelsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCategoryLevelsInput, Prisma.UserUncheckedCreateWithoutCategoryLevelsInput>
+}
+
+export type UserUpsertWithoutCategoryLevelsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCategoryLevelsInput, Prisma.UserUncheckedUpdateWithoutCategoryLevelsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCategoryLevelsInput, Prisma.UserUncheckedCreateWithoutCategoryLevelsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCategoryLevelsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCategoryLevelsInput, Prisma.UserUncheckedUpdateWithoutCategoryLevelsInput>
+}
+
+export type UserUpdateWithoutCategoryLevelsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rhp?: Prisma.IntFieldUpdateOperationsInput | number
+  avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  playerRank?: Prisma.PlayerRankUpdateOneWithoutUsersNestedInput
+  roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUpdateManyWithoutActorNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
+  receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
+  dailyMapBeats?: Prisma.DailyMapBeatUpdateManyWithoutUserNestedInput
+  rhpTransactions?: Prisma.RhpTransactionUpdateManyWithoutUserNestedInput
+  challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
+  challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
+  reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCategoryLevelsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  playerRankId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rhp?: Prisma.IntFieldUpdateOperationsInput | number
+  avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUncheckedUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUncheckedUpdateManyWithoutActorNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
+  receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
+  dailyMapBeats?: Prisma.DailyMapBeatUncheckedUpdateManyWithoutUserNestedInput
+  rhpTransactions?: Prisma.RhpTransactionUncheckedUpdateManyWithoutUserNestedInput
+  challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateManyPlayerRankInput = {
+  id?: string
+  discordId?: string | null
+  username: string
+  discriminator: string
+  avatar?: string | null
+  locale?: string | null
+  email?: string | null
+  passwordHash?: string | null
+  displayName?: string | null
+  profileHandle: string
+  discordRoles?: Prisma.UserCreatediscordRolesInput | string[]
+  inGuild?: boolean
+  onboardingCompleted?: boolean
+  joinedAt?: Date | string
+  bio?: string | null
+  website?: string | null
+  isSuspended?: boolean
+  suspendedUntil?: Date | string | null
+  mutedUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  rhp?: number
+  avgMapRating?: number | null
+  scoreImportDone?: boolean
+  dailyStreak?: number
+  lastDailyBeatAt?: Date | string | null
+  lastRhythiaRpCheckAt?: Date | string | null
+  rhythiaVerified?: boolean
+}
+
+export type UserUpdateWithoutPlayerRankInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rhp?: Prisma.IntFieldUpdateOperationsInput | number
+  avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUpdateManyWithoutReviewedByNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUpdateManyWithoutActorNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  sentFriendRequests?: Prisma.FriendRequestUpdateManyWithoutSenderNestedInput
+  receivedFriendRequests?: Prisma.FriendRequestUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUpdateManyWithoutActorNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUpdateManyWithoutResolvedByUserNestedInput
+  dailyMapBeats?: Prisma.DailyMapBeatUpdateManyWithoutUserNestedInput
+  rhpTransactions?: Prisma.RhpTransactionUpdateManyWithoutUserNestedInput
+  challengeMaps?: Prisma.ChallengeMapUpdateManyWithoutSubmittedByNestedInput
+  challengeCompletions?: Prisma.ChallengeMapCompletionUpdateManyWithoutUserNestedInput
+  reviewedChallengeMaps?: Prisma.ChallengeMapUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPlayerRankInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  discriminator?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileHandle?: Prisma.StringFieldUpdateOperationsInput | string
+  discordRoles?: Prisma.UserUpdatediscordRolesInput | string[]
+  inGuild?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mutedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rhp?: Prisma.IntFieldUpdateOperationsInput | number
+  avgMapRating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
+  lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  clips?: Prisma.ClipUncheckedUpdateManyWithoutUploaderNestedInput
+  reviewedClips?: Prisma.ClipUncheckedUpdateManyWithoutReviewedByNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  coachComments?: Prisma.CoachCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  clipLikes?: Prisma.ClipLikeUncheckedUpdateManyWithoutUserNestedInput
+  userTags?: Prisma.UserTagUncheckedUpdateManyWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  articleRevisions?: Prisma.ArticleRevisionUncheckedUpdateManyWithoutAuthorNestedInput
+  knowledgeArticles?: Prisma.KnowledgeArticleUncheckedUpdateManyWithoutAuthorNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportedResolvedBy?: Prisma.ReportUncheckedUpdateManyWithoutResolverNestedInput
+  moderationActions?: Prisma.ModerationActionUncheckedUpdateManyWithoutActorNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutCreatedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  sentFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutSenderNestedInput
+  receivedFriendRequests?: Prisma.FriendRequestUncheckedUpdateManyWithoutReceiverNestedInput
+  warnings?: Prisma.UserWarningUncheckedUpdateManyWithoutUserNestedInput
+  issuedWarnings?: Prisma.UserWarningUncheckedUpdateManyWithoutActorNestedInput
+  rhythiaProfile?: Prisma.RhythiaProfileUncheckedUpdateOneWithoutUserNestedInput
+  rhythiaProfileRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutUserNestedInput
+  resolvedRhythiaRequests?: Prisma.RhythiaProfileRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput
+  dailyMapBeats?: Prisma.DailyMapBeatUncheckedUpdateManyWithoutUserNestedInput
+  rhpTransactions?: Prisma.RhpTransactionUncheckedUpdateManyWithoutUserNestedInput
+  challengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  challengeCompletions?: Prisma.ChallengeMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  reviewedChallengeMaps?: Prisma.ChallengeMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutSubmittedByNestedInput
+  reviewedCategoryMaps?: Prisma.CategoryMapUncheckedUpdateManyWithoutReviewedByNestedInput
+  categoryCompletions?: Prisma.CategoryMapCompletionUncheckedUpdateManyWithoutUserNestedInput
+  categoryLevels?: Prisma.UserCategoryLevelUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutPlayerRankInput = {
@@ -9655,6 +11489,7 @@ export type UserUncheckedUpdateManyWithoutPlayerRankInput = {
   scoreImportDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastDailyBeatAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastRhythiaRpCheckAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rhythiaVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
@@ -9693,6 +11528,10 @@ export type UserCountOutputType = {
   challengeMaps: number
   challengeCompletions: number
   reviewedChallengeMaps: number
+  categoryMaps: number
+  reviewedCategoryMaps: number
+  categoryCompletions: number
+  categoryLevels: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -9725,6 +11564,10 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   challengeMaps?: boolean | UserCountOutputTypeCountChallengeMapsArgs
   challengeCompletions?: boolean | UserCountOutputTypeCountChallengeCompletionsArgs
   reviewedChallengeMaps?: boolean | UserCountOutputTypeCountReviewedChallengeMapsArgs
+  categoryMaps?: boolean | UserCountOutputTypeCountCategoryMapsArgs
+  reviewedCategoryMaps?: boolean | UserCountOutputTypeCountReviewedCategoryMapsArgs
+  categoryCompletions?: boolean | UserCountOutputTypeCountCategoryCompletionsArgs
+  categoryLevels?: boolean | UserCountOutputTypeCountCategoryLevelsArgs
 }
 
 /**
@@ -9940,6 +11783,34 @@ export type UserCountOutputTypeCountReviewedChallengeMapsArgs<ExtArgs extends ru
   where?: Prisma.ChallengeMapWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCategoryMapsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CategoryMapWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountReviewedCategoryMapsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CategoryMapWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCategoryCompletionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CategoryMapCompletionWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCategoryLevelsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserCategoryLevelWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -9969,6 +11840,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   scoreImportDone?: boolean
   dailyStreak?: boolean
   lastDailyBeatAt?: boolean
+  lastRhythiaRpCheckAt?: boolean
   rhythiaVerified?: boolean
   playerRank?: boolean | Prisma.User$playerRankArgs<ExtArgs>
   roles?: boolean | Prisma.User$rolesArgs<ExtArgs>
@@ -10001,6 +11873,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   challengeMaps?: boolean | Prisma.User$challengeMapsArgs<ExtArgs>
   challengeCompletions?: boolean | Prisma.User$challengeCompletionsArgs<ExtArgs>
   reviewedChallengeMaps?: boolean | Prisma.User$reviewedChallengeMapsArgs<ExtArgs>
+  categoryMaps?: boolean | Prisma.User$categoryMapsArgs<ExtArgs>
+  reviewedCategoryMaps?: boolean | Prisma.User$reviewedCategoryMapsArgs<ExtArgs>
+  categoryCompletions?: boolean | Prisma.User$categoryCompletionsArgs<ExtArgs>
+  categoryLevels?: boolean | Prisma.User$categoryLevelsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -10032,6 +11908,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   scoreImportDone?: boolean
   dailyStreak?: boolean
   lastDailyBeatAt?: boolean
+  lastRhythiaRpCheckAt?: boolean
   rhythiaVerified?: boolean
   playerRank?: boolean | Prisma.User$playerRankArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -10064,6 +11941,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   scoreImportDone?: boolean
   dailyStreak?: boolean
   lastDailyBeatAt?: boolean
+  lastRhythiaRpCheckAt?: boolean
   rhythiaVerified?: boolean
   playerRank?: boolean | Prisma.User$playerRankArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -10096,10 +11974,11 @@ export type UserSelectScalar = {
   scoreImportDone?: boolean
   dailyStreak?: boolean
   lastDailyBeatAt?: boolean
+  lastRhythiaRpCheckAt?: boolean
   rhythiaVerified?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "discordId" | "username" | "discriminator" | "avatar" | "locale" | "email" | "passwordHash" | "displayName" | "profileHandle" | "discordRoles" | "inGuild" | "onboardingCompleted" | "playerRankId" | "joinedAt" | "bio" | "website" | "isSuspended" | "suspendedUntil" | "mutedUntil" | "createdAt" | "updatedAt" | "rhp" | "avgMapRating" | "scoreImportDone" | "dailyStreak" | "lastDailyBeatAt" | "rhythiaVerified", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "discordId" | "username" | "discriminator" | "avatar" | "locale" | "email" | "passwordHash" | "displayName" | "profileHandle" | "discordRoles" | "inGuild" | "onboardingCompleted" | "playerRankId" | "joinedAt" | "bio" | "website" | "isSuspended" | "suspendedUntil" | "mutedUntil" | "createdAt" | "updatedAt" | "rhp" | "avgMapRating" | "scoreImportDone" | "dailyStreak" | "lastDailyBeatAt" | "lastRhythiaRpCheckAt" | "rhythiaVerified", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   playerRank?: boolean | Prisma.User$playerRankArgs<ExtArgs>
   roles?: boolean | Prisma.User$rolesArgs<ExtArgs>
@@ -10132,6 +12011,10 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   challengeMaps?: boolean | Prisma.User$challengeMapsArgs<ExtArgs>
   challengeCompletions?: boolean | Prisma.User$challengeCompletionsArgs<ExtArgs>
   reviewedChallengeMaps?: boolean | Prisma.User$reviewedChallengeMapsArgs<ExtArgs>
+  categoryMaps?: boolean | Prisma.User$categoryMapsArgs<ExtArgs>
+  reviewedCategoryMaps?: boolean | Prisma.User$reviewedCategoryMapsArgs<ExtArgs>
+  categoryCompletions?: boolean | Prisma.User$categoryCompletionsArgs<ExtArgs>
+  categoryLevels?: boolean | Prisma.User$categoryLevelsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -10175,6 +12058,10 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     challengeMaps: Prisma.$ChallengeMapPayload<ExtArgs>[]
     challengeCompletions: Prisma.$ChallengeMapCompletionPayload<ExtArgs>[]
     reviewedChallengeMaps: Prisma.$ChallengeMapPayload<ExtArgs>[]
+    categoryMaps: Prisma.$CategoryMapPayload<ExtArgs>[]
+    reviewedCategoryMaps: Prisma.$CategoryMapPayload<ExtArgs>[]
+    categoryCompletions: Prisma.$CategoryMapCompletionPayload<ExtArgs>[]
+    categoryLevels: Prisma.$UserCategoryLevelPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -10204,6 +12091,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     scoreImportDone: boolean
     dailyStreak: number
     lastDailyBeatAt: Date | null
+    lastRhythiaRpCheckAt: Date | null
     rhythiaVerified: boolean
   }, ExtArgs["result"]["user"]>
   composites: {}
@@ -10630,6 +12518,10 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   challengeMaps<T extends Prisma.User$challengeMapsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$challengeMapsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChallengeMapPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   challengeCompletions<T extends Prisma.User$challengeCompletionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$challengeCompletionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChallengeMapCompletionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reviewedChallengeMaps<T extends Prisma.User$reviewedChallengeMapsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reviewedChallengeMapsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChallengeMapPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  categoryMaps<T extends Prisma.User$categoryMapsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$categoryMapsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CategoryMapPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  reviewedCategoryMaps<T extends Prisma.User$reviewedCategoryMapsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reviewedCategoryMapsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CategoryMapPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  categoryCompletions<T extends Prisma.User$categoryCompletionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$categoryCompletionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CategoryMapCompletionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  categoryLevels<T extends Prisma.User$categoryLevelsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$categoryLevelsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserCategoryLevelPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -10686,6 +12578,7 @@ export interface UserFieldRefs {
   readonly scoreImportDone: Prisma.FieldRef<"User", 'Boolean'>
   readonly dailyStreak: Prisma.FieldRef<"User", 'Int'>
   readonly lastDailyBeatAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly lastRhythiaRpCheckAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly rhythiaVerified: Prisma.FieldRef<"User", 'Boolean'>
 }
     
@@ -11819,6 +13712,102 @@ export type User$reviewedChallengeMapsArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.ChallengeMapScalarFieldEnum | Prisma.ChallengeMapScalarFieldEnum[]
+}
+
+/**
+ * User.categoryMaps
+ */
+export type User$categoryMapsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CategoryMap
+   */
+  select?: Prisma.CategoryMapSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CategoryMap
+   */
+  omit?: Prisma.CategoryMapOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CategoryMapInclude<ExtArgs> | null
+  where?: Prisma.CategoryMapWhereInput
+  orderBy?: Prisma.CategoryMapOrderByWithRelationInput | Prisma.CategoryMapOrderByWithRelationInput[]
+  cursor?: Prisma.CategoryMapWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CategoryMapScalarFieldEnum | Prisma.CategoryMapScalarFieldEnum[]
+}
+
+/**
+ * User.reviewedCategoryMaps
+ */
+export type User$reviewedCategoryMapsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CategoryMap
+   */
+  select?: Prisma.CategoryMapSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CategoryMap
+   */
+  omit?: Prisma.CategoryMapOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CategoryMapInclude<ExtArgs> | null
+  where?: Prisma.CategoryMapWhereInput
+  orderBy?: Prisma.CategoryMapOrderByWithRelationInput | Prisma.CategoryMapOrderByWithRelationInput[]
+  cursor?: Prisma.CategoryMapWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CategoryMapScalarFieldEnum | Prisma.CategoryMapScalarFieldEnum[]
+}
+
+/**
+ * User.categoryCompletions
+ */
+export type User$categoryCompletionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CategoryMapCompletion
+   */
+  select?: Prisma.CategoryMapCompletionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CategoryMapCompletion
+   */
+  omit?: Prisma.CategoryMapCompletionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CategoryMapCompletionInclude<ExtArgs> | null
+  where?: Prisma.CategoryMapCompletionWhereInput
+  orderBy?: Prisma.CategoryMapCompletionOrderByWithRelationInput | Prisma.CategoryMapCompletionOrderByWithRelationInput[]
+  cursor?: Prisma.CategoryMapCompletionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CategoryMapCompletionScalarFieldEnum | Prisma.CategoryMapCompletionScalarFieldEnum[]
+}
+
+/**
+ * User.categoryLevels
+ */
+export type User$categoryLevelsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserCategoryLevel
+   */
+  select?: Prisma.UserCategoryLevelSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserCategoryLevel
+   */
+  omit?: Prisma.UserCategoryLevelOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserCategoryLevelInclude<ExtArgs> | null
+  where?: Prisma.UserCategoryLevelWhereInput
+  orderBy?: Prisma.UserCategoryLevelOrderByWithRelationInput | Prisma.UserCategoryLevelOrderByWithRelationInput[]
+  cursor?: Prisma.UserCategoryLevelWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserCategoryLevelScalarFieldEnum | Prisma.UserCategoryLevelScalarFieldEnum[]
 }
 
 /**
