@@ -5,11 +5,15 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-const connectionString = normalizeDatabaseUrl(process.env.DATABASE_URL);
+// Prefer a serverless-safe Supabase pooler URL when supplied. Keep DATABASE_URL
+// as the fallback for local development and direct database tooling.
+const connectionString = normalizeDatabaseUrl(
+  process.env.DATABASE_POOLER_URL ?? process.env.DATABASE_URL
+);
 
 if (!connectionString) {
   throw new Error(
-    "DATABASE_URL is not configured. Add it to your Vercel project (Settings → Environment Variables) and redeploy. It must be the Supabase/Postgres connection string, e.g. postgresql://user:password@host:5432/postgres."
+    "DATABASE_POOLER_URL or DATABASE_URL is not configured. Add a Supabase pooler connection string to Vercel and redeploy."
   );
 }
 
