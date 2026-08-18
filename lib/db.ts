@@ -48,31 +48,30 @@ function normalizeDatabaseUrl(value: string | undefined): string | undefined {
   const raw = value.trim().replace(/^['"]|['"]$/g, "");
   const schemeEnd = raw.indexOf("://");
   const authorityStart = schemeEnd + 3;
-  const suffixIndex = raw.slice(authorityStart).search(/[/?#]/);
-  const authorityEnd = suffixIndex === -1 ? -1 : authorityStart + suffixIndex;
-  const authority = raw.slice(authorityStart, authorityEnd === -1 ? raw.length : authorityEnd);
-  const hasUnescapedAtInPassword = authority.indexOf("@") !== authority.lastIndexOf("@");
 
   try {
-    if (!hasUnescapedAtInPassword) {
-      new URL(raw);
-      return raw;
-    }
+    new URL(raw);
+    return raw;
   } catch {
-    // Continue below so malformed credentials receive the clearer error.
+    // Repair credentials below. PostgreSQL passwords commonly contain @, ?, #,
+    // or /, all of which must be percent-encoded inside a URL.
   }
 
-  const lastAt = authority.lastIndexOf("@");
-  const separator = authority.indexOf(":");
+  const lastAt = raw.lastIndexOf("@");
+  const credentials = raw.slice(authorityStart, lastAt);
+  const separator = credentials.indexOf(":");
 
   if (schemeEnd === -1 || lastAt === -1 || separator === -1 || separator > lastAt) {
-    throw new Error("DATABASE_URL is not a valid PostgreSQL connection URL.");
+    console.error("DATABASE_URL is invalid. Set it to a complete postgresql:// connection string in Vercel.");
+    return "postgresql://invalid:invalid@localhost:5432/invalid";
   }
 
-  const username = authority.slice(0, separator);
-  const password = authority.slice(separator + 1, lastAt);
-  const host = authority.slice(lastAt + 1);
-  const suffix = authorityEnd === -1 ? "" : raw.slice(authorityEnd);
+  const username = credentials.slice(0, separator);
+  const password = credentials.slice(separator + 1);
+  const hostAndSuffix = raw.slice(lastAt + 1);
+  const suffixIndex = hostAndSuffix.search(/[/?#]/);
+  const host = suffixIndex === -1 ? hostAndSuffix : hostAndSuffix.slice(0, suffixIndex);
+  const suffix = suffixIndex === -1 ? "" : hostAndSuffix.slice(suffixIndex);
   const repaired = `${raw.slice(0, authorityStart)}${encodeURIComponent(username)}:${encodeURIComponent(password)}@${host}${suffix}`;
 
   try {
@@ -80,6 +79,7 @@ function normalizeDatabaseUrl(value: string | undefined): string | undefined {
     console.warn("DATABASE_URL contained unescaped credentials; repaired its user-info encoding.");
     return repaired;
   } catch {
-    throw new Error("DATABASE_URL is not a valid PostgreSQL connection URL.");
+    console.error("DATABASE_URL is invalid. Set it to a complete postgresql:// connection string in Vercel.");
+    return "postgresql://invalid:invalid@localhost:5432/invalid";
   }
 }
