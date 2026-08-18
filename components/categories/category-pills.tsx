@@ -1,6 +1,6 @@
 "use client";
 
-import { CATEGORIES, CATEGORY_LABELS, type Category } from "@/lib/categories";
+import { CATEGORIES, CATEGORY_LABELS, type Category } from "@/lib/category-constants";
 
 export function CategoryPills({
   selected,

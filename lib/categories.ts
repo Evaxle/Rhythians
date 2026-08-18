@@ -1,21 +1,15 @@
 import { prisma } from "@/lib/db";
 import { fetchRhythiaScores, findScoreForMap } from "@/lib/daily";
+import {
+  CATEGORIES,
+  CATEGORY_LABELS,
+  MAX_CATEGORY_LEVEL,
+  isCategory,
+  type Category,
+} from "@/lib/category-constants";
 
-export const CATEGORIES = ["jumps", "stream", "tech", "off_grid"] as const;
-export type Category = (typeof CATEGORIES)[number];
-
-export const CATEGORY_LABELS: Record<Category, string> = {
-  jumps: "Jumps",
-  stream: "Stream",
-  tech: "Tech",
-  off_grid: "Off Grid",
-};
-
-export const MAX_CATEGORY_LEVEL = 10;
-
-export function isCategory(value: string | null | undefined): value is Category {
-  return CATEGORIES.includes(value as Category);
-}
+export { CATEGORIES, CATEGORY_LABELS, MAX_CATEGORY_LEVEL, isCategory };
+export type { Category };
 
 // A user's current level in every category. Everyone starts at level 0.
 export async function getUserCategoryLevels(userId: string): Promise<Array<{ category: Category; level: number }>> {

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { CheckCircle2, Download, Plus, XCircle } from "lucide-react";
-import { CATEGORIES, CATEGORY_LABELS, MAX_CATEGORY_LEVEL, type Category } from "@/lib/categories";
+import { CATEGORIES, CATEGORY_LABELS, MAX_CATEGORY_LEVEL, type Category } from "@/lib/category-constants";
 
 type AdminMap = {
   id: string;

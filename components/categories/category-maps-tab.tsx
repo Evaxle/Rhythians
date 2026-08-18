@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { CheckCircle2, Download, FolderDown, Lock, RefreshCw } from "lucide-react";
-import { CATEGORY_LABELS, MAX_CATEGORY_LEVEL, type Category } from "@/lib/categories";
+import { CATEGORY_LABELS, MAX_CATEGORY_LEVEL, type Category } from "@/lib/category-constants";
 import { CategoryPills } from "@/components/categories/category-pills";
 
 type MapEntry = {

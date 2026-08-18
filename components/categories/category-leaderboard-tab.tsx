@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { CATEGORY_LABELS, type Category } from "@/lib/categories";
+import { CATEGORY_LABELS, type Category } from "@/lib/category-constants";
 import { CategoryPills } from "@/components/categories/category-pills";
 
 type Row = {

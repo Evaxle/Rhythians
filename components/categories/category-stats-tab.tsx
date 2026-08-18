@@ -1,6 +1,6 @@
 "use client";
 
-import { MAX_CATEGORY_LEVEL, type Category } from "@/lib/categories";
+import { MAX_CATEGORY_LEVEL, type Category } from "@/lib/category-constants";
 
 type Stats = {
   category: Category;

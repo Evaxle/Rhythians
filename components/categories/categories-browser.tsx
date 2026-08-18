@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Map as MapIcon, Trophy, BarChart3 } from "lucide-react";
-import { type Category } from "@/lib/categories";
+import { type Category } from "@/lib/category-constants";
 import { CategoryMapsTab } from "@/components/categories/category-maps-tab";
 import { CategoryLeaderboardTab } from "@/components/categories/category-leaderboard-tab";
 import { CategoryStatsTab } from "@/components/categories/category-stats-tab";
