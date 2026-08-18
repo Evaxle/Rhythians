@@ -1,2 +1,0 @@
--- Link resolvedBy to the User that handled the request.
-ALTER TABLE "RhythiaProfileRequest" ADD CONSTRAINT "RhythiaProfileRequest_resolvedBy_fkey" FOREIGN KEY ("resolvedBy") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
