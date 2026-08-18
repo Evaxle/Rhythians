@@ -46,6 +46,8 @@ function normalizeDatabaseUrl(value: string | undefined): string | undefined {
   if (!value) return value;
 
   const raw = value.trim().replace(/^['"]|['"]$/g, "");
+  if (!raw) return raw;
+
   const schemeEnd = raw.indexOf("://");
   const authorityStart = schemeEnd + 3;
 
@@ -61,13 +63,13 @@ function normalizeDatabaseUrl(value: string | undefined): string | undefined {
   const credentials = raw.slice(authorityStart, lastAt);
   const separator = credentials.indexOf(":");
 
-  if (schemeEnd === -1 || lastAt === -1 || separator === -1 || separator > lastAt) {
+  if (schemeEnd === -1 || lastAt <= authorityStart || separator === -1) {
     console.error("DATABASE_URL is invalid. Set it to a complete postgresql:// connection string in Vercel.");
     return "postgresql://invalid:invalid@localhost:5432/invalid";
   }
 
-  const username = credentials.slice(0, separator);
-  const password = credentials.slice(separator + 1);
+  const username = decodeUrlPart(credentials.slice(0, separator));
+  const password = decodeUrlPart(credentials.slice(separator + 1));
   const hostAndSuffix = raw.slice(lastAt + 1);
   const suffixIndex = hostAndSuffix.search(/[/?#]/);
   const host = suffixIndex === -1 ? hostAndSuffix : hostAndSuffix.slice(0, suffixIndex);
@@ -81,5 +83,13 @@ function normalizeDatabaseUrl(value: string | undefined): string | undefined {
   } catch {
     console.error("DATABASE_URL is invalid. Set it to a complete postgresql:// connection string in Vercel.");
     return "postgresql://invalid:invalid@localhost:5432/invalid";
+  }
+}
+
+function decodeUrlPart(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
   }
 }
