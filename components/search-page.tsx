@@ -174,7 +174,7 @@ export function SearchPage() {
               onChange={(event) => setQuery(event.target.value)}
               autoFocus
               className="w-full bg-transparent text-white outline-none placeholder:text-muted"
-              placeholder="Search users, wiki, clips..."
+              placeholder="Search users, knowledge, clips..."
             />
             {searching && <Loader2 size={16} className="shrink-0 animate-spin text-muted" />}
           </div>
@@ -198,13 +198,13 @@ export function SearchPage() {
             render={(user) => <UserResult key={user.id} user={user} />}
           />
           <Section
-            title={`Wiki (${results.articles.length})`}
+            title={`Knowledge (${results.articles.length})`}
             icon={<BookOpen size={15} />}
             items={results.articles}
             render={(article) => (
               <Link
                 key={article.id}
-                href={`/wiki/${article.category.slug}`}
+                href={`/knowledge/${article.category.slug}`}
                 className="block rounded-2xl border border-border bg-background/70 px-4 py-3 transition hover:border-accent/40"
               >
                 <p className="text-sm font-semibold text-white">{article.title}</p>

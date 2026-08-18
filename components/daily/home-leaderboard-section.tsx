@@ -2,8 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Link2, Lock, Trophy } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
-import { getDailyLeaderboard } from "@/lib/daily";
-import { getRankInfo } from "@/lib/ranks";
+import { getDailyLeaderboard, startOfMonthUTC } from "@/lib/daily";
 
 export async function HomeLeaderboardSection() {
   const user = await getSessionUser();
@@ -58,9 +57,10 @@ export async function HomeLeaderboardSection() {
     );
   }
 
-  const userRow = await prisma.user.findUnique({ where: { id: user.id }, select: { rhp: true } });
-  const rankInfo = getRankInfo(userRow?.rhp ?? 0);
-  const rows = await getDailyLeaderboard(rankInfo.index, 5);
+  const monthStart = startOfMonthUTC();
+  const monthEnd = new Date(Date.UTC(monthStart.getUTCFullYear(), monthStart.getUTCMonth() + 1, 1));
+  const monthLabel = monthStart.toLocaleDateString("en-US", { month: "long", timeZone: "UTC" });
+  const rows = await getDailyLeaderboard(monthStart, monthEnd, 5);
 
   return (
     <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
@@ -72,12 +72,12 @@ export async function HomeLeaderboardSection() {
           All boards <ArrowRight size={15} />
         </Link>
       </div>
-      <p className="mt-2 text-sm text-muted">Top daily map streaks in <span style={{ color: rankInfo.color }} className="font-semibold">{rankInfo.name}</span>.</p>
+      <p className="mt-2 text-sm text-muted">Top daily map beaters this {monthLabel.toLowerCase()}.</p>
 
       <div className="mt-5 space-y-2">
         {rows.length === 0 ? (
           <p className="rounded-2xl border border-border bg-background/70 p-5 text-sm text-muted">
-            No daily maps beaten in your rank yet. Beat today&apos;s map to start a streak.
+            No daily maps beaten yet. Beat today&apos;s map to claim the first spot.
           </p>
         ) : (
           rows.map((row, index) => (
@@ -89,10 +89,10 @@ export async function HomeLeaderboardSection() {
                 <Link href={`/profile/${row.profileHandle}`} className="truncate text-sm font-semibold text-white hover:text-accent">
                   {row.displayName ?? row.username}
                 </Link>
-                <p className="text-xs text-muted">{row.rhp.toLocaleString()} RHP</p>
+                <p className="text-xs text-muted">{row.totalPoints.toLocaleString()} RHP earned</p>
               </div>
-              <span className="text-sm font-semibold text-white">{row.streak}</span>
-              <span className="text-xs text-muted">day{row.streak === 1 ? "" : "s"}</span>
+              <span className="text-sm font-semibold text-white">{row.count}</span>
+              <span className="text-xs text-muted">map{row.count === 1 ? "" : "s"}</span>
             </div>
           ))
         )}

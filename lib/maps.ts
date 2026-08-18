@@ -55,11 +55,15 @@ export async function submitChallengeMap(data: {
   });
 }
 
+export function fairRatingFromStars(stars: number): number {
+  return roundRating(stars * 0.41);
+}
+
 export async function getPendingChallengeMaps() {
   return prisma.challengeMap.findMany({
     where: { status: "pending" },
     orderBy: { createdAt: "asc" },
-    include: { submittedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } } },
+    include: { submittedBy: { select: { username: true, displayName: true, profileHandle: true } } },
   });
 }
 
@@ -144,7 +148,7 @@ export async function checkAndAwardChallengeMap(userId: string, challengeMapId: 
     : null;
 
   if (passHit) {
-    const points = rhpGainForMap(map.rating, accuracy, passHit.speed, rankInfo.index);
+    const points = rhpGainForMap(map.rating, accuracy);
     const newRhp = user.rhp + points;
     const newRankInfo = getRankInfo(newRhp);
 
@@ -185,7 +189,7 @@ export async function checkAndAwardChallengeMap(userId: string, challengeMapId: 
           userId,
           type: "rank_change",
           title: "Rank up!",
-          message: `You reached ${newRankInfo.name} ${newRankInfo.isExpert ? "" : newRankInfo.tier}!`,
+          message: `You reached ${newRankInfo.name} ${newRankInfo.isUnnamed ? "" : newRankInfo.tier}!`,
           url: "/leaderboards",
         },
       });
@@ -196,21 +200,11 @@ export async function checkAndAwardChallengeMap(userId: string, challengeMapId: 
 
   const failHit = allScores.find((score) => !score.passed && matchesTitle(score.beatmapTitle, map.title));
   if (failHit && !existing) {
-    const failAccuracy = failHit.accuracy ?? accuracyFromMisses(failHit.beatmapNotes, failHit.misses);
-    const passers = await prisma.challengeMapCompletion.findMany({
-      where: { challengeMapId: map.id, passed: true },
-      select: { accuracy: true },
-    });
-    const totalBeaters = passers.length;
-    const yourPlace =
-      failAccuracy == null
-        ? totalBeaters + 1
-        : 1 + passers.filter((entry) => entry.accuracy != null && entry.accuracy > failAccuracy).length;
-    const loss = -rhpLossForMap(map.rating, { totalBeaters, yourPlace });
+    const loss = -rhpLossForMap(map.rating);
     const newRhp = Math.max(0, user.rhp + loss);
     await prisma.$transaction([
       prisma.challengeMapCompletion.create({
-        data: { challengeMapId: map.id, userId, rating: map.rating, accuracy: failAccuracy, passed: false, points: loss, scoreId: failHit.id },
+        data: { challengeMapId: map.id, userId, rating: map.rating, accuracy, passed: false, points: loss, scoreId: failHit.id },
       }),
       prisma.user.update({ where: { id: userId }, data: { rhp: newRhp } }),
       prisma.rhpTransaction.create({
@@ -226,9 +220,7 @@ export async function checkAndAwardChallengeMap(userId: string, challengeMapId: 
 export async function getUserGlobalRank(userId: string): Promise<number | null> {
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } });
   if (!user) return null;
-  const higher = await prisma.user.count({
-    where: { rhp: { gt: user.rhp }, rhythiaVerified: true },
-  });
+  const higher = await prisma.user.count({ where: { rhp: { gt: user.rhp } } });
   return higher + 1;
 }
 
@@ -240,7 +232,6 @@ export async function getChallengeLeaderboard(rankIndex: number, limit = 100) {
   const users = await prisma.user.findMany({
     where: {
       rhp: maxRhp == null ? { gte: minRhp } : { gte: minRhp, lt: maxRhp },
-      rhythiaVerified: true,
       NOT: { profileHandle: "rhythia-imports" },
     },
     select: { id: true, username: true, displayName: true, profileHandle: true, avatar: true, rhp: true, avgMapRating: true },
@@ -273,10 +264,7 @@ export async function getApprovedMaps(includeAll: boolean, userId: string | null
   const maps = await prisma.challengeMap.findMany({
     where: { status: "approved", rating: { not: null } },
     orderBy: [{ rating: "asc" }, { createdAt: "desc" }],
-    include: {
-      submittedBy: { select: { username: true, displayName: true, profileHandle: true } },
-      reviewedBy: { select: { username: true, displayName: true, profileHandle: true } },
-    },
+    include: { submittedBy: { select: { username: true, displayName: true, profileHandle: true } } },
   });
 
   const user = userId ? await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } }) : null;
@@ -306,189 +294,7 @@ export async function getApprovedMaps(includeAll: boolean, userId: string | null
       noteCount: map.noteCount,
       length: map.length,
       submittedBy: map.submittedBy,
-      reviewedBy: map.reviewedBy,
       completion: stateMap.get(map.id) ?? null,
     })),
   };
-}
-
-export type CheckAllResult = {
-  checked: number;
-  newlyCompleted: number;
-  totalPoints: number;
-  alreadyCompleted: number;
-  failed: number;
-  errors: number;
-};
-
-// Fetches the user's Rhythia scores once and awards RHP for every ranked map
-// (within their rank's rating range) they have a passing score for.
-export async function checkAndAwardAllChallengeMaps(userId: string): Promise<CheckAllResult> {
-  const profile = await prisma.rhythiaProfile.findUnique({ where: { userId } });
-  if (!profile) throw new Error("Link your Rhythia account to check your scores.");
-
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true, avgMapRating: true } });
-  if (!user) throw new Error("User not found.");
-
-  const rankInfo = getRankInfo(user.rhp);
-  const maps = await prisma.challengeMap.findMany({
-    where: { status: "approved", rating: { not: null } },
-    orderBy: [{ rating: "asc" }, { createdAt: "desc" }],
-  });
-  const candidates = maps.filter((map) => map.rating != null && isMapInRankRange(map.rating, rankInfo.index));
-
-  let scores: { recent: import("@/lib/daily").RhythiaScoreEntry[]; top: import("@/lib/daily").RhythiaScoreEntry[] };
-  try {
-    scores = await fetchRhythiaScores(profile.profileId);
-  } catch {
-    throw new Error("Unable to fetch your recent scores from Rhythia. Try again later.");
-  }
-
-  const existing = await prisma.challengeMapCompletion.findMany({
-    where: { userId, challengeMapId: { in: candidates.map((map) => map.id) } },
-    select: { challengeMapId: true, passed: true },
-  });
-  const existingMap = new Map(existing.map((entry) => [entry.challengeMapId, entry]));
-
-  const passers = await prisma.challengeMapCompletion.findMany({
-    where: { challengeMapId: { in: candidates.map((map) => map.id) }, passed: true },
-    select: { challengeMapId: true, accuracy: true },
-  });
-  const passersByMap = new Map<string, Array<number | null>>();
-  for (const entry of passers) {
-    const list = passersByMap.get(entry.challengeMapId) ?? [];
-    list.push(entry.accuracy);
-    passersByMap.set(entry.challengeMapId, list);
-  }
-
-  const result: CheckAllResult = { checked: candidates.length, newlyCompleted: 0, totalPoints: 0, alreadyCompleted: 0, failed: 0, errors: 0 };
-
-  let rhp = user.rhp;
-  let avgMapRating = user.avgMapRating;
-  let passedCount = await prisma.challengeMapCompletion.count({ where: { userId, passed: true } });
-
-  const completionsToUpsert: Array<{
-    challengeMapId: string;
-    rating: number;
-    accuracy: number | null;
-    passed: boolean;
-    points: number;
-    scoreId: number | null;
-  }> = [];
-  const rhpTransactions: Array<{ amount: number; description: string }> = [];
-  const notifications: Array<{ type: "rhp_earned"; title: string; message: string }> = [];
-
-  for (const map of candidates) {
-    const rating = map.rating as number;
-    const prior = existingMap.get(map.id);
-    if (prior?.passed) {
-      result.alreadyCompleted += 1;
-      continue;
-    }
-
-    const passHit =
-      findScoreForMap(scores.recent, map.title) ??
-      findScoreForMap(scores.top, map.title);
-
-    if (passHit) {
-      const accuracy = passHit.accuracy ?? accuracyFromMisses(passHit.beatmapNotes, passHit.misses);
-      const points = rhpGainForMap(rating, accuracy, passHit.speed, rankInfo.index);
-      rhp += points;
-      passedCount += 1;
-      avgMapRating = passedCount === 0
-        ? rating
-        : roundRating(((avgMapRating ?? rating) * (passedCount - 1) + rating) / passedCount);
-
-      completionsToUpsert.push({
-        challengeMapId: map.id,
-        rating,
-        accuracy,
-        passed: true,
-        points,
-        scoreId: passHit.id,
-      });
-      rhpTransactions.push({ amount: points, description: `Completed ranked map: ${map.title} (${rating.toFixed(2)})` });
-      notifications.push({
-        type: "rhp_earned",
-        title: "Map completed",
-        message: `You earned ${points} RHP for beating ${map.title} (${rating.toFixed(2)} rating).`,
-      });
-      result.newlyCompleted += 1;
-      result.totalPoints += points;
-      continue;
-    }
-
-    const failHit = [...scores.recent, ...scores.top].find(
-      (score) => !score.passed && matchesTitle(score.beatmapTitle, map.title)
-    );
-    if (failHit && !prior) {
-      const failAccuracy = failHit.accuracy ?? accuracyFromMisses(failHit.beatmapNotes, failHit.misses);
-      const mapPassers = passersByMap.get(map.id) ?? [];
-      const totalBeaters = mapPassers.length;
-      const yourPlace =
-        failAccuracy == null
-          ? totalBeaters + 1
-          : 1 + mapPassers.filter((entry) => entry != null && entry > failAccuracy).length;
-      const loss = -rhpLossForMap(rating, { totalBeaters, yourPlace });
-      rhp = Math.max(0, rhp + loss);
-      completionsToUpsert.push({
-        challengeMapId: map.id,
-        rating,
-        accuracy: failAccuracy,
-        passed: false,
-        points: loss,
-        scoreId: failHit.id,
-      });
-      rhpTransactions.push({ amount: loss, description: `Attempted ranked map: ${map.title}` });
-      result.failed += 1;
-    }
-  }
-
-  const newRhp = Math.max(0, rhp);
-  const newRankInfo = getRankInfo(newRhp);
-
-  if (completionsToUpsert.length > 0) {
-    await prisma.$transaction([
-      ...completionsToUpsert.map((entry) =>
-        prisma.challengeMapCompletion.upsert({
-          where: { challengeMapId_userId: { challengeMapId: entry.challengeMapId, userId } },
-          create: { ...entry, userId },
-          update: {
-            accuracy: entry.accuracy,
-            passed: entry.passed,
-            points: entry.points,
-            scoreId: entry.scoreId,
-          },
-        })
-      ),
-      prisma.user.update({
-        where: { id: userId },
-        data: { rhp: newRhp, avgMapRating: roundRating(avgMapRating ?? user.avgMapRating ?? 0) },
-      }),
-      ...rhpTransactions.map((transaction) =>
-        prisma.rhpTransaction.create({
-          data: { userId, amount: transaction.amount, reason: "challenge_map", description: transaction.description },
-        })
-      ),
-      ...notifications.map((notification) =>
-        prisma.notification.create({
-          data: { userId, type: notification.type, title: notification.title, message: notification.message, url: "/maps" },
-        })
-      ),
-    ]);
-
-    if (newRankInfo.index > rankInfo.index) {
-      await prisma.notification.create({
-        data: {
-          userId,
-          type: "rank_change",
-          title: "Rank up!",
-          message: `You reached ${newRankInfo.name} ${newRankInfo.isExpert ? "" : newRankInfo.tier}!`,
-          url: "/leaderboards",
-        },
-      });
-    }
-  }
-
-  return result;
 }

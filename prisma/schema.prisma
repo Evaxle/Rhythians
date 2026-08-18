@@ -141,9 +141,6 @@ model User {
   resolvedRhythiaRequests RhythiaProfileRequest[] @relation("resolvedRhythiaRequests")
   rhp             Int                  @default(0)
   avgMapRating    Float?
-  dailyStreak     Int                  @default(0)
-  lastDailyBeatAt DateTime?
-  rhythiaVerified Boolean              @default(false)
   dailyMapBeats   DailyMapBeat[]
   rhpTransactions RhpTransaction[]
   challengeMaps   ChallengeMap[]       @relation("challengeMapSubmissions")
@@ -401,7 +398,6 @@ model Clip {
   id             String         @id @default(uuid())
   title          String
   description    String
-  songName       String?
   status         ClipStatus     @default(pending)
   featuredOrder  Int?
   cameraMode     CameraMode?
@@ -587,8 +583,7 @@ model FriendRequest {
 
 model DailyMap {
   id          String         @id @default(uuid())
-  date        DateTime
-  rankIndex   Int            @default(0)
+  date        DateTime       @unique
   beatmapId   Int
   title       String
   artist      String?
@@ -604,9 +599,7 @@ model DailyMap {
   beats       DailyMapBeat[]
   createdAt   DateTime       @default(now())
 
-  @@unique([date, rankIndex])
   @@index([date])
-  @@index([rankIndex])
 }
 
 model DailyMapBeat {

@@ -27,7 +27,6 @@ export type AggregateDailyMap = {
 }
 
 export type DailyMapAvgAggregateOutputType = {
-  rankIndex: number | null
   beatmapId: number | null
   difficulty: number | null
   starRating: number | null
@@ -37,7 +36,6 @@ export type DailyMapAvgAggregateOutputType = {
 }
 
 export type DailyMapSumAggregateOutputType = {
-  rankIndex: number | null
   beatmapId: number | null
   difficulty: number | null
   starRating: number | null
@@ -49,7 +47,6 @@ export type DailyMapSumAggregateOutputType = {
 export type DailyMapMinAggregateOutputType = {
   id: string | null
   date: Date | null
-  rankIndex: number | null
   beatmapId: number | null
   title: string | null
   artist: string | null
@@ -68,7 +65,6 @@ export type DailyMapMinAggregateOutputType = {
 export type DailyMapMaxAggregateOutputType = {
   id: string | null
   date: Date | null
-  rankIndex: number | null
   beatmapId: number | null
   title: string | null
   artist: string | null
@@ -87,7 +83,6 @@ export type DailyMapMaxAggregateOutputType = {
 export type DailyMapCountAggregateOutputType = {
   id: number
   date: number
-  rankIndex: number
   beatmapId: number
   title: number
   artist: number
@@ -106,7 +101,6 @@ export type DailyMapCountAggregateOutputType = {
 
 
 export type DailyMapAvgAggregateInputType = {
-  rankIndex?: true
   beatmapId?: true
   difficulty?: true
   starRating?: true
@@ -116,7 +110,6 @@ export type DailyMapAvgAggregateInputType = {
 }
 
 export type DailyMapSumAggregateInputType = {
-  rankIndex?: true
   beatmapId?: true
   difficulty?: true
   starRating?: true
@@ -128,7 +121,6 @@ export type DailyMapSumAggregateInputType = {
 export type DailyMapMinAggregateInputType = {
   id?: true
   date?: true
-  rankIndex?: true
   beatmapId?: true
   title?: true
   artist?: true
@@ -147,7 +139,6 @@ export type DailyMapMinAggregateInputType = {
 export type DailyMapMaxAggregateInputType = {
   id?: true
   date?: true
-  rankIndex?: true
   beatmapId?: true
   title?: true
   artist?: true
@@ -166,7 +157,6 @@ export type DailyMapMaxAggregateInputType = {
 export type DailyMapCountAggregateInputType = {
   id?: true
   date?: true
-  rankIndex?: true
   beatmapId?: true
   title?: true
   artist?: true
@@ -272,7 +262,6 @@ export type DailyMapGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 export type DailyMapGroupByOutputType = {
   id: string
   date: Date
-  rankIndex: number
   beatmapId: number
   title: string
   artist: string | null
@@ -314,7 +303,6 @@ export type DailyMapWhereInput = {
   NOT?: Prisma.DailyMapWhereInput | Prisma.DailyMapWhereInput[]
   id?: Prisma.StringFilter<"DailyMap"> | string
   date?: Prisma.DateTimeFilter<"DailyMap"> | Date | string
-  rankIndex?: Prisma.IntFilter<"DailyMap"> | number
   beatmapId?: Prisma.IntFilter<"DailyMap"> | number
   title?: Prisma.StringFilter<"DailyMap"> | string
   artist?: Prisma.StringNullableFilter<"DailyMap"> | string | null
@@ -334,7 +322,6 @@ export type DailyMapWhereInput = {
 export type DailyMapOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   date?: Prisma.SortOrder
-  rankIndex?: Prisma.SortOrder
   beatmapId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   artist?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -353,12 +340,10 @@ export type DailyMapOrderByWithRelationInput = {
 
 export type DailyMapWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  date_rankIndex?: Prisma.DailyMapDateRankIndexCompoundUniqueInput
+  date?: Date | string
   AND?: Prisma.DailyMapWhereInput | Prisma.DailyMapWhereInput[]
   OR?: Prisma.DailyMapWhereInput[]
   NOT?: Prisma.DailyMapWhereInput | Prisma.DailyMapWhereInput[]
-  date?: Prisma.DateTimeFilter<"DailyMap"> | Date | string
-  rankIndex?: Prisma.IntFilter<"DailyMap"> | number
   beatmapId?: Prisma.IntFilter<"DailyMap"> | number
   title?: Prisma.StringFilter<"DailyMap"> | string
   artist?: Prisma.StringNullableFilter<"DailyMap"> | string | null
@@ -373,12 +358,11 @@ export type DailyMapWhereUniqueInput = Prisma.AtLeast<{
   mapperName?: Prisma.StringNullableFilter<"DailyMap"> | string | null
   createdAt?: Prisma.DateTimeFilter<"DailyMap"> | Date | string
   beats?: Prisma.DailyMapBeatListRelationFilter
-}, "id" | "date_rankIndex">
+}, "id" | "date">
 
 export type DailyMapOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   date?: Prisma.SortOrder
-  rankIndex?: Prisma.SortOrder
   beatmapId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   artist?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -405,7 +389,6 @@ export type DailyMapScalarWhereWithAggregatesInput = {
   NOT?: Prisma.DailyMapScalarWhereWithAggregatesInput | Prisma.DailyMapScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"DailyMap"> | string
   date?: Prisma.DateTimeWithAggregatesFilter<"DailyMap"> | Date | string
-  rankIndex?: Prisma.IntWithAggregatesFilter<"DailyMap"> | number
   beatmapId?: Prisma.IntWithAggregatesFilter<"DailyMap"> | number
   title?: Prisma.StringWithAggregatesFilter<"DailyMap"> | string
   artist?: Prisma.StringNullableWithAggregatesFilter<"DailyMap"> | string | null
@@ -424,7 +407,6 @@ export type DailyMapScalarWhereWithAggregatesInput = {
 export type DailyMapCreateInput = {
   id?: string
   date: Date | string
-  rankIndex?: number
   beatmapId: number
   title: string
   artist?: string | null
@@ -444,7 +426,6 @@ export type DailyMapCreateInput = {
 export type DailyMapUncheckedCreateInput = {
   id?: string
   date: Date | string
-  rankIndex?: number
   beatmapId: number
   title: string
   artist?: string | null
@@ -464,7 +445,6 @@ export type DailyMapUncheckedCreateInput = {
 export type DailyMapUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  rankIndex?: Prisma.IntFieldUpdateOperationsInput | number
   beatmapId?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   artist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -484,7 +464,6 @@ export type DailyMapUpdateInput = {
 export type DailyMapUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  rankIndex?: Prisma.IntFieldUpdateOperationsInput | number
   beatmapId?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   artist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -504,7 +483,6 @@ export type DailyMapUncheckedUpdateInput = {
 export type DailyMapCreateManyInput = {
   id?: string
   date: Date | string
-  rankIndex?: number
   beatmapId: number
   title: string
   artist?: string | null
@@ -523,7 +501,6 @@ export type DailyMapCreateManyInput = {
 export type DailyMapUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  rankIndex?: Prisma.IntFieldUpdateOperationsInput | number
   beatmapId?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   artist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -542,7 +519,6 @@ export type DailyMapUpdateManyMutationInput = {
 export type DailyMapUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  rankIndex?: Prisma.IntFieldUpdateOperationsInput | number
   beatmapId?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   artist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -558,15 +534,9 @@ export type DailyMapUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type DailyMapDateRankIndexCompoundUniqueInput = {
-  date: Date | string
-  rankIndex: number
-}
-
 export type DailyMapCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   date?: Prisma.SortOrder
-  rankIndex?: Prisma.SortOrder
   beatmapId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   artist?: Prisma.SortOrder
@@ -583,7 +553,6 @@ export type DailyMapCountOrderByAggregateInput = {
 }
 
 export type DailyMapAvgOrderByAggregateInput = {
-  rankIndex?: Prisma.SortOrder
   beatmapId?: Prisma.SortOrder
   difficulty?: Prisma.SortOrder
   starRating?: Prisma.SortOrder
@@ -595,7 +564,6 @@ export type DailyMapAvgOrderByAggregateInput = {
 export type DailyMapMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   date?: Prisma.SortOrder
-  rankIndex?: Prisma.SortOrder
   beatmapId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   artist?: Prisma.SortOrder
@@ -614,7 +582,6 @@ export type DailyMapMaxOrderByAggregateInput = {
 export type DailyMapMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   date?: Prisma.SortOrder
-  rankIndex?: Prisma.SortOrder
   beatmapId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   artist?: Prisma.SortOrder
@@ -631,7 +598,6 @@ export type DailyMapMinOrderByAggregateInput = {
 }
 
 export type DailyMapSumOrderByAggregateInput = {
-  rankIndex?: Prisma.SortOrder
   beatmapId?: Prisma.SortOrder
   difficulty?: Prisma.SortOrder
   starRating?: Prisma.SortOrder
@@ -670,7 +636,6 @@ export type DailyMapUpdateOneRequiredWithoutBeatsNestedInput = {
 export type DailyMapCreateWithoutBeatsInput = {
   id?: string
   date: Date | string
-  rankIndex?: number
   beatmapId: number
   title: string
   artist?: string | null
@@ -689,7 +654,6 @@ export type DailyMapCreateWithoutBeatsInput = {
 export type DailyMapUncheckedCreateWithoutBeatsInput = {
   id?: string
   date: Date | string
-  rankIndex?: number
   beatmapId: number
   title: string
   artist?: string | null
@@ -724,7 +688,6 @@ export type DailyMapUpdateToOneWithWhereWithoutBeatsInput = {
 export type DailyMapUpdateWithoutBeatsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  rankIndex?: Prisma.IntFieldUpdateOperationsInput | number
   beatmapId?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   artist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -743,7 +706,6 @@ export type DailyMapUpdateWithoutBeatsInput = {
 export type DailyMapUncheckedUpdateWithoutBeatsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  rankIndex?: Prisma.IntFieldUpdateOperationsInput | number
   beatmapId?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   artist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -793,7 +755,6 @@ export type DailyMapCountOutputTypeCountBeatsArgs<ExtArgs extends runtime.Types.
 export type DailyMapSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   date?: boolean
-  rankIndex?: boolean
   beatmapId?: boolean
   title?: boolean
   artist?: boolean
@@ -814,7 +775,6 @@ export type DailyMapSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type DailyMapSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   date?: boolean
-  rankIndex?: boolean
   beatmapId?: boolean
   title?: boolean
   artist?: boolean
@@ -833,7 +793,6 @@ export type DailyMapSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
 export type DailyMapSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   date?: boolean
-  rankIndex?: boolean
   beatmapId?: boolean
   title?: boolean
   artist?: boolean
@@ -852,7 +811,6 @@ export type DailyMapSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
 export type DailyMapSelectScalar = {
   id?: boolean
   date?: boolean
-  rankIndex?: boolean
   beatmapId?: boolean
   title?: boolean
   artist?: boolean
@@ -868,7 +826,7 @@ export type DailyMapSelectScalar = {
   createdAt?: boolean
 }
 
-export type DailyMapOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "date" | "rankIndex" | "beatmapId" | "title" | "artist" | "difficulty" | "starRating" | "noteCount" | "length" | "playcount" | "mapHash" | "downloadUrl" | "imageUrl" | "mapperName" | "createdAt", ExtArgs["result"]["dailyMap"]>
+export type DailyMapOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "date" | "beatmapId" | "title" | "artist" | "difficulty" | "starRating" | "noteCount" | "length" | "playcount" | "mapHash" | "downloadUrl" | "imageUrl" | "mapperName" | "createdAt", ExtArgs["result"]["dailyMap"]>
 export type DailyMapInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   beats?: boolean | Prisma.DailyMap$beatsArgs<ExtArgs>
   _count?: boolean | Prisma.DailyMapCountOutputTypeDefaultArgs<ExtArgs>
@@ -884,7 +842,6 @@ export type $DailyMapPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     date: Date
-    rankIndex: number
     beatmapId: number
     title: string
     artist: string | null
@@ -1324,7 +1281,6 @@ export interface Prisma__DailyMapClient<T, Null = never, ExtArgs extends runtime
 export interface DailyMapFieldRefs {
   readonly id: Prisma.FieldRef<"DailyMap", 'String'>
   readonly date: Prisma.FieldRef<"DailyMap", 'DateTime'>
-  readonly rankIndex: Prisma.FieldRef<"DailyMap", 'Int'>
   readonly beatmapId: Prisma.FieldRef<"DailyMap", 'Int'>
   readonly title: Prisma.FieldRef<"DailyMap", 'String'>
   readonly artist: Prisma.FieldRef<"DailyMap", 'String'>

@@ -45,12 +45,6 @@ export const ROLE_TO_TAG_MAP: Record<string, string> = {
   "rhythian coach": "rhythian-coach",
   tester: "tester",
   admin: "admin",
-  mentor: "mentor",
-  "post-reviewer": "post-reviewer",
-  "map-reviewer": "map-reviewer",
-  mapper: "mapper",
-  developer: "developer",
-  owner: "owner",
 };
 
 export function mapDiscordRolesToTags(discordRoles: string[], roleMappings: Record<string, string>): string[] {

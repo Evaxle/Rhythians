@@ -2,25 +2,19 @@
 
 import { useState } from "react";
 import { RefreshCw } from "lucide-react";
-import { RANKS, fairRatingFromStars } from "@/lib/ranks";
 
 export function AdminDailyRefresh() {
   const [busy, setBusy] = useState(false);
-  const [rankIndex, setRankIndex] = useState(0);
   const [message, setMessage] = useState<{ tone: "ok" | "err"; text: string } | null>(null);
 
   async function refresh() {
     setBusy(true);
     setMessage(null);
     try {
-      const response = await fetch("/api/admin/daily/refresh", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rankIndex }),
-      });
+      const response = await fetch("/api/admin/daily/refresh", { method: "POST" });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Could not refresh the daily map.");
-      setMessage({ tone: "ok", text: `Refreshed ${RANKS[rankIndex].name}! Today's map is now: ${data.map.title} (${fairRatingFromStars(data.map.starRating).toFixed(2)} rating)${data.replaced ? "" : " (no change needed)"}.` });
+      setMessage({ tone: "ok", text: `Refreshed! Today's map is now: ${data.map.title} (${data.map.starRating.toFixed(2)} stars)${data.replaced ? "" : " (no change needed)"}.` });
     } catch (err) {
       setMessage({ tone: "err", text: err instanceof Error ? err.message : "Could not refresh the daily map." });
     } finally {
@@ -33,18 +27,9 @@ export function AdminDailyRefresh() {
       <p className="text-sm font-semibold text-white">Daily map</p>
       <p className="mt-1 text-sm text-muted">Force a new daily map pick for today if the current one is broken or unpopular.</p>
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <select
-          value={rankIndex}
-          onChange={(event) => setRankIndex(Number(event.target.value))}
-          className="rounded-full border border-border bg-background px-4 py-2.5 text-sm text-white outline-none transition focus:border-accent"
-        >
-          {RANKS.map((rank, index) => (
-            <option key={rank.name} value={index}>{rank.name}</option>
-          ))}
-        </select>
         <button
           type="button"
-          onClick={() => { if (window.confirm(`Refresh today's ${RANKS[rankIndex].name} daily map? This replaces it for everyone in that rank.`)) refresh(); }}
+          onClick={() => { if (window.confirm("Refresh today's daily map? This replaces it for everyone.")) refresh(); }}
           disabled={busy}
           className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent2 disabled:opacity-60"
         >

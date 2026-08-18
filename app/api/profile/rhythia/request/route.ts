@@ -14,14 +14,10 @@ export async function POST(request: Request) {
     const profile = await fetchRhythiaProfile(parsed.id);
 
     if (namesMatch(profile.username, [user.username, user.displayName, user.profileHandle])) {
-      const saved = await prisma.$transaction(async (tx) => {
-        const profileRow = await tx.rhythiaProfile.upsert({
-          where: { userId: user.id },
-          create: { userId: user.id, profileUrl: parsed.url, ...profile },
-          update: { profileUrl: parsed.url, ...profile, syncedAt: new Date() },
-        });
-        await tx.user.update({ where: { id: user.id }, data: { rhythiaVerified: true } });
-        return profileRow;
+      const saved = await prisma.rhythiaProfile.upsert({
+        where: { userId: user.id },
+        create: { userId: user.id, profileUrl: parsed.url, ...profile },
+        update: { profileUrl: parsed.url, ...profile, syncedAt: new Date() },
       });
       return NextResponse.json({ profile: saved });
     }

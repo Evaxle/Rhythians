@@ -5,7 +5,6 @@ import { getSessionUser } from "@/lib/auth";
 import { canAccessAdmin } from "@/lib/admin-access";
 import { getAvatarUrl } from "@/lib/avatar";
 import { cameraModeLabel, cameraModeEmoji } from "@/lib/camera-mode";
-import { Music, Tag as TagIcon } from "lucide-react";
 import { ClipComments } from "@/components/clip-comments";
 import { CoachComments } from "@/components/coach-comments";
 import { ClipPlayer } from "@/components/clip-player";
@@ -48,7 +47,6 @@ export default async function ClipPage({ params }: Props) {
       },
       reviewedBy: { select: { username: true, discriminator: true, displayName: true } },
       category: true,
-      tags: { include: { tag: true } },
       comments: {
         orderBy: { createdAt: "desc" },
         include: {
@@ -195,33 +193,6 @@ export default async function ClipPage({ params }: Props) {
               </div>
             )}
             <p className="mt-4 text-sm text-muted">{clip.description}</p>
-
-            {clip.songName && (
-              <div className="mt-4 flex flex-wrap items-center gap-2">
-                <a
-                  href={`/clips?song=${encodeURIComponent(clip.songName)}`}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-sm font-semibold text-accent transition hover:bg-accent/20"
-                  title="View clips for this song"
-                >
-                  <Music size={15} /> {clip.songName}
-                </a>
-              </div>
-            )}
-
-            {clip.tags.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {clip.tags.map(({ tag }) => (
-                  <a
-                    key={tag.id}
-                    href={`/clips?tag=${encodeURIComponent(tag.slug)}`}
-                    className="inline-flex items-center gap-1 rounded-full border border-border bg-background/60 px-2.5 py-0.5 text-xs font-medium text-muted transition hover:border-accent/40 hover:text-white"
-                  >
-                    <TagIcon className="h-3 w-3" /> {tag.name}
-                  </a>
-                ))}
-              </div>
-            )}
-
             <div className="mt-5 flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.25em] text-accent">
               <span>{clip.category?.name ?? "Uncategorized"}</span>
               {cameraModeLabel(clip.cameraMode) && (

@@ -21,14 +21,12 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { title, description, cameraMode, storagePath, thumbnailPath, songName, tagIds } = body as {
+  const { title, description, cameraMode, storagePath, thumbnailPath } = body as {
     title?: string;
     description?: string;
     cameraMode?: string;
     storagePath?: string;
     thumbnailPath?: string;
-    songName?: string;
-    tagIds?: string[];
   };
 
   const validCameraModes = new Set(["lock", "spin", "vr"]);
@@ -43,27 +41,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Video storage path is required." }, { status: 400 });
   }
 
-  // Validate tags against the available ones so users can only tag with real tags.
-  let validTagIds: string[] = [];
-  if (Array.isArray(tagIds) && tagIds.length > 0) {
-    const existing = await prisma.tag.findMany({ where: { id: { in: tagIds.slice(0, 10) } }, select: { id: true } });
-    validTagIds = existing.map((tag) => tag.id);
-  }
-
-  const clip = await prisma.$transaction(async (tx) => {
-    const created = await tx.clip.create({
-      data: {
-        title,
-        description: description ?? "",
-        songName: typeof songName === "string" && songName.trim() ? songName.trim().slice(0, 120) : null,
-        storagePath,
-        thumbnailPath,
-        cameraMode: validCameraModes.has(cameraMode ?? "") ? (cameraMode as "lock" | "spin" | "vr") : null,
-        uploaderId: user.id,
-        tags: validTagIds.length > 0 ? { create: validTagIds.map((tagId) => ({ tagId })) } : undefined,
-      },
-    });
-    return created;
+  const clip = await prisma.clip.create({
+    data: {
+      title,
+      description: description ?? "",
+      storagePath,
+      thumbnailPath,
+      cameraMode: validCameraModes.has(cameraMode ?? "") ? (cameraMode as "lock" | "spin" | "vr") : null,
+      uploaderId: user.id,
+    },
   });
 
   await prisma.moderationAction.create({
@@ -72,7 +58,7 @@ export async function POST(request: Request) {
       action: "clip_submitted",
       targetType: "clip",
       targetId: clip.id,
-      metadata: { title, songName: clip.songName, tagIds: validTagIds },
+      metadata: { title },
     },
   });
 

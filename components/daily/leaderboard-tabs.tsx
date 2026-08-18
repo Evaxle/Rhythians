@@ -2,15 +2,18 @@
 
 import { useState } from "react";
 import { Trophy, Swords } from "lucide-react";
-import { DailyLeaderboard, type DailyLeaderboardRow } from "@/components/daily/daily-leaderboard";
+import type { DailyLeaderboardRow } from "@/lib/daily";
+import { DailyLeaderboardTable } from "@/components/daily/daily-leaderboard";
 import { ChallengeLeaderboard, type ChallengeRow } from "@/components/daily/challenge-leaderboard";
 
 export function LeaderboardTabs({
-  dailyLeaderboards,
+  dailyRows,
+  monthLabel,
   challengeLeaderboards,
   currentUserId,
 }: {
-  dailyLeaderboards: DailyLeaderboardRow[][];
+  dailyRows: DailyLeaderboardRow[];
+  monthLabel: string;
   challengeLeaderboards: ChallengeRow[][];
   currentUserId: string | null;
 }) {
@@ -44,7 +47,16 @@ export function LeaderboardTabs({
       </div>
 
       {tab === "daily" ? (
-        <DailyLeaderboard leaderboards={dailyLeaderboards} currentUserId={currentUserId} />
+        <section className="space-y-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm uppercase tracking-[0.24em] text-accent">Daily leaderboards</p>
+              <h2 className="mt-1 text-2xl font-semibold text-white">{monthLabel}</h2>
+            </div>
+            <p className="text-sm text-muted">Ranked by the most daily maps beaten this month.</p>
+          </div>
+          <DailyLeaderboardTable rows={dailyRows} />
+        </section>
       ) : (
         <ChallengeLeaderboard leaderboards={challengeLeaderboards} currentUserId={currentUserId} />
       )}

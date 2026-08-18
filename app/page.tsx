@@ -61,7 +61,7 @@ export default async function HomePage() {
             </div>
             <div className="flex flex-wrap gap-3">
               <Link href="/community" className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent2">Join Discord</Link>
-              <Link href="/wiki" className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-5 py-3 text-sm text-white transition hover:border-accent/40">Explore Wiki</Link>
+              <Link href="/knowledge" className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-5 py-3 text-sm text-white transition hover:border-accent/40">Explore Knowledge</Link>
               {user && !linkedProfile && (
                 <Link href={`/profile/${user.profileHandle}`} className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-5 py-3 text-sm font-semibold text-amber-200 transition hover:bg-amber-400/20">
                   <Link2 size={16} /> Link your Rhythia account
@@ -110,9 +110,9 @@ export default async function HomePage() {
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/15 text-accent">
             <BookOpen size={24} />
           </div>
-          <h2 className="mt-4 text-xl font-semibold text-white">Wiki</h2>
+          <h2 className="mt-4 text-xl font-semibold text-white">Knowledge</h2>
           <p className="mt-2 text-sm leading-6 text-muted">Explore the wiki, guides, FAQs, and resources curated for the community.</p>
-          <Link href="/wiki" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-accent transition hover:text-white">
+          <Link href="/knowledge" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-accent transition hover:text-white">
             View articles <ArrowRight size={16} />
           </Link>
         </article>
