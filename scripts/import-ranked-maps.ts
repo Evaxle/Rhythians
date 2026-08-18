@@ -1,7 +1,6 @@
 import "dotenv/config";
 import { fetchRankedMaps } from "../lib/daily";
-import { submitChallengeMap } from "../lib/maps";
-import { fairRatingFromStars } from "../lib/ranks";
+import { submitChallengeMap, fairRatingFromStars } from "../lib/maps";
 import { prisma } from "../lib/db";
 
 const SYSTEM_USER_HANDLE = "rhythia-imports";

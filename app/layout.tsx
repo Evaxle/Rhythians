@@ -47,7 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </div>
               <div className="flex flex-wrap gap-3 text-sm text-muted">
                 <a href="/" className="hover:text-white">Home</a>
-                <a href="/wiki" className="hover:text-white">Wiki</a>
+                <a href="/knowledge" className="hover:text-white">Knowledge</a>
                 <a href="/clips" className="hover:text-white">Clips</a>
                 <a href="/rules" className="hover:text-white">Rules</a>
                 <a href="/community" className="hover:text-white">Community</a>

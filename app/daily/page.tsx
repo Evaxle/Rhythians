@@ -3,7 +3,6 @@ import { Link2, LogIn, Sparkles } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { getOrCreateDailyMap, getUserDailyStatus, formatDailyDate, rhpForMap, getRankedMapsCached } from "@/lib/daily";
-import { getRankInfo } from "@/lib/ranks";
 import { DailyMapCard } from "@/components/daily/daily-map-card";
 
 export const dynamic = "force-dynamic";
@@ -53,10 +52,9 @@ export default async function DailyPage() {
     );
   }
 
-  const userRow = await prisma.user.findUnique({ where: { id: user.id }, select: { rhp: true, dailyStreak: true } });
-  const rankInfo = getRankInfo(userRow?.rhp ?? 0);
-  const daily = await getOrCreateDailyMap(rankInfo.index);
+  const daily = await getOrCreateDailyMap();
   const status = await getUserDailyStatus(user.id);
+  const userRow = await prisma.user.findUnique({ where: { id: user.id }, select: { rhp: true } });
   const randomMaps = (await getRankedMapsCached()).map((map) => ({ id: map.id, title: map.title }));
 
   return (
@@ -67,11 +65,8 @@ export default async function DailyPage() {
         </p>
         <h1 className="text-3xl font-semibold text-white">Today&apos;s map</h1>
         <p className="text-sm text-muted">
-          A daily map matched to your {rankInfo.name} rank ({rankInfo.rangeMin.toFixed(2)}–{rankInfo.rangeMax.toFixed(2)} rating).
-          Beat it for Rhythian Points (RHP) — {formatDailyDate(daily.date)}, worth{" "}
-          <span className="font-semibold text-white">{rhpForMap(daily.starRating, rankInfo.index)} RHP</span> at 100% accuracy
-          (scaled by accuracy and speed, based on your {rankInfo.name} rank).
-          {status?.streak ? ` Your streak: ${status.streak} day${status.streak === 1 ? "" : "s"}.` : ""}
+          Beat today&apos;s map for Rhythian Points (RHP). {formatDailyDate(daily.date)} — worth{" "}
+          <span className="font-semibold text-white">{rhpForMap(daily.starRating)} RHP</span>.
         </p>
       </section>
 
@@ -92,8 +87,6 @@ export default async function DailyPage() {
         }}
         initialBeat={status?.beat ?? null}
         userRhp={userRow?.rhp ?? 0}
-        streak={status?.streak ?? 0}
-        rankName={rankInfo.name}
         randomMaps={randomMaps}
       />
     </div>

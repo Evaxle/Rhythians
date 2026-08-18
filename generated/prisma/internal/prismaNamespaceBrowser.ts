@@ -134,10 +134,7 @@ export const UserScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   rhp: 'rhp',
-  avgMapRating: 'avgMapRating',
-  dailyStreak: 'dailyStreak',
-  lastDailyBeatAt: 'lastDailyBeatAt',
-  rhythiaVerified: 'rhythiaVerified'
+  avgMapRating: 'avgMapRating'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -414,7 +411,6 @@ export const ClipScalarFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
-  songName: 'songName',
   status: 'status',
   featuredOrder: 'featuredOrder',
   cameraMode: 'cameraMode',
@@ -598,7 +594,6 @@ export type FriendRequestScalarFieldEnum = (typeof FriendRequestScalarFieldEnum)
 export const DailyMapScalarFieldEnum = {
   id: 'id',
   date: 'date',
-  rankIndex: 'rankIndex',
   beatmapId: 'beatmapId',
   title: 'title',
   artist: 'artist',

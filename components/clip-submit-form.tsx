@@ -7,26 +7,16 @@ import { CAMERA_MODES } from "@/lib/camera-mode";
 const validVideoTypes = ["video/mp4", "video/webm", "video/quicktime"];
 const validThumbnailTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
 
-type ClipTag = { id: string; name: string; slug: string };
-
-export default function ClipSubmitForm({ tags }: { tags: ClipTag[] }) {
+export default function ClipSubmitForm() {
   const router = useRouter();
   const [title, setTitle] = useState("");
-  const [songName, setSongName] = useState("");
   const [description, setDescription] = useState("");
   const [cameraMode, setCameraMode] = useState<string>("");
-  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-
-  const toggleTag = (id: string) => {
-    setSelectedTagIds((current) =>
-      current.includes(id) ? current.filter((tagId) => tagId !== id) : [...current, id]
-    );
-  };
 
   const uploadFile = async (file: File, folder: string) => {
     const response = await fetch("/api/clip-upload", {
@@ -138,12 +128,10 @@ export default function ClipSubmitForm({ tags }: { tags: ClipTag[] }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: title.trim(),
-          songName: songName.trim() || null,
           description: description.trim(),
           cameraMode: cameraMode || null,
           storagePath,
           thumbnailPath,
-          tagIds: selectedTagIds,
         }),
       });
 
@@ -154,10 +142,8 @@ export default function ClipSubmitForm({ tags }: { tags: ClipTag[] }) {
 
       setSuccess("Clip submitted! It will appear once approved.");
       setTitle("");
-      setSongName("");
       setDescription("");
       setCameraMode("");
-      setSelectedTagIds([]);
       setVideoFile(null);
       setThumbnailFile(null);
       router.refresh();
@@ -182,18 +168,6 @@ export default function ClipSubmitForm({ tags }: { tags: ClipTag[] }) {
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-white">Song / map name</label>
-        <input
-          value={songName}
-          onChange={(event) => setSongName(event.target.value)}
-          maxLength={120}
-          className="mt-3 w-full rounded-3xl border border-border bg-background/80 px-4 py-3 text-sm text-white outline-none transition focus:border-accent"
-          placeholder="e.g. Camellia - We Magicians Still Alive In 2021"
-        />
-        <p className="mt-2 text-xs text-muted">The name of the song or map shown in this clip. It displays as a clickable tag.</p>
-      </div>
-
-      <div>
         <label className="block text-sm font-semibold text-white">Description</label>
         <textarea
           value={description}
@@ -203,29 +177,6 @@ export default function ClipSubmitForm({ tags }: { tags: ClipTag[] }) {
           placeholder="Share what makes this clip special..."
         />
       </div>
-
-      {tags.length > 0 && (
-        <div>
-          <p className="text-sm font-semibold text-white">Tags</p>
-          <p className="mt-1 text-xs text-muted">Optional. Tag your clip to make it easier to find.</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {tags.map((tag) => (
-              <button
-                key={tag.id}
-                type="button"
-                onClick={() => toggleTag(tag.id)}
-                className={`rounded-full border px-3 py-1.5 text-sm font-medium transition ${
-                  selectedTagIds.includes(tag.id)
-                    ? "border-accent bg-accent/20 text-accent"
-                    : "border-border bg-background/80 text-muted hover:border-accent/50 hover:text-white"
-                }`}
-              >
-                {tag.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       <div>
         <p className="text-sm font-semibold text-white">Camera mode</p>

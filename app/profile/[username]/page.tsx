@@ -12,8 +12,6 @@ import { RhythiaStats } from "@/components/rhythia-stats";
 import { getRhythiaStatus } from "@/lib/rhythia-status";
 import { RankProgress } from "@/components/rank-progress";
 import { getUserGlobalRank } from "@/lib/maps";
-import { RhythiaVerifiedBadge } from "@/components/rhythia-verified-badge";
-import { CheckAllScoresButton } from "@/components/check-all-scores-button";
 
 export const dynamic = "force-dynamic";
 
@@ -82,8 +80,7 @@ export default async function ProfilePage({ params }: Props) {
               <p className="text-sm uppercase tracking-[0.3em] text-accent">Profile</p>
               <h1 className="mt-2 flex items-center gap-3 text-3xl font-semibold text-white">
                 {user.displayName ?? user.username}
-                {user.rhythiaProfile?.flag && <FlagIcon flag={user.rhythiaProfile?.flag} country={user.rhythiaProfile?.country} size="md" />}
-                {user.rhythiaVerified && <RhythiaVerifiedBadge size="sm" />}
+                <FlagIcon flag={user.rhythiaProfile?.flag} country={user.rhythiaProfile?.country} size="md" />
 {user.rhythiaProfile && presence && (
                   <span
                     title={presenceLabel}
@@ -112,7 +109,6 @@ export default async function ProfilePage({ params }: Props) {
           <div className="flex flex-col items-stretch gap-3">
             {!isOwnProfile && <FriendButton userId={user.id} />}
             {isOwnProfile && <RhythiaConnect connectedUrl={user.rhythiaProfile?.profileUrl} />}
-            {isOwnProfile && user.rhythiaProfile && <CheckAllScoresButton />}
             {!isOwnProfile && (
               <Link
                 href={`/messages?user=${encodeURIComponent(user.profileHandle)}`}

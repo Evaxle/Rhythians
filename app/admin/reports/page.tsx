@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/db";
 import { ReportsManager } from "@/components/admin/reports-manager";
-import { fairRatingFromStars } from "@/lib/ranks";
 
 export const dynamic = "force-dynamic";
 
@@ -86,7 +85,7 @@ export default async function AdminReportsPage() {
             report.targetType === "daily_map"
               ? (() => {
                   const m = dailyMapById.get(report.targetId);
-                  return m ? { id: m.id, title: m.title, rating: fairRatingFromStars(m.starRating), status: "approved" } : null;
+                  return m ? { id: m.id, title: m.title, rating: m.starRating, status: "approved" } : null;
                 })()
               : report.targetType === "challenge_map"
                 ? (challengeMapById.get(report.targetId) ?? null)

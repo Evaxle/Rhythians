@@ -83,7 +83,6 @@ export default async function MapsPage() {
             length: map.length,
             completion: map.completion,
             submittedBy: map.submittedBy,
-            reviewedBy: map.reviewedBy,
           }))}
           rankInfo={data.rankInfo}
           userRhp={userRow?.rhp ?? 0}
