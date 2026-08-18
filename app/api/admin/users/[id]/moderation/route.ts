@@ -28,6 +28,11 @@ export async function PATCH(request: Request, { params }: Props) {
   const target = await prisma.user.findUnique({ where: { id } });
   if (!target) return NextResponse.json({ error: "User not found." }, { status: 404 });
 
+  // The site owner can never be banned, suspended, or muted.
+  if (isOwner(target) && ["ban", "suspend", "mute"].includes(action as string)) {
+    return NextResponse.json({ error: "You can't apply this action to the site owner." }, { status: 400 });
+  }
+
   if (action === "ban") {
     await prisma.user.update({ where: { id }, data: { isSuspended: true, suspendedUntil: null } });
     await prisma.session.deleteMany({ where: { userId: id } });

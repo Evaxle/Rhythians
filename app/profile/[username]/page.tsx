@@ -26,17 +26,36 @@ type Props = {
 export default async function ProfilePage({ params }: Props) {
   const { username } = await params;
   const currentUser = await getSessionUser();
-  const user = await prisma.user.findFirst({
-    where: { profileHandle: username },
-    include: {
-      clips: { where: { status: "approved" }, orderBy: { createdAt: "desc" }, include: { category: true, reviewedBy: { select: { username: true, displayName: true } } } },
-      articleRevisions: true,
-      roles: { include: { role: true } },
-      playerRank: true,
-      userTags: { include: { tag: true } },
-      rhythiaProfile: true,
-    },
-  });
+
+  // Query the user with relations; if a related table is missing from the
+  // database (schema drift), fall back to the bare user so the page still
+  // renders instead of returning a 500.
+  let user: any = null;
+  try {
+    user = await prisma.user.findFirst({
+      where: { profileHandle: username },
+      include: {
+        clips: { where: { status: "approved" }, orderBy: { createdAt: "desc" }, include: { category: true, reviewedBy: { select: { username: true, displayName: true } } } },
+        articleRevisions: true,
+        roles: { include: { role: true } },
+        playerRank: true,
+        userTags: { include: { tag: true } },
+        rhythiaProfile: true,
+      },
+    });
+  } catch {
+    user = await prisma.user.findFirst({
+      where: { profileHandle: username },
+      include: { roles: { include: { role: true } } },
+    });
+    if (user) {
+      user.clips = [];
+      user.articleRevisions = [];
+      user.playerRank = null;
+      user.userTags = [];
+      user.rhythiaProfile = null;
+    }
+  }
 
   if (!user) {
     return <p className="rounded-3xl border border-border bg-surface/95 p-8 text-muted">Profile not found.</p>;
@@ -44,12 +63,18 @@ export default async function ProfilePage({ params }: Props) {
 
   const isOwnProfile = currentUser?.id === user.id;
   const avatarUrl = getAvatarUrl(user, 256);
-  const globalRank = await getUserGlobalRank(user.id);
-  const categoryLevels = await getUserCategoryLevels(user.id);
+
+  // These helpers hit tables that may not exist yet; degrade to safe defaults.
+  const [rankResult, categoryResult] = await Promise.allSettled([
+    getUserGlobalRank(user.id),
+    getUserCategoryLevels(user.id),
+  ]);
+  const globalRank = rankResult.status === "fulfilled" ? rankResult.value : null;
+  const categoryLevels = categoryResult.status === "fulfilled" ? categoryResult.value : [];
 
   let presence: { isOnline: boolean; lastActiveAt: Date | null } | null = null;
   if (user.rhythiaProfile) {
-    presence = await getRhythiaStatus(user.rhythiaProfile);
+    presence = await getRhythiaStatus(user.rhythiaProfile).catch(() => null);
   }
 
   let presenceLabel = "Offline";

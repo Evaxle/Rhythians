@@ -13,8 +13,11 @@ export async function getSessionUser() {
     include: { user: { include: { roles: { include: { role: { include: { permissions: { include: { permission: true } } } } } } } } },
   });
   if (!session || session.expiresAt < new Date()) return null;
-  if (session.user.isSuspended) return null;
-  if (session.user.suspendedUntil && session.user.suspendedUntil > new Date()) return null;
+  // The owner can never be locked out, even if a suspension flag was set in error.
+  if (!isOwner(session.user)) {
+    if (session.user.isSuspended) return null;
+    if (session.user.suspendedUntil && session.user.suspendedUntil > new Date()) return null;
+  }
   return session.user;
 }
 

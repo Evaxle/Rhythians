@@ -213,6 +213,35 @@ export async function GET(request: Request) {
       errors.push({ statement: "backfill rhythiaVerified", error: err instanceof Error ? err.message : String(err) });
     }
 
+    // Ensure every user has a level-0 row in each category (the profile and
+    // category helpers expect these to exist; everyone starts at level 0).
+    try {
+      await client.query(`
+        INSERT INTO "UserCategoryLevel" ("id", "userId", "category", "level", "updatedAt")
+        SELECT gen_random_uuid()::text, u."id", c."category", 0, NOW()
+        FROM "User" u
+        CROSS JOIN (VALUES ('jumps'), ('stream'), ('tech'), ('off_grid')) AS c("category")
+        WHERE NOT EXISTS (
+          SELECT 1 FROM "UserCategoryLevel" ucl
+          WHERE ucl."userId" = u."id" AND ucl."category" = c."category"
+        )
+      `);
+    } catch (err) {
+      errors.push({ statement: "backfill UserCategoryLevel", error: err instanceof Error ? err.message : String(err) });
+    }
+
+    // Make sure the owner account is never left in a suspended/banned state.
+    try {
+      if (process.env.OWNER_DISCORD_ID) {
+        await client.query(
+          `UPDATE "User" SET "isSuspended" = false, "suspendedUntil" = NULL, "mutedUntil" = NULL WHERE "discordId" = $1`,
+          [process.env.OWNER_DISCORD_ID]
+        );
+      }
+    } catch (err) {
+      errors.push({ statement: "owner unsuspend", error: err instanceof Error ? err.message : String(err) });
+    }
+
     return NextResponse.json({ success: errors.length === 0, applied, errors });
   } catch (err) {
     return NextResponse.json({ error: err instanceof Error ? err.message : "Unknown error" }, { status: 500 });
