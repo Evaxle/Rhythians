@@ -23,6 +23,20 @@ type Props = {
   params: Promise<{ username: string }>;
 };
 
+function loadProfileUser(username: string) {
+  return prisma.user.findFirst({
+    where: { profileHandle: username },
+    include: {
+      clips: { where: { status: "approved" }, orderBy: { createdAt: "desc" }, include: { category: true, reviewedBy: { select: { username: true, displayName: true } } } },
+      articleRevisions: true,
+      roles: { include: { role: true } },
+      playerRank: true,
+      userTags: { include: { tag: true } },
+      rhythiaProfile: true,
+    },
+  });
+}
+
 export default async function ProfilePage({ params }: Props) {
   const { username } = await params;
   const currentUser = await getSessionUser();
@@ -30,30 +44,23 @@ export default async function ProfilePage({ params }: Props) {
   // Query the user with relations; if a related table is missing from the
   // database (schema drift), fall back to the bare user so the page still
   // renders instead of returning a 500.
-  let user: any = null;
+  let user: Awaited<ReturnType<typeof loadProfileUser>> | null = null;
   try {
-    user = await prisma.user.findFirst({
-      where: { profileHandle: username },
-      include: {
-        clips: { where: { status: "approved" }, orderBy: { createdAt: "desc" }, include: { category: true, reviewedBy: { select: { username: true, displayName: true } } } },
-        articleRevisions: true,
-        roles: { include: { role: true } },
-        playerRank: true,
-        userTags: { include: { tag: true } },
-        rhythiaProfile: true,
-      },
-    });
+    user = await loadProfileUser(username);
   } catch {
-    user = await prisma.user.findFirst({
+    const bare = await prisma.user.findFirst({
       where: { profileHandle: username },
       include: { roles: { include: { role: true } } },
     });
-    if (user) {
-      user.clips = [];
-      user.articleRevisions = [];
-      user.playerRank = null;
-      user.userTags = [];
-      user.rhythiaProfile = null;
+    if (bare) {
+      user = {
+        ...bare,
+        clips: [],
+        articleRevisions: [],
+        playerRank: null,
+        userTags: [],
+        rhythiaProfile: null,
+      } as Awaited<ReturnType<typeof loadProfileUser>>;
     }
   }
 
