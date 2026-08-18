@@ -64,66 +64,107 @@ export async function GET(request: Request) {
   }
 
   const discordUser = await userResponse.json();
-  const handle = `${discordUser.username.toLowerCase()}-${discordUser.discriminator}`;
+  const baseHandle = `${discordUser.username.toLowerCase()}-${discordUser.discriminator}`;
 
   const guildMember = await getGuildMember(accessToken);
   const inGuild = guildMember !== null;
   const discordRoles = guildMember?.roles ?? [];
 
-  const [user] = await Promise.all([
-    prisma.user.upsert({
-      where: { discordId: discordUser.id },
-      update: {
-        username: discordUser.username,
-        discriminator: discordUser.discriminator,
-        avatar: discordUser.avatar,
-        email: discordUser.email,
-        locale: discordUser.locale,
-        profileHandle: handle,
-        discordRoles,
-        inGuild,
-      },
-      create: {
-        discordId: discordUser.id,
-        username: discordUser.username,
-        discriminator: discordUser.discriminator,
-        avatar: discordUser.avatar,
-        email: discordUser.email,
-        locale: discordUser.locale,
-        profileHandle: handle,
-        discordRoles,
-        inGuild,
-      },
-    }),
-  ]);
+  try {
+    // 1. If a user already exists with this Discord ID, just update them.
+    let user = await prisma.user.findUnique({ where: { discordId: discordUser.id } });
 
-  await ensureTagsExist();
+    // 2. Otherwise, try to link to an existing account that shares the same email
+    //    (e.g. someone who registered with email/password first). This avoids a
+    //    unique-constraint crash on `email` when the upsert tries to create a duplicate.
+    if (!user && discordUser.email) {
+      user = await prisma.user.findUnique({ where: { email: discordUser.email } });
+      if (user) {
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: { discordId: discordUser.id },
+        });
+      }
+    }
 
-  if (inGuild) {
-    await syncUserTagsFromDiscord(prisma, user.id, discordRoles);
-  } else {
-    await prisma.userTag.deleteMany({ where: { userId: user.id, source: "discord" } });
-  }
-
-  if ((await prisma.role.count()) === 0) {
-    const permissions = await prisma.permission.findMany({ select: { id: true } });
-    const adminRole = await prisma.role.create({
-      data: {
-        name: "Admin",
-        description: "Full access to community administration.",
-        permissions: {
-          create: permissions.map(({ id }) => ({ permissionId: id })),
+    // 3. If no matching account exists, create a brand-new one. Generate a unique
+    //    profileHandle so we never collide with an existing handle.
+    if (!user) {
+      const profileHandle = await generateUniqueHandle(baseHandle);
+      user = await prisma.user.create({
+        data: {
+          discordId: discordUser.id,
+          username: discordUser.username,
+          discriminator: discordUser.discriminator,
+          avatar: discordUser.avatar,
+          email: discordUser.email,
+          locale: discordUser.locale,
+          profileHandle,
+          discordRoles,
+          inGuild,
         },
-      },
-    });
-    await prisma.userRole.create({ data: { userId: user.id, roleId: adminRole.id } });
+      });
+    } else {
+      // 4. Existing user (linked or already Discord-linked): refresh their profile data.
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          username: discordUser.username,
+          discriminator: discordUser.discriminator,
+          avatar: discordUser.avatar,
+          email: discordUser.email,
+          locale: discordUser.locale,
+          discordRoles,
+          inGuild,
+        },
+      });
+    }
+
+    await ensureTagsExist();
+
+    if (inGuild) {
+      await syncUserTagsFromDiscord(prisma, user.id, discordRoles);
+    } else {
+      await prisma.userTag.deleteMany({ where: { userId: user.id, source: "discord" } });
+    }
+
+    if ((await prisma.role.count()) === 0) {
+      const permissions = await prisma.permission.findMany({ select: { id: true } });
+      const adminRole = await prisma.role.create({
+        data: {
+          name: "Admin",
+          description: "Full access to community administration.",
+          permissions: {
+            create: permissions.map(({ id }) => ({ permissionId: id })),
+          },
+        },
+      });
+      await prisma.userRole.create({ data: { userId: user.id, roleId: adminRole.id } });
+    }
+
+    const token = await createSession(user.id);
+    const response = NextResponse.redirect(new URL("/", request.url));
+    setSessionCookie(response, token);
+
+    return response;
+  } catch (error) {
+    console.error("Discord OAuth callback failed:", error);
+    return NextResponse.redirect(new URL("/login?error=oauth_failed", request.url));
   }
+}
 
-  const token = await createSession(user.id);
-  const response = NextResponse.redirect(new URL("/", request.url));
-  setSessionCookie(response, token);
-
-  return response;
+async function generateUniqueHandle(baseHandle: string): Promise<string> {
+  let profileHandle = baseHandle;
+  let attempts = 0;
+  while (await prisma.user.findUnique({ where: { profileHandle } })) {
+    attempts++;
+    if (attempts > 5) {
+      profileHandle = `${baseHandle}-${Math.random().toString(36).slice(2, 6)}`;
+      break;
+    }
+    profileHandle = `${baseHandle}-${Math.random().toString(36).slice(2, 6)}`;
+  }
+  return profileHandle;
 }
 
 async function ensureTagsExist() {
