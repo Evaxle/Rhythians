@@ -172,7 +172,9 @@ export async function GET(request: Request) {
 
     return response;
   } catch (error) {
-    console.error("Discord OAuth callback failed:", error);
+    const message = error instanceof Error ? error.message : "Unknown error";
+    const code = typeof error === "object" && error !== null && "code" in error ? String(error.code) : "unknown";
+    console.error("Discord OAuth callback failed:", { code, message: message.slice(0, 500) });
     return NextResponse.redirect(new URL("/login?error=oauth_failed", request.url));
   }
 }
