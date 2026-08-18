@@ -18,6 +18,8 @@ export default async function ApprovalMapsPage() {
     artist: map.artist,
     description: map.description,
     mapFileUrl: map.mapFileUrl,
+    imageUrl: map.imageUrl,
+    sourceUrl: map.sourceUrl,
     requestedRating: map.requestedRating,
     mapperName: map.mapperName,
     noteCount: map.noteCount,
@@ -27,6 +29,7 @@ export default async function ApprovalMapsPage() {
       username: map.submittedBy.username,
       displayName: map.submittedBy.displayName,
       profileHandle: map.submittedBy.profileHandle,
+      avatar: map.submittedBy.avatar,
     },
   }));
 

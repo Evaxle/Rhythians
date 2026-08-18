@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { User, Search, ShieldAlert, ShieldOff, BellOff, Bell, TriangleAlert } from "lucide-react";
+import { User, Search, ShieldAlert, ShieldOff, BellOff, Bell, TriangleAlert, RotateCcw } from "lucide-react";
 import { FlagIcon } from "@/components/flag-icon";
+import { getRankInfo } from "@/lib/ranks";
 
 type SearchedUser = {
   id: string;
@@ -39,6 +40,18 @@ type SearchedUser = {
     syncedAt: string;
   } | null;
   stats: { clips: number; comments: number; messages: number; reportsFiled: number; warnings: number };
+  ranked: {
+    rhp: number;
+    avgMapRating: number | null;
+    scoreImportDone: boolean;
+    dailyStreak: number;
+    lastDailyBeatAt: string | null;
+    lastRhythiaRpCheckAt: string | null;
+    rhythiaVerified: boolean;
+    completions: number;
+    dailyBeats: number;
+    rhpTransactions: number;
+  };
   moderation: {
     isSuspended: boolean;
     suspensionExpiry: string | null;
@@ -83,6 +96,8 @@ export function AdminUserSearch() {
   const [showEdit, setShowEdit] = useState(false);
   const [warningReason, setWarningReason] = useState("");
   const [editForm, setEditForm] = useState({ displayName: "", bio: "", website: "", profileHandle: "" });
+  const [rhpInput, setRhpInput] = useState("");
+  const [resetting, setResetting] = useState(false);
 
   async function search() {
     const q = query.trim();
@@ -153,6 +168,53 @@ export function AdminUserSearch() {
       setError(editError instanceof Error ? editError.message : "Could not save changes.");
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function saveRhp() {
+    if (!user) return;
+    const rhp = Number(rhpInput);
+    if (!Number.isFinite(rhp) || rhp < 0) {
+      setError("Enter a valid RHP value (0 or more).");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    try {
+      const response = await fetch(`/api/admin/users/${encodeURIComponent(user.id)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rhp: Math.round(rhp) }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? "Could not update RHP.");
+      setRhpInput("");
+      await search();
+    } catch (rhpError) {
+      setError(rhpError instanceof Error ? rhpError.message : "Could not update RHP.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function resetRanked() {
+    if (!user) return;
+    if (!window.confirm(`Reset ${user.displayName ?? user.username}'s entire ranked status? This sets RHP, rank, tier, and all completed map history back to zero. This cannot be undone.`)) return;
+    setResetting(true);
+    setError("");
+    try {
+      const response = await fetch(`/api/admin/users/${encodeURIComponent(user.id)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resetRanked: true }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? "Could not reset ranked status.");
+      await search();
+    } catch (resetError) {
+      setError(resetError instanceof Error ? resetError.message : "Could not reset ranked status.");
+    } finally {
+      setResetting(false);
     }
   }
 
@@ -348,6 +410,58 @@ export function AdminUserSearch() {
                 <InfoRow label="Messages" value={user.stats.messages} />
                 <InfoRow label="Reports filed" value={user.stats.reportsFiled} />
                 <InfoRow label="Warnings" value={user.stats.warnings} />
+              </div>
+
+              <div className="space-y-3 rounded-3xl border border-border bg-background/60 p-5">
+                <p className="text-xs uppercase tracking-[0.24em] text-accent">Ranked status</p>
+                {(() => {
+                  const rankInfo = getRankInfo(user.ranked.rhp);
+                  const rankLabel = rankInfo.isExpert ? "Expert" : `${rankInfo.name} ${rankInfo.tier}`;
+                  return (
+                    <>
+                      <InfoRow label="RHP" value={user.ranked.rhp.toLocaleString()} />
+                      <InfoRow label="Rank / tier" value={rankLabel} />
+                      <InfoRow label="Avg map rating" value={user.ranked.avgMapRating == null ? "—" : user.ranked.avgMapRating.toFixed(2)} />
+                      <InfoRow label="Daily streak" value={user.ranked.dailyStreak} />
+                      <InfoRow label="Maps completed" value={user.ranked.completions} />
+                      <InfoRow label="Daily maps beaten" value={user.ranked.dailyBeats} />
+                      <InfoRow label="RHP transactions" value={user.ranked.rhpTransactions} />
+                      <InfoRow label="Score import" value={user.ranked.scoreImportDone ? "Done" : "Pending"} />
+                      <InfoRow label="Rhythia verified" value={user.ranked.rhythiaVerified ? "Yes" : "No"} />
+                      <InfoRow label="Last daily beat" value={formatDate(user.ranked.lastDailyBeatAt)} />
+                      <InfoRow label="Last RP check" value={formatDate(user.ranked.lastRhythiaRpCheckAt)} />
+                    </>
+                  );
+                })()}
+
+                <div className="mt-2 border-t border-border pt-3">
+                  <p className="text-xs text-muted">Set RHP directly</p>
+                  <div className="mt-2 flex gap-2">
+                    <input
+                      value={rhpInput}
+                      onChange={(e) => setRhpInput(e.target.value)}
+                      type="number"
+                      min={0}
+                      placeholder={String(user.ranked.rhp)}
+                      className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-white outline-none focus:border-accent"
+                    />
+                    <button
+                      onClick={saveRhp}
+                      disabled={busy || rhpInput === ""}
+                      className="shrink-0 rounded-xl bg-accent px-4 py-2 text-xs font-semibold text-white transition hover:bg-accent2 disabled:opacity-50"
+                    >
+                      {busy ? "Saving…" : "Save"}
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  onClick={resetRanked}
+                  disabled={resetting || busy}
+                  className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-red-400/40 bg-red-400/10 px-4 py-2 text-xs font-semibold text-red-200 transition hover:bg-red-400/20 disabled:opacity-50"
+                >
+                  <RotateCcw size={13} /> {resetting ? "Resetting…" : "Reset ranked status to zero"}
+                </button>
               </div>
 
               <div className="space-y-3 rounded-3xl border border-border bg-background/60 p-5">

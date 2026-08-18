@@ -16,6 +16,13 @@
     "db:cleanup": "tsx scripts/db-cleanup.ts",
     "daily:sync": "tsx scripts/sync-daily-maps.ts",
     "maps:import": "tsx scripts/import-ranked-maps.ts",
+    "maps:recalc-points": "tsx scripts/recalculate-map-points.ts",
+    "maps:check-balance": "tsx scripts/check-rhp-balance.ts",
+    "maps:analyze-formulas": "tsx scripts/analyze-rp-formulas.ts",
+    "test:rhp-formulas": "node scripts/test-rhp-formulas.mjs",
+    "test:rhp-logic": "node scripts/test-rhp-logic.mjs",
+    "test:rp-gain": "node scripts/test-rp-gain.mjs",
+    "test:rhp": "node scripts/test-rhp-formulas.mjs && node scripts/test-rhp-logic.mjs && node scripts/test-rp-gain.mjs",
     "test:profanity": "tsx scripts/test-profanity.ts",
     "bot:start": "tsx discord-bot/index.ts"
   },

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Download, RefreshCw, Star, Trophy, CheckCircle2, Clock, Flag, Dices } from "lucide-react";
+import { Download, RefreshCw, Trophy, CheckCircle2, Clock, Flag, Dices, CalendarDays, Gauge, Music2, Timer } from "lucide-react";
+import { fairRatingFromStars } from "@/lib/ranks";
 
 type DailyMapData = {
   id: string;
@@ -27,54 +28,31 @@ type Beat = {
 
 type RandomMap = { id: number; title: string };
 
-const cardStyle = {
-  background: "#12182B",
-  borderRadius: 10,
-  boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
-} as const;
-
-const btnStyle = {
-  backgroundColor: "#3476c2",
-  color: "#ffffff",
-  border: "2px solid #000000",
-  borderRadius: 5,
-  cursor: "pointer",
-  width: "100%",
-} as const;
-
-const resultItemStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  background: "#ffffff",
-  padding: "10px 14px",
-  borderRadius: 6,
-  border: "2px solid #000000",
-} as const;
-
 export function DailyMapCard({
   dailyMap,
   initialBeat,
   userRhp,
+  streak,
+  rankName,
   randomMaps,
 }: {
   dailyMap: DailyMapData;
   initialBeat: Beat | null;
   userRhp: number;
+  streak: number;
+  rankName: string;
   randomMaps: RandomMap[];
 }) {
   const [beat, setBeat] = useState<Beat | null>(initialBeat);
   const [rhp, setRhp] = useState(userRhp);
+  const [currentStreak, setCurrentStreak] = useState(streak);
   const [state, setState] = useState<"idle" | "checking" | "found" | "not_found">(initialBeat ? "found" : "idle");
   const [message, setMessage] = useState("");
-  const [reportOpen, setReportOpen] = useState(false);
-  const [reportReason, setReportReason] = useState("Broken or misleading content");
-  const [reportDetail, setReportDetail] = useState("");
   const [reportState, setReportState] = useState<"idle" | "sending" | "sent">("idle");
   const [randomResult, setRandomResult] = useState<RandomMap | null>(null);
 
   type CheckResult =
-    | { ok: true; status: "beat" | "already" | "not_beat"; points: number }
+    | { ok: true; status: "beat" | "already" | "not_beat"; points: number; streak?: number }
     | { ok: false; error: string };
 
   async function runCheck(): Promise<CheckResult> {
@@ -82,8 +60,8 @@ export function DailyMapCard({
       const response = await fetch("/api/daily/check", { method: "POST" });
       const data = await response.json();
       if (!response.ok) return { ok: false, error: data.error ?? "Unable to check your scores." };
-      if (data.status === "beat") return { ok: true, status: "beat", points: data.points };
-      if (data.status === "already") return { ok: true, status: "already", points: 0 };
+      if (data.status === "beat") return { ok: true, status: "beat", points: data.points, streak: data.streak };
+      if (data.status === "already") return { ok: true, status: "already", points: 0, streak: data.streak };
       if (data.status === "no_profile") return { ok: false, error: "Link your Rhythia account to participate in the daily map." };
       return { ok: true, status: "not_beat", points: 0 };
     } catch {
@@ -100,6 +78,7 @@ export function DailyMapCard({
     if (result.status === "beat") {
       setBeat({ points: result.points, accuracy: null, misses: null });
       setRhp((value) => value + result.points);
+      if (result.streak != null) setCurrentStreak(result.streak);
       setState("found");
       setMessage(`Great job! You earned ${result.points} RHP for beating today's map.`);
     } else if (result.status === "already") {
@@ -139,14 +118,14 @@ export function DailyMapCard({
         body: JSON.stringify({
           targetType: "daily_map",
           targetId: dailyMap.id,
-          reason: reportReason,
-          description: reportDetail.trim() || null,
+          reason: "Broken daily map",
+          description: null,
         }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Could not send report.");
       setReportState("sent");
-      setReportOpen(false);
+      setMessage("Report sent. An admin will review the map and refresh it if needed.");
     } catch (err) {
       setReportState("idle");
       setMessage(err instanceof Error ? err.message : "Could not send report.");
@@ -161,40 +140,38 @@ export function DailyMapCard({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap justify-center gap-10">
-        <div style={cardStyle} className="w-full max-w-xl p-8">
-          <h2 style={{ textAlign: "center", marginTop: 0, color: "#ffffff" }}>Daily Map</h2>
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="min-w-0">
+              <p className="flex items-center gap-2 text-sm uppercase tracking-[0.24em] text-accent">
+                <CalendarDays size={16} /> Daily map
+              </p>
+              <p className="mt-2 text-sm text-muted">{dailyMap.artist ?? "Unknown artist"}</p>
+              <h2 className="mt-1 truncate text-2xl font-semibold text-white">{dailyMap.title}</h2>
+              <p className="mt-1 text-xs text-muted">Mapped by {dailyMap.mapperName ?? "Unknown"}</p>
+            </div>
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-sm font-semibold text-amber-300">
+              {fairRatingFromStars(dailyMap.starRating).toFixed(2)} rating
+            </span>
+          </div>
 
-          <p style={{ textAlign: "center", color: "#9aa4bf", fontSize: "0.9rem", marginBottom: 16 }}>
-            {dateLabel} · {rhp.toLocaleString()} RHP
-          </p>
-
-          <div className="results-grid" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <div style={resultItemStyle}>
-              <span className="label" style={{ fontWeight: 700, color: "#000", fontSize: "0.85rem" }}>Map</span>
-              <span className="value" style={{ fontWeight: 700, color: "#000", fontSize: "0.9rem", textAlign: "right" }}>{dailyMap.title}</span>
+          <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="rounded-2xl border border-border bg-background/70 p-4">
+              <p className="flex items-center gap-1.5 text-xs uppercase tracking-[0.16em] text-muted"><Gauge size={12} /> Difficulty</p>
+              <p className="mt-2 text-lg font-semibold text-white">{difficultyLabel}</p>
             </div>
-            <div style={resultItemStyle}>
-              <span className="label" style={{ fontWeight: 700, color: "#000", fontSize: "0.85rem" }}>Artist</span>
-              <span className="value" style={{ fontWeight: 700, color: "#000", fontSize: "0.9rem", textAlign: "right" }}>{dailyMap.artist ?? "—"}</span>
+            <div className="rounded-2xl border border-border bg-background/70 p-4">
+              <p className="flex items-center gap-1.5 text-xs uppercase tracking-[0.16em] text-muted"><Music2 size={12} /> Notes</p>
+              <p className="mt-2 text-lg font-semibold text-white">{dailyMap.noteCount?.toLocaleString() ?? "—"}</p>
             </div>
-            <div style={resultItemStyle}>
-              <span className="label" style={{ fontWeight: 700, color: "#000", fontSize: "0.85rem" }}>Stars</span>
-              <span className="value" style={{ fontWeight: 700, color: "#000", fontSize: "0.9rem" }}>
-                <Star size={14} style={{ color: "#d4a017", verticalAlign: -2 }} /> {dailyMap.starRating.toFixed(2)}
-              </span>
+            <div className="rounded-2xl border border-border bg-background/70 p-4">
+              <p className="flex items-center gap-1.5 text-xs uppercase tracking-[0.16em] text-muted"><Timer size={12} /> Length</p>
+              <p className="mt-2 text-lg font-semibold text-white">{lengthLabel}</p>
             </div>
-            <div style={resultItemStyle}>
-              <span className="label" style={{ fontWeight: 700, color: "#000", fontSize: "0.85rem" }}>Difficulty</span>
-              <span className="value" style={{ fontWeight: 700, color: "#000", fontSize: "0.9rem" }}>{difficultyLabel}</span>
-            </div>
-            <div style={resultItemStyle}>
-              <span className="label" style={{ fontWeight: 700, color: "#000", fontSize: "0.85rem" }}>Notes</span>
-              <span className="value" style={{ fontWeight: 700, color: "#000", fontSize: "0.9rem" }}>{dailyMap.noteCount?.toLocaleString() ?? "—"}</span>
-            </div>
-            <div style={resultItemStyle}>
-              <span className="label" style={{ fontWeight: 700, color: "#000", fontSize: "0.85rem" }}>Length</span>
-              <span className="value" style={{ fontWeight: 700, color: "#000", fontSize: "0.9rem" }}>{lengthLabel}</span>
+            <div className="rounded-2xl border border-border bg-background/70 p-4">
+              <p className="flex items-center gap-1.5 text-xs uppercase tracking-[0.16em] text-muted"><Clock size={12} /> Date</p>
+              <p className="mt-2 text-lg font-semibold text-white">{dateLabel.split(",")[0]}</p>
             </div>
           </div>
 
@@ -202,7 +179,7 @@ export function DailyMapCard({
             <img
               src={dailyMap.imageUrl}
               alt={dailyMap.title}
-              className="mt-4 aspect-[16/9] w-full rounded-lg border-2 border-black object-cover"
+              className="mt-5 aspect-[16/9] w-full rounded-2xl border border-border object-cover"
               onError={(event) => ((event.currentTarget as HTMLImageElement).style.display = "none")}
             />
           )}
@@ -212,7 +189,7 @@ export function DailyMapCard({
               href={dailyMap.downloadUrl}
               target="_blank"
               rel="noreferrer"
-              style={{ ...btnStyle, width: "auto", padding: "10px 18px", display: "inline-flex", alignItems: "center", gap: 8 }}
+              className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent/20"
             >
               <Download size={15} /> Download map
             </a>
@@ -220,115 +197,89 @@ export function DailyMapCard({
               type="button"
               onClick={handleCheck}
               disabled={state === "checking"}
-              style={{ ...btnStyle, width: "auto", padding: "10px 18px", display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 0 }}
+              className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent2 disabled:opacity-60"
             >
               <RefreshCw size={15} className={state === "checking" ? "animate-spin" : ""} />
               {state === "checking" ? "Checking..." : "Check my score"}
             </button>
             <button
               type="button"
-              onClick={() => setReportOpen((value) => !value)}
-              style={{ ...btnStyle, width: "auto", padding: "10px 18px", display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 0, backgroundColor: "#8a3a3a" }}
+              onClick={() => void submitReport()}
+              disabled={reportState === "sending"}
+              className="inline-flex items-center gap-2 rounded-full border border-red-400/40 bg-red-400/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-400/20 disabled:opacity-60"
             >
-              <Flag size={15} /> Report broken map
+              <Flag size={15} /> {reportState === "sending" ? "Reporting..." : "Report broken map"}
             </button>
           </div>
 
-          {reportOpen && (
-            <div className="mt-4 rounded-lg border-2 border-black bg-white/5 p-4">
-              <p style={{ color: "#fff", fontWeight: 600, fontSize: "0.85rem", marginBottom: 8 }}>Report this daily map</p>
-              <select
-                value={reportReason}
-                onChange={(event) => setReportReason(event.target.value)}
-                className="w-full rounded border-2 border-black bg-white px-3 py-2 text-sm text-black"
-              >
-                <option>Broken or misleading content</option>
-                <option>Spam or advertising</option>
-                <option>Inappropriate content</option>
-                <option>Other</option>
-              </select>
-              <textarea
-                value={reportDetail}
-                onChange={(event) => setReportDetail(event.target.value)}
-                rows={2}
-                placeholder="What's wrong with the map? (optional)"
-                className="mt-2 w-full rounded border-2 border-black bg-white px-3 py-2 text-sm text-black"
-              />
-              <div className="mt-2 flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => void submitReport()}
-                  disabled={reportState === "sending"}
-                  style={{ ...btnStyle, width: "auto", padding: "8px 16px", marginBottom: 0 }}
-                >
-                  {reportState === "sending" ? "Sending..." : "Send report"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setReportOpen(false)}
-                  style={{ ...btnStyle, width: "auto", padding: "8px 16px", marginBottom: 0, backgroundColor: "#555" }}
-                >
-                  Cancel
-                </button>
+          {beat ? (
+            <div className="mt-4 flex items-center gap-3 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3">
+              <CheckCircle2 size={18} className="shrink-0 text-emerald-300" />
+              <div>
+                <p className="text-sm font-semibold text-emerald-300">Completed</p>
+                <p className="mt-1 text-sm text-emerald-200/90">
+                  You earned <span className="font-semibold">{beat.points} RHP</span>
+                  {beat.accuracy != null && <> at {beat.accuracy.toFixed(2)}% accuracy</>}
+                  {beat.misses != null && <> with {beat.misses} miss{beat.misses === 1 ? "" : "es"}</>}.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-4 flex items-center gap-3 rounded-2xl border border-border bg-background/70 px-4 py-3">
+              <Clock size={18} className="shrink-0 text-muted" />
+              <div>
+                <p className="text-sm font-semibold text-white">Not beaten yet</p>
+                <p className="mt-1 text-sm text-muted">
+                  Beat this map in Rhythia with a passing score, then come back and check to earn Rhythian Points.
+                </p>
               </div>
             </div>
           )}
 
-          {beat ? (
-            <div className="mt-4 rounded-lg border-2 border-[#2e7d4f] bg-[#1e3a2c] p-4">
-              <p className="flex items-center gap-2 text-sm font-semibold" style={{ color: "#6ee7a0" }}>
-                <CheckCircle2 size={16} /> Completed
-              </p>
-              <p className="mt-2 text-sm" style={{ color: "#b7f2cd" }}>
-                You earned <span className="font-semibold">{beat.points} RHP</span>
-                {beat.accuracy != null && <> at {beat.accuracy.toFixed(2)}% accuracy</>}
-                {beat.misses != null && <> with {beat.misses} miss{beat.misses === 1 ? "" : "es"}</>}.
-              </p>
-            </div>
-          ) : (
-            <div className="mt-4 rounded-lg border-2 border-[#3a3f52] bg-[#161b2e] p-4">
-              <p className="flex items-center gap-2 text-sm font-semibold text-white">
-                <Clock size={16} /> Not beaten yet
-              </p>
-              <p className="mt-2 text-sm" style={{ color: "#9aa4bf" }}>
-                Beat this map in Rhythia with a passing score, then come back and check to earn Rhythian Points.
-              </p>
-            </div>
-          )}
-
           {message && state !== "found" && (
-            <p className="mt-3 rounded-lg border-2 border-[#3a3f52] bg-[#161b2e] p-3 text-sm" style={{ color: "#c9d1e5" }}>{message}</p>
+            <p className="mt-3 rounded-2xl border border-border bg-background/70 p-3 text-sm text-amber-200">{message}</p>
           )}
           {state === "found" && message && (
-            <p className="mt-3 rounded-lg border-2 border-[#2e7d4f] bg-[#1e3a2c] p-3 text-sm" style={{ color: "#b7f2cd" }}>{message}</p>
+            <p className="mt-3 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-3 text-sm text-emerald-200">{message}</p>
           )}
-          {reportState === "sent" && (
-            <p className="mt-3 rounded-lg border-2 border-[#2e7d4f] bg-[#1e3a2c] p-3 text-sm" style={{ color: "#b7f2cd" }}>
+          {reportState === "sent" && !message && (
+            <p className="mt-3 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-3 text-sm text-emerald-200">
               Report sent. An admin will review it and refresh the map if needed.
             </p>
           )}
 
-          <p style={{ color: "#9aa4bf", fontSize: "0.75rem", textAlign: "center", marginTop: 16 }}>
+          <p className="mt-5 text-center text-xs text-muted">
             New map every day at midnight UTC · Maps reset each month and can be picked again.
           </p>
-        </div>
+        </section>
 
-        <div style={cardStyle} className="w-full max-w-sm p-8">
-          <h2 style={{ textAlign: "center", marginTop: 0, color: "#ffffff" }}>Map Randomizer</h2>
+        <section className="flex h-fit flex-col rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+          <p className="flex items-center gap-2 text-sm uppercase tracking-[0.24em] text-accent">
+            <Dices size={16} /> Map randomizer
+          </p>
+          <p className="mt-2 text-sm text-muted">
+            Explore the current ranked map pool and open a random map directly in Rhythia.
+          </p>
 
-          <button type="button" onClick={handleRandomize} style={{ ...btnStyle, marginBottom: 20 }}>
-            <Dices size={18} style={{ verticalAlign: -3, marginRight: 6 }} /> Randomize Map
+          <button
+            type="button"
+            onClick={handleRandomize}
+            className="mt-4 inline-flex items-center justify-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent2"
+          >
+            <Dices size={16} /> Randomize map
           </button>
 
-          <div className="results-grid" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <div style={resultItemStyle}>
-              <span className="label" style={{ fontWeight: 700, color: "#000", fontSize: "0.85rem" }}>www.rhythia.com/maps/</span>
-              <span className="value" style={{ fontWeight: 700, color: "#000", fontSize: "1rem" }}>{randomResult ? randomResult.id : "-"}</span>
+          <div className="mt-5 space-y-3">
+            <div className="rounded-2xl border border-border bg-background/70 p-4">
+              <p className="text-xs uppercase tracking-[0.16em] text-muted">www.rhythia.com/maps/</p>
+              <p className="mt-2 text-xl font-semibold text-white">{randomResult ? randomResult.id : "-"}</p>
             </div>
             {randomResult && (
-              <div style={resultItemStyle}>
-                <span className="label" style={{ fontWeight: 700, color: "#000", fontSize: "0.85rem" }}>Map</span>
-                <span className="value" style={{ fontWeight: 700, color: "#000", fontSize: "0.8rem", textAlign: "right", maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{randomResult.title}</span>
+              <div className="rounded-2xl border border-border bg-background/70 p-4">
+                <p className="text-xs uppercase tracking-[0.16em] text-muted">Map</p>
+                <p className="mt-2 truncate text-sm font-semibold text-white" title={randomResult.title}>
+                  {randomResult.title}
+                </p>
               </div>
             )}
             <a
@@ -336,26 +287,26 @@ export function DailyMapCard({
               href={randomResult ? `https://www.rhythia.com/maps/${randomResult.id}` : "#"}
               target="_blank"
               rel="noreferrer"
-              style={{ color: "#64b5f6", textDecoration: "underline", textAlign: "center" }}
+              className={`block text-center text-sm font-semibold underline ${randomResult ? "text-accent hover:text-white" : "pointer-events-none text-muted"}`}
             >
               Click to open in browser
             </a>
           </div>
 
-          <p style={{ color: "#ffffff", fontSize: "0.8rem", textAlign: "center", marginTop: 12 }}>
-            Links leading to a blank page usually means that the map has been deleted
+          <p className="mt-5 text-xs text-muted">
+            Links leading to a blank page usually means that the map has been deleted.
           </p>
-        </div>
+        </section>
       </div>
 
-      <div className="flex flex-wrap items-center justify-center gap-4 rounded-xl border border-border bg-surface/60 px-5 py-3 text-sm text-muted">
+      <div className="flex flex-wrap items-center justify-center gap-4 rounded-3xl border border-border bg-surface/60 px-5 py-3 text-sm text-muted">
         <span>Made by <span className="font-semibold text-white">LC727</span> for Rhythians</span>
         <span className="text-border">·</span>
         <Link href="/leaderboards" className="inline-flex items-center gap-1 font-semibold text-accent hover:text-white">
           <Trophy size={14} /> View leaderboards
         </Link>
         <span className="text-border">·</span>
-        <span>Earn {rhp.toLocaleString()} RHP</span>
+        <span>{rankName} rank · {currentStreak} day streak · {rhp.toLocaleString()} RHP</span>
       </div>
     </div>
   );

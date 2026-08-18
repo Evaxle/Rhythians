@@ -129,7 +129,7 @@ export function WelcomeModal({ user, hasLinkedProfile, profileHandle }: { user: 
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="rounded-2xl border border-border bg-background/70 p-4">
               <p className="flex items-center gap-2 text-sm font-semibold text-white">
-                <BookOpen size={16} className="text-accent" /> Knowledge
+                <BookOpen size={16} className="text-accent" /> Wiki
               </p>
               <p className="mt-2 text-xs leading-6 text-muted">Guides, FAQs, and resources for the community.</p>
             </div>

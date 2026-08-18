@@ -12,6 +12,9 @@ import { RhythiaStats } from "@/components/rhythia-stats";
 import { getRhythiaStatus } from "@/lib/rhythia-status";
 import { RankProgress } from "@/components/rank-progress";
 import { getUserGlobalRank } from "@/lib/maps";
+import { RhythiaVerifiedBadge } from "@/components/rhythia-verified-badge";
+import { ProfileScoreRefresh } from "@/components/profile-score-refresh";
+import { RhythiaRpGainCheck } from "@/components/rhythia-rp-gain-check";
 
 export const dynamic = "force-dynamic";
 
@@ -80,7 +83,8 @@ export default async function ProfilePage({ params }: Props) {
               <p className="text-sm uppercase tracking-[0.3em] text-accent">Profile</p>
               <h1 className="mt-2 flex items-center gap-3 text-3xl font-semibold text-white">
                 {user.displayName ?? user.username}
-                <FlagIcon flag={user.rhythiaProfile?.flag} country={user.rhythiaProfile?.country} size="md" />
+                {user.rhythiaProfile?.flag && <FlagIcon flag={user.rhythiaProfile?.flag} country={user.rhythiaProfile?.country} size="md" />}
+                {user.rhythiaVerified && <RhythiaVerifiedBadge size="sm" />}
 {user.rhythiaProfile && presence && (
                   <span
                     title={presenceLabel}
@@ -108,7 +112,15 @@ export default async function ProfilePage({ params }: Props) {
           </div>
           <div className="flex flex-col items-stretch gap-3">
             {!isOwnProfile && <FriendButton userId={user.id} />}
-            {isOwnProfile && <RhythiaConnect connectedUrl={user.rhythiaProfile?.profileUrl} />}
+            {isOwnProfile && (
+              <div className="flex items-center gap-2">
+                <div className="flex-1">
+                  <RhythiaConnect connectedUrl={user.rhythiaProfile?.profileUrl} />
+                </div>
+                {user.rhythiaProfile && <ProfileScoreRefresh />}
+              </div>
+            )}
+            {isOwnProfile && user.rhythiaProfile && <RhythiaRpGainCheck />}
             {!isOwnProfile && (
               <Link
                 href={`/messages?user=${encodeURIComponent(user.profileHandle)}`}
