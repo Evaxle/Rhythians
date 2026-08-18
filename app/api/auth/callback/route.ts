@@ -8,6 +8,7 @@ const DISCORD_TOKEN_URL = "https://discord.com/api/oauth2/token";
 const DISCORD_USER_URL = "https://discord.com/api/users/@me";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const AVAILABLE_TAGS = [
   "beginner",
@@ -36,7 +37,8 @@ export async function GET(request: Request) {
   const clientSecret = process.env.DISCORD_CLIENT_SECRET?.trim();
   const redirectUri = process.env.DISCORD_REDIRECT_URI?.trim();
   if (!clientId || !clientSecret || !redirectUri) {
-    return NextResponse.json({ error: "Discord OAuth not configured" }, { status: 500 });
+    console.error("Discord OAuth environment variables are missing.");
+    return NextResponse.redirect(new URL("/login?error=discord_config", request.url));
   }
 
   const tokenBody = new URLSearchParams({
@@ -65,22 +67,47 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL("/login?error=discord_config", request.url));
   }
 
-  const tokenData = await tokenResponse.json();
+  let tokenData: { access_token?: unknown };
+  try {
+    tokenData = await tokenResponse.json();
+  } catch (error) {
+    console.error("Discord token response was not valid JSON:", error);
+    return NextResponse.redirect(new URL("/login?error=discord_token", request.url));
+  }
   const accessToken = tokenData.access_token;
   if (typeof accessToken !== "string" || !accessToken) {
     return NextResponse.redirect(new URL("/login?error=discord_token", request.url));
   }
 
-  const userResponse = await fetch(DISCORD_USER_URL, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
+  let userResponse: Response;
+  try {
+    userResponse = await fetch(DISCORD_USER_URL, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
+    });
+  } catch (error) {
+    console.error("Discord user request failed:", error);
+    return NextResponse.redirect(new URL("/login?error=discord_network", request.url));
+  }
 
   if (!userResponse.ok) {
     console.error("Discord user lookup failed:", userResponse.status);
     return NextResponse.redirect(new URL("/login?error=discord_user", request.url));
   }
 
-  const discordUser = await userResponse.json();
+  let discordUser: {
+    id?: unknown;
+    username?: unknown;
+    discriminator?: unknown;
+    avatar?: string | null;
+    locale?: string | null;
+  };
+  try {
+    discordUser = await userResponse.json();
+  } catch (error) {
+    console.error("Discord user response was not valid JSON:", error);
+    return NextResponse.redirect(new URL("/login?error=discord_user", request.url));
+  }
   const discordId = typeof discordUser.id === "string" ? discordUser.id : "";
   const username = typeof discordUser.username === "string" ? discordUser.username.trim() : "";
   if (!discordId || !username) {
