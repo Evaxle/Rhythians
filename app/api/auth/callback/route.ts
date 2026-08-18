@@ -88,16 +88,18 @@ export async function GET(request: Request) {
     }
 
     // 3. If no matching account exists, create a brand-new one. Generate a unique
-    //    profileHandle so we never collide with an existing handle.
+    //    profileHandle so we never collide with an existing handle, and only set
+    //    the email if it isn't already claimed by another account.
     if (!user) {
       const profileHandle = await generateUniqueHandle(baseHandle);
+      const email = await safeEmailForUser(discordUser.email, null);
       user = await prisma.user.create({
         data: {
           discordId: discordUser.id,
           username: discordUser.username,
           discriminator: discordUser.discriminator,
           avatar: discordUser.avatar,
-          email: discordUser.email,
+          email,
           locale: discordUser.locale,
           profileHandle,
           discordRoles,
@@ -105,14 +107,18 @@ export async function GET(request: Request) {
         },
       });
     } else {
-      // 4. Existing user (linked or already Discord-linked): refresh their profile data.
+      // 4. Existing user (linked or already Discord-linked): refresh their profile
+      //    data. Only set the email if it isn't already claimed by a DIFFERENT
+      //    account — otherwise the unique constraint on `email` throws and the
+      //    whole login fails with a 500 / oauth_failed.
+      const email = await safeEmailForUser(discordUser.email, user.id);
       user = await prisma.user.update({
         where: { id: user.id },
         data: {
           username: discordUser.username,
           discriminator: discordUser.discriminator,
           avatar: discordUser.avatar,
-          email: discordUser.email,
+          email,
           locale: discordUser.locale,
           discordRoles,
           inGuild,
@@ -165,6 +171,20 @@ async function generateUniqueHandle(baseHandle: string): Promise<string> {
     profileHandle = `${baseHandle}-${Math.random().toString(36).slice(2, 6)}`;
   }
   return profileHandle;
+}
+
+// Returns the Discord email only if it isn't already claimed by another account.
+// `currentUserId` is the user being updated (null when creating a new user). If
+// the email belongs to a different user, we return null so the unique constraint
+// on `email` never throws and the login doesn't fail.
+async function safeEmailForUser(
+  email: string | null | undefined,
+  currentUserId: string | null
+): Promise<string | null> {
+  if (!email) return null;
+  const owner = await prisma.user.findUnique({ where: { email } });
+  if (owner && owner.id !== currentUserId) return null;
+  return email;
 }
 
 async function ensureTagsExist() {
