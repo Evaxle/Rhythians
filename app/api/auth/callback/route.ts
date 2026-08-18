@@ -82,7 +82,16 @@ export async function GET(request: Request) {
   }
 
   const discordUser = await userResponse.json();
-  const baseHandle = `${discordUser.username.toLowerCase()}-${discordUser.discriminator}`;
+  const discordId = typeof discordUser.id === "string" ? discordUser.id : "";
+  const username = typeof discordUser.username === "string" ? discordUser.username.trim() : "";
+  if (!discordId || !username) {
+    console.error("Discord user response was missing id or username.");
+    return NextResponse.redirect(new URL("/login?error=discord_user", request.url));
+  }
+  const discriminator = typeof discordUser.discriminator === "string" && discordUser.discriminator
+    ? discordUser.discriminator
+    : "0";
+  const baseHandle = `${username.toLowerCase()}-${discriminator}`;
 
   const guildMember = await getGuildMember(accessToken);
   const inGuild = guildMember !== null;
@@ -90,7 +99,7 @@ export async function GET(request: Request) {
 
   try {
     // 1. If a user already exists with this Discord ID, just update them.
-    let user = await prisma.user.findUnique({ where: { discordId: discordUser.id } });
+    let user = await prisma.user.findUnique({ where: { discordId } });
 
     // 2. Otherwise, try to link to an existing account that shares the same email
     //    (e.g. someone who registered with email/password first). This avoids a
@@ -100,7 +109,7 @@ export async function GET(request: Request) {
       if (user) {
         user = await prisma.user.update({
           where: { id: user.id },
-          data: { discordId: discordUser.id },
+          data: { discordId },
         });
       }
     }
@@ -113,9 +122,9 @@ export async function GET(request: Request) {
       const email = await safeEmailForUser(discordUser.email, null);
       user = await prisma.user.create({
         data: {
-          discordId: discordUser.id,
-          username: discordUser.username,
-          discriminator: discordUser.discriminator,
+          discordId,
+          username,
+          discriminator,
           avatar: discordUser.avatar,
           email,
           locale: discordUser.locale,
@@ -133,8 +142,8 @@ export async function GET(request: Request) {
       user = await prisma.user.update({
         where: { id: user.id },
         data: {
-          username: discordUser.username,
-          discriminator: discordUser.discriminator,
+          username,
+          discriminator,
           avatar: discordUser.avatar,
           email,
           locale: discordUser.locale,
