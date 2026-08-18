@@ -42,7 +42,6 @@ export type RhythiaScoreEntry = {
   accuracy?: number | null;
   created_at?: string | null;
   speed?: number | null;
-  awarded_sp?: number | null;
 };
 
 // The daily map uses the same balanced gain as challenge maps: a base that
@@ -257,20 +256,6 @@ export function findScoreForMap(scores: RhythiaScoreEntry[], title: string): Rhy
 export async function fetchRhythiaScores(profileId: number): Promise<{ recent: RhythiaScoreEntry[]; top: RhythiaScoreEntry[] }> {
   const data = await rhythiaRequest<{ lastDay?: RhythiaScoreEntry[]; top?: RhythiaScoreEntry[] }>("getUserScores", { id: profileId, limit: 100 });
   return { recent: data.lastDay ?? [], top: data.top ?? [] };
-}
-
-export async function fetchAllRhythiaScores(profileId: number): Promise<RhythiaScoreEntry[]> {
-  const data = await rhythiaRequest<{
-    lastDay?: RhythiaScoreEntry[];
-    top?: RhythiaScoreEntry[];
-    vrTop?: RhythiaScoreEntry[];
-    vrRecent?: RhythiaScoreEntry[];
-  }>("getUserScores", { id: profileId, limit: 100 });
-  const seen = new Map<number, RhythiaScoreEntry>();
-  for (const entry of [...(data.lastDay ?? []), ...(data.top ?? []), ...(data.vrTop ?? []), ...(data.vrRecent ?? [])]) {
-    if (entry && typeof entry.id === "number" && !seen.has(entry.id)) seen.set(entry.id, entry);
-  }
-  return [...seen.values()];
 }
 
 export type DailyCheckResult = {

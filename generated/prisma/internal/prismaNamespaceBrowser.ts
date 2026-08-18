@@ -135,7 +135,6 @@ export const UserScalarFieldEnum = {
   updatedAt: 'updatedAt',
   rhp: 'rhp',
   avgMapRating: 'avgMapRating',
-  scoreImportDone: 'scoreImportDone',
   dailyStreak: 'dailyStreak',
   lastDailyBeatAt: 'lastDailyBeatAt',
   rhythiaVerified: 'rhythiaVerified'

@@ -3,7 +3,6 @@ import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { canAccessAdmin } from "@/lib/admin-access";
 import { fetchRhythiaProfile } from "@/lib/rhythia";
-import { checkAndAwardAllChallengeMaps } from "@/lib/maps";
 
 export const dynamic = "force-dynamic";
 
@@ -70,18 +69,6 @@ export async function PATCH(request: Request, { params }: Props) {
         url: `/profile/${requestRecord.user.profileHandle}`,
       },
     });
-
-    const approvedUser = await prisma.user.findUnique({
-      where: { id: requestRecord.userId },
-      select: { scoreImportDone: true },
-    });
-    if (!approvedUser?.scoreImportDone) {
-      try {
-        await checkAndAwardAllChallengeMaps(requestRecord.userId);
-      } catch {
-        // The profile is linked either way; the user can import scores later from settings.
-      }
-    }
   } else {
     await prisma.rhythiaProfileRequest.update({
       where: { id },
