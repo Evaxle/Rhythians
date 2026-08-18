@@ -28,6 +28,11 @@ if (connectionString.includes("localhost") || connectionString.includes("127.0.0
 const adapter = new PrismaPg({
   connectionString,
   ssl: { rejectUnauthorized: false },
+  // Vercel creates many short-lived serverless instances. Keep one database
+  // connection per warm instance so Supabase's pooler is not exhausted.
+  max: 1,
+  idleTimeoutMillis: 10_000,
+  connectionTimeoutMillis: 10_000,
 });
 
 export const prisma =
