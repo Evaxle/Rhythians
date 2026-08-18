@@ -155,7 +155,11 @@ export async function GET(request: Request) {
     return response;
   } catch (error) {
     console.error("Discord OAuth callback failed:", error);
-    return NextResponse.redirect(new URL("/login?error=oauth_failed", request.url));
+    // TEMP: surface the error message in the URL for debugging. Remove before production.
+    const detail = error instanceof Error ? error.message : String(error);
+    return NextResponse.redirect(
+      new URL(`/login?error=oauth_failed&detail=${encodeURIComponent(detail)}`, request.url)
+    );
   }
 }
 
