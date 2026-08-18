@@ -50,10 +50,16 @@ function normalizeDatabaseUrl(value: string | undefined): string | undefined {
 
   const schemeEnd = raw.indexOf("://");
   const authorityStart = schemeEnd + 3;
+  const authoritySuffix = raw.slice(authorityStart).search(/[/?#]/);
+  const authorityEnd = authoritySuffix === -1 ? raw.length : authorityStart + authoritySuffix;
+  const authority = raw.slice(authorityStart, authorityEnd);
+  const hasMultipleAtSigns = authority.indexOf("@") !== authority.lastIndexOf("@");
 
   try {
-    new URL(raw);
-    return raw;
+    if (!hasMultipleAtSigns) {
+      new URL(raw);
+      return raw;
+    }
   } catch {
     // Repair credentials below. PostgreSQL passwords commonly contain @, ?, #,
     // or /, all of which must be percent-encoded inside a URL.

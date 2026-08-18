@@ -11,30 +11,44 @@ import { HomeLeaderboardSection } from "@/components/daily/home-leaderboard-sect
 export const dynamic = "force-dynamic";
 
 async function getStats() {
-  const [members, clips, online] = await Promise.all([
-    prisma.user.count(),
-    prisma.clip.count({ where: { status: "approved" } }),
-    getOnlineUserCount(),
-  ]);
-  const articles = getPublishedArticleCount();
-  return { members, articles, clips, online };
+  try {
+    const [members, clips, online] = await Promise.all([
+      prisma.user.count(),
+      prisma.clip.count({ where: { status: "approved" } }),
+      getOnlineUserCount(),
+    ]);
+    return { members, articles: getPublishedArticleCount(), clips, online };
+  } catch (error) {
+    console.error("Homepage stats unavailable:", error);
+    return { members: 0, articles: 0, clips: 0, online: 0 };
+  }
 }
 
 async function getFeaturedClips() {
-  return prisma.clip.findMany({
-    where: { status: "approved", featuredOrder: { not: null } },
-    orderBy: { featuredOrder: "asc" },
-    include: { uploader: { select: { username: true } }, category: { select: { name: true } } },
-  });
+  try {
+    return await prisma.clip.findMany({
+      where: { status: "approved", featuredOrder: { not: null } },
+      orderBy: { featuredOrder: "asc" },
+      include: { uploader: { select: { username: true } }, category: { select: { name: true } } },
+    });
+  } catch (error) {
+    console.error("Featured clips unavailable:", error);
+    return [];
+  }
 }
 
 async function getLatestAnnouncements() {
-  return prisma.announcement.findMany({
-    where: { published: true },
-    orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
-    take: 3,
-    select: { id: true, title: true, slug: true, createdAt: true },
-  });
+  try {
+    return await prisma.announcement.findMany({
+      where: { published: true },
+      orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
+      take: 3,
+      select: { id: true, title: true, slug: true, createdAt: true },
+    });
+  } catch (error) {
+    console.error("Announcements unavailable:", error);
+    return [];
+  }
 }
 
 export default async function HomePage() {
@@ -43,7 +57,7 @@ export default async function HomePage() {
   const announcements = await getLatestAnnouncements();
   const user = await getSessionUser();
   const linkedProfile = user
-    ? await prisma.rhythiaProfile.findUnique({ where: { userId: user.id }, select: { id: true } })
+    ? await prisma.rhythiaProfile.findUnique({ where: { userId: user.id }, select: { id: true } }).catch(() => null)
     : null;
 
   return (
