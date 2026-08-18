@@ -34,6 +34,11 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Discord OAuth not configured" }, { status: 500 });
   }
 
+  // Self-heal schema drift: the production DB was bootstrapped before several
+  // User columns existed, which made every Prisma user query throw P2022.
+  // These idempotent ALTERs are a no-op once the columns exist.
+  await ensureUserColumns();
+
   try {
     const tokenBody = new URLSearchParams({
       client_id: process.env.DISCORD_CLIENT_ID,
@@ -154,5 +159,33 @@ async function ensureTagsExist() {
       update: {},
       create: { name: tagName, slug: tagSlug },
     });
+  }
+}
+
+const USER_COLUMN_MIGRATIONS = [
+  `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "suspendedUntil" TIMESTAMP(3)`,
+  `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "mutedUntil" TIMESTAMP(3)`,
+  `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "rhp" INTEGER NOT NULL DEFAULT 0`,
+  `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "avgMapRating" DOUBLE PRECISION`,
+  `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "scoreImportDone" BOOLEAN NOT NULL DEFAULT false`,
+  `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "dailyStreak" INTEGER NOT NULL DEFAULT 0`,
+  `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "lastDailyBeatAt" TIMESTAMP(3)`,
+  `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "lastRhythiaRpCheckAt" TIMESTAMP(3)`,
+  `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "rhythiaVerified" BOOLEAN NOT NULL DEFAULT false`,
+];
+
+let userColumnsEnsured = false;
+
+async function ensureUserColumns() {
+  if (userColumnsEnsured) return;
+  try {
+    for (const statement of USER_COLUMN_MIGRATIONS) {
+      await prisma.$executeRawUnsafe(statement);
+    }
+    userColumnsEnsured = true;
+  } catch (error) {
+    // If the columns can't be added (permissions, connection), don't block the
+    // login attempt — the original error will surface and be logged below.
+    console.error("Failed to ensure User columns exist:", error);
   }
 }
