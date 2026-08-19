@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { canReviewMaps } from "@/lib/map-review";
+import { prisma } from "@/lib/db";
 import { reviewChallengeMap } from "@/lib/maps";
+import { setMapSubmissionMetadata, getMapSubmissionMetadata, type ChallengePlacement } from "@/lib/map-submission-metadata";
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const user = await getSessionUser();
@@ -13,10 +15,24 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   const status = body?.status as "approved" | "rejected" | undefined;
   if (status !== "approved" && status !== "rejected") return NextResponse.json({ error: "Invalid review status." }, { status: 400 });
   const note = typeof body?.note === "string" ? body.note : null;
+  const placement = body?.challengePlacement as ChallengePlacement | null | undefined;
+  const level = body?.challengeLevel == null ? null : Number(body.challengeLevel);
 
   try {
+    const metadata = await getMapSubmissionMetadata(id);
+    if (!metadata) return NextResponse.json({ error: "Map submission type is missing." }, { status: 400 });
+    if (status === "approved" && metadata.submissionType === "challenge") {
+      if (!["main", "jumps", "stream", "tech", "off_grid"].includes(String(placement))) return NextResponse.json({ error: "Choose a valid challenge destination." }, { status: 400 });
+      if (!Number.isInteger(level) || level! < 1 || level! > 20) return NextResponse.json({ error: "Challenge level must be between 1 and 20." }, { status: 400 });
+      await setMapSubmissionMetadata(id, "challenge", placement!, level!);
+      const updated = await reviewChallengeMap(id, user.id, status, null, note);
+      await prisma.$executeRawUnsafe('INSERT INTO "ChallengeMapLevel" ("id","challengeMapId","level","createdAt","updatedAt") VALUES ($1,$2,$3,NOW(),NOW()) ON CONFLICT ("challengeMapId") DO UPDATE SET "level"=EXCLUDED."level","updatedAt"=NOW()', crypto.randomUUID(), id, level);
+      return NextResponse.json({ map: updated, submissionType: "challenge", challengePlacement: placement, challengeLevel: level });
+    }
+
     const updated = await reviewChallengeMap(id, user.id, status, null, note);
-    return NextResponse.json({ map: updated });
+    if (status === "approved") await setMapSubmissionMetadata(id, "ranked", null, null);
+    return NextResponse.json({ map: updated, submissionType: metadata.submissionType });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to review this map." }, { status: 400 });
   }
