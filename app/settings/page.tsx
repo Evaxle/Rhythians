@@ -11,8 +11,6 @@ import { AvatarUploader } from "@/components/avatar-uploader";
 import { OnboardingForm } from "@/components/onboarding-form";
 import { CursorSettings } from "@/components/cursor-settings";
 import { CheckAllScoresButton } from "@/components/check-all-scores-button";
-import { RhythiaRpGainCheck } from "@/components/rhythia-rp-gain-check";
-import { RhythiaRpCheckButton } from "@/components/rhythia-rp-check-button";
 
 export const dynamic = "force-dynamic";
 
@@ -72,12 +70,6 @@ export default async function SettingsPage() {
           </p>
           <div className="mt-6 border-t border-border pt-6">
             <CheckAllScoresButton />
-          </div>
-          <div className="mt-4">
-            <RhythiaRpCheckButton />
-          </div>
-          <div className="mt-4">
-            <RhythiaRpGainCheck />
           </div>
         </section>
       )}
