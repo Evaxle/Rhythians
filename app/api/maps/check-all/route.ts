@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
-import { checkAllRankedMaps } from "@/lib/maps-legacy";
+import { checkAllRankedMaps } from "@/lib/ranked-map-check";
 
 export async function POST() {
   const user = await getSessionUser();
