@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { fetchAllRhythiaScores, type RhythiaScoreEntry } from "@/lib/daily";
 import { accuracyFromMisses, getRankInfo, isMapInRankRange, rhpGainForMap } from "@/lib/ranks";
+import { upsertRankedMapScore } from "@/lib/ranked-map-leaderboard";
 
 function normalizeTitle(value: string | null | undefined) {
   return (value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
@@ -29,6 +30,12 @@ async function alreadyAwarded(userId: string, mapId: string) {
   }));
 }
 
+function scoreDetails(map: { rating: number; length: number | null }, score: RhythiaScoreEntry, rankIndex: number) {
+  const accuracy = score.accuracy ?? accuracyFromMisses(score.beatmapNotes, score.misses);
+  const points = rhpGainForMap(map.rating, accuracy, score.speed, rankIndex, map.length != null ? map.length / 1000 : null);
+  return { accuracy, points };
+}
+
 export async function checkRankedMap(userId: string, mapId: string) {
   const [profile, user] = await Promise.all([
     prisma.rhythiaProfile.findUnique({ where: { userId }, select: { profileId: true } }),
@@ -51,10 +58,6 @@ export async function checkRankedMap(userId: string, mapId: string) {
     return { status: "out_of_range" as const, points: 0, rankInfo };
   }
 
-  if (await alreadyAwarded(userId, map.id)) {
-    return { status: "already" as const, points: 0, rankInfo };
-  }
-
   let scores: RhythiaScoreEntry[];
   try {
     scores = await fetchAllRhythiaScores(profile.profileId);
@@ -65,8 +68,21 @@ export async function checkRankedMap(userId: string, mapId: string) {
   const score = bestScoresByTitle(scores).get(normalizeTitle(map.title));
   if (!score) return { status: "not_beat" as const, points: 0, rankInfo };
 
-  const accuracy = score.accuracy ?? accuracyFromMisses(score.beatmapNotes, score.misses);
-  const points = rhpGainForMap(map.rating, accuracy, score.speed, rankInfo.index, map.length != null ? map.length / 1000 : null);
+  const { accuracy, points } = scoreDetails(map, score, rankInfo.index);
+  await upsertRankedMapScore(map.id, userId, {
+    rating: map.rating,
+    accuracy,
+    passed: true,
+    points,
+    scoreId: score.id ?? null,
+    speed: score.speed ?? null,
+    rankIndex: rankInfo.index,
+  });
+
+  if (await alreadyAwarded(userId, map.id)) {
+    return { status: "already" as const, points: 0, accuracy, rankInfo: getRankInfo(user.rhp) };
+  }
+
   const updatedUser = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } });
   if (!updatedUser) return { status: "not_available" as const, points: 0 };
 
@@ -119,13 +135,22 @@ export async function checkAllRankedMaps(userId: string) {
     if (!score) continue;
     foundScores += 1;
 
+    const { accuracy, points } = scoreDetails({ rating: map.rating, length: map.length }, score, rankInfo.index);
+    await upsertRankedMapScore(map.id, userId, {
+      rating: map.rating,
+      accuracy,
+      passed: true,
+      points,
+      scoreId: score.id ?? null,
+      speed: score.speed ?? null,
+      rankIndex: rankInfo.index,
+    });
+
     if (await alreadyAwarded(userId, map.id)) {
       alreadyCompleted += 1;
       continue;
     }
 
-    const accuracy = score.accuracy ?? accuracyFromMisses(score.beatmapNotes, score.misses);
-    const points = rhpGainForMap(map.rating, accuracy, score.speed, rankInfo.index, map.length != null ? map.length / 1000 : null);
     const currentUser = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } });
     if (!currentUser) continue;
 
