@@ -52,7 +52,7 @@ export default async function MapsPage() {
         <p className="flex items-center gap-2 text-sm uppercase tracking-[0.24em] text-accent"><MapIcon size={16} /> Ranked maps</p>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-3xl font-semibold text-white">Challenge maps</h1>
+            <h1 className="text-3xl font-semibold text-white">Ranked maps</h1>
             <p className="mt-2 max-w-2xl text-sm leading-7 text-muted">Beat ranked maps within your rank&apos;s rating range to earn Rhythian Points (RHP) and climb the ladder. Maps outside your range won&apos;t earn points.</p>
           </div>
           <CheckAllRankedMapsButton />
