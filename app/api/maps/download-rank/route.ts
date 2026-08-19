@@ -52,7 +52,7 @@ function u32(value: number) {
 function dosTimeAndDate(date = new Date()) {
   const time = (date.getHours() << 11) | (date.getMinutes() << 5) | Math.floor(date.getSeconds() / 2);
   const year = Math.max(1980, date.getFullYear());
-  const day = (year - 1980 << 9) | ((date.getMonth() + 1) << 5) | date.getDate();
+  const day = ((year - 1980) << 9) | ((date.getMonth() + 1) << 5) | date.getDate();
   return { time, day };
 }
 
@@ -67,57 +67,23 @@ function buildZip(files: Array<{ name: string; data: Buffer }>) {
     const size = file.data.length;
     const checksum = crc32(file.data);
     const local = Buffer.concat([
-      u32(0x04034b50),
-      u16(20),
-      u16(0x0800),
-      u16(0),
-      u16(time),
-      u16(day),
-      u32(checksum),
-      u32(size),
-      u32(size),
-      u16(name.length),
-      u16(0),
-      name,
-      file.data,
+      u32(0x04034b50), u16(20), u16(0x0800), u16(0), u16(time), u16(day),
+      u32(checksum), u32(size), u32(size), u16(name.length), u16(0), name, file.data,
     ]);
     localParts.push(local);
-
     centralParts.push(Buffer.concat([
-      u32(0x02014b50),
-      u16(20),
-      u16(20),
-      u16(0x0800),
-      u16(0),
-      u16(time),
-      u16(day),
-      u32(checksum),
-      u32(size),
-      u32(size),
-      u16(name.length),
-      u16(0),
-      u16(0),
-      u16(0),
-      u16(0),
-      u32(0),
-      u32(offset),
-      name,
+      u32(0x02014b50), u16(20), u16(20), u16(0x0800), u16(0), u16(time), u16(day),
+      u32(checksum), u32(size), u32(size), u16(name.length), u16(0), u16(0), u16(0), u16(0),
+      u32(0), u32(offset), name,
     ]));
-
     offset += local.length;
   }
 
   const local = Buffer.concat(localParts);
   const central = Buffer.concat(centralParts);
   const end = Buffer.concat([
-    u32(0x06054b50),
-    u16(0),
-    u16(0),
-    u16(files.length),
-    u16(files.length),
-    u32(central.length),
-    u32(local.length),
-    u16(0),
+    u32(0x06054b50), u16(0), u16(0), u16(files.length), u16(files.length),
+    u32(central.length), u32(local.length), u16(0),
   ]);
   return Buffer.concat([local, central, end]);
 }
@@ -148,13 +114,15 @@ export async function GET() {
   const files: Array<{ name: string; data: Buffer }> = [];
   const failures: string[] = [];
   const queue = [...maps];
+  let nextIndex = 0;
   const workers = Array.from({ length: Math.min(8, queue.length) }, async () => {
     while (queue.length > 0) {
       const map = queue.shift();
       if (!map) return;
       try {
-        const data = await fetchMap(map.mapFileUrl);
-        files.push({ name: `${String(files.length + 1).padStart(3, "0")} - ${safeName(map.title)}${extensionFromUrl(map.mapFileUrl)}`, data });
+        const fileData = await fetchMap(map.mapFileUrl);
+        nextIndex += 1;
+        files.push({ name: `${String(nextIndex).padStart(3, "0")} - ${safeName(map.title)}${extensionFromUrl(map.mapFileUrl)}`, data: fileData });
       } catch (error) {
         failures.push(`${map.title}: ${error instanceof Error ? error.message : "download failed"}`);
       }
