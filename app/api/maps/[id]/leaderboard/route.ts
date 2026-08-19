@@ -13,7 +13,7 @@ export async function GET(request: Request, { params }: Props) {
   const { id } = await params;
   const url = new URL(request.url);
   const rankParam = url.searchParams.get("rank");
-  const selectedRank = rankParam == null || rankParam === "all" ? null : Number(rankParam);
+  const selectedRank = rankParam == null || rankParam === "all" || rankParam === "-1" ? null : Number(rankParam);
   if (selectedRank != null && (!Number.isInteger(selectedRank) || selectedRank < 0 || selectedRank > 8)) {
     return NextResponse.json({ error: "Invalid rank selection." }, { status: 400 });
   }
