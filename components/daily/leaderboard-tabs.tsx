@@ -22,10 +22,10 @@ export function LeaderboardTabs({
 }) {
   const [tab, setTab] = useState<"daily" | "ranked" | "challenge">("daily");
   const [rankedSection, setRankedSection] = useState<"global" | "my-rank" | "lock" | "spin" | "vr">("global");
-  const [rankedSelected, setRankedSelected] = useState(initialRankIndex);
 
-  const selectedRankedRows = challengeLeaderboards[rankedSelected] ?? [];
-  const globalRankedRows = challengeLeaderboards.flat().map((row, index) => ({ ...row, position: index + 1 })).sort((a, b) => b.rhp - a.rhp);
+  const globalRankedRows = [...challengeLeaderboards.flat()]
+    .sort((a, b) => b.rhp - a.rhp)
+    .map((row, index) => ({ ...row, position: index + 1 }));
 
   return (
     <div className="space-y-6">
