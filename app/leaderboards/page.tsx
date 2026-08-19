@@ -12,7 +12,6 @@ export const dynamic = "force-dynamic";
 
 const ranks = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 const cameraModes = ["lock", "spin", "vr"] as const;
-
 type CameraMode = (typeof cameraModes)[number];
 
 function filterCameraRows<T extends { userId: string }>(rows: T[], cameraUserIds: Set<string>) {
@@ -32,14 +31,12 @@ export default async function LeaderboardsPage() {
 
   const allUserIds = [...new Set([...dailyLeaderboards.flat(), ...rankedLeaderboards.flat()].map((row) => row.userId))];
   const userTags = await prisma.userTag.findMany({ where: { userId: { in: allUserIds } }, select: { userId: true, tag: { select: { slug: true } } } });
-  const cameraUserIds: Record<CameraMode, Set<string>> = {
-    lock: new Set(),
-    spin: new Set(),
-    vr: new Set(),
-  };
+  const cameraUserIds: Record<CameraMode, Set<string>> = { lock: new Set(), spin: new Set(), vr: new Set() };
   for (const entry of userTags) {
     const slug = entry.tag.slug.toLowerCase();
-    if (slug === "lock" || slug === "spin" || slug === "vr") cameraUserIds[slug].add(entry.userId);
+    if (slug === "camera-lock") cameraUserIds.lock.add(entry.userId);
+    if (slug === "camera-spin") cameraUserIds.spin.add(entry.userId);
+    if (slug === "camera-vr") cameraUserIds.vr.add(entry.userId);
   }
 
   const dailyCameraLeaderboards = {
