@@ -1,14 +1,19 @@
 import { getRankInfo } from "@/lib/ranks";
 import { RankBadge } from "@/components/rank-badge";
 
-export function RankProgress({ rhp, globalRank }: { rhp: number; globalRank: number | null }) {
+export function RankProgress({ rhp, globalRank, highestSkillLevel }: { rhp: number; globalRank: number | null; highestSkillLevel?: number }) {
   const rank = getRankInfo(rhp);
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <RankBadge rank={rank} globalRank={globalRank} size="lg" />
-        <span className="text-lg font-semibold text-white">{rhp.toLocaleString()} RHP</span>
+        <div className="flex items-center gap-3 text-right">
+          {highestSkillLevel != null && (
+            <span className="text-sm font-semibold text-accent">Level {highestSkillLevel}</span>
+          )}
+          <span className="text-lg font-semibold text-white">{rhp.toLocaleString()} RHP</span>
+        </div>
       </div>
 
       {rank.isExpert ? (
@@ -29,9 +34,7 @@ export function RankProgress({ rhp, globalRank }: { rhp: number; globalRank: num
                   </span>
                 )}
               </span>
-              <span>
-                {Math.round(rank.progressToNextTier * 100)}%
-              </span>
+              <span>{Math.round(rank.progressToNextTier * 100)}%</span>
             </div>
             <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-white/10">
               <div
