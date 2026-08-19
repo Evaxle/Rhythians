@@ -3,7 +3,6 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   productionBrowserSourceMaps: false,
-  serverExternalPackages: ["archiver"],
   images: {
     remotePatterns: [
       {
