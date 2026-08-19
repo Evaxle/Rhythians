@@ -69,6 +69,7 @@ export async function POST(request: Request) {
       submittedById: user.id,
       sourceBeatmapId,
       sourceUrl,
+      isAutoImported: submissionType === "ranked",
     });
     await setMapSubmissionMetadata(map.id, submissionType);
   } catch (error: any) {
