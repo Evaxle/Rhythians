@@ -25,6 +25,7 @@ export async function POST(request: Request) {
   const path = getStoragePath(bucket, "maps", fileName);
   const { data, error } = await supabaseAdmin.storage.from(bucket).createSignedUploadUrl(path);
   if (error || !data) return NextResponse.json({ error: error?.message ?? "Could not create upload URL." }, { status: 500 });
+  const publicUrl = supabaseAdmin.storage.from(bucket).getPublicUrl(path).data.publicUrl;
 
-  return NextResponse.json({ uploadUrl: data.signedUrl, path, contentType, fileName });
+  return NextResponse.json({ uploadUrl: data.signedUrl, path, publicUrl, contentType, fileName });
 }
