@@ -15,9 +15,9 @@ function extensionFromUrl(url: string) {
   try {
     const pathname = new URL(url).pathname;
     const match = pathname.match(/(\.[a-z0-9]{2,8})$/i);
-    return match?.[1] ?? ".rhm";
+    return match?.[1] ?? ".sspm";
   } catch {
-    return ".rhm";
+    return ".sspm";
   }
 }
 
@@ -88,13 +88,26 @@ function buildZip(files: Array<{ name: string; data: Buffer }>) {
   return Buffer.concat([local, central, end]);
 }
 
-async function fetchMap(url: string) {
+async function fetchMap(url: string, referer: string) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 12_000);
+  const timer = setTimeout(() => controller.abort(), 15_000);
   try {
-    const response = await fetch(url, { cache: "no-store", signal: controller.signal });
+    const response = await fetch(url, {
+      cache: "no-store",
+      redirect: "follow",
+      signal: controller.signal,
+      headers: {
+        accept: "application/octet-stream,application/x-sspm,*/*",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151.0.0.0 Safari/537.36",
+        referer,
+      },
+    });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return Buffer.from(await response.arrayBuffer());
+    const contentType = response.headers.get("content-type") ?? "";
+    if (contentType.includes("text/html")) throw new Error("Rhythia returned an HTML page instead of an SSPM file");
+    const data = Buffer.from(await response.arrayBuffer());
+    if (data.length < 4) throw new Error("Downloaded file was empty");
+    return data;
   } finally {
     clearTimeout(timer);
   }
@@ -109,20 +122,20 @@ export async function GET() {
 
   const rankInfo = getRankInfo(user.rhp);
   const maps = data.maps.filter((map) => map.isAutoImported && map.rating != null && map.rating >= rankInfo.rangeMin && map.rating <= rankInfo.rangeMax);
-  if (maps.length === 0) return NextResponse.json({ error: "No maps are available for your rank." }, { status: 404 });
+  if (maps.length === 0) return NextResponse.json({ error: "No ranked maps are available for your current rank." }, { status: 404 });
 
   const files: Array<{ name: string; data: Buffer }> = [];
   const failures: string[] = [];
+  let successfulIndex = 0;
   const queue = [...maps];
-  let nextIndex = 0;
   const workers = Array.from({ length: Math.min(8, queue.length) }, async () => {
     while (queue.length > 0) {
       const map = queue.shift();
       if (!map) return;
       try {
-        const fileData = await fetchMap(map.mapFileUrl);
-        nextIndex += 1;
-        files.push({ name: `${String(nextIndex).padStart(3, "0")} - ${safeName(map.title)}${extensionFromUrl(map.mapFileUrl)}`, data: fileData });
+        const fileData = await fetchMap(map.mapFileUrl, `https://www.rhythia.com/maps/${map.id}`);
+        successfulIndex += 1;
+        files.push({ name: `${String(successfulIndex).padStart(3, "0")} - ${safeName(map.title)}${extensionFromUrl(map.mapFileUrl)}`, data: fileData });
       } catch (error) {
         failures.push(`${map.title}: ${error instanceof Error ? error.message : "download failed"}`);
       }
@@ -130,7 +143,9 @@ export async function GET() {
   });
 
   await Promise.all(workers);
-  if (files.length === 0) return NextResponse.json({ error: "Unable to download any maps for your rank." }, { status: 502 });
+  if (files.length === 0) {
+    return NextResponse.json({ error: `Rhythia's map files could not be downloaded. ${failures.slice(0, 3).join(" | ")}`, failed: failures.length, total: maps.length }, { status: 502 });
+  }
   if (failures.length > 0) files.push({ name: "download-errors.txt", data: Buffer.from(`${failures.join("\n")}\n`, "utf8") });
 
   const zip = buildZip(files);
