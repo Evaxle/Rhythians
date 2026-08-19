@@ -1,9 +1,12 @@
 import { PassThrough, Readable } from "node:stream";
-import archiver from "archiver";
+import { createRequire } from "node:module";
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { getApprovedMaps } from "@/lib/maps-legacy";
 import { getRankInfo } from "@/lib/ranks";
+
+const require = createRequire(import.meta.url);
+const archiver = require("archiver") as typeof import("archiver");
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
