@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { getAvatarUrl } from "@/lib/avatar";
 import { UserTagsManager } from "@/components/user-tags-manager";
 import { AdminUserSearch } from "@/components/admin-user-search";
+import { AdminUserProfileControls } from "@/components/admin-user-profile-controls";
 import { ResetRatingSystem } from "@/components/admin/reset-rating-system";
 import { AdminCheckUserScores } from "@/components/admin/check-user-scores";
 
@@ -15,8 +16,8 @@ export default async function AdminUsersPage() {
     <div className="space-y-8">
       <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
         <p className="text-sm uppercase tracking-[0.3em] text-accent">User management</p>
-        <h1 className="mt-3 text-3xl font-semibold text-white">Manage users and their tags</h1>
-        <p className="mt-3 text-sm leading-7 text-muted">Search for a user to view full details, punish accounts, or assign tags.</p>
+        <h1 className="mt-3 text-3xl font-semibold text-white">Manage users and their profiles</h1>
+        <p className="mt-3 text-sm leading-7 text-muted">Search for a user to view full details, punish accounts, or assign tags. Use the profile editor on any user to change their challenge levels and, for the site owner, their profile title.</p>
       </section>
 
       <AdminCheckUserScores />
@@ -25,8 +26,8 @@ export default async function AdminUsersPage() {
 
       <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
         <p className="text-sm uppercase tracking-[0.3em] text-accent">All users</p>
-        <h2 className="mt-2 text-2xl font-semibold text-white">Tag management</h2>
-        <p className="mt-2 text-sm leading-7 text-muted">Assign tags to users based on their Discord roles or manually override them here.</p>
+        <h2 className="mt-2 text-2xl font-semibold text-white">User profiles</h2>
+        <p className="mt-2 text-sm leading-7 text-muted">Edit tags, challenge progression, and owner-only profile titles directly from each user.</p>
       </section>
 
       <div className="space-y-4">
@@ -41,10 +42,11 @@ export default async function AdminUsersPage() {
                   <p className="mt-1 text-xs text-muted">{user.inGuild ? "In server" : "Not in server"} · Joined {user.joinedAt.toLocaleDateString()}</p>
                 </div>
               </div>
-              <div className="flex-1 lg:max-w-md">
+              <div className="w-full lg:max-w-md">
                 <UserTagsManager userId={user.id} currentTags={user.userTags.map((ut) => ({ id: ut.tag.id, name: ut.tag.name, slug: ut.tag.slug }))} allTags={allTags.map((tag) => ({ id: tag.id, name: tag.name, slug: tag.slug }))} />
               </div>
             </div>
+            <AdminUserProfileControls userId={user.id} />
           </div>
         ))}
       </div>
