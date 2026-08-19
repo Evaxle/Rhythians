@@ -1,5 +1,45 @@
 import { prisma } from "@/lib/db";
-import { RANKS, getRankInfo, isMapInRankRange, rankIndexForRating, type RankInfo } from "@/lib/ranks";
+import { fetchRankedMaps } from "@/lib/daily";
+import { RANKS, getRankInfo, isMapInRankRange, rankIndexForRating, fairRatingFromStars, type RankInfo } from "@/lib/ranks";
+
+async function restoreAutoImportedMaps() {
+  const existing = await prisma.challengeMap.count({ where: { isAutoImported: true } });
+  if (existing > 0) return;
+
+  const importer = await prisma.user.findFirst({ where: { profileHandle: "rhythia-imports" }, select: { id: true } });
+  if (!importer) return;
+
+  const ranked = await fetchRankedMaps();
+  const data = ranked
+    .filter((map) => map.id > 0 && map.downloadUrl)
+    .map((map) => {
+      const separator = map.title.indexOf(" - ");
+      const artist = separator > 0 ? map.title.slice(0, separator).trim() : null;
+      const rating = fairRatingFromStars(map.starRating ?? 0);
+      return {
+        title: map.title,
+        artist,
+        description: null,
+        mapFileUrl: map.downloadUrl ?? `https://www.rhythia.com/maps/${map.id}`,
+        imageUrl: map.imageUrl,
+        requestedRating: rating,
+        rating,
+        mapperName: map.ownerUsername,
+        noteCount: map.noteCount,
+        length: map.length,
+        submittedById: importer.id,
+        status: "approved" as const,
+        reviewedById: importer.id,
+        reviewedAt: new Date(),
+        sourceBeatmapId: map.id,
+        sourceUrl: `https://www.rhythia.com/maps/${map.id}`,
+        isAutoImported: true,
+      };
+    });
+
+  if (data.length === 0) return;
+  await prisma.challengeMap.createMany({ data, skipDuplicates: true });
+}
 
 export async function getUserGlobalRank(userId: string): Promise<number | null> {
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } });
@@ -24,11 +64,12 @@ export async function getChallengeLeaderboard(rankIndex: number, limit = 100) {
 }
 
 export async function getApprovedMaps(includeAll: boolean, userId: string | null) {
+  await restoreAutoImportedMaps();
   const maps = await prisma.challengeMap.findMany({ where: { status: "approved", rating: { not: null } }, orderBy: [{ rating: "asc" }, { createdAt: "desc" }], include: { submittedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } }, reviewedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } } } });
   const user = userId ? await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } }) : null;
   const rankInfo: RankInfo | null = user ? getRankInfo(user.rhp) : null;
   const visible = includeAll || !rankInfo ? maps : maps.filter((map) => isMapInRankRange(map.rating ?? 0, rankInfo.index));
-  const completionState = userId ? await prisma.challengeMapCompletion.findMany({ where: { userId, challengeMapId: { in: visible.map((map) => map.id) } }, select: { challengeMapId: true, passed: true, points: true } }) : [];
+  const completionState = userId ? await prisma.challengeMapCompletion.findMany({ where: { userId, challengeMapId: { in: visible.filter((map) => !map.isAutoImported).map((map) => map.id) } }, select: { challengeMapId: true, passed: true, points: true } }) : [];
   const stateMap = new Map(completionState.map((entry) => [entry.challengeMapId, entry]));
   return { rankInfo, maps: visible.map((map) => ({ id: map.id, title: map.title, artist: map.artist, description: map.description, mapFileUrl: map.mapFileUrl, imageUrl: map.imageUrl, rating: map.rating, mapperName: map.mapperName, noteCount: map.noteCount, length: map.length, submittedBy: map.submittedBy, reviewedBy: map.reviewedBy, completion: stateMap.get(map.id) ?? null })) };
 }
