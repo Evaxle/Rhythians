@@ -13,7 +13,7 @@ export async function GET(request: Request) {
   const id = new URL(request.url).searchParams.get("id");
   if (!id) return NextResponse.json({ error: "Map id is required." }, { status: 400 });
 
-  const map = await prisma.categoryMap.findUnique({ where: { id }, select: { mapFileUrl: true, status: true } });
+  const map = await prisma.categoryMap.findFirst({ where: { id, submittedBy: { profileHandle: { not: "rhythia-imports" } } }, select: { mapFileUrl: true, status: true } });
   if (!map || map.status !== "approved") return NextResponse.json({ error: "Map not found." }, { status: 404 });
 
   const response = await fetch(map.mapFileUrl, { cache: "no-store" });

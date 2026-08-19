@@ -31,7 +31,7 @@ export async function GET(request: Request) {
   }
 
   const maps = await prisma.categoryMap.findMany({
-    where: { category, status: "approved", ...(level != null ? { level } : {}) },
+    where: { category, status: "approved", submittedBy: { profileHandle: { not: "rhythia-imports" } }, ...(level != null ? { level } : {}) },
     orderBy: [{ level: "asc" }, { title: "asc" }],
     select: { title: true, level: true, mapFileUrl: true },
   });

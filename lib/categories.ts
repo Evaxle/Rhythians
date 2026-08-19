@@ -11,6 +11,8 @@ import {
 export { CATEGORIES, CATEGORY_LABELS, MAX_CATEGORY_LEVEL, isCategory };
 export type { Category };
 
+const AUTO_IMPORT_PROFILE_HANDLE = "rhythia-imports";
+
 // A user's current level in every category. Everyone starts at level 0.
 export async function getUserCategoryLevels(userId: string): Promise<Array<{ category: Category; level: number }>> {
   const rows = await prisma.userCategoryLevel.findMany({ where: { userId } });
@@ -28,7 +30,7 @@ export async function getUserCategoryLevel(userId: string, category: Category): 
 // All approved maps in a category, optionally filtered to a single level.
 export async function getCategoryMaps(category: Category, level?: number) {
   return prisma.categoryMap.findMany({
-    where: { category, status: "approved", ...(level != null ? { level } : {}) },
+    where: { category, status: "approved", submittedBy: { profileHandle: { not: AUTO_IMPORT_PROFILE_HANDLE } }, ...(level != null ? { level } : {}) },
     orderBy: [{ level: "asc" }, { createdAt: "asc" }],
   });
 }
@@ -98,7 +100,7 @@ export async function checkAndAwardCategoryMap(userId: string, categoryMapId: st
   const profile = await prisma.rhythiaProfile.findUnique({ where: { userId } });
   if (!profile) return { status: "no_profile" };
 
-  const map = await prisma.categoryMap.findUnique({ where: { id: categoryMapId } });
+  const map = await prisma.categoryMap.findFirst({ where: { id: categoryMapId, submittedBy: { profileHandle: { not: AUTO_IMPORT_PROFILE_HANDLE } } } });
   if (!map || map.status !== "approved") return { status: "not_available" };
 
   const currentLevel = await getUserCategoryLevel(userId, map.category);
@@ -182,7 +184,7 @@ export async function getCategoryLeaderboard(category: Category, limit = 100): P
 
   const completionCounts = await prisma.categoryMapCompletion.groupBy({
     by: ["userId"],
-    where: { passed: true, categoryMap: { category } },
+    where: { passed: true, categoryMap: { category, submittedBy: { profileHandle: { not: AUTO_IMPORT_PROFILE_HANDLE } } } },
     _count: { _all: true },
   });
   const countMap = new Map(completionCounts.map((entry) => [entry.userId, entry._count._all]));
@@ -218,7 +220,7 @@ export async function getCategoryStats(userId: string): Promise<CategoryStats[]>
   const levelMap = new Map(levels.map((entry) => [entry.category, entry.level]));
 
   const completions = await prisma.categoryMapCompletion.findMany({
-    where: { userId, passed: true },
+    where: { userId, passed: true, categoryMap: { submittedBy: { profileHandle: { not: AUTO_IMPORT_PROFILE_HANDLE } } } },
     include: { categoryMap: { select: { category: true, level: true } } },
   });
 
@@ -229,7 +231,7 @@ export async function getCategoryStats(userId: string): Promise<CategoryStats[]>
 
   const nextLevelMaps = await prisma.categoryMap.groupBy({
     by: ["category", "level"],
-    where: { status: "approved" },
+    where: { status: "approved", submittedBy: { profileHandle: { not: AUTO_IMPORT_PROFILE_HANDLE } } },
     _count: { _all: true },
   });
   const nextLevelMapCount = new Map<string, number>();

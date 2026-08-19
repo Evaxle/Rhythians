@@ -13,8 +13,8 @@ export async function GET(request: Request) {
   const id = new URL(request.url).searchParams.get("id");
   if (!id) return NextResponse.json({ error: "Map id is required." }, { status: 400 });
 
-  const map = await prisma.challengeMap.findUnique({ where: { id }, select: { mapFileUrl: true, status: true, title: true } });
-  if (!map || map.status !== "approved") return NextResponse.json({ error: "Map not found." }, { status: 404 });
+  const map = await prisma.challengeMap.findUnique({ where: { id }, select: { mapFileUrl: true, status: true, title: true, isAutoImported: true } });
+  if (!map || map.isAutoImported || map.status !== "approved") return NextResponse.json({ error: "Map not found." }, { status: 404 });
 
   const response = await fetch(map.mapFileUrl, { cache: "no-store" });
   if (!response.ok || !response.body) return NextResponse.json({ error: "Map file is unavailable." }, { status: 404 });

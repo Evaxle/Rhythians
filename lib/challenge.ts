@@ -54,7 +54,7 @@ export async function getChallengeMapsWithCompletions(userId: string) {
 
   const assignmentMap = new Map(assignments.map((assignment) => [assignment.challengeMapId, assignment.level]));
   const maps = await prisma.challengeMap.findMany({
-    where: { id: { in: [...assignmentMap.keys()] }, status: "approved", rating: { not: null } },
+    where: { id: { in: [...assignmentMap.keys()] }, status: "approved", rating: { not: null }, isAutoImported: false },
     orderBy: [{ rating: "asc" }, { createdAt: "asc" }],
     include: { completions: { where: { userId }, select: { passed: true, accuracy: true } } },
   });
@@ -88,7 +88,7 @@ export async function checkAndAwardChallengeLevelMap(userId: string, challengeMa
   if (!level || level < 1 || level > MAX_CHALLENGE_LEVEL) return { status: "not_available" as const };
 
   const map = await prisma.challengeMap.findUnique({ where: { id: challengeMapId } });
-  if (!map || map.status !== "approved" || map.rating == null) return { status: "not_available" as const };
+  if (!map || map.isAutoImported || map.status !== "approved" || map.rating == null) return { status: "not_available" as const };
 
   const currentLevel = await getUserChallengeLevel(userId);
   if (level > currentLevel + 1) return { status: "locked" as const, currentLevel, requiredLevel: currentLevel + 1, level };

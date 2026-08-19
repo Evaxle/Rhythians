@@ -24,7 +24,7 @@ export async function getChallengeLeaderboard(rankIndex: number, limit = 100) {
 }
 
 export async function getApprovedMaps(includeAll: boolean, userId: string | null) {
-  const maps = await prisma.challengeMap.findMany({ where: { status: "approved", rating: { not: null } }, orderBy: [{ rating: "asc" }, { createdAt: "desc" }], include: { submittedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } }, reviewedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } } } });
+  const maps = await prisma.challengeMap.findMany({ where: { status: "approved", isAutoImported: false, rating: { not: null } }, orderBy: [{ rating: "asc" }, { createdAt: "desc" }], include: { submittedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } }, reviewedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } } } });
   const user = userId ? await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } }) : null;
   const rankInfo: RankInfo | null = user ? getRankInfo(user.rhp) : null;
   const visible = includeAll || !rankInfo ? maps : maps.filter((map) => isMapInRankRange(map.rating ?? 0, rankInfo.index));
@@ -34,8 +34,8 @@ export async function getApprovedMaps(includeAll: boolean, userId: string | null
 }
 
 export async function getMapLeaderboard(mapId: string) {
-  const map = await prisma.challengeMap.findUnique({ where: { id: mapId }, select: { id: true, title: true, rating: true, status: true } });
-  if (!map || map.status !== "approved" || map.rating == null) return null;
+  const map = await prisma.challengeMap.findUnique({ where: { id: mapId }, select: { id: true, title: true, rating: true, status: true, isAutoImported: true } });
+  if (!map || map.isAutoImported || map.status !== "approved" || map.rating == null) return null;
   const rankIndex = rankIndexForRating(map.rating);
   const rank = RANKS[rankIndex] ?? RANKS[0];
   const completions = await prisma.challengeMapCompletion.findMany({ where: { challengeMapId: mapId, passed: true }, include: { user: { select: { id: true, username: true, displayName: true, profileHandle: true, avatar: true, rhp: true } } } });

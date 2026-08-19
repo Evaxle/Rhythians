@@ -111,7 +111,7 @@ export async function checkAndAwardChallengeMap(userId: string, challengeMapId: 
   const profile = await prisma.rhythiaProfile.findUnique({ where: { userId } });
   if (!profile) return { status: "no_profile", points: 0 };
   const map = await prisma.challengeMap.findUnique({ where: { id: challengeMapId } });
-  if (!map || map.status !== "approved" || map.rating == null) return { status: "not_available", points: 0 };
+  if (!map || map.isAutoImported || map.status !== "approved" || map.rating == null) return { status: "not_available", points: 0 };
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true, avgMapRating: true } });
   if (!user) return { status: "not_available", points: 0 };
   const rankInfo = getRankInfo(user.rhp);
@@ -163,7 +163,7 @@ export async function checkAndAwardChallengeMap(userId: string, challengeMapId: 
 
 export async function getChallengeMapsForRank(rankIndex: number) {
   const rank = RANKS[rankIndex] ?? RANKS[RANKS.length - 1];
-  return prisma.challengeMap.findMany({ where: { status: "approved", rating: { gte: rank.rangeMin, lte: rank.rangeMax } }, orderBy: [{ rating: "asc" }, { createdAt: "desc" }], include: { submittedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } } } });
+  return prisma.challengeMap.findMany({ where: { status: "approved", isAutoImported: false, rating: { gte: rank.rangeMin, lte: rank.rangeMax } }, orderBy: [{ rating: "asc" }, { createdAt: "desc" }], include: { submittedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } } } });
 }
 
 export async function checkAndAwardAllChallengeMaps(userId: string) {
@@ -172,7 +172,7 @@ export async function checkAndAwardAllChallengeMaps(userId: string) {
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } });
   if (!user) return { checked: 0, awarded: 0, rankIndex: null };
   const rankInfo = getRankInfo(user.rhp);
-  const maps = await prisma.challengeMap.findMany({ where: { status: "approved", rating: { gte: rankInfo.rangeMin, lte: rankInfo.rangeMax } }, orderBy: [{ rating: "asc" }, { createdAt: "asc" }] });
+  const maps = await prisma.challengeMap.findMany({ where: { status: "approved", isAutoImported: false, rating: { gte: rankInfo.rangeMin, lte: rankInfo.rangeMax } }, orderBy: [{ rating: "asc" }, { createdAt: "asc" }] });
   const scores = await fetchAllRhythiaScores(profile.profileId);
   const bestScores = bestScoreByTitle(scores);
   let checked = 0;
