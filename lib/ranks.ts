@@ -91,17 +91,24 @@ export function fairRatingFromStars(stars: number): number {
 const MAP_RHP_FLOOR = 16.5;
 const MAP_RHP_CEILING = 21;
 const MAP_LENGTH_REFERENCE_SECONDS = 180;
+const EXPERT_START_RATING = 3.7;
+const MAX_RATING = 9.99;
 
 export function difficultyFactorForRating(rating: number, rankIndex: number): number {
-  const rank = RANKS[rankIndex] ?? RANKS[RANKS.length - 1];
-  const span = Math.max(0.01, rank.rangeMax - rank.rangeMin);
-  const position = Math.min(1, Math.max(0, (rating - rank.rangeMin) / span));
-  return Math.pow(position, 0.9);
+  const safe = Math.max(0, Math.min(MAX_RATING, rating));
+  if (safe >= EXPERT_START_RATING) {
+    return Math.pow((safe - EXPERT_START_RATING) / (MAX_RATING - EXPERT_START_RATING), 0.2);
+  }
+  return safe / EXPERT_START_RATING;
 }
 
 export function baseRhpForRating(rating: number, rankIndex: number): number {
-  const factor = difficultyFactorForRating(rating, rankIndex);
-  return MAP_RHP_FLOOR + (MAP_RHP_CEILING - MAP_RHP_FLOOR) * factor;
+  const safe = Math.max(0, Math.min(MAX_RATING, rating));
+  if (safe >= EXPERT_START_RATING) {
+    const factor = difficultyFactorForRating(safe, rankIndex);
+    return MAP_RHP_FLOOR + (MAP_RHP_CEILING - MAP_RHP_FLOOR) * factor;
+  }
+  return 10 + 6.5 * (safe / EXPERT_START_RATING);
 }
 
 export function lengthMultiplier(lengthSeconds: number | null | undefined): number {
@@ -137,15 +144,8 @@ export function rhpGainForMap(
   return Math.max(5, Math.round(base * multiplier));
 }
 
-const RHYTHIA_RP_WEIGHT_FLOOR = 0.3;
-
 export function rhpFromRhythiaRp(rp: number): number {
-  if (!Number.isFinite(rp) || rp <= 0) return 0;
-  const steps = Math.floor(rp / 500);
-  let weight = 0.8 - 0.05 * steps;
-  if (weight < 0.4) weight = 0.4 - 0.02 * (steps - 8);
-  weight = Math.max(RHYTHIA_RP_WEIGHT_FLOOR, weight);
-  return Math.round(rp * weight);
+  return 0;
 }
 
 export function rhpLossForMap(rating: number, context: { totalBeaters: number; yourPlace: number }): number {
