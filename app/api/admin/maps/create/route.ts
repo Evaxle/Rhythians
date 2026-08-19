@@ -45,23 +45,19 @@ export async function POST(request: Request) {
 
   try {
     await ensureRhpOverrideColumn();
-    const map = await prisma.challengeMap.create({
-      data: { title, artist, mapperName, mapFileUrl, requestedRating: rating, rating, noteCount, length, submittedById: admin.id, status: "approved", reviewedById: admin.id, reviewedAt: new Date(), isAutoImported: false },
-    });
+    const map = await prisma.challengeMap.create({ data: { title, artist, mapperName, mapFileUrl, requestedRating: rating, rating, noteCount, length, submittedById: admin.id, status: "approved", reviewedById: admin.id, reviewedAt: new Date(), isAutoImported: false } });
     await prisma.$executeRawUnsafe('UPDATE "ChallengeMap" SET "rhpOverride" = $1 WHERE "id" = $2', rhpOverride, map.id);
 
     if (challengeLevel != null) {
       await ensureChallengeLevelTable();
       await prisma.$executeRawUnsafe(
         `INSERT INTO "ChallengeMapLevel" ("id", "challengeMapId", "level", "createdAt", "updatedAt") VALUES ($1, $2, $3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) ON CONFLICT ("challengeMapId") DO UPDATE SET "level" = EXCLUDED."level", "updatedAt" = CURRENT_TIMESTAMP`,
-        randomUUID(),
-        map.id,
-        challengeLevel,
+        randomUUID(), map.id, challengeLevel,
       );
     }
 
     if (category && categoryLevel != null) {
-      await prisma.categoryMap.create({ data: { category, level: categoryLevel, title, artist, mapFileUrl, mapperName, noteCount, length, submittedById: admin.id, status: "approved", reviewedById: admin.id, reviewedAt: new Date() } });
+      await prisma.categoryMap.create({ data: { category: category as "jumps" | "stream" | "tech" | "off_grid", level: categoryLevel, title, artist, mapFileUrl, mapperName, noteCount, length, submittedById: admin.id, status: "approved", reviewedById: admin.id, reviewedAt: new Date() } });
     }
 
     await prisma.moderationAction.create({ data: { actorId: admin.id, action: "admin_map_created", targetType: "challenge_map", targetId: map.id, metadata: { rating, calculatedRhp, rhpOverride, category, categoryLevel, challengeLevel } } });
