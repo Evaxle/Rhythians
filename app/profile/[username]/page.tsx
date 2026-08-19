@@ -48,10 +48,16 @@ export default async function ProfilePage({ params }: Props) {
   if (!user) return <p className="rounded-3xl border border-border bg-surface/95 p-8 text-muted">Profile not found.</p>;
   const isOwnProfile = currentUser?.id === user.id;
   const avatarUrl = getAvatarUrl(user, 256);
-  const [rankResult, categoryResult, challengeResult] = await Promise.allSettled([getUserGlobalRank(user.id), getUserCategoryLevels(user.id), getUserChallengeLevel(user.id)]);
+  const [rankResult, categoryResult, challengeResult, titleResult] = await Promise.allSettled([
+    getUserGlobalRank(user.id),
+    getUserCategoryLevels(user.id),
+    getUserChallengeLevel(user.id),
+    prisma.$queryRawUnsafe<Array<{ title: string; color: string }>>('SELECT "title", "color" FROM "UserProfileTitle" WHERE "userId" = $1 LIMIT 1', user.id),
+  ]);
   const globalRank = rankResult.status === "fulfilled" ? rankResult.value : null;
   const categoryLevels = categoryResult.status === "fulfilled" ? categoryResult.value : [];
   const challengeLevel = challengeResult.status === "fulfilled" ? challengeResult.value : 0;
+  const profileTitle = titleResult.status === "fulfilled" ? titleResult.value[0] ?? null : null;
   let presence: { isOnline: boolean; lastActiveAt: Date | null } | null = null;
   if (user.rhythiaProfile) presence = await getRhythiaStatus(user.rhythiaProfile).catch(() => null);
   let presenceLabel = "Offline";
@@ -71,7 +77,8 @@ export default async function ProfilePage({ params }: Props) {
             {avatarUrl ? <img src={avatarUrl} alt={`${user.username}'s avatar`} className="h-24 w-24 rounded-full border-2 border-accent/30" /> : <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-accent/30 bg-accent/10 text-3xl font-bold text-accent">{user.username.charAt(0).toUpperCase()}</div>}
             <div>
               <p className="text-sm uppercase tracking-[0.3em] text-accent">Profile</p>
-              <h1 className="mt-2 flex items-center gap-3 text-3xl font-semibold text-white">{user.displayName ?? user.username}{user.rhythiaProfile?.flag && <FlagIcon flag={user.rhythiaProfile.flag} country={user.rhythiaProfile.country} size="md" />}{user.rhythiaVerified && <RhythiaVerifiedBadge size="sm" />}{user.rhythiaProfile && presence && <span title={presenceLabel} className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${presence.isOnline ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-300" : "border-red-400/40 bg-red-400/10 text-red-300"}`}><span className={`h-2 w-2 rounded-full ${presence.isOnline ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" : "bg-red-400/70"}`} />{presence.isOnline ? "Online" : "Offline"}</span>}</h1>
+              <h1 className="mt-2 flex flex-wrap items-center gap-3 text-3xl font-semibold text-white">{user.displayName ?? user.username}{user.rhythiaProfile?.flag && <FlagIcon flag={user.rhythiaProfile.flag} country={user.rhythiaProfile.country} size="md" />}{user.rhythiaVerified && <RhythiaVerifiedBadge size="sm" />}{user.rhythiaProfile && presence && <span title={presenceLabel} className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${presence.isOnline ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-300" : "border-red-400/40 bg-red-400/10 text-red-300"}`}><span className={`h-2 w-2 rounded-full ${presence.isOnline ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" : "bg-red-400/70"}`} />{presence.isOnline ? "Online" : "Offline"}</span>}</h1>
+              {profileTitle && <p className="mt-1 text-base font-semibold" style={{ color: profileTitle.color }}>{profileTitle.title}</p>}
               <p className="mt-1 text-sm text-muted">@{user.profileHandle}</p>
               {user.userTags.length > 0 && <div className="mt-4"><UserTags tags={user.userTags} size="md" /></div>}
               {user.bio && <p className="mt-4 text-sm leading-7 text-muted">{user.bio}</p>}
