@@ -25,27 +25,16 @@ export function bestScoreByTitle(scores: RhythiaScoreEntry[]): Map<string, Rhyth
 }
 
 async function fetchAllRhythiaScoresForImport(profileId: number): Promise<RhythiaScoreEntry[]> {
+  const data = await rhythiaRequest<Partial<Record<"lastDay" | "top" | "vrTop" | "vrRecent", RhythiaScoreEntry[]>>>("getUserScores", {
+    id: profileId,
+    limit: 100,
+  });
   const seen = new Map<number, RhythiaScoreEntry>();
-  const buckets = ["lastDay", "top", "vrTop", "vrRecent"] as const;
-  const previous = new Map<string, string>();
-
-  for (let offset = 0; offset <= 5000; offset += 100) {
-    const data = await rhythiaRequest<Partial<Record<(typeof buckets)[number], RhythiaScoreEntry[]>>>("getUserScores", { id: profileId, limit: 100, offset });
-    let found = false;
-    let repeated = true;
-    for (const bucket of buckets) {
-      const entries = data[bucket] ?? [];
-      if (entries.length > 0) found = true;
-      const signature = entries.map((entry) => entry.id).join(",");
-      if (signature !== previous.get(bucket)) repeated = false;
-      previous.set(bucket, signature);
-      for (const entry of entries) {
-        if (typeof entry.id === "number") seen.set(entry.id, entry);
-      }
+  for (const bucket of ["lastDay", "top", "vrTop", "vrRecent"] as const) {
+    for (const entry of data[bucket] ?? []) {
+      if (entry && typeof entry.id === "number") seen.set(entry.id, entry);
     }
-    if (!found || repeated) break;
   }
-
   return [...seen.values()];
 }
 
@@ -220,7 +209,7 @@ export async function checkAndAwardAllChallengeMaps(userId: string) {
     const newAvg = passedCount === 0 ? map.rating : roundRating(((currentUser.avgMapRating ?? map.rating) * passedCount + map.rating) / (passedCount + 1));
     await prisma.$transaction([
       prisma.challengeMapCompletion.upsert({ where: { challengeMapId_userId: { challengeMapId: map.id, userId } }, create: { challengeMapId: map.id, userId, rating: map.rating, accuracy, passed: true, points, scoreId: score.id }, update: { accuracy, passed: true, points, scoreId: score.id } }),
-      prisma.user.update({ where: { id: userId, }, data: { rhp: newRhp, avgMapRating: newAvg } }),
+      prisma.user.update({ where: { id: userId }, data: { rhp: newRhp, avgMapRating: newAvg } }),
       prisma.rhpTransaction.create({ data: { userId, amount: points, reason: "challenge_map", description: `Imported completed ranked map: ${map.title} (${map.rating.toFixed(2)})` } }),
     ]);
     awarded += points;
