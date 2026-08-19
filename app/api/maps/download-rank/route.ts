@@ -6,7 +6,7 @@ import { getApprovedMaps } from "@/lib/maps-legacy";
 import { getRankInfo } from "@/lib/ranks";
 
 const require = createRequire(import.meta.url);
-const archiver = require("archiver") as typeof import("archiver");
+const archiver = require("archiver") as unknown as (format: string, options?: { zlib?: { level: number } }) => any;
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
