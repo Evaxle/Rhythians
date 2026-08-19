@@ -23,21 +23,17 @@ function lengthLabel(length: number | null) {
 }
 
 export function MapDetail({ map, userRank, currentUserId }: Props) {
-  const initialRank = userRank.index;
-  const [selectedRank, setSelectedRank] = useState(initialRank);
+  const [selectedRank, setSelectedRank] = useState(userRank.index);
   const [data, setData] = useState(map);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    setSelectedRank(userRank.index);
-  }, [userRank.index]);
-
-  useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
     setError("");
-    fetch(`/api/maps/${map.mapId}/leaderboard?rank=${selectedRank}`, { signal: controller.signal })
+    const rankQuery = selectedRank < 0 ? "all" : String(selectedRank);
+    fetch(`/api/maps/${map.mapId}/leaderboard?rank=${rankQuery}`, { signal: controller.signal })
       .then(async (response) => {
         const body = await response.json();
         if (!response.ok) throw new Error(body?.error ?? "Unable to load the leaderboard.");
@@ -51,8 +47,8 @@ export function MapDetail({ map, userRank, currentUserId }: Props) {
     return () => controller.abort();
   }, [map.mapId, selectedRank]);
 
-  const selectedRankInfo = RANKS[selectedRank] ?? RANKS[map.rankIndex];
   const length = useMemo(() => lengthLabel(data.length), [data.length]);
+  const baseRhp = Math.max(5, Math.round(data.rating * 10));
 
   return (
     <div className="space-y-8">
@@ -74,7 +70,7 @@ export function MapDetail({ map, userRank, currentUserId }: Props) {
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">Rating</p><p className="mt-1 text-xl font-semibold" style={{ color: data.rankColor }}>{data.rating.toFixed(2)}</p></div>
             <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">Rank range</p><p className="mt-1 text-xl font-semibold text-white">{data.rangeMin.toFixed(2)}–{data.rangeMax.toFixed(2)}</p></div>
-            <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">100% RHP</p><p className="mt-1 text-xl font-semibold text-white">{Math.max(5, Math.round(data.rating * 10))}</p></div>
+            <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">Base RHP</p><p className="mt-1 text-xl font-semibold text-white">{baseRhp}</p></div>
             <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">Length</p><p className="mt-1 text-xl font-semibold text-white">{length ?? "—"}</p></div>
           </div>
 
