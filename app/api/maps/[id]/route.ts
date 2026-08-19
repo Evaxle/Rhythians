@@ -5,6 +5,8 @@ import { prisma } from "@/lib/db";
 import { reviewChallengeMap } from "@/lib/maps";
 import { setMapSubmissionMetadata, getMapSubmissionMetadata, type ChallengePlacement } from "@/lib/map-submission-metadata";
 
+const VALID_CHALLENGE_PLACEMENTS: ChallengePlacement[] = ["main", "jumps", "stream", "tech", "off_grid"];
+
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "You must be signed in." }, { status: 401 });
@@ -23,19 +25,21 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     if (!metadata) return NextResponse.json({ error: "Map submission type is missing." }, { status: 400 });
 
     if (status === "approved" && metadata.submissionType === "challenge") {
-      if (!["main", "jumps", "stream", "tech", "off_grid"].includes(String(placement))) return NextResponse.json({ error: "Choose a valid challenge destination." }, { status: 400 });
-      if (!Number.isInteger(level) || level! < 1 || level! > 20) return NextResponse.json({ error: "Challenge level must be between 1 and 20." }, { status: 400 });
+      if (!placement || !VALID_CHALLENGE_PLACEMENTS.includes(placement)) return NextResponse.json({ error: "Choose a valid challenge destination." }, { status: 400 });
+      if (!Number.isInteger(level) || level === null || level < 1 || level > 20) return NextResponse.json({ error: "Challenge level must be between 1 and 20." }, { status: 400 });
 
+      const challengePlacement = placement;
+      const challengeLevel = level;
       const map = await prisma.challengeMap.findUnique({ where: { id } });
       if (!map) return NextResponse.json({ error: "Map not found." }, { status: 404 });
 
-      if (placement === "main") {
-        await prisma.$executeRawUnsafe('INSERT INTO "ChallengeMapLevel" ("id","challengeMapId","level","createdAt","updatedAt") VALUES ($1,$2,$3,NOW(),NOW()) ON CONFLICT ("challengeMapId") DO UPDATE SET "level"=EXCLUDED."level","updatedAt"=NOW()', crypto.randomUUID(), id, level);
+      if (challengePlacement === "main") {
+        await prisma.$executeRawUnsafe('INSERT INTO "ChallengeMapLevel" ("id","challengeMapId","level","createdAt","updatedAt") VALUES ($1,$2,$3,NOW(),NOW()) ON CONFLICT ("challengeMapId") DO UPDATE SET "level"=EXCLUDED."level","updatedAt"=NOW()', crypto.randomUUID(), id, challengeLevel);
       } else {
         await prisma.categoryMap.create({
           data: {
-            category: placement,
-            level,
+            category: challengePlacement,
+            level: challengeLevel,
             title: map.title,
             artist: map.artist,
             description: map.description,
@@ -55,9 +59,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         });
       }
 
-      await setMapSubmissionMetadata(id, "challenge", placement!, level!);
+      await setMapSubmissionMetadata(id, "challenge", challengePlacement, challengeLevel);
       const updated = await reviewChallengeMap(id, user.id, status, null, note);
-      return NextResponse.json({ map: updated, submissionType: "challenge", challengePlacement: placement, challengeLevel: level });
+      return NextResponse.json({ map: updated, submissionType: "challenge", challengePlacement, challengeLevel });
     }
 
     const updated = await reviewChallengeMap(id, user.id, status, null, note);
