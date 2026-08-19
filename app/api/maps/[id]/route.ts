@@ -26,10 +26,10 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
     if (status === "approved" && metadata.submissionType === "challenge") {
       if (!placement || !VALID_CHALLENGE_PLACEMENTS.includes(placement)) return NextResponse.json({ error: "Choose a valid challenge destination." }, { status: 400 });
-      if (!Number.isInteger(level) || level === null || level < 1 || level > 20) return NextResponse.json({ error: "Challenge level must be between 1 and 20." }, { status: 400 });
+      if (!Number.isInteger(level) || level < 1 || level > 20) return NextResponse.json({ error: "Challenge level must be between 1 and 20." }, { status: 400 });
 
-      const challengePlacement = placement;
-      const challengeLevel = level;
+      const challengePlacement: ChallengePlacement = placement;
+      const challengeLevel: number = level;
       const map = await prisma.challengeMap.findUnique({ where: { id } });
       if (!map) return NextResponse.json({ error: "Map not found." }, { status: 404 });
 
