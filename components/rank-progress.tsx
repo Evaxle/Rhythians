@@ -9,48 +9,23 @@ export function RankProgress({ rhp, globalRank, highestSkillLevel }: { rhp: numb
       <div className="flex items-center justify-between gap-3">
         <RankBadge rank={rank} globalRank={globalRank} size="lg" />
         <div className="flex items-center gap-3 text-right">
-          {highestSkillLevel != null && (
-            <span className="text-sm font-semibold text-accent">Level {highestSkillLevel}</span>
-          )}
+          {highestSkillLevel != null && <span className="text-sm font-semibold text-accent">Challenge Level {highestSkillLevel}</span>}
           <span className="text-lg font-semibold text-white">{rhp.toLocaleString()} RHP</span>
         </div>
       </div>
 
       {rank.isExpert ? (
-        <p className="text-sm leading-6 text-muted">
-          You are in the <span style={{ color: rank.color }} className="font-semibold">Expert</span> rank — the peak of
-          the ladder. Your global position:{" "}
-          <span className="font-semibold text-white">{globalRank != null ? `#${globalRank.toLocaleString()}` : "—"}</span>
-        </p>
+        <p className="text-sm leading-6 text-muted">You are in the <span style={{ color: rank.color }} className="font-semibold">Expert</span> rank — the peak of the ladder. Your global position: <span className="font-semibold text-white">{globalRank != null ? `#${globalRank.toLocaleString()}` : "—"}</span></p>
       ) : (
         <div className="space-y-3">
           <div>
             <div className="flex items-center justify-between text-xs text-muted">
-              <span>
-                Tier {rank.tier} of 5
-                {rank.nextRankStart != null && (
-                  <span className="ml-2 text-muted">
-                    Next tier at {rank.nextTierStart.toLocaleString()} RHP
-                  </span>
-                )}
-              </span>
+              <span>Tier {rank.tier} of 5{rank.nextRankStart != null && <span className="ml-2 text-muted">Next tier at {rank.nextTierStart.toLocaleString()} RHP</span>}</span>
               <span>{Math.round(rank.progressToNextTier * 100)}%</span>
             </div>
-            <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-white/10">
-              <div
-                className="h-full rounded-full transition-all"
-                style={{ width: `${rank.progressToNextTier * 100}%`, backgroundColor: rank.color }}
-              />
-            </div>
+            <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full transition-all" style={{ width: `${rank.progressToNextTier * 100}%`, backgroundColor: rank.color }} /></div>
           </div>
-
-          {rank.nextRankStart != null && (
-            <p className="text-xs text-muted">
-              Next rank at{" "}
-              <span className="font-semibold text-white">{rank.nextRankStart.toLocaleString()} RHP</span>
-              {" "}({rank.nextRankStart - rhp >= 0 ? (rank.nextRankStart - rhp).toLocaleString() : 0} RHP to go)
-            </p>
-          )}
+          {rank.nextRankStart != null && <p className="text-xs text-muted">Next rank at <span className="font-semibold text-white">{rank.nextRankStart.toLocaleString()} RHP</span> ({rank.nextRankStart - rhp >= 0 ? (rank.nextRankStart - rhp).toLocaleString() : 0} RHP to go)</p>}
         </div>
       )}
     </div>
