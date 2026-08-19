@@ -3,6 +3,7 @@ import { Link2, LogIn, Map as MapIcon } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { getApprovedMaps } from "@/lib/maps-legacy";
+import { getMapSubmissionMetadataMap } from "@/lib/map-submission-metadata";
 import { RANKS, RANK_TIERS, TIER_SPAN, getRankInfo } from "@/lib/ranks";
 import { MapsBrowser } from "@/components/maps/maps-browser";
 import { CheckAllRankedMapsButton } from "@/components/maps/check-all-ranked-maps-button";
@@ -20,7 +21,9 @@ export default async function MapsPage() {
   const profile = await prisma.rhythiaProfile.findUnique({ where: { userId: user.id }, select: { id: true } });
   if (!profile) return <div className="mx-auto max-w-2xl space-y-6"><section className="rounded-3xl border border-border bg-surface/95 p-10 text-center shadow-glow"><div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/15 text-accent"><Link2 size={26} /></div><h1 className="mt-5 text-2xl font-semibold text-white">Link your Rhythia account</h1><p className="mx-auto mt-3 max-w-md text-sm leading-6 text-muted">To play ranked maps and earn Rhythian Points you first need to link your Rhythia profile.</p><Link href={`/profile/${user.profileHandle}`} className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white"><Link2 size={16} /> Go to my profile</Link></section></div>;
 
-  const [data, userRow] = await Promise.all([getApprovedMaps(true, user.id), prisma.user.findUnique({ where: { id: user.id }, select: { rhp: true } })]);
+  const [rawData, userRow] = await Promise.all([getApprovedMaps(true, user.id), prisma.user.findUnique({ where: { id: user.id }, select: { rhp: true } })]);
+  const metadata = await getMapSubmissionMetadataMap(rawData.maps.map((map) => map.id));
+  const data = { ...rawData, maps: rawData.maps.filter((map) => metadata.get(map.id)?.submissionType === "ranked") };
   const userRhp = userRow?.rhp ?? 0;
   const rankInfo = data.rankInfo ?? getRankInfo(userRhp);
   const nextLabel = rankInfo.isExpert && rankInfo.tier === RANK_TIERS ? "Max rank" : rankInfo.tier < RANK_TIERS ? rankLabel(rankInfo.name, rankInfo.tier + 1) : rankLabel(RANKS[Math.min(rankInfo.index + 1, RANKS.length - 1)].name, 1);
