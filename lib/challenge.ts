@@ -8,13 +8,30 @@ export function challengeLevelForRating(rating: number): number {
   return Math.min(MAX_CHALLENGE_LEVEL, Math.max(1, Math.ceil(Math.max(0, rating) / 0.5)));
 }
 
+export async function ensureChallengeLevelTable() {
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "ChallengeMapLevel" (
+      "id" TEXT NOT NULL,
+      "challengeMapId" TEXT NOT NULL,
+      "level" INTEGER NOT NULL,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL,
+      CONSTRAINT "ChallengeMapLevel_pkey" PRIMARY KEY ("id")
+    )
+  `);
+  await prisma.$executeRawUnsafe('CREATE UNIQUE INDEX IF NOT EXISTS "ChallengeMapLevel_challengeMapId_key" ON "ChallengeMapLevel"("challengeMapId")');
+  await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "ChallengeMapLevel_level_idx" ON "ChallengeMapLevel"("level")');
+}
+
 async function getAssignedLevels() {
+  await ensureChallengeLevelTable();
   return prisma.$queryRawUnsafe<Array<{ challengeMapId: string; level: number }>>(
     'SELECT "challengeMapId", "level" FROM "ChallengeMapLevel" WHERE "level" BETWEEN 1 AND 20',
   );
 }
 
 export async function getUserChallengeLevel(userId: string): Promise<number> {
+  await ensureChallengeLevelTable();
   const completed = await prisma.$queryRawUnsafe<Array<{ level: number }>>(
     `SELECT DISTINCT l."level"
      FROM "ChallengeMapLevel" l
@@ -62,6 +79,7 @@ export async function checkAndAwardChallengeLevelMap(userId: string, challengeMa
   const profile = await prisma.rhythiaProfile.findUnique({ where: { userId } });
   if (!profile) return { status: "no_profile" as const };
 
+  await ensureChallengeLevelTable();
   const assignment = await prisma.$queryRawUnsafe<Array<{ level: number }>>(
     'SELECT "level" FROM "ChallengeMapLevel" WHERE "challengeMapId" = $1 LIMIT 1',
     challengeMapId,
