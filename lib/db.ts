@@ -5,8 +5,6 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-// Prefer a serverless-safe Supabase pooler URL when supplied. Keep DATABASE_URL
-// as the fallback for local development and direct database tooling.
 const connectionString = normalizeDatabaseUrl(
   process.env.DATABASE_POOLER_URL ?? process.env.DATABASE_URL
 );
@@ -17,8 +15,6 @@ if (!connectionString) {
   );
 }
 
-// Warn loudly if the placeholder localhost URL is being used at runtime — it can never
-// connect from Vercel (or anywhere outside the machine that runs Postgres).
 if (connectionString.includes("localhost") || connectionString.includes("127.0.0.1")) {
   console.warn(
     "⚠️ DATABASE_URL points to a localhost/placeholder database. This will NOT work in production. Set the real Supabase connection string in Vercel."
@@ -28,11 +24,9 @@ if (connectionString.includes("localhost") || connectionString.includes("127.0.0
 const adapter = new PrismaPg({
   connectionString,
   ssl: { rejectUnauthorized: false },
-  // Vercel creates many short-lived serverless instances. Keep one database
-  // connection per warm instance so Supabase's pooler is not exhausted.
   max: 1,
   idleTimeoutMillis: 10_000,
-  connectionTimeoutMillis: 10_000,
+  connectionTimeoutMillis: 15_000,
 });
 
 export const prisma =
@@ -41,16 +35,8 @@ export const prisma =
     adapter,
   });
 
-// Reuse one client per warm Vercel instance. Creating a new pg connection pool
-// for every request quickly exhausts Supabase connections in serverless runs.
 globalForPrisma.prisma = prisma;
 
-/**
- * Vercel environment variables are sometimes pasted with an unescaped `@`
- * in the database password. That makes the connection string invalid because
- * `@` separates credentials from the host. Encode the user-info portion while
- * preserving an already valid URL and its query parameters.
- */
 function normalizeDatabaseUrl(value: string | undefined): string | undefined {
   if (!value) return value;
 
@@ -66,13 +52,15 @@ function normalizeDatabaseUrl(value: string | undefined): string | undefined {
 
   try {
     if (!hasMultipleAtSigns) {
-      new URL(raw);
+      const url = new URL(raw);
+      if (url.hostname.endsWith(".pooler.supabase.com") && url.port === "5432") {
+        url.port = "6543";
+        if (!url.searchParams.has("pgbouncer")) url.searchParams.set("pgbouncer", "true");
+        return url.toString();
+      }
       return raw;
     }
-  } catch {
-    // Repair credentials below. PostgreSQL passwords commonly contain @, ?, #,
-    // or /, all of which must be percent-encoded inside a URL.
-  }
+  } catch {}
 
   const lastAt = raw.lastIndexOf("@");
   const credentials = raw.slice(authorityStart, lastAt);
@@ -87,13 +75,23 @@ function normalizeDatabaseUrl(value: string | undefined): string | undefined {
   const password = decodeUrlPart(credentials.slice(separator + 1));
   const hostAndSuffix = raw.slice(lastAt + 1);
   const suffixIndex = hostAndSuffix.search(/[/?#]/);
-  const host = suffixIndex === -1 ? hostAndSuffix : hostAndSuffix.slice(0, suffixIndex);
-  const suffix = suffixIndex === -1 ? "" : hostAndSuffix.slice(suffixIndex);
+  let host = suffixIndex === -1 ? hostAndSuffix : hostAndSuffix.slice(0, suffixIndex);
+  let suffix = suffixIndex === -1 ? "" : hostAndSuffix.slice(suffixIndex);
+
+  try {
+    const hostUrl = new URL(`postgresql://${host}${suffix}`);
+    if (hostUrl.hostname.endsWith(".pooler.supabase.com") && hostUrl.port === "5432") {
+      hostUrl.port = "6543";
+      if (!hostUrl.searchParams.has("pgbouncer")) hostUrl.searchParams.set("pgbouncer", "true");
+      host = hostUrl.host;
+      suffix = hostUrl.search;
+    }
+  } catch {}
+
   const repaired = `${raw.slice(0, authorityStart)}${encodeURIComponent(username)}:${encodeURIComponent(password)}@${host}${suffix}`;
 
   try {
     new URL(repaired);
-    console.warn("DATABASE_URL contained unescaped credentials; repaired its user-info encoding.");
     return repaired;
   } catch {
     console.error("DATABASE_URL is invalid. Set it to a complete postgresql:// connection string in Vercel.");
