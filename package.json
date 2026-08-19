@@ -1,6 +1,6 @@
 {
   "name": "rhythians",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -43,7 +43,7 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-markdown": "8.0.7",
-    "remark-gfm": "4.0.1",
+    "remark-gfm": "4.1.0",
     "zod": "3.23.8"
   },
   "devDependencies": {
