@@ -1,16 +1,16 @@
 import { prisma } from "@/lib/db";
+import { ensureChallengeLevelTable } from "@/lib/challenge";
 import { ChallengeMapLevelManager } from "@/components/admin/challenge-map-level-manager";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminChallengePage() {
+  await ensureChallengeLevelTable();
   const maps = await prisma.challengeMap.findMany({
     orderBy: [{ status: "asc" }, { createdAt: "desc" }],
     select: { id: true, title: true, artist: true, mapFileUrl: true, rating: true, status: true },
   });
-  const assignments = maps.length === 0 ? [] : await prisma.$queryRawUnsafe<Array<{ challengeMapId: string; level: number }>>(
-    'SELECT "challengeMapId", "level" FROM "ChallengeMapLevel"',
-  );
+  const assignments = await prisma.$queryRawUnsafe<Array<{ challengeMapId: string; level: number }>>('SELECT "challengeMapId", "level" FROM "ChallengeMapLevel"');
   const levels = new Map(assignments.map((assignment) => [assignment.challengeMapId, assignment.level]));
 
   return (
