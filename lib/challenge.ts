@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { fetchRhythiaScores, findScoreForMap } from "@/lib/daily";
-import { accuracyFromMisses, getRankInfo, rhpGainForMap, isMapInRankRange, roundRating } from "@/lib/ranks";
+import { accuracyFromMisses } from "@/lib/ranks";
 
 export const MAX_CHALLENGE_LEVEL = 20;
 
@@ -49,7 +49,7 @@ export async function checkAndAwardChallengeLevelMap(userId: string, challengeMa
   const level = assignment[0]?.level;
   if (!level || level < 1 || level > MAX_CHALLENGE_LEVEL) return { status: "not_available" as const };
   const map = await prisma.challengeMap.findUnique({ where: { id: challengeMapId } });
-  if (!map || map.isAutoImported || map.status !== "approved" || map.rating == null) return { status: "not_available" as const };
+  if (!map || map.isAutoImported || map.status !== "approved") return { status: "not_available" as const };
   const currentLevel = await getUserChallengeLevel(userId);
   if (level > currentLevel + 1) return { status: "locked" as const, currentLevel, requiredLevel: currentLevel + 1, level };
   const existing = await prisma.challengeMapCompletion.findUnique({ where: { challengeMapId_userId: { challengeMapId, userId } } });
@@ -59,19 +59,13 @@ export async function checkAndAwardChallengeLevelMap(userId: string, challengeMa
   const hit = findScoreForMap(scores.recent, map.title) ?? findScoreForMap(scores.top, map.title);
   if (!hit) return { status: "not_beat" as const, level };
   const accuracy = hit.accuracy ?? accuracyFromMisses(hit.beatmapNotes, hit.misses);
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true, avgMapRating: true } });
-  if (!user) return { status: "not_available" as const };
-  const rankInfo = getRankInfo(user.rhp);
-  const earnsRhp = isMapInRankRange(map.rating, rankInfo.index);
-  const points = earnsRhp ? rhpGainForMap(map.rating, accuracy, hit.speed, rankInfo.index, map.length) : 0;
-  const passedCount = await prisma.challengeMapCompletion.count({ where: { userId, passed: true } });
-  const newAvg = passedCount === 0 ? roundRating(map.rating) : roundRating(((user.avgMapRating ?? map.rating) * passedCount + map.rating) / (passedCount + 1));
-  await prisma.$transaction([
-    prisma.challengeMapCompletion.upsert({ where: { challengeMapId_userId: { challengeMapId, userId } }, create: { challengeMapId, userId, rating: map.rating, accuracy, passed: true, points, scoreId: hit.id }, update: { accuracy, passed: true, points, scoreId: hit.id } }),
-    ...(earnsRhp && points > 0 ? [prisma.user.update({ where: { id: userId }, data: { rhp: user.rhp + points, avgMapRating: newAvg } }), prisma.rhpTransaction.create({ data: { userId, amount: points, reason: "challenge_map", description: `Completed ranked map: ${map.title} (${map.rating.toFixed(2)})` } }), prisma.notification.create({ data: { userId, type: "rhp_earned", title: "Challenge map completed", message: `You earned ${points} RHP for beating ${map.title} (${map.rating.toFixed(2)} rating).`, url: "/categories?tab=challenge" } })] : []),
-  ]);
+  await prisma.challengeMapCompletion.upsert({
+    where: { challengeMapId_userId: { challengeMapId, userId } },
+    create: { challengeMapId, userId, rating: map.rating ?? 0, accuracy, passed: true, points: 0, scoreId: hit.id },
+    update: { accuracy, passed: true, points: 0, scoreId: hit.id },
+  });
   const newLevel = await getUserChallengeLevel(userId);
-  return { status: level === currentLevel + 1 && newLevel > currentLevel ? "level_up" as const : "passed" as const, level: newLevel, mapLevel: level, points, earnsRhp };
+  return { status: level === currentLevel + 1 && newLevel > currentLevel ? "level_up" as const : "passed" as const, level: newLevel, mapLevel: level, points: 0, earnsRhp: false };
 }
 
 export type ChallengeLeaderboardRow = { position: number; userId: string; username: string; displayName: string | null; profileHandle: string; level: number; completions: number };
