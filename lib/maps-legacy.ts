@@ -90,7 +90,7 @@ export async function getChallengeLeaderboard(rankIndex: number, limit = 100) {
 export async function getApprovedMaps(includeAll: boolean, userId: string | null) {
   await restoreAutoImportedMaps();
   const maps = await prisma.challengeMap.findMany({ where: { status: "approved", rating: { not: null } }, orderBy: [{ rating: "asc" }, { createdAt: "desc" }], include: { submittedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } }, reviewedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } } } });
-  const user = userId ? await prisma.user.findUnique({ where: { id: userId }, select: { id: true, rhp: true } }) : null;
+  const user = userId ? await prisma.user.findUnique({ where: { id: userId, }, select: { id: true, rhp: true } }) : null;
   const rankInfo: RankInfo | null = user ? getRankInfo(user.rhp) : null;
   const visible = includeAll || !rankInfo ? maps : maps.filter((map) => isMapInRankRange(map.rating ?? 0, rankInfo.index));
   const realMapIds = visible.filter((map) => !map.isAutoImported).map((map) => map.id);
@@ -100,8 +100,11 @@ export async function getApprovedMaps(includeAll: boolean, userId: string | null
   let scoredTitles = new Set<string>();
   if (user?.id) {
     try {
-      const scores = await fetchAllRhythiaScores((await prisma.rhythiaProfile.findUnique({ where: { userId: user.id }, select: { profileId: true } }))?.profileId ?? 0);
-      scoredTitles = new Set(scores.map((score) => normalizeTitle(score.beatmapTitle)).filter(Boolean));
+      const profile = await prisma.rhythiaProfile.findUnique({ where: { userId: user.id }, select: { profileId: true } });
+      if (profile) {
+        const scores = await fetchAllRhythiaScores(profile.profileId);
+        scoredTitles = new Set(scores.filter((score) => score.passed).map((score) => normalizeTitle(score.beatmapTitle)).filter(Boolean));
+      }
     } catch {
       scoredTitles = new Set<string>();
     }
@@ -129,6 +132,7 @@ export async function getApprovedMaps(includeAll: boolean, userId: string | null
         reviewedBy: map.reviewedBy,
         completion: stateMap.get(map.id) ?? null,
         hasScore: scoredTitles.has(normalizeTitle(map.title)),
+        isAutoImported: map.isAutoImported,
       };
     }),
   };
