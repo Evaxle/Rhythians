@@ -1,4 +1,8 @@
-const RHYTHIA_API = "https://production.rhythia.com/api";
+const RHYTHIA_API_URLS = [
+  process.env.RHYTHIA_API_URL,
+  "https://production.rhythia.com/api",
+  "https://www.rhythia.com/api",
+].filter((url): url is string => Boolean(url));
 
 export type RhythiaScore = {
   id: number;
@@ -42,17 +46,46 @@ function titleFor(rhythmPoints: number | null, globalRank: number | null) {
   return "Novice";
 }
 
+async function requestFromApi<T>(baseUrl: string, path: string, body: object): Promise<T> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+  try {
+    const response = await fetch(`${baseUrl.replace(/\/$/, "")}/${path}`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        accept: "application/json",
+        "user-agent": "Rhythians/1.0",
+      },
+      body: JSON.stringify({ session: "", ...body }),
+      cache: "no-store",
+      signal: controller.signal,
+    });
+    if (!response.ok) throw new Error(`Rhythia API returned ${response.status}.`);
+    const data = await response.json();
+    if (data.error) throw new Error(data.error);
+    return data;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 export async function rhythiaRequest<T>(path: string, body: object): Promise<T> {
-  const response = await fetch(`${RHYTHIA_API}/${path}`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ session: "", ...body }),
-    cache: "no-store",
-  });
-  if (!response.ok) throw new Error("Rhythia could not be reached.");
-  const data = await response.json();
-  if (data.error) throw new Error(data.error);
-  return data;
+  let lastError: unknown = null;
+
+  for (const baseUrl of RHYTHIA_API_URLS) {
+    try {
+      return await requestFromApi<T>(baseUrl, path, body);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  if (lastError instanceof Error && lastError.name === "AbortError") {
+    throw new Error("Rhythia took too long to respond.");
+  }
+
+  throw new Error("Rhythia could not be reached.");
 }
 
 function normalizeName(name: string | null | undefined) {
