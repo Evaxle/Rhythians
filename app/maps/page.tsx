@@ -61,7 +61,7 @@ export default async function MapsPage() {
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-8">
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
         <div className="min-w-0 space-y-8">
           <section className="space-y-3">
             <p className="flex items-center gap-2 text-sm uppercase tracking-[0.24em] text-accent"><MapIcon size={16} /> Ranked maps</p>
@@ -125,7 +125,7 @@ export default async function MapsPage() {
           )}
         </div>
 
-        <aside className="lg:sticky lg:top-6 lg:self-start">
+        <aside>
           <section className="rounded-3xl border border-border bg-surface/95 p-5 shadow-glow">
             <div className="mb-4">
               <p className="text-xs uppercase tracking-[0.2em] text-accent">Rank ladder</p>
