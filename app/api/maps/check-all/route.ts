@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { checkAllRankedMaps } from "@/lib/ranked-map-check";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const maxDuration = 60;
+
 export async function POST() {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "You must be signed in." }, { status: 401 });
