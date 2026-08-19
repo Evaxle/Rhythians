@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/db";
 import { fetchAllRhythiaScores, fetchRhythiaScores, findScoreForMap, type RhythiaScoreEntry } from "@/lib/daily";
-import { fetchRhythiaProfile } from "@/lib/rhythia";
 import { RANKS, getRankInfo, isMapInRankRange, roundRating, rhpGainForMap, rhpLossForMap, accuracyFromMisses, type RankInfo } from "@/lib/ranks";
 
 function normalizeTitle(value: string | null | undefined): string {
@@ -202,5 +201,4 @@ export async function checkAndAwardAllChallengeMaps(userId: string) {
   return { checked, awarded, rankIndex: rankInfo.index };
 }
 
-export { bestScoreByTitle, normalizeTitle } from "@/lib/maps-legacy";
 export { getApprovedMaps, getChallengeLeaderboard, getMapLeaderboard, getUserGlobalRank, resetUserRankedStatus } from "@/lib/maps-legacy";
