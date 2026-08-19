@@ -1,4 +1,4 @@
-import { PassThrough } from "node:stream";
+import { PassThrough, Readable } from "node:stream";
 import archiver from "archiver";
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
@@ -22,7 +22,7 @@ function extensionFromUrl(url: string) {
   }
 }
 
-export async function GET(request: Request) {
+export async function GET() {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "You must be signed in." }, { status: 401 });
 
@@ -58,7 +58,7 @@ export async function GET(request: Request) {
   if (failures.length > 0) archive.append(`${failures.join("\n")}\n`, { name: "download-errors.txt" });
   await archive.finalize();
 
-  return new NextResponse(pass as unknown as BodyInit, {
+  return new NextResponse(Readable.toWeb(pass) as ReadableStream, {
     headers: {
       "Content-Type": "application/zip",
       "Content-Disposition": `attachment; filename="${safeName(rankInfo.isExpert ? "Expert" : `${rankInfo.name} ${rankInfo.tier}`)}-maps.zip"`,
