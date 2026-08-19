@@ -24,7 +24,7 @@ export async function getChallengeLeaderboard(rankIndex: number, limit = 100) {
 }
 
 export async function getApprovedMaps(includeAll: boolean, userId: string | null) {
-  const maps = await prisma.challengeMap.findMany({ where: { status: "approved", isAutoImported: false, rating: { not: null } }, orderBy: [{ rating: "asc" }, { createdAt: "desc" }], include: { submittedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } }, reviewedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } } } });
+  const maps = await prisma.challengeMap.findMany({ where: { status: "approved", rating: { not: null } }, orderBy: [{ rating: "asc" }, { createdAt: "desc" }], include: { submittedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } }, reviewedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } } } });
   const user = userId ? await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } }) : null;
   const rankInfo: RankInfo | null = user ? getRankInfo(user.rhp) : null;
   const visible = includeAll || !rankInfo ? maps : maps.filter((map) => isMapInRankRange(map.rating ?? 0, rankInfo.index));
