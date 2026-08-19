@@ -1,9 +1,11 @@
 "use client";
 
 import { RefreshCw } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export function CheckAllRankedMapsButton() {
+  const router = useRouter();
   const [checking, setChecking] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -15,6 +17,7 @@ export function CheckAllRankedMapsButton() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Unable to check your scores.");
       setMessage(`Checked ${data.checked} maps${data.foundScores ? ` · ${data.foundScores} with scores` : ""}${data.newlyCompleted ? ` · ${data.newlyCompleted} awarded` : ""}.`);
+      router.refresh();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Unable to check your scores.");
     } finally {
