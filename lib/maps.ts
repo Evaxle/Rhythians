@@ -254,10 +254,10 @@ export async function getChallengeMapsForRank(rankIndex: number) {
 
 export async function checkAndAwardAllChallengeMaps(userId: string) {
   const profile = await prisma.rhythiaProfile.findUnique({ where: { userId } });
-  if (!profile) return { checked: 0, awarded: 0 };
+  if (!profile) return { checked: 0, awarded: 0, rankIndex: null };
 
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true, scoreImportDone: true } });
-  if (!user) return { checked: 0, awarded: 0 };
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } });
+  if (!user) return { checked: 0, awarded: 0, rankIndex: null };
 
   const rankInfo = getRankInfo(user.rhp);
   const maps = await prisma.challengeMap.findMany({
@@ -283,13 +283,10 @@ export async function checkAndAwardAllChallengeMaps(userId: string) {
     const score = bestScores.get(normalizeTitle(map.title));
     if (!score) continue;
 
+    const accuracy = score.accuracy ?? accuracyFromMisses(score.beatmapNotes, score.misses);
+    const points = rhpGainForMap(map.rating, accuracy, score.speed, rankInfo.index, map.length);
     const currentUser = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true, avgMapRating: true } });
     if (!currentUser) continue;
-    const currentRank = getRankInfo(currentUser.rhp);
-    if (!isMapInRankRange(map.rating, currentRank.index)) continue;
-
-    const accuracy = score.accuracy ?? accuracyFromMisses(score.beatmapNotes, score.misses);
-    const points = rhpGainForMap(map.rating, accuracy, score.speed, currentRank.index, map.length);
     const newRhp = currentUser.rhp + points;
     const passedCount = await prisma.challengeMapCompletion.count({ where: { userId, passed: true } });
     const newAvg = passedCount === 0
@@ -316,5 +313,5 @@ export async function checkAndAwardAllChallengeMaps(userId: string) {
   }
 
   await prisma.user.update({ where: { id: userId }, data: { scoreImportDone: true } });
-  return { checked, awarded };
+  return { checked, awarded, rankIndex: rankInfo.index };
 }
