@@ -14,29 +14,29 @@ export async function SiteHeader() {
 
   return (
     <header className="border-b border-border bg-surface/80 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:gap-6 sm:px-6 sm:py-4 lg:px-8">
-        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+      <div className="mx-auto flex max-w-[1600px] items-center gap-2 px-3 py-3 sm:gap-4 sm:px-5 sm:py-4 lg:px-6 2xl:gap-5 2xl:px-8">
+        <div className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3">
           <Link href="/" className="flex shrink-0 items-center gap-2 whitespace-nowrap text-base font-semibold text-white sm:gap-3 sm:text-lg">
-            <img src="/favicon.ico" alt="Rhythians" className="h-11 w-11 shrink-0 rounded-2xl" />
+            <img src="/favicon.ico" alt="Rhythians" className="h-10 w-10 shrink-0 rounded-2xl sm:h-11 sm:w-11" />
             <span>Rhythians<span className="hidden sm:inline"> Beta</span></span>
           </Link>
-          <span className="hidden whitespace-nowrap rounded-full border border-border bg-white/5 px-2.5 py-1 text-[10px] font-semibold tracking-wide text-muted md:inline">v{version}</span>
+          <span className="hidden whitespace-nowrap rounded-full border border-border bg-white/5 px-2 py-1 text-[10px] font-semibold tracking-wide text-muted xl:inline">v{version}</span>
         </div>
-        <nav className="hidden min-w-0 flex-1 items-center justify-center gap-3 2xl:flex">
-          <Link href="/" className="whitespace-nowrap text-sm text-muted transition hover:text-white">Home</Link>
-          <Link href="/daily" className="whitespace-nowrap text-sm text-muted transition hover:text-white">Daily</Link>
-          <Link href="/maps" className="whitespace-nowrap text-sm text-muted transition hover:text-white">Maps</Link>
-          <Link href="/categories?tab=challenge" className="whitespace-nowrap text-sm text-muted transition hover:text-white">Challenge</Link>
-          <Link href="/leaderboards" className="whitespace-nowrap text-sm text-muted transition hover:text-white">Leaderboards</Link>
-          <Link href="/wiki" className="whitespace-nowrap text-sm text-muted transition hover:text-white">Wiki</Link>
-          <Link href="/clips" className="whitespace-nowrap text-sm text-muted transition hover:text-white">Clips</Link>
-          <Link href="/rules" className="whitespace-nowrap text-sm text-muted transition hover:text-white">Rules</Link>
-          <Link href="/community" className="whitespace-nowrap text-sm text-muted transition hover:text-white">Community</Link>
-          {user && <Link href="/messages" className="whitespace-nowrap text-sm text-muted transition hover:text-white">Messages</Link>}
-          {hasApprovalAccess && <Link href="/approval" className="whitespace-nowrap text-sm text-accent transition hover:text-white">Review</Link>}
-          {isAdmin && <Link href="/admin" className="whitespace-nowrap text-sm font-semibold text-accent transition hover:text-white">Admin</Link>}
+        <nav className="hidden min-w-0 flex-1 items-center justify-center gap-2 2xl:flex">
+          <Link href="/" className="whitespace-nowrap text-xs text-muted transition hover:text-white">Home</Link>
+          <Link href="/daily" className="whitespace-nowrap text-xs text-muted transition hover:text-white">Daily</Link>
+          <Link href="/maps" className="whitespace-nowrap text-xs text-muted transition hover:text-white">Maps</Link>
+          <Link href="/categories?tab=challenge" className="whitespace-nowrap text-xs text-muted transition hover:text-white">Challenge</Link>
+          <Link href="/leaderboards" className="whitespace-nowrap text-xs text-muted transition hover:text-white">Leaderboards</Link>
+          <Link href="/wiki" className="whitespace-nowrap text-xs text-muted transition hover:text-white">Wiki</Link>
+          <Link href="/clips" className="whitespace-nowrap text-xs text-muted transition hover:text-white">Clips</Link>
+          <Link href="/rules" className="whitespace-nowrap text-xs text-muted transition hover:text-white">Rules</Link>
+          <Link href="/community" className="whitespace-nowrap text-xs text-muted transition hover:text-white">Community</Link>
+          {user && <Link href="/messages" className="whitespace-nowrap text-xs text-muted transition hover:text-white">Messages</Link>}
+          {hasApprovalAccess && <Link href="/approval" className="whitespace-nowrap text-xs text-accent transition hover:text-white">Review</Link>}
+          {isAdmin && <Link href="/admin" className="whitespace-nowrap text-xs font-semibold text-accent transition hover:text-white">Admin</Link>}
         </nav>
-        <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
+        <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-2.5">
           <details className="relative 2xl:hidden">
             <summary className="flex h-10 cursor-pointer list-none items-center justify-center rounded-full border border-border bg-white/5 px-3 text-sm text-muted transition hover:border-accent/40 hover:text-white [&::-webkit-details-marker]:hidden" aria-label="Open navigation menu">
               <Menu size={18} />
