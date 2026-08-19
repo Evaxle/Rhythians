@@ -10,11 +10,11 @@ export function challengeLevelForRating(rating: number): number {
 
 export async function getUserChallengeLevel(userId: string): Promise<number> {
   const completions = await prisma.challengeMapCompletion.findMany({
-    where: { userId, passed: true },
+    where: { userId, passed: true, challengeMap: { rating: { not: null } } },
     select: { challengeMap: { select: { rating: true } } },
   });
   const completedLevels = new Set(
-    completions.map((completion) => challengeLevelForRating(completion.challengeMap.rating))
+    completions.map((completion) => challengeLevelForRating(completion.challengeMap.rating!))
   );
   let level = 0;
   for (let next = 1; next <= MAX_CHALLENGE_LEVEL; next += 1) {
