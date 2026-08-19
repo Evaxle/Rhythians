@@ -1,5 +1,5 @@
 import { CATEGORIES, CATEGORY_LABELS, MAX_CATEGORY_LEVEL } from "@/lib/category-constants";
-import { MAX_CHALLENGE_LEVEL, challengeLevelForRating } from "@/lib/challenge";
+import { MAX_CHALLENGE_LEVEL } from "@/lib/challenge";
 
 const CATEGORY_DESCRIPTIONS = {
   jumps: "Maps focused on jump patterns, spacing, aim transitions, and the ability to move cleanly between demanding note positions.",
@@ -9,6 +9,12 @@ const CATEGORY_DESCRIPTIONS = {
 } as const;
 
 const CHALLENGE_LEVELS = Array.from({ length: MAX_CHALLENGE_LEVEL }, (_, index) => index + 1);
+
+function levelRatingRange(level: number): string {
+  const min = (level - 1) * 0.5;
+  const max = level * 0.5;
+  return level === MAX_CHALLENGE_LEVEL ? `${min.toFixed(2)}+` : `${min.toFixed(2)} – ${max.toFixed(2)}`;
+}
 
 export default function AboutChallengePage() {
   return (
@@ -54,17 +60,14 @@ export default function AboutChallengePage() {
           {CHALLENGE_LEVELS.map((level) => (
             <div key={level} className="rounded-2xl border border-border bg-background/70 p-4">
               <p className="text-sm font-semibold text-white">Level {level}</p>
-              <p className="mt-2 text-xs leading-5 text-muted">
-                Maps around {((level - 1) * 0.5 + 0.01).toFixed(2)}+ rating difficulty. Level assignment is curated for the Challenge ladder.
-              </p>
+              <p className="mt-2 text-xs leading-5 text-muted">Rating band reference: {levelRatingRange(level)}</p>
             </div>
           ))}
         </div>
         <p className="mt-5 text-sm leading-7 text-muted">
-          The level assignment is not simply a replacement for a star rating. It is a progression system:
-          beating the next Challenge level advances you, while beating a higher level before it is unlocked
-          does not let you skip the progression. This keeps the Challenge ladder focused on demonstrating
-          skill step by step.
+          The rating bands provide a difficulty reference for assigning Challenge levels, but the level itself
+          is the progression gate. Beating the next Challenge level advances you, while a higher level cannot
+          be used to skip the progression. This keeps the ladder focused on demonstrating skill step by step.
         </p>
       </section>
 
