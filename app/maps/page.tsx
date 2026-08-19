@@ -57,7 +57,7 @@ export default async function MapsPage() {
   const progressValue = rankInfo.isExpert && rankInfo.tier === RANK_TIERS ? 1 : rankInfo.progressToNextTier;
   const progressPercent = Math.round(progressValue * 100);
   const remainingRhp = rankInfo.isExpert && rankInfo.tier === RANK_TIERS ? 0 : Math.max(0, rankInfo.nextTierStart - Math.max(0, Math.floor(userRhp)));
-  const ladder = RANKS.flatMap((rank) => Array.from({ length: rankInfo.isExpert && rank.name === "Expert" ? RANK_TIERS : RANK_TIERS }, (_, tierIndex) => ({ rank, tier: tierIndex + 1, minRhp: rank.minRhp + tierIndex * TIER_SPAN }))).reverse();
+  const ladder = RANKS.flatMap((rank) => Array.from({ length: RANK_TIERS }, (_, tierIndex) => ({ rank, tier: tierIndex + 1, minRhp: rank.minRhp + tierIndex * TIER_SPAN }))).reverse();
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-8">
@@ -131,7 +131,7 @@ export default async function MapsPage() {
               <p className="text-xs uppercase tracking-[0.2em] text-accent">Rank ladder</p>
               <h2 className="mt-1 text-lg font-semibold text-white">All ranks and tiers</h2>
             </div>
-            <div className="max-h-[calc(100vh-120px)] space-y-2 overflow-y-auto pr-1">
+            <div className="space-y-2 pr-1">
               {ladder.map(({ rank, tier, minRhp }) => {
                 const active = rank.index === rankInfo.index && tier === rankInfo.tier;
                 return (
