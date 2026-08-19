@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { RANKS, getRankInfo, isMapInRankRange, type RankInfo } from "@/lib/ranks";
+import { RANKS, getRankInfo, isMapInRankRange, rankIndexForRating, type RankInfo } from "@/lib/ranks";
 
 export async function getUserGlobalRank(userId: string): Promise<number | null> {
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } });
@@ -36,17 +36,15 @@ export async function getApprovedMaps(includeAll: boolean, userId: string | null
 export async function getMapLeaderboard(mapId: string) {
   const map = await prisma.challengeMap.findUnique({ where: { id: mapId }, select: { id: true, title: true, rating: true, status: true } });
   if (!map || map.status !== "approved" || map.rating == null) return null;
-  const rankInfo = getRankInfo((await prisma.user.findFirst({ where: { rhp: { gte: 0 } }, select: { rhp: true }, orderBy: { rhp: "asc" } }))?.rhp ?? 0);
-  const rankIndex = RANKS.findIndex((rank) => rank.name === rankInfo.name && rank.tier === rankInfo.tier);
+  const rankIndex = rankIndexForRating(map.rating);
+  const rank = RANKS[rankIndex] ?? RANKS[0];
   const completions = await prisma.challengeMapCompletion.findMany({ where: { challengeMapId: mapId, passed: true }, include: { user: { select: { id: true, username: true, displayName: true, profileHandle: true, avatar: true, rhp: true } } } });
   const rows = completions
-    .filter((entry) => isMapInRankRange(map.rating, getRankInfo(entry.user.rhp).index))
+    .filter((entry) => getRankInfo(entry.user.rhp).index === rankIndex)
     .sort((a, b) => (b.accuracy ?? -1) - (a.accuracy ?? -1) || b.points - a.points)
+    .slice(0, 100)
     .map((entry, index) => ({ position: index + 1, userId: entry.user.id, username: entry.user.username, displayName: entry.user.displayName, profileHandle: entry.user.profileHandle, avatar: entry.user.avatar, accuracy: entry.accuracy, points: entry.points, rankInfo: getRankInfo(entry.user.rhp) }));
-  const targetRank = rows.length ? getRankInfo((await prisma.user.findUnique({ where: { id: rows[0].userId }, select: { rhp: true } }))?.rhp ?? 0) : rankInfo;
-  const targetIndex = rows.length ? targetRank.index : rankIndex;
-  const target = RANKS[targetIndex] ?? RANKS[0];
-  return { mapId: map.id, title: map.title, rating: map.rating, rankIndex: targetIndex, rankName: target.isExpert ? "Expert" : `${target.name} ${target.tier}`, rankColor: target.color, rangeMin: target.rangeMin, rangeMax: target.rangeMax, rows };
+  return { mapId: map.id, title: map.title, rating: map.rating, rankIndex, rankName: rank.name === "Expert" ? "Expert" : rank.name, rankColor: rank.color, rangeMin: rank.rangeMin, rangeMax: rank.rangeMax, rows };
 }
 
 export async function resetUserRankedStatus(userId: string) {
