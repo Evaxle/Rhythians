@@ -1,7 +1,6 @@
 const RHYTHIA_API_URLS = [
   process.env.RHYTHIA_API_URL,
   "https://production.rhythia.com/api",
-  "https://www.rhythia.com/api",
 ].filter((url): url is string => Boolean(url));
 
 export type RhythiaScore = {
@@ -54,45 +53,64 @@ function buildUrl(baseUrl: string, path: string, body: Record<string, unknown>) 
   return url;
 }
 
-async function readApiResponse<T>(response: Response): Promise<T> {
+async function readApiResponse<T>(response: Response, endpoint: string): Promise<T> {
   const text = await response.text();
-  if (!response.ok) throw new Error(`Rhythia API returned ${response.status}.`);
+  const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
+
+  if (!response.ok) {
+    const detail = text.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 180);
+    throw new Error(`Rhythia API returned ${response.status}${detail ? `: ${detail}` : ""}.`);
+  }
+
+  if (!contentType.includes("json")) {
+    if (/^\s*<!doctype html/i.test(text) || /<html[\s>]/i.test(text)) {
+      throw new Error(`Rhythia API endpoint ${endpoint} returned an HTML page instead of JSON.`);
+    }
+    throw new Error(`Rhythia API endpoint ${endpoint} returned a non-JSON response.`);
+  }
+
   try {
-    const data = JSON.parse(text) as T & { error?: string };
+    const data = JSON.parse(text) as T & { error?: string; message?: string };
     if (data.error) throw new Error(data.error);
+    if (data.message && !Object.keys(data as object).some((key) => key !== "message")) throw new Error(data.message);
     return data;
   } catch (error) {
     if (error instanceof Error && error.message !== "Unexpected end of JSON input") throw error;
-    throw new Error("Rhythia returned an invalid response.");
+    throw new Error("Rhythia returned invalid JSON.");
   }
 }
 
 async function requestFromApi<T>(baseUrl: string, path: string, body: Record<string, unknown>): Promise<T> {
+  const endpoint = `${baseUrl.replace(/\/$/, "")}/${path}`;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10000);
   try {
-    const endpoint = `${baseUrl.replace(/\/$/, "")}/${path}`;
-    const headers = {
-      accept: "application/json",
-      "user-agent": "Rhythians/1.0",
-    };
-    const postResponse = await fetch(endpoint, {
+    const response = await fetch(endpoint, {
       method: "POST",
-      headers: { ...headers, "content-type": "application/json" },
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "user-agent": "Rhythians/1.0",
+      },
       body: JSON.stringify({ session: "", ...body }),
       cache: "no-store",
       signal: controller.signal,
     });
 
-    if (postResponse.status !== 405) return await readApiResponse<T>(postResponse);
+    if (response.status === 405) {
+      const getResponse = await fetch(buildUrl(baseUrl, path, { session: "", ...body }), {
+        method: "GET",
+        headers: {
+          accept: "application/json",
+          "user-agent": "Rhythians/1.0",
+        },
+        cache: "no-store",
+        signal: controller.signal,
+      });
+      return await readApiResponse<T>(getResponse, `${baseUrl}/${path}`);
+    }
 
-    const getResponse = await fetch(buildUrl(baseUrl, path, { session: "", ...body }), {
-      method: "GET",
-      headers,
-      cache: "no-store",
-      signal: controller.signal,
-    });
-    return await readApiResponse<T>(getResponse);
+    return await readApiResponse<T>(response, endpoint);
   } finally {
     clearTimeout(timeout);
   }
