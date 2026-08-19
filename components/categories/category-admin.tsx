@@ -22,6 +22,11 @@ type AdminMap = {
   reviewedBy: { username: string; displayName: string | null; profileHandle: string } | null;
 };
 
+type AddCategoryMapResponse = {
+  map: AdminMap;
+  error?: string;
+};
+
 const STATUS_STYLES: Record<string, string> = {
   pending: "border-yellow-400/30 bg-yellow-400/10 text-yellow-300",
   approved: "border-emerald-400/30 bg-emerald-400/10 text-emerald-300",
@@ -50,7 +55,7 @@ export function CategoryAdmin({ initialMaps }: { initialMaps: AdminMap[] }) {
       const putResponse = await fetch(uploadData.uploadUrl, { method: "PUT", headers: { "Content-Type": mapFile.type || "application/octet-stream" }, body: mapFile });
       if (!putResponse.ok) throw new Error("The map file upload failed.");
       const response = await fetch("/api/admin/categories", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, level: Number(form.level), mapFileUrl: uploadData.publicUrl, noteCount: form.noteCount ? Number(form.noteCount) : null, length: form.length ? Number(form.length) : null, sourceBeatmapId: form.sourceBeatmapId ? Number(form.sourceBeatmapId) : null }) });
-      const data = await response.json();
+      const data: AddCategoryMapResponse = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Could not add the map.");
       setMaps((current) => [data.map, ...current]);
       setMessage(`Added "${data.map.title}" to ${CATEGORY_LABELS[data.map.category]} Level ${data.map.level} — it's live now.`);
