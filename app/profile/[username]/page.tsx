@@ -41,9 +41,6 @@ export default async function ProfilePage({ params }: Props) {
   const { username } = await params;
   const currentUser = await getSessionUser();
 
-  // Query the user with relations; if a related table is missing from the
-  // database (schema drift), fall back to the bare user so the page still
-  // renders instead of returning a 500.
   let user: Awaited<ReturnType<typeof loadProfileUser>> | null = null;
   try {
     user = await loadProfileUser(username);
@@ -71,13 +68,13 @@ export default async function ProfilePage({ params }: Props) {
   const isOwnProfile = currentUser?.id === user.id;
   const avatarUrl = getAvatarUrl(user, 256);
 
-  // These helpers hit tables that may not exist yet; degrade to safe defaults.
   const [rankResult, categoryResult] = await Promise.allSettled([
     getUserGlobalRank(user.id),
     getUserCategoryLevels(user.id),
   ]);
   const globalRank = rankResult.status === "fulfilled" ? rankResult.value : null;
   const categoryLevels = categoryResult.status === "fulfilled" ? categoryResult.value : [];
+  const highestSkillLevel = categoryLevels.reduce((highest, entry) => Math.max(highest, entry.level), 0);
 
   let presence: { isOnline: boolean; lastActiveAt: Date | null } | null = null;
   if (user.rhythiaProfile) {
@@ -86,7 +83,6 @@ export default async function ProfilePage({ params }: Props) {
 
   let presenceLabel = "Offline";
   if (presence?.lastActiveAt) {
-    // eslint-disable-next-line react-hooks/purity
     const seconds = Math.floor((Date.now() - presence.lastActiveAt.getTime()) / 1000);
     if (seconds < 60) presenceLabel = "Active now";
     else if (seconds < 3600) presenceLabel = `Active ${Math.floor(seconds / 60)}m ago`;
@@ -103,11 +99,7 @@ export default async function ProfilePage({ params }: Props) {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex items-start gap-6">
             {avatarUrl ? (
-              <img
-                src={avatarUrl}
-                alt={`${user.username}'s avatar`}
-                className="h-24 w-24 rounded-full border-2 border-accent/30"
-              />
+              <img src={avatarUrl} alt={`${user.username}'s avatar`} className="h-24 w-24 rounded-full border-2 border-accent/30" />
             ) : (
               <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-accent/30 bg-accent/10 text-3xl font-bold text-accent">
                 {user.username.charAt(0).toUpperCase()}
@@ -119,7 +111,7 @@ export default async function ProfilePage({ params }: Props) {
                 {user.displayName ?? user.username}
                 {user.rhythiaProfile?.flag && <FlagIcon flag={user.rhythiaProfile?.flag} country={user.rhythiaProfile?.country} size="md" />}
                 {user.rhythiaVerified && <RhythiaVerifiedBadge size="sm" />}
-{user.rhythiaProfile && presence && (
+                {user.rhythiaProfile && presence && (
                   <span
                     title={presenceLabel}
                     className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${
@@ -134,38 +126,25 @@ export default async function ProfilePage({ params }: Props) {
                 )}
               </h1>
               <p className="mt-1 text-sm text-muted">@{user.profileHandle}</p>
-              {user.userTags.length > 0 && (
-                <div className="mt-4">
-                  <UserTags tags={user.userTags} size="md" />
-                </div>
-              )}
-              {user.bio && (
-                <p className="mt-4 text-sm leading-7 text-muted">{user.bio}</p>
-              )}
+              {user.userTags.length > 0 && <div className="mt-4"><UserTags tags={user.userTags} size="md" /></div>}
+              {user.bio && <p className="mt-4 text-sm leading-7 text-muted">{user.bio}</p>}
             </div>
           </div>
           <div className="flex flex-col items-stretch gap-3">
             {!isOwnProfile && <FriendButton userId={user.id} />}
             {isOwnProfile && (
               <div className="flex items-center gap-2">
-                <div className="flex-1">
-                  <RhythiaConnect connectedUrl={user.rhythiaProfile?.profileUrl} />
-                </div>
+                <div className="flex-1"><RhythiaConnect connectedUrl={user.rhythiaProfile?.profileUrl} /></div>
                 {user.rhythiaProfile && <ProfileScoreRefresh />}
               </div>
             )}
             {isOwnProfile && user.rhythiaProfile && <RhythiaRpGainCheck />}
             {!isOwnProfile && (
-              <Link
-                href={`/messages?user=${encodeURIComponent(user.profileHandle)}`}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:border-accent/40"
-              >
+              <Link href={`/messages?user=${encodeURIComponent(user.profileHandle)}`} className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:border-accent/40">
                 <MessageCircle size={16} /> Message
               </Link>
             )}
-            {currentUser && !isOwnProfile && (
-              <ReportButton targetType="user" targetId={user.id} targetLabel={user.username} />
-            )}
+            {currentUser && !isOwnProfile && <ReportButton targetType="user" targetId={user.id} targetLabel={user.username} />}
             <div className="rounded-3xl border border-border bg-background/80 px-5 py-4 text-sm text-muted">
               <p>Member since</p>
               <p className="mt-2 text-lg font-semibold text-white">{user.joinedAt.toLocaleDateString()}</p>
@@ -177,7 +156,7 @@ export default async function ProfilePage({ params }: Props) {
               </div>
             )}
             <div className="rounded-3xl border border-accent/30 bg-accent/10 px-5 py-4">
-              <RankProgress rhp={user.rhp} globalRank={globalRank} />
+              <RankProgress rhp={user.rhp} globalRank={globalRank} highestSkillLevel={highestSkillLevel} />
             </div>
           </div>
         </div>
@@ -213,7 +192,6 @@ export default async function ProfilePage({ params }: Props) {
           </div>
           <p className="text-sm text-muted">{user.clips.length} approved clip{user.clips.length === 1 ? "" : "s"}</p>
         </div>
-
         {user.clips.length === 0 ? (
           <div className="rounded-3xl border border-border bg-background/80 p-8 text-sm text-muted">No approved clips are visible yet.</div>
         ) : (
@@ -224,11 +202,7 @@ export default async function ProfilePage({ params }: Props) {
                 <div className="mt-4">
                   <p className="text-sm uppercase tracking-[0.24em] text-accent">{clip.category?.name ?? "Uncategorized"}</p>
                   <h3 className="mt-3 text-lg font-semibold text-white">{clip.title}</h3>
-                  {clip.reviewedBy && (
-                    <p className="mt-2 text-xs text-muted">
-                      Approved by <span className="font-semibold text-white">{clip.reviewedBy.displayName ?? clip.reviewedBy.username}</span>
-                    </p>
-                  )}
+                  {clip.reviewedBy && <p className="mt-2 text-xs text-muted">Approved by <span className="font-semibold text-white">{clip.reviewedBy.displayName ?? clip.reviewedBy.username}</span></p>}
                   <p className="mt-2 text-sm text-muted">{clip.createdAt.toLocaleDateString()}</p>
                 </div>
               </Link>
