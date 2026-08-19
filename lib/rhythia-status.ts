@@ -1,32 +1,26 @@
 import { prisma } from "@/lib/db";
+import { rhythiaRequest } from "@/lib/rhythia";
 
-const RHYTHIA_API = "https://production.rhythia.com/api";
 const STATUS_TTL_MS = 60_000;
 const ONLINE_COUNT_TTL_MS = 60_000;
 const ONLINE_COUNT_KEY = "online_users_count";
 
 async function fetchRhythiaStatus(profileId: number): Promise<{ isOnline: boolean; lastActiveAt: Date | null }> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 6000);
-  try {
-    const response = await fetch(`${RHYTHIA_API}/getProfile`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ session: "", id: profileId }),
-      cache: "no-store",
-      signal: controller.signal,
-    });
-    if (!response.ok) throw new Error("Rhythia could not be reached.");
-    const data = await response.json();
-    const user = data?.user;
-    if (!user || !user.id) throw new Error("Rhythia profile not found.");
-    return {
-      isOnline: Boolean(user.is_online),
-      lastActiveAt: typeof user.last_active_timestamp === "number" ? new Date(user.last_active_timestamp) : null,
+  const data = await rhythiaRequest<{
+    user?: {
+      id: number;
+      is_online?: boolean;
+      last_active_timestamp?: number | null;
     };
-  } finally {
-    clearTimeout(timeout);
-  }
+  }>("getProfile", { id: profileId });
+
+  const user = data?.user;
+  if (!user || user.id !== profileId) throw new Error("Rhythia profile not found.");
+
+  return {
+    isOnline: Boolean(user.is_online),
+    lastActiveAt: typeof user.last_active_timestamp === "number" ? new Date(user.last_active_timestamp) : null,
+  };
 }
 
 export type RhythiaStatusRow = {
@@ -56,7 +50,6 @@ export async function getRhythiaStatus(profile: RhythiaStatusRow): Promise<{ isO
     try {
       return await refreshRhythiaStatus(profile);
     } catch {
-      // Fall back to the cached value if Rhythia is unreachable.
     }
   }
   return { isOnline: Boolean(profile.isOnline), lastActiveAt: profile.lastActiveAt };
@@ -77,7 +70,6 @@ async function computeOnlineUserCount(): Promise<number> {
           try {
             await refreshRhythiaStatus(profile);
           } catch {
-            // Ignore unreachable players so one bad fetch doesn't block the count.
           }
         }
       })
@@ -98,11 +90,9 @@ export async function getOnlineUserCount(): Promise<number> {
           return parsed.count;
         }
       } catch {
-        // Corrupt cache entry, recompute below.
       }
     }
   } catch {
-    // Fall through and compute fresh.
   }
 
   const count = await computeOnlineUserCount();
@@ -117,7 +107,6 @@ export async function getOnlineUserCount(): Promise<number> {
       },
     });
   } catch {
-    // Cache write failures shouldn't fail the request.
   }
   return count;
 }
