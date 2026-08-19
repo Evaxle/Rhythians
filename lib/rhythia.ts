@@ -120,8 +120,9 @@ export async function rhythiaRequest<T>(path: string, body: object): Promise<T> 
   let lastError: unknown = null;
   const requestBody = { ...body } as Record<string, unknown>;
 
-  if (path === "getUserScores" && typeof requestBody.offset === "number" && requestBody.page === undefined) {
-    requestBody.page = Math.floor(requestBody.offset / 100) + 1;
+  if (path === "getUserScores") {
+    delete requestBody.offset;
+    delete requestBody.page;
   }
 
   for (const baseUrl of RHYTHIA_API_URLS) {
