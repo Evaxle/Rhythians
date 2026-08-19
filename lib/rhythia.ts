@@ -61,8 +61,14 @@ async function requestFromApi<T>(baseUrl: string, path: string, body: object): P
       cache: "no-store",
       signal: controller.signal,
     });
+    const text = await response.text();
     if (!response.ok) throw new Error(`Rhythia API returned ${response.status}.`);
-    const data = await response.json();
+    let data: T & { error?: string };
+    try {
+      data = JSON.parse(text) as T & { error?: string };
+    } catch {
+      throw new Error("Rhythia returned an invalid response.");
+    }
     if (data.error) throw new Error(data.error);
     return data;
   } finally {
@@ -72,17 +78,23 @@ async function requestFromApi<T>(baseUrl: string, path: string, body: object): P
 
 export async function rhythiaRequest<T>(path: string, body: object): Promise<T> {
   let lastError: unknown = null;
+  const requestBody = { ...body } as Record<string, unknown>;
+
+  if (path === "getUserScores" && typeof requestBody.offset === "number") {
+    requestBody.page = Math.floor(requestBody.offset / 100) + 1;
+  }
 
   for (const baseUrl of RHYTHIA_API_URLS) {
     try {
-      return await requestFromApi<T>(baseUrl, path, body);
+      return await requestFromApi<T>(baseUrl, path, requestBody);
     } catch (error) {
       lastError = error;
     }
   }
 
-  if (lastError instanceof Error && lastError.name === "AbortError") {
-    throw new Error("Rhythia took too long to respond.");
+  if (lastError instanceof Error) {
+    if (lastError.name === "AbortError") throw new Error("Rhythia took too long to respond.");
+    throw lastError;
   }
 
   throw new Error("Rhythia could not be reached.");
@@ -99,11 +111,16 @@ export function namesMatch(rhythiaUsername: string | null, localNames: (string |
 }
 
 export async function fetchRhythiaProfile(id: number) {
-  const [profile, scoreData] = await Promise.all([
-    rhythiaRequest<{ user?: { id: number; username: string | null; flag: string | null; position: number | null; country_position: number | null; skill_points: number | null } }>("getProfile", { id }),
-    rhythiaRequest<{ top?: RhythiaScore[] }>("getUserScores", { id, limit: 10 }),
-  ]);
+  const profile = await rhythiaRequest<{ user?: { id: number; username: string | null; flag: string | null; position: number | null; country_position: number | null; skill_points: number | null } }>("getProfile", { id });
   if (!profile.user || profile.user.id !== id) throw new Error("That Rhythia profile was not found.");
+
+  let scores: RhythiaScore[] = [];
+  try {
+    const scoreData = await rhythiaRequest<{ top?: RhythiaScore[] }>("getUserScores", { id, limit: 10 });
+    scores = scoreData.top ?? [];
+  } catch {
+  }
+
   const rhythmPoints = profile.user.skill_points;
   return {
     profileId: id,
@@ -114,6 +131,6 @@ export async function fetchRhythiaProfile(id: number) {
     countryRank: profile.user.country_position,
     rhythmPoints,
     title: titleFor(rhythmPoints, profile.user.position),
-    scores: scoreData.top ?? [],
+    scores,
   };
 }
