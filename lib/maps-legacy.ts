@@ -2,6 +2,10 @@ import { prisma } from "@/lib/db";
 import { fetchAllRhythiaScores, fetchRankedMaps } from "@/lib/daily";
 import { RANKS, getRankInfo, isMapInRankRange, rankIndexForRating, fairRatingFromStars, type RankInfo } from "@/lib/ranks";
 
+function normalizeTitle(value: string | null | undefined) {
+  return (value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
 async function restoreAutoImportedMaps() {
   const existing = await prisma.challengeMap.count({ where: { isAutoImported: true } });
   if (existing > 0) return existing;
@@ -51,24 +55,20 @@ export async function getUserGlobalRank(userId: string): Promise<number | null> 
 export async function checkAllRankedMaps(userId: string) {
   await restoreAutoImportedMaps();
   const profile = await prisma.rhythiaProfile.findUnique({ where: { userId }, select: { profileId: true } });
-  if (!profile) return { checked: 0, foundScores: 0, alreadyCompleted: 0, newlyCompleted: 0, totalPoints: 0 };
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } });
+  if (!profile || !user) return { checked: 0, foundScores: 0, alreadyCompleted: 0, newlyCompleted: 0, totalPoints: 0 };
 
+  const rankInfo = getRankInfo(user.rhp);
   const maps = await prisma.challengeMap.findMany({
-    where: { status: "approved", rating: { not: null }, isAutoImported: true },
-    select: { id: true, title: true, rating: true },
+    where: { status: "approved", rating: { not: null, gte: rankInfo.rangeMin, lte: rankInfo.rangeMax }, isAutoImported: true },
+    select: { id: true, title: true, rating: true, length: true },
   });
   const scores = await fetchAllRhythiaScores(profile.profileId);
-  const normalize = (value: string | null | undefined) => (value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
-  const scoreTitles = new Set(scores.filter((score) => score.passed).map((score) => normalize(score.beatmapTitle)));
-  const foundScores = maps.filter((map) => scoreTitles.has(normalize(map.title))).length;
+  const scoreTitles = new Set(scores.map((score) => normalizeTitle(score.beatmapTitle)).filter(Boolean));
+  let foundScores = 0;
+  for (const map of maps) if (scoreTitles.has(normalizeTitle(map.title))) foundScores += 1;
 
-  return {
-    checked: maps.length,
-    foundScores,
-    alreadyCompleted: 0,
-    newlyCompleted: 0,
-    totalPoints: 0,
-  };
+  return { checked: maps.length, foundScores, alreadyCompleted: 0, newlyCompleted: 0, totalPoints: 0, rankIndex: rankInfo.index };
 }
 
 export async function getChallengeLeaderboard(rankIndex: number, limit = 100) {
@@ -90,32 +90,47 @@ export async function getChallengeLeaderboard(rankIndex: number, limit = 100) {
 export async function getApprovedMaps(includeAll: boolean, userId: string | null) {
   await restoreAutoImportedMaps();
   const maps = await prisma.challengeMap.findMany({ where: { status: "approved", rating: { not: null } }, orderBy: [{ rating: "asc" }, { createdAt: "desc" }], include: { submittedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } }, reviewedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } } } });
-  const user = userId ? await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } }) : null;
+  const user = userId ? await prisma.user.findUnique({ where: { id: userId }, select: { id: true, rhp: true } }) : null;
   const rankInfo: RankInfo | null = user ? getRankInfo(user.rhp) : null;
   const visible = includeAll || !rankInfo ? maps : maps.filter((map) => isMapInRankRange(map.rating ?? 0, rankInfo.index));
   const realMapIds = visible.filter((map) => !map.isAutoImported).map((map) => map.id);
   const completionState = userId && realMapIds.length > 0 ? await prisma.challengeMapCompletion.findMany({ where: { userId, challengeMapId: { in: realMapIds } }, select: { challengeMapId: true, passed: true, points: true } }) : [];
   const stateMap = new Map(completionState.map((entry) => [entry.challengeMapId, entry]));
+
+  let scoredTitles = new Set<string>();
+  if (user?.id) {
+    try {
+      const scores = await fetchAllRhythiaScores((await prisma.rhythiaProfile.findUnique({ where: { userId: user.id }, select: { profileId: true } }))?.profileId ?? 0);
+      scoredTitles = new Set(scores.map((score) => normalizeTitle(score.beatmapTitle)).filter(Boolean));
+    } catch {
+      scoredTitles = new Set<string>();
+    }
+  }
+
   return {
     rankInfo,
-    maps: visible.map((map) => ({
-      id: map.id,
-      title: map.title,
-      artist: map.artist,
-      description: map.description,
-      mapFileUrl: map.mapFileUrl,
-      imageUrl: map.imageUrl,
-      rating: map.rating,
-      rankIndex: rankIndexForRating(map.rating ?? 0),
-      rankName: RANKS[rankIndexForRating(map.rating ?? 0)]?.name ?? "Expert",
-      rankColor: RANKS[rankIndexForRating(map.rating ?? 0)]?.color ?? RANKS[RANKS.length - 1].color,
-      mapperName: map.mapperName,
-      noteCount: map.noteCount,
-      length: map.length,
-      submittedBy: map.submittedBy,
-      reviewedBy: map.reviewedBy,
-      completion: stateMap.get(map.id) ?? null,
-    }))
+    maps: visible.map((map) => {
+      const mapRankIndex = rankIndexForRating(map.rating ?? 0);
+      return {
+        id: map.id,
+        title: map.title,
+        artist: map.artist,
+        description: map.description,
+        mapFileUrl: map.mapFileUrl,
+        imageUrl: map.imageUrl,
+        rating: map.rating,
+        rankIndex: mapRankIndex,
+        rankName: RANKS[mapRankIndex]?.name ?? "Expert",
+        rankColor: RANKS[mapRankIndex]?.color ?? RANKS[RANKS.length - 1].color,
+        mapperName: map.mapperName,
+        noteCount: map.noteCount,
+        length: map.length,
+        submittedBy: map.submittedBy,
+        reviewedBy: map.reviewedBy,
+        completion: stateMap.get(map.id) ?? null,
+        hasScore: scoredTitles.has(normalizeTitle(map.title)),
+      };
+    }),
   };
 }
 
