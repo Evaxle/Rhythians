@@ -23,6 +23,16 @@ export function bestScoreByTitle(scores: RhythiaScoreEntry[]): Map<string, Rhyth
   return best;
 }
 
+async function getAdminRhpOverride(mapId: string) {
+  try {
+    await prisma.$executeRawUnsafe('ALTER TABLE "ChallengeMap" ADD COLUMN IF NOT EXISTS "rhpOverride" INTEGER');
+    const rows = await prisma.$queryRawUnsafe<Array<{ rhpOverride: number | null }>>('SELECT "rhpOverride" FROM "ChallengeMap" WHERE "id" = $1', mapId);
+    return rows[0]?.rhpOverride ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function submitChallengeMap(data: {
   title: string;
   artist: string | null;
@@ -70,7 +80,7 @@ export async function reviewChallengeMap(mapId: string, reviewerId: string, stat
   const map = await prisma.challengeMap.findUnique({ where: { id: mapId } });
   if (!map) throw new Error("Map not found.");
   if (map.status !== "pending") throw new Error("This map has already been reviewed.");
-  const rating = status === "approved" ? roundRating(finalRating ?? map.requestedRating) : null;
+  const rating = status === "approved" ? roundRating(map.requestedRating) : null;
   const updated = await prisma.challengeMap.update({
     where: { id: mapId },
     data: { status, rating, reviewerNote: note?.trim() || null, reviewedById: reviewerId, reviewedAt: new Date() },
@@ -118,24 +128,19 @@ export async function checkAndAwardChallengeMap(userId: string, challengeMapId: 
   if (existing?.passed) return { status: "already", points: existing.points };
   const accuracy = passHit ? passHit.accuracy ?? accuracyFromMisses(passHit.beatmapNotes, passHit.misses) : null;
   if (passHit) {
-    const points = rhpGainForMap(map.rating, accuracy, passHit.speed, rankInfo.index, map.length);
+    const calculatedPoints = rhpGainForMap(map.rating, accuracy, passHit.speed, rankInfo.index, map.length != null ? map.length / 1000 : null);
+    const points = (await getAdminRhpOverride(map.id)) ?? calculatedPoints;
     const newRhp = user.rhp + points;
     const newRankInfo = getRankInfo(newRhp);
     const passedCount = await prisma.challengeMapCompletion.count({ where: { userId, passed: true } });
     const newAvg = passedCount === 0 ? map.rating : roundRating(((user.avgMapRating ?? map.rating) * passedCount + map.rating) / (passedCount + 1));
     await prisma.$transaction([
-      prisma.challengeMapCompletion.upsert({
-        where: { challengeMapId_userId: { challengeMapId: map.id, userId } },
-        create: { challengeMapId: map.id, userId, rating: map.rating, accuracy, passed: true, points, scoreId: passHit.id },
-        update: { accuracy, passed: true, points, scoreId: passHit.id },
-      }),
+      prisma.challengeMapCompletion.upsert({ where: { challengeMapId_userId: { challengeMapId: map.id, userId } }, create: { challengeMapId: map.id, userId, rating: map.rating, accuracy, passed: true, points, scoreId: passHit.id }, update: { accuracy, passed: true, points, scoreId: passHit.id } }),
       prisma.user.update({ where: { id: userId }, data: { rhp: newRhp, avgMapRating: newAvg } }),
       prisma.rhpTransaction.create({ data: { userId, amount: points, reason: "challenge_map", description: `Completed ranked map: ${map.title} (${map.rating.toFixed(2)})` } }),
       prisma.notification.create({ data: { userId, type: "rhp_earned", title: "Map completed", message: `You earned ${points} RHP for beating ${map.title} (${map.rating.toFixed(2)} rating).`, url: "/maps" } }),
     ]);
-    if (newRankInfo.index > rankInfo.index) {
-      await prisma.notification.create({ data: { userId, type: "rank_change", title: "Rank up!", message: `You reached ${newRankInfo.name} ${newRankInfo.isExpert ? "" : newRankInfo.tier}!`, url: "/leaderboards" } });
-    }
+    if (newRankInfo.index > rankInfo.index) await prisma.notification.create({ data: { userId, type: "rank_change", title: "Rank up!", message: `You reached ${newRankInfo.name} ${newRankInfo.isExpert ? "" : newRankInfo.tier}!`, url: "/leaderboards" } });
     return { status: "beat", points, rankInfo: newRankInfo, accuracy };
   }
   const failHit = allScores.find((score) => !score.passed && matchesTitle(score.beatmapTitle, map.title));
@@ -147,11 +152,7 @@ export async function checkAndAwardChallengeMap(userId: string, challengeMapId: 
     const loss = rhpLossForMap(map.rating, { totalBeaters, yourPlace });
     const newRhp = Math.max(0, user.rhp - loss);
     await prisma.$transaction([
-      prisma.challengeMapCompletion.upsert({
-        where: { challengeMapId_userId: { challengeMapId: map.id, userId } },
-        create: { challengeMapId: map.id, userId, rating: map.rating, accuracy: failAccuracy, passed: false, points: -loss, scoreId: failHit.id },
-        update: { accuracy: failAccuracy, passed: false, points: -loss, scoreId: failHit.id },
-      }),
+      prisma.challengeMapCompletion.upsert({ where: { challengeMapId_userId: { challengeMapId: map.id, userId } }, create: { challengeMapId: map.id, userId, rating: map.rating, accuracy: failAccuracy, passed: false, points: -loss, scoreId: failHit.id }, update: { accuracy: failAccuracy, passed: false, points: -loss, scoreId: failHit.id } }),
       prisma.user.update({ where: { id: userId }, data: { rhp: newRhp } }),
       prisma.rhpTransaction.create({ data: { userId, amount: -loss, reason: "challenge_map_fail", description: `Failed ranked map: ${map.title} (${map.rating.toFixed(2)})` } }),
     ]);
@@ -184,7 +185,8 @@ export async function checkAndAwardAllChallengeMaps(userId: string) {
     const score = bestScores.get(normalizeTitle(map.title));
     if (!score) continue;
     const accuracy = score.accuracy ?? accuracyFromMisses(score.beatmapNotes, score.misses);
-    const points = rhpGainForMap(map.rating, accuracy, score.speed, rankInfo.index, map.length);
+    const calculatedPoints = rhpGainForMap(map.rating, accuracy, score.speed, rankInfo.index, map.length != null ? map.length / 1000 : null);
+    const points = (await getAdminRhpOverride(map.id)) ?? calculatedPoints;
     const currentUser = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true, avgMapRating: true } });
     if (!currentUser) continue;
     const newRhp = currentUser.rhp + points;

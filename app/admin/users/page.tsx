@@ -3,14 +3,12 @@ import { getAvatarUrl } from "@/lib/avatar";
 import { UserTagsManager } from "@/components/user-tags-manager";
 import { AdminUserSearch } from "@/components/admin-user-search";
 import { ResetRatingSystem } from "@/components/admin/reset-rating-system";
+import { AdminCheckUserScores } from "@/components/admin/check-user-scores";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminUsersPage() {
-  const users = await prisma.user.findMany({
-    orderBy: { createdAt: "desc" },
-    include: { userTags: { include: { tag: true } } },
-  });
+  const users = await prisma.user.findMany({ orderBy: { createdAt: "desc" }, include: { userTags: { include: { tag: true } } } });
   const allTags = await prisma.tag.findMany({ orderBy: { name: "asc" } });
 
   return (
@@ -21,6 +19,7 @@ export default async function AdminUsersPage() {
         <p className="mt-3 text-sm leading-7 text-muted">Search for a user to view full details, punish accounts, or assign tags.</p>
       </section>
 
+      <AdminCheckUserScores />
       <AdminUserSearch />
       <ResetRatingSystem />
 
@@ -43,11 +42,7 @@ export default async function AdminUsersPage() {
                 </div>
               </div>
               <div className="flex-1 lg:max-w-md">
-                <UserTagsManager
-                  userId={user.id}
-                  currentTags={user.userTags.map((ut) => ({ id: ut.tag.id, name: ut.tag.name, slug: ut.tag.slug }))}
-                  allTags={allTags.map((tag) => ({ id: tag.id, name: tag.name, slug: tag.slug }))}
-                />
+                <UserTagsManager userId={user.id} currentTags={user.userTags.map((ut) => ({ id: ut.tag.id, name: ut.tag.name, slug: ut.tag.slug }))} allTags={allTags.map((tag) => ({ id: tag.id, name: tag.name, slug: tag.slug }))} />
               </div>
             </div>
           </div>

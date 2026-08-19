@@ -22,6 +22,8 @@ export const RANKS: RankDefinition[] = [
 export const RANK_TIERS = 5;
 export const RANK_SPAN = 500;
 export const TIER_SPAN = 100;
+export const MAP_RHP_FLOOR = 18;
+export const MAP_RHP_CEILING = 25;
 
 export type RankInfo = {
   index: number;
@@ -52,22 +54,7 @@ export function getRankInfo(rhp: number): RankInfo {
   const progressToNextTier = Math.min(1, Math.max(0, (safe - tierStart) / TIER_SPAN));
   const nextRankStart = index < RANKS.length - 1 ? RANKS[index + 1].minRhp : null;
 
-  return {
-    index,
-    name: rank.name,
-    tier,
-    isExpert: index === RANKS.length - 1,
-    minRhp: rank.minRhp,
-    maxRhp: index < RANKS.length - 1 ? rank.minRhp + RANK_SPAN : null,
-    tierStart,
-    tierEnd,
-    nextTierStart,
-    nextRankStart,
-    color: rank.color,
-    progressToNextTier,
-    rangeMin: rank.rangeMin,
-    rangeMax: rank.rangeMax,
-  };
+  return { index, name: rank.name, tier, isExpert: index === RANKS.length - 1, minRhp: rank.minRhp, maxRhp: index < RANKS.length - 1 ? rank.minRhp + RANK_SPAN : null, tierStart, tierEnd, nextTierStart, nextRankStart, color: rank.color, progressToNextTier, rangeMin: rank.rangeMin, rangeMax: rank.rangeMax };
 }
 
 export function isMapInRankRange(rating: number, rankIndex: number): boolean {
@@ -88,28 +75,21 @@ export function fairRatingFromStars(stars: number): number {
   return roundRating(stars * 0.41);
 }
 
-const MAP_RHP_FLOOR = 16.5;
-const MAP_RHP_CEILING = 21;
-const MAP_LENGTH_REFERENCE_SECONDS = 180;
-const EXPERT_START_RATING = 3.7;
-const MAX_RATING = 9.99;
-
 export function difficultyFactorForRating(rating: number, rankIndex: number): number {
-  const safe = Math.max(0, Math.min(MAX_RATING, rating));
-  if (safe >= EXPERT_START_RATING) {
-    return Math.pow((safe - EXPERT_START_RATING) / (MAX_RATING - EXPERT_START_RATING), 0.2);
-  }
-  return safe / EXPERT_START_RATING;
+  const rank = RANKS[rankIndex] ?? RANKS[RANKS.length - 1];
+  const safe = Math.max(rank.rangeMin, Math.min(rank.rangeMax, rating));
+  const span = Math.max(0.01, rank.rangeMax - rank.rangeMin);
+  return Math.min(1, Math.max(0, (safe - rank.rangeMin) / span));
 }
 
-export function baseRhpForRating(rating: number, rankIndex: number): number {
-  const safe = Math.max(0, Math.min(MAX_RATING, rating));
-  if (safe >= EXPERT_START_RATING) {
-    const factor = difficultyFactorForRating(safe, rankIndex);
-    return MAP_RHP_FLOOR + (MAP_RHP_CEILING - MAP_RHP_FLOOR) * factor;
-  }
-  return 10 + 6.5 * (safe / EXPERT_START_RATING);
+export function baseRhpForRating(rating: number, rankIndex?: number): number {
+  const idx = rankIndex ?? rankIndexForRating(rating);
+  const rank = RANKS[idx] ?? RANKS[rankIndexForRating(rating)] ?? RANKS[0];
+  const factor = difficultyFactorForRating(rating, rank.index);
+  return MAP_RHP_FLOOR + (MAP_RHP_CEILING - MAP_RHP_FLOOR) * factor;
 }
+
+const MAP_LENGTH_REFERENCE_SECONDS = 180;
 
 export function lengthMultiplier(lengthSeconds: number | null | undefined): number {
   if (lengthSeconds == null || !Number.isFinite(lengthSeconds) || lengthSeconds <= 0) return 1;
@@ -131,13 +111,7 @@ export function speedMultiplier(speed: number | null | undefined): number {
   return Math.min(1.5, 1 + (speed - 1) * 0.25);
 }
 
-export function rhpGainForMap(
-  rating: number,
-  accuracy: number | null,
-  speed?: number | null,
-  rankIndex?: number,
-  lengthSeconds?: number | null,
-): number {
+export function rhpGainForMap(rating: number, accuracy: number | null, speed?: number | null, rankIndex?: number, lengthSeconds?: number | null): number {
   const idx = rankIndex ?? rankIndexForRating(rating);
   const base = baseRhpForRating(rating, idx) * lengthMultiplier(lengthSeconds);
   const multiplier = (accuracy == null ? 1 : accuracyMultiplier(accuracy)) * speedMultiplier(speed);
