@@ -1,6 +1,8 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SiteHeader } from "@/components/site-header";
 import { TailwindIndicator } from "@/components/tailwind-indicator";
 import { CursorFX } from "@/components/cursor-fx";
@@ -33,7 +35,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} bg-background text-white`}> 
+      <body className={`${inter.className} bg-background text-white`}>
         <div className="min-h-screen bg-background text-white">
           <SiteHeader />
           <main className="mx-auto max-w-7xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
@@ -58,6 +60,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <CursorFX />
           <WarningPopups />
         </div>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
