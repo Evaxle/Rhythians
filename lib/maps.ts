@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
-import { fetchAllRhythiaScores, fetchRhythiaScores, findScoreForMap, type RhythiaScoreEntry } from "@/lib/daily";
+import { fetchRhythiaScores, findScoreForMap, type RhythiaScoreEntry } from "@/lib/daily";
+import { rhythiaRequest } from "@/lib/rhythia";
 import { RANKS, getRankInfo, isMapInRankRange, roundRating, rhpGainForMap, rhpLossForMap, accuracyFromMisses, type RankInfo } from "@/lib/ranks";
 
 function normalizeTitle(value: string | null | undefined): string {
@@ -21,6 +22,31 @@ export function bestScoreByTitle(scores: RhythiaScoreEntry[]): Map<string, Rhyth
     if (!existing || (score.awarded_sp ?? 0) > (existing.awarded_sp ?? 0)) best.set(title, score);
   }
   return best;
+}
+
+async function fetchAllRhythiaScoresForImport(profileId: number): Promise<RhythiaScoreEntry[]> {
+  const seen = new Map<number, RhythiaScoreEntry>();
+  const buckets = ["lastDay", "top", "vrTop", "vrRecent"] as const;
+  const previous = new Map<string, string>();
+
+  for (let offset = 0; offset <= 5000; offset += 100) {
+    const data = await rhythiaRequest<Partial<Record<(typeof buckets)[number], RhythiaScoreEntry[]>>>("getUserScores", { id: profileId, limit: 100, offset });
+    let found = false;
+    let repeated = true;
+    for (const bucket of buckets) {
+      const entries = data[bucket] ?? [];
+      if (entries.length > 0) found = true;
+      const signature = entries.map((entry) => entry.id).join(",");
+      if (signature !== previous.get(bucket)) repeated = false;
+      previous.set(bucket, signature);
+      for (const entry of entries) {
+        if (typeof entry.id === "number") seen.set(entry.id, entry);
+      }
+    }
+    if (!found || repeated) break;
+  }
+
+  return [...seen.values()];
 }
 
 async function getAdminRhpOverride(mapId: string) {
@@ -172,8 +198,8 @@ export async function checkAndAwardAllChallengeMaps(userId: string) {
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } });
   if (!user) return { checked: 0, awarded: 0, rankIndex: null };
   const rankInfo = getRankInfo(user.rhp);
-  const maps = await prisma.challengeMap.findMany({ where: { status: "approved", isAutoImported: false, rating: { gte: rankInfo.rangeMin, lte: rankInfo.rangeMax } }, orderBy: [{ rating: "asc" }, { createdAt: "asc" }] });
-  const scores = await fetchAllRhythiaScores(profile.profileId);
+  const maps = await prisma.challengeMap.findMany({ where: { status: "approved", rating: { not: null, gte: rankInfo.rangeMin, lte: rankInfo.rangeMax } }, orderBy: [{ rating: "asc" }, { createdAt: "asc" }] });
+  const scores = await fetchAllRhythiaScoresForImport(profile.profileId);
   const bestScores = bestScoreByTitle(scores);
   let checked = 0;
   let awarded = 0;
@@ -194,13 +220,13 @@ export async function checkAndAwardAllChallengeMaps(userId: string) {
     const newAvg = passedCount === 0 ? map.rating : roundRating(((currentUser.avgMapRating ?? map.rating) * passedCount + map.rating) / (passedCount + 1));
     await prisma.$transaction([
       prisma.challengeMapCompletion.upsert({ where: { challengeMapId_userId: { challengeMapId: map.id, userId } }, create: { challengeMapId: map.id, userId, rating: map.rating, accuracy, passed: true, points, scoreId: score.id }, update: { accuracy, passed: true, points, scoreId: score.id } }),
-      prisma.user.update({ where: { id: userId }, data: { rhp: newRhp, avgMapRating: newAvg, scoreImportDone: true } }),
+      prisma.user.update({ where: { id: userId, }, data: { rhp: newRhp, avgMapRating: newAvg } }),
       prisma.rhpTransaction.create({ data: { userId, amount: points, reason: "challenge_map", description: `Imported completed ranked map: ${map.title} (${map.rating.toFixed(2)})` } }),
     ]);
     awarded += points;
   }
   await prisma.user.update({ where: { id: userId }, data: { scoreImportDone: true } });
-  return { checked, awarded, rankIndex: rankInfo.index };
+  return { checked, awarded, newlyCompleted: await prisma.challengeMapCompletion.count({ where: { userId, passed: true } }), totalPoints: awarded, rankIndex: rankInfo.index };
 }
 
 export { getApprovedMaps, getChallengeLeaderboard, getMapLeaderboard, getUserGlobalRank, resetUserRankedStatus } from "@/lib/maps-legacy";
