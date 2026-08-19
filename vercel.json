@@ -11,10 +11,6 @@
     {
       "path": "/api/internal/db-cleanup",
       "schedule": "0 3 * * *"
-    },
-    {
-      "path": "/api/internal/rhythia-rp-check",
-      "schedule": "0 4 * * *"
     }
   ]
 }
