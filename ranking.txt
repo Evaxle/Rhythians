@@ -2,268 +2,138 @@
   RHYTHIANS RANKED SYSTEM — FULL REFERENCE
 ================================================
 
-Rhythians uses a competitive ladder built around Rhythian Points (RHP).
-There are 9 ranks, each split into 5 tiers. You climb by beating maps and
-daily maps; you can also lose RHP by failing challenge maps, so the ladder
-stays fair and everyone plays maps near their own skill level.
+Rhythians uses Rhythian Points (RHP). Your rank is determined by your RHP.
+There are 9 ranks, with the first 8 split into 5 tiers of 100 RHP each.
 
 ------------------------------------------------
 1. THE RANKS
 ------------------------------------------------
-Each rank spans 500 RHP and contains 5 tiers (100 RHP each).
-Your rank is based purely on your current RHP.
 
-  RANK      RHP RANGE        MAP RATING RANGE   COLOR
-  Copper    0     - 500      0.00 - 1.49        Copper
-  Bronze    501   - 1000     1.50 - 1.99        Bronze
-  Silver    1001  - 1500     2.00 - 2.49        Silver
-  Gold      1501  - 2000     2.50 - 2.99        Gold
-  Platinum  2001  - 2500     3.00 - 3.49        Platinum
-  Emerald   2501  - 3000     3.50 - 3.99        Emerald
-  Diamond   3001  - 3500     4.00 - 4.49        Diamond
-  Master    3501  - 4000     4.50 - 4.99        Master
-  Expert    4001+            5.00 - 9.99        Expert
+  RANK      RHP RANGE        MAP RATING RANGE
+  Copper    0     - 500      0.00 - 1.09
+  Bronze    501   - 1000     1.10 - 1.49
+  Silver    1001  - 1500     1.50 - 1.89
+  Gold      1501  - 2000     1.90 - 2.29
+  Platinum  2001  - 2500     2.30 - 2.69
+  Emerald   2501  - 3000     2.70 - 2.99
+  Diamond   3001  - 3500     3.00 - 3.29
+  Master    3501  - 4000     3.30 - 3.69
+  Expert    4001+            3.70 - 9.99
 
-Each of the first 8 ranks has 5 tiers:
-  Tier 1  = first 100 RHP of the rank
-  Tier 2  = second 100 RHP
-  Tier 3  = third 100 RHP
-  Tier 4  = fourth 100 RHP
-  Tier 5  = fifth 100 RHP (the top tier, next stop is the next rank)
+Expert begins at 3.70. The Rhythia-to-Rhythians conversion remains exactly:
+
+  Rhythians rating = Rhythia stars x 0.41
+
+rounded to two decimals.
 
 Examples:
-  Copper 1  = 0 - 100 RHP
-  Copper 2  = 101 - 200 RHP
-  Copper 3  = 201 - 300 RHP
-  Copper 4  = 301 - 400 RHP
-  Copper 5  = 401 - 500 RHP
-  Bronze 1  = 501 - 600 RHP   (just crossed into Bronze)
-  ...and so on up to Master 5 = 3501 - 4000 RHP.
+  5.00 stars = 2.05 rating
+  8.00 stars = 3.28 rating
+  9.00 stars = 3.69 rating
+  9.03 stars = 3.70 rating
 
-The Expert rank has no tiers. Instead, it shows your GLOBAL position
-(#1, #2, #3...) on the rank badge. It is the peak of the ladder.
+Therefore 9.00 stars is still Master, while the first Expert maps begin
+when the converted rating reaches 3.70.
 
-------------------------------------------------
-2. RHYTHIAN POINTS (RHP)
-------------------------------------------------
-RHP is the currency of the ranked ladder. Everyone starts at 0 RHP
-(Copper 1). You earn RHP by completing content, and you can lose RHP
-by failing a challenge map.
+Each rank may only earn RHP from maps inside that rank's rating range.
+Playing a map outside the player's current rank range earns no RHP.
 
-How you GAIN RHP:
-  - Challenge maps: beating any map inside your rank's rating range
-      awards base RHP based on YOUR RANK (higher ranks earn slightly less,
-      keeping the ladder balanced), scaled by accuracy and speed.
-  - Daily maps: the daily map uses the exact same rank-based system.
-
-  Base RHP per rank (at 100% accuracy, no modifiers):
-    Copper   -> 20 RHP
-    Bronze   -> 19 RHP
-    Silver   -> 18 RHP
-    Gold     -> 17 RHP
-    Platinum -> 16 RHP
-    Emerald  -> 15 RHP
-    Diamond  -> 14 RHP
-    Master   -> 13 RHP
-    Expert   -> 10 RHP
-
-  So a 1.00 map in Copper and a 4.70 map in Master are each worth that
-  rank's base, scaled by how you played it.
-
-How you LOSE RHP:
-  - Failing a challenge map (a failed pass recorded on your linked
-      Rhythia profile for that map) costs you RHP based on:
-        * how many people in total have beaten the map, and
-        * what place your failed attempt would have earned.
-      The better your attempt (higher placement), the less you lose.
-      An attempt with no recorded accuracy counts as last place and
-      takes the full loss. See section 5.
-
-RHP never goes below 0, and a failed map only counts once per map
-(the first recorded attempt).
-
-STARTING RHP FROM YOUR RHYTHIA SKILL:
-  When you first link your Rhythia account you get a one-time RHP credit
-  based on your Rhythia RP (skill points), so a highly skilled player
-  starts in a rank that matches their ability instead of grinding from
-  Copper 1. The credit is your RP times a weight that shrinks as your RP
-  grows (diminishing returns):
-
-    weight = 0.8 - 0.05 per 500 RP
-    once the weight would drop below 0.4, it drops by 0.02 per 500 RP
-    instead, and it never goes below 0.3.
-
-  Examples:
-    500 RP   x 0.75 = 375 RHP   (Copper 4)
-    1000 RP  x 0.70 = 700 RHP   (Bronze 3)
-    2000 RP  x 0.60 = 1200 RHP  (Silver 3)
-    5000 RP  x 0.36 = 1800 RHP  (Gold 3)
-    10000 RP x 0.30 = 3000 RHP  (Diamond 1)
-    20000 RP x 0.30 = 6000 RHP  (Expert)
-
-  So a low-skill player is never boosted into a high rank, and a very
-  high-RP player gets a meaningful but not overwhelming starting rank.
-  The credit is awarded once and never again (reconnecting or refreshing
-  your profile does not double-credit).
-
-  DAILY RP RE-WEIGHT:
-  Once every 24 hours the system re-checks your connected Rhythia
-  profile. If your RP has grown, the whole credit is recomputed with the
-  current formula and you are paid the difference. Example: you linked at
-  10,000 RP and received the credit for that amount; a week later you are
-  at 11,000 RP, so the total credit is recomputed for 11,000 RP and you
-  receive the extra RHP. RP drops never take RHP back — only gains pay
-  out. The check runs automatically (a daily cron plus a check whenever
-  you visit your profile or settings), so you never have to do anything.
+Submitters suggest a rating when submitting a map. The reviewer confirms or
+overrides the final rating, and the approved reviewer rating is authoritative.
 
 ------------------------------------------------
-3. HOW CHALLENGE MAP RATING WORKS
+2. RHP GAIN
 ------------------------------------------------
-Every map on the site has a rating with two decimal places (e.g. 2.05).
-This rating decides WHICH RANKS are allowed to play the map for points.
 
-A typical 5-star Rhythia map is around a 2.05 rating. The conversion
-from Rhythia stars to our rating is:
+RHP is calculated from four factors:
 
-    Rhythia rating = stars x 0.41  (rounded to 2 decimals)
+  1. The map's position inside the player's current rank range.
+  2. The map's length.
+  3. Accuracy.
+  4. Speed modifier.
 
-Each rank may ONLY earn RHP from maps inside its rating band:
-  Copper   -> maps rated 0.00 - 1.49
-  Bronze   -> maps rated 1.50 - 1.99
-  Silver   -> maps rated 2.00 - 2.49
-  Gold     -> maps rated 2.50 - 2.99
-  Platinum -> maps rated 3.00 - 3.49
-  Emerald  -> maps rated 3.50 - 3.99
-  Diamond  -> maps rated 4.00 - 4.49
-  Master   -> maps rated 4.50 - 4.99
-  Expert   -> maps rated 5.00 - 9.99
+The same reward range is used for every rank. A map at the bottom of a rank
+starts at the same base RHP as a map at the bottom of every other rank.
+A harder map inside the same rank pays more.
 
-This keeps everyone playing maps at their skill level. A Copper player
-cannot gain points from a Diamond map, and a Diamond player cannot gain
-points from a Bronze map. If you play a map outside your range, you earn
-NOTHING (and it is not submitted for points).
+The rating position is normalized separately for the player's rank:
 
-WHO SETS THE RATING:
-  - Submitters suggest a rating when they submit a map.
-  - The map-reviewer confirms (or overrides) the final rating when they
-    approve the map. The reviewer's rating is what actually counts.
+  position = clamp((rating - rankMin) / (rankMax - rankMin), 0, 1)
+  difficultyFactor = position ^ 0.9
 
-------------------------------------------------
-4. RHP GAIN — DIFFICULTY, ACCURACY & SPEED
-------------------------------------------------
-The base RHP for a challenge map or daily map depends on YOUR RANK:
+The base reward is:
 
-    Copper   -> 20 RHP   (at 100% accuracy, no modifiers)
-    Bronze   -> 19 RHP
-    Silver   -> 18 RHP
-    Gold     -> 17 RHP
-    Platinum -> 16 RHP
-    Emerald  -> 15 RHP
-    Diamond  -> 14 RHP
-    Master   -> 13 RHP
-    Expert   -> 10 RHP
+  baseRHP = 16.5 + (21 - 16.5) x difficultyFactor
 
-Higher ranks earn less so the ladder stays balanced — the more RHP you
-have, the less each map is worth (diminishing returns as you climb).
+This means every rank uses the same difficulty-to-RHP curve. A 4.00 Diamond
+map is at the bottom of Diamond and therefore has the same base difficulty
+reward as a 4.50 Master map at the bottom of Master. A 4.49 Diamond map is
+worth more because it is near the top of Diamond.
 
-The base is then scaled by how hard the map is WITHIN your rank's
-rating range. A map at the very bottom of the range is worth 0.6x the
-rank base, a map at the very top is worth 1.4x:
-
-    difficulty factor = 0.6 + 0.8 x position in range
-
-So a lower rated map pays less and a higher rated map pays more, while
-staying fair inside the rank. Examples (Copper, base 20 RHP):
-   0.00-rated map (bottom of range) -> 12 RHP
-   0.75-rated map (middle of range) -> 20 RHP
-   1.49-rated map (top of range)    -> 28 RHP
-
-Your accuracy scales the base:
-  Accuracy  >= 100%  -> 100% of base RHP
-  Accuracy  >=  99%  ->  90% of base RHP
-  Accuracy  >=  98%  ->  75% of base RHP
-  Accuracy  >=  95%  ->  60% of base RHP
-  Accuracy  >=  90%  ->  50% of base RHP
-  Accuracy  <   90%  ->  40% of base RHP
-
-Example (Copper, base 20 RHP):
-  100% accuracy  -> 20 RHP
-   99% accuracy  -> 18 RHP
-   98% accuracy  -> 15 RHP
-   95% accuracy  -> 12 RHP
-  <90% accuracy  ->  8 RHP
-
-Playing with a SPEED MODIFIER (anything above 1.00x) adds a bonus:
-  +25% of the base per 1.00x of extra speed, capped at +50%.
-  A mid-range Copper 2.00x perfect clear earns 20 x 1.25 = 25 RHP.
-  A mid-range Master 2.00x perfect clear earns 13 x 1.25 = 16 RHP.
-  A 3.00x+ clear earns up to 1.5x the base.
+At roughly 3 minutes, a 1.00-rated Copper map is around 20 RHP before
+accuracy and speed modifiers.
 
 ------------------------------------------------
-5. RHP LOSS — PLACEMENT BASED
+3. MAP LENGTH
 ------------------------------------------------
-Failing a challenge map costs RHP. The loss is based on two things:
-  - totalBeaters: how many players have beaten the map, and
-  - yourPlace:    the placement your failed attempt would have earned
-                  among those beaters (by accuracy, 1 = best).
 
-    loss = baseLoss x (yourPlace - 1) / totalBeaters
-    baseLoss = round(rating x 10)   (minimum 5 RHP)
+Three minutes is the reference length.
 
-  - If you are effectively #1 on the map (your failed accuracy beats
-    every existing score), you lose nothing.
-  - If your attempt is average, you lose a portion of the base loss.
-  - If no one has beaten the map, or your attempt has no recorded
-    accuracy, you are treated as last place and take the full loss.
+  lengthMultiplier = 0.75 + 0.25 x sqrt(lengthSeconds / 180)
 
-Example: a 2.05-rated map (base loss = 21). If 10 players have beaten
-it and your failed attempt would place 5th, you lose 21 x 4/10 = 8 RHP.
-If it would place last, you lose the full 21 RHP.
+The multiplier is clamped between 0.70 and 1.35.
 
-------------------------------------------------
-6. THE DAILY MAP
-------------------------------------------------
-Every day at midnight UTC a new daily map is picked FOR EACH RANK. The
-daily map is chosen at random from maps inside that rank's rating range,
-so it is always matched to your skill level.
+The square-root curve makes longer maps worth more without allowing very long
+maps to dominate the ladder.
 
-  - Beating the daily map awards the SAME rank-based RHP as challenge
-    maps (your rank's base at 100% accuracy), scaled by accuracy and
-    speed. Copper 20 RHP ... Expert 10 RHP.
-  - Each rank gets its own daily map (Copper players see a Copper map,
-    Bronze players see a Bronze map, etc.).
-  - Maps are not repeated within a calendar month, then the pool resets.
-
-STREAKS:
-  Beating the daily map on consecutive days builds a STREAK.
-  - If you beat the map yesterday too, your streak increases by 1.
-  - If you miss a day, your streak resets to 0.
-  - The daily leaderboard ranks players by their streak, within their
-    own rank only.
+Examples:
+  30 seconds  -> about 0.85x
+  1 minute    -> about 0.89x
+  3 minutes   -> 1.00x
+  5 minutes   -> about 1.07x
+  10 minutes  -> about 1.34x
 
 ------------------------------------------------
-7. THE LEADERBOARDS
+4. ACCURACY
 ------------------------------------------------
-There are two kinds of leaderboard, each split per-rank (a separate
-leaderboard for Copper, Bronze, Silver, etc.):
 
-  DAILY LEADERBOARDS:
-    Ranks players by their daily map STREAK within their rank.
-    A Bronze player with a 50-day streak ranks above a Master with a
-    30-day streak ON THE BRONZE BOARD. Cross-rank comparison does not
-    matter — each leaderboard is only about the players in that rank.
+  100%+ -> 1.00x
+  99%+  -> 0.90x
+  98%+  -> 0.75x
+  95%+  -> 0.60x
+  90%+  -> 0.50x
+  <90%  -> 0.40x
 
-  CHALLENGE LEADERBOARDS:
-    Ranks players by their RHP within their rank. Everyone starts at the
-    bottom of their rank's board and climbs by earning RHP.
+------------------------------------------------
+5. SPEED
+------------------------------------------------
 
-Only Rhythia-VERIFIED members appear on (or contribute to) the
-leaderboards. Unverified accounts are never listed, and their RHP does
-not count toward anyone's global placement.
+Speed above 1.00x grants a bonus:
 
-Because the ladder goes both up and down, players who stop playing or
-stop progressing settle into the lower ranks instead of hoarding points.
+  speedMultiplier = min(1.5, 1 + (speed - 1) x 0.25)
 
-================================================
-  Made by LC727 for Rhythians
+Normal speed receives no bonus. The speed bonus is capped at 1.50x.
+
+------------------------------------------------
+6. FINAL RHP
+------------------------------------------------
+
+  RHP = round(baseRHP x lengthMultiplier x accuracyMultiplier x speedMultiplier)
+
+The minimum awarded amount is 5 RHP.
+
+The rank range controls eligibility and the normalized position controls the
+map's difficulty reward. Rank names themselves do not make maps worth more.
+
+------------------------------------------------
+7. RHP LOSS
+------------------------------------------------
+
+Failing a challenge map uses the existing placement-based loss system:
+
+  baseLoss = max(5, round(rating x 10))
+  loss = round(baseLoss x (yourPlace - 1) / totalBeaters)
+
+RHP cannot fall below zero.
+
 ================================================
