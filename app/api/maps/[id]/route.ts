@@ -21,12 +21,42 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   try {
     const metadata = await getMapSubmissionMetadata(id);
     if (!metadata) return NextResponse.json({ error: "Map submission type is missing." }, { status: 400 });
+
     if (status === "approved" && metadata.submissionType === "challenge") {
       if (!["main", "jumps", "stream", "tech", "off_grid"].includes(String(placement))) return NextResponse.json({ error: "Choose a valid challenge destination." }, { status: 400 });
       if (!Number.isInteger(level) || level! < 1 || level! > 20) return NextResponse.json({ error: "Challenge level must be between 1 and 20." }, { status: 400 });
+
+      const map = await prisma.challengeMap.findUnique({ where: { id } });
+      if (!map) return NextResponse.json({ error: "Map not found." }, { status: 404 });
+
+      if (placement === "main") {
+        await prisma.$executeRawUnsafe('INSERT INTO "ChallengeMapLevel" ("id","challengeMapId","level","createdAt","updatedAt") VALUES ($1,$2,$3,NOW(),NOW()) ON CONFLICT ("challengeMapId") DO UPDATE SET "level"=EXCLUDED."level","updatedAt"=NOW()', crypto.randomUUID(), id, level);
+      } else {
+        await prisma.categoryMap.create({
+          data: {
+            category: placement,
+            level,
+            title: map.title,
+            artist: map.artist,
+            description: map.description,
+            mapFileUrl: map.mapFileUrl,
+            imageUrl: map.imageUrl,
+            mapperName: map.mapperName,
+            noteCount: map.noteCount,
+            length: map.length,
+            sourceBeatmapId: map.sourceBeatmapId,
+            sourceUrl: map.sourceUrl,
+            submittedById: map.submittedById,
+            status: "approved",
+            reviewerNote: note,
+            reviewedById: user.id,
+            reviewedAt: new Date(),
+          },
+        });
+      }
+
       await setMapSubmissionMetadata(id, "challenge", placement!, level!);
       const updated = await reviewChallengeMap(id, user.id, status, null, note);
-      await prisma.$executeRawUnsafe('INSERT INTO "ChallengeMapLevel" ("id","challengeMapId","level","createdAt","updatedAt") VALUES ($1,$2,$3,NOW(),NOW()) ON CONFLICT ("challengeMapId") DO UPDATE SET "level"=EXCLUDED."level","updatedAt"=NOW()', crypto.randomUUID(), id, level);
       return NextResponse.json({ map: updated, submissionType: "challenge", challengePlacement: placement, challengeLevel: level });
     }
 
