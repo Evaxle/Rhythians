@@ -30,6 +30,8 @@
     "@prisma/adapter-pg": "7.9.1",
     "@prisma/client": "7.9.1",
     "@supabase/supabase-js": "2.39.8",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "archiver": "^8.0.0",
     "clsx": "2.1.1",
     "dayjs": "1.11.10",
