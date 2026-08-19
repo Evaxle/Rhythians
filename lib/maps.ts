@@ -1,254 +1,13 @@
 import { prisma } from "@/lib/db";
-import { fetchAllRhythiaScores, fetchRhythiaScores, findScoreForMap, type RhythiaScoreEntry } from "@/lib/daily";
-import { fetchRhythiaProfile } from "@/lib/rhythia";
-import {
-  RANKS,
-  getRankInfo,
-  isMapInRankRange,
-  rankIndexForRating,
-  roundRating,
-  rhpGainForMap,
-  rhpLossForMap,
-  accuracyFromMisses,
-  type RankInfo,
-} from "@/lib/ranks";
-
-function normalizeTitle(value: string | null | undefined): string {
-  return (value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
-}
-
-function matchesTitle(scoreTitle: string | null | undefined, mapTitle: string): boolean {
-  const target = normalizeTitle(mapTitle);
-  return target.length > 0 && normalizeTitle(scoreTitle) === target;
-}
-
-export function bestScoreByTitle(scores: RhythiaScoreEntry[]): Map<string, RhythiaScoreEntry> {
-  const best = new Map<string, RhythiaScoreEntry>();
-  for (const score of scores) {
-    if (!score.passed) continue;
-    const title = normalizeTitle(score.beatmapTitle);
-    if (!title) continue;
-    const existing = best.get(title);
-    if (!existing || (score.awarded_sp ?? 0) > (existing.awarded_sp ?? 0)) best.set(title, score);
-  }
-  return best;
-}
-
-export async function submitChallengeMap(data: {
-  title: string;
-  artist: string | null;
-  description: string | null;
-  mapFileUrl: string;
-  imageUrl: string | null;
-  requestedRating: number;
-  mapperName: string | null;
-  noteCount: number | null;
-  length: number | null;
-  submittedById: string;
-  sourceBeatmapId?: number | null;
-  sourceUrl?: string | null;
-  isAutoImported?: boolean;
-}) {
-  const rating = roundRating(Math.min(9.99, Math.max(0, data.requestedRating)));
-  return prisma.challengeMap.create({
-    data: {
-      title: data.title.trim(),
-      artist: data.artist?.trim() || null,
-      description: data.description?.trim() || null,
-      mapFileUrl: data.mapFileUrl,
-      imageUrl: data.imageUrl,
-      requestedRating: rating,
-      mapperName: data.mapperName?.trim() || null,
-      noteCount: data.noteCount,
-      length: data.length,
-      submittedById: data.submittedById,
-      sourceBeatmapId: data.sourceBeatmapId ?? null,
-      sourceUrl: data.sourceUrl ?? null,
-      isAutoImported: data.isAutoImported ?? false,
-    },
-  });
-}
-
-export async function getPendingChallengeMaps() {
-  return prisma.challengeMap.findMany({
-    where: { status: "pending" },
-    orderBy: { createdAt: "asc" },
-    include: { submittedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } } },
-  });
-}
-
-export async function reviewChallengeMap(mapId: string, reviewerId: string, status: "approved" | "rejected", finalRating: number | null, note: string | null) {
-  const map = await prisma.challengeMap.findUnique({ where: { id: mapId } });
-  if (!map) throw new Error("Map not found.");
-  if (map.status !== "pending") throw new Error("This map has already been reviewed.");
-
-  const rating = status === "approved" ? roundRating(finalRating ?? map.requestedRating) : null;
-
-  const updated = await prisma.challengeMap.update({
-    where: { id: mapId },
-    data: {
-      status,
-      rating,
-      reviewerNote: note?.trim() || null,
-      reviewedById: reviewerId,
-      reviewedAt: new Date(),
-    },
-  });
-
-  await prisma.notification.create({
-    data: {
-      userId: map.submittedById,
-      type: status === "approved" ? "map_approved" : "map_rejected",
-      title: status === "approved" ? "Your map was approved" : "Your map was rejected",
-      message:
-        status === "approved"
-          ? `"${map.title}" was approved and is now playable with a rating of ${rating?.toFixed(2)}.`
-          : `"${map.title}" was rejected.${note?.trim() ? `\n\nReason: ${note.trim()}` : ""}`,
-      url: "/maps",
-    },
-  });
-
-  return updated;
-}
-
-export type ChallengeMapCheckResult =
-  | { status: "no_profile"; points: number }
-  | { status: "not_available"; points: number }
-  | { status: "out_of_range"; points: number; rankInfo: RankInfo }
-  | { status: "error"; points: number }
-  | { status: "already"; points: number }
-  | { status: "beat"; points: number; rankInfo: RankInfo; accuracy: number | null }
-  | { status: "failed"; points: number; rankInfo: RankInfo }
-  | { status: "not_beat"; points: number };
-
-export async function checkAndAwardChallengeMap(userId: string, challengeMapId: string): Promise<ChallengeMapCheckResult> {
-  const profile = await prisma.rhythiaProfile.findUnique({ where: { userId } });
-  if (!profile) return { status: "no_profile", points: 0 };
-
-  const map = await prisma.challengeMap.findUnique({ where: { id: challengeMapId } });
-  if (!map || map.status !== "approved" || map.rating == null) return { status: "not_available", points: 0 };
-
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true, avgMapRating: true } });
-  if (!user) return { status: "not_available", points: 0 };
-
-  const rankInfo = getRankInfo(user.rhp);
-  if (!isMapInRankRange(map.rating, rankInfo.index)) return { status: "out_of_range", points: 0, rankInfo };
-
-  let scores: { recent: import("@/lib/daily").RhythiaScoreEntry[]; top: import("@/lib/daily").RhythiaScoreEntry[] };
-  try {
-    scores = await fetchRhythiaScores(profile.profileId);
-  } catch {
-    return { status: "error", points: 0 };
-  }
-
-  const allScores = [...scores.recent, ...scores.top];
-  const passHit = findScoreForMap(scores.recent, map.title) ?? findScoreForMap(scores.top, map.title);
-
-  const existing = await prisma.challengeMapCompletion.findUnique({
-    where: { challengeMapId_userId: { challengeMapId: map.id, userId } },
-  });
-  if (existing?.passed) return { status: "already", points: existing.points };
-
-  const accuracy = passHit ? passHit.accuracy ?? accuracyFromMisses(passHit.beatmapNotes, passHit.misses) : null;
-
-  if (passHit) {
-    const points = rhpGainForMap(map.rating, accuracy, passHit.speed, rankInfo.index, map.length);
-    const newRhp = user.rhp + points;
-    const newRankInfo = getRankInfo(newRhp);
-
-    const passedCount = await prisma.challengeMapCompletion.count({ where: { userId, passed: true } });
-    const newAvg = passedCount === 0
-      ? map.rating
-      : roundRating(((user.avgMapRating ?? map.rating) * passedCount + map.rating) / (passedCount + 1));
-
-    await prisma.$transaction([
-      prisma.challengeMapCompletion.upsert({
-        where: { challengeMapId_userId: { challengeMapId: map.id, userId } },
-        create: { challengeMapId: map.id, userId, rating: map.rating, accuracy, passed: true, points, scoreId: passHit.id },
-        update: { accuracy, passed: true, points, scoreId: passHit.id },
-      }),
-      prisma.user.update({ where: { id: userId }, data: { rhp: newRhp, avgMapRating: newAvg } }),
-      prisma.rhpTransaction.create({
-        data: {
-          userId,
-          amount: points,
-          reason: "challenge_map",
-          description: `Completed ranked map: ${map.title} (${map.rating.toFixed(2)})`,
-        },
-      }),
-      prisma.notification.create({
-        data: {
-          userId,
-          type: "rhp_earned",
-          title: "Map completed",
-          message: `You earned ${points} RHP for beating ${map.title} (${map.rating.toFixed(2)} rating).`,
-          url: "/maps",
-        },
-      }),
-    ]);
-
-    if (newRankInfo.index > rankInfo.index) {
-      await prisma.notification.create({
-        data: {
-          userId,
-          type: "rank_change",
-          title: "Rank up!",
-          message: `You reached ${newRankInfo.name} ${newRankInfo.isExpert ? "" : newRankInfo.tier}!`,
-          url: "/leaderboards",
-        },
-      });
-    }
-
-    return { status: "beat", points, rankInfo: newRankInfo, accuracy };
-  }
-
-  const failHit = allScores.find((score) => !score.passed && matchesTitle(score.beatmapTitle, map.title));
-  if (failHit && !existing) {
-    const failAccuracy = failHit.accuracy ?? accuracyFromMisses(failHit.beatmapNotes, failHit.misses);
-    const passers = await prisma.challengeMapCompletion.findMany({
-      where: { challengeMapId: map.id, passed: true },
-      select: { accuracy: true },
-    });
-    const totalBeaters = passers.length;
-    const yourPlace =
-      1 + passers.filter((entry) => entry.accuracy != null && failAccuracy != null && entry.accuracy > failAccuracy).length;
-    const loss = rhpLossForMap(map.rating, { totalBeaters, yourPlace });
-    const newRhp = Math.max(0, user.rhp - loss);
-
-    await prisma.$transaction([
-      prisma.challengeMapCompletion.upsert({
-        where: { challengeMapId_userId: { challengeMapId: map.id, userId } },
-        create: { challengeMapId: map.id, userId, rating: map.rating, accuracy: failAccuracy, passed: false, points: -loss, scoreId: failHit.id },
-        update: { accuracy: failAccuracy, passed: false, points: -loss, scoreId: failHit.id },
-      }),
-      prisma.user.update({ where: { id: userId }, data: { rhp: newRhp } }),
-      prisma.rhpTransaction.create({
-        data: {
-          userId,
-          amount: -loss,
-          reason: "challenge_map_fail",
-          description: `Failed ranked map: ${map.title} (${map.rating.toFixed(2)})`,
-        },
-      }),
-    ]);
-
-    return { status: "failed", points: -loss, rankInfo: getRankInfo(newRhp) };
-  }
-
-  return { status: "not_beat", points: 0 };
-}
+import { fetchAllRhythiaScores, bestScoreByTitle, normalizeTitle } from "@/lib/daily";
+import { accuracyFromMisses, getRankInfo, rhpGainForMap, RANKS, roundRating } from "@/lib/ranks";
 
 export async function getChallengeMapsForRank(rankIndex: number) {
   const rank = RANKS[rankIndex] ?? RANKS[RANKS.length - 1];
   return prisma.challengeMap.findMany({
-    where: {
-      status: "approved",
-      rating: { gte: rank.rangeMin, lte: rank.rangeMax },
-    },
+    where: { status: "approved", rating: { gte: rank.rangeMin, lte: rank.rangeMax } },
     orderBy: [{ rating: "asc" }, { createdAt: "desc" }],
-    include: {
-      submittedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } },
-    },
+    include: { submittedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } } },
   });
 }
 
@@ -261,10 +20,7 @@ export async function checkAndAwardAllChallengeMaps(userId: string) {
 
   const rankInfo = getRankInfo(user.rhp);
   const maps = await prisma.challengeMap.findMany({
-    where: {
-      status: "approved",
-      rating: { gte: rankInfo.rangeMin, lte: rankInfo.rangeMax },
-    },
+    where: { status: "approved", rating: { gte: rankInfo.rangeMin, lte: rankInfo.rangeMax } },
     orderBy: [{ rating: "asc" }, { createdAt: "asc" }],
   });
 
@@ -275,9 +31,9 @@ export async function checkAndAwardAllChallengeMaps(userId: string) {
 
   for (const map of maps) {
     checked += 1;
-    const existing = await prisma.challengeMapCompletion.findUnique({
-      where: { challengeMapId_userId: { challengeMapId: map.id, userId } },
-    });
+    if (map.rating == null) continue;
+
+    const existing = await prisma.challengeMapCompletion.findUnique({ where: { challengeMapId_userId: { challengeMapId: map.id, userId } } });
     if (existing?.passed) continue;
 
     const score = bestScores.get(normalizeTitle(map.title));
@@ -289,9 +45,7 @@ export async function checkAndAwardAllChallengeMaps(userId: string) {
     if (!currentUser) continue;
     const newRhp = currentUser.rhp + points;
     const passedCount = await prisma.challengeMapCompletion.count({ where: { userId, passed: true } });
-    const newAvg = passedCount === 0
-      ? map.rating
-      : roundRating(((currentUser.avgMapRating ?? map.rating) * passedCount + map.rating) / (passedCount + 1));
+    const newAvg = passedCount === 0 ? map.rating : roundRating(((currentUser.avgMapRating ?? map.rating) * passedCount + map.rating) / (passedCount + 1));
 
     await prisma.$transaction([
       prisma.challengeMapCompletion.upsert({
