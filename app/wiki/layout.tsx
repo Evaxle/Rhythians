@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { Settings2, Grid3X3, Trophy } from "lucide-react";
+import { Settings2, Grid3X3, Trophy, Swords } from "lucide-react";
 
 const navItems = [
   { href: "/wiki/ranking", label: "About Ranking", icon: Trophy },
+  { href: "/wiki/challenge", label: "About Challenge", icon: Swords },
   { href: "/wiki/settings", label: "Settings Guide", icon: Settings2 },
   { href: "/wiki/patterns", label: "Patterns Wiki", icon: Grid3X3 },
 ];
@@ -20,11 +21,7 @@ export default function WikiLayout({ children }: { children: React.ReactNode }) 
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="flex items-center gap-3 rounded-2xl px-3 py-3 text-muted transition hover:bg-white/5 hover:text-white"
-                >
+                <Link key={item.href} href={item.href} className="flex items-center gap-3 rounded-2xl px-3 py-3 text-muted transition hover:bg-white/5 hover:text-white">
                   <Icon size={18} className="shrink-0 text-accent" />
                   <span>{item.label}</span>
                 </Link>
