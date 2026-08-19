@@ -24,35 +24,20 @@ export async function SiteHeader() {
             <Link href="/daily" className="text-sm text-muted transition hover:text-white">Daily</Link>
             <Link href="/maps" className="text-sm text-muted transition hover:text-white">Maps</Link>
             <Link href="/categories" className="text-sm text-muted transition hover:text-white">Categories</Link>
-            <Link href="/challenge" className="text-sm text-muted transition hover:text-white">Challenge</Link>
             <Link href="/leaderboards" className="text-sm text-muted transition hover:text-white">Leaderboards</Link>
             <Link href="/wiki" className="text-sm text-muted transition hover:text-white">Wiki</Link>
             <Link href="/clips" className="text-sm text-muted transition hover:text-white">Clips</Link>
             <Link href="/rules" className="text-sm text-muted transition hover:text-white">Rules</Link>
             <Link href="/community" className="text-sm text-muted transition hover:text-white">Community</Link>
-            {user && (
-              <Link href="/messages" className="text-sm text-muted transition hover:text-white">Messages</Link>
-            )}
-            {hasApprovalAccess && (
-              <Link href="/approval" className="text-sm text-accent transition hover:text-white">Review</Link>
-            )}
-            {isAdmin && (
-              <Link href="/admin" className="text-sm font-semibold text-accent transition hover:text-white">Admin</Link>
-            )}
+            {user && <Link href="/messages" className="text-sm text-muted transition hover:text-white">Messages</Link>}
+            {hasApprovalAccess && <Link href="/approval" className="text-sm text-accent transition hover:text-white">Review</Link>}
+            {isAdmin && <Link href="/admin" className="text-sm font-semibold text-accent transition hover:text-white">Admin</Link>}
           </nav>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/search" className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-4 py-2 text-sm text-muted transition hover:border-accent/40 hover:text-white">
-            <Search size={16} /> Search
-          </Link>
+          <Link href="/search" className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-4 py-2 text-sm text-muted transition hover:border-accent/40 hover:text-white"><Search size={16} /> Search</Link>
           {user && <NotificationsBell />}
-          {user ? (
-            <ProfileMenu user={user} />
-          ) : (
-            <Link href="/login" className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent2">
-              <MessageCircle size={16} /> Login
-            </Link>
-          )}
+          {user ? <ProfileMenu user={user} /> : <Link href="/login" className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent2"><MessageCircle size={16} /> Login</Link>}
         </div>
       </div>
     </header>
