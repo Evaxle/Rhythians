@@ -10,6 +10,15 @@ export async function POST() {
   const profile = await prisma.rhythiaProfile.findUnique({ where: { userId: user.id }, select: { id: true } });
   if (!profile) return NextResponse.json({ error: "Link your Rhythia account to check your scores." }, { status: 403 });
 
+  const challengeMapCount = await prisma.challengeMap.count({
+    where: { status: "approved", rating: { not: null }, isAutoImported: false },
+  });
+
+  if (challengeMapCount === 0) {
+    await prisma.user.update({ where: { id: user.id }, data: { scoreImportDone: true } });
+    return NextResponse.json({ checked: 0, awarded: 0, newlyCompleted: 0, totalPoints: 0, rankIndex: 0 });
+  }
+
   try {
     const result = await checkAndAwardAllChallengeMaps(user.id);
     return NextResponse.json(result);
