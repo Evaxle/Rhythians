@@ -390,6 +390,7 @@ model ArticleTag {
   article    KnowledgeArticle @relation(fields: [articleId], references: [id])
   articleId  String
   tag        Tag              @relation(fields: [tagId], references: [id])
+  tagId      String
 }
 
 model ArticleRevision {
