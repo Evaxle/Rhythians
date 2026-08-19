@@ -8,12 +8,21 @@ export function challengeLevelForRating(rating: number): number {
   return Math.min(MAX_CHALLENGE_LEVEL, Math.max(1, Math.ceil(Math.max(0, rating) / 0.5)));
 }
 
+async function getAssignedLevels() {
+  return prisma.$queryRawUnsafe<Array<{ challengeMapId: string; level: number }>>(
+    'SELECT "challengeMapId", "level" FROM "ChallengeMapLevel" WHERE "level" BETWEEN 1 AND 20',
+  );
+}
+
 export async function getUserChallengeLevel(userId: string): Promise<number> {
-  const completions = await prisma.challengeMapCompletion.findMany({
-    where: { userId, passed: true, challengeMap: { rating: { not: null } } },
-    select: { challengeMap: { select: { rating: true } } },
-  });
-  const completedLevels = new Set(completions.map((completion) => challengeLevelForRating(completion.challengeMap.rating!)));
+  const completed = await prisma.$queryRawUnsafe<Array<{ level: number }>>(
+    `SELECT DISTINCT l."level"
+     FROM "ChallengeMapLevel" l
+     INNER JOIN "ChallengeMapCompletion" c ON c."challengeMapId" = l."challengeMapId"
+     WHERE c."userId" = $1 AND c."passed" = true AND l."level" BETWEEN 1 AND 20`,
+    userId,
+  );
+  const completedLevels = new Set(completed.map((row) => row.level));
   let level = 0;
   for (let next = 1; next <= MAX_CHALLENGE_LEVEL; next += 1) {
     if (!completedLevels.has(next)) break;
@@ -23,11 +32,16 @@ export async function getUserChallengeLevel(userId: string): Promise<number> {
 }
 
 export async function getChallengeMapsWithCompletions(userId: string) {
+  const assignments = await getAssignedLevels();
+  if (assignments.length === 0) return [];
+
+  const assignmentMap = new Map(assignments.map((assignment) => [assignment.challengeMapId, assignment.level]));
   const maps = await prisma.challengeMap.findMany({
-    where: { status: "approved", rating: { not: null } },
+    where: { id: { in: [...assignmentMap.keys()] }, status: "approved", rating: { not: null } },
     orderBy: [{ rating: "asc" }, { createdAt: "asc" }],
     include: { completions: { where: { userId }, select: { passed: true, accuracy: true } } },
   });
+
   return maps.map((map) => ({
     id: map.id,
     title: map.title,
@@ -39,7 +53,7 @@ export async function getChallengeMapsWithCompletions(userId: string) {
     mapperName: map.mapperName,
     noteCount: map.noteCount,
     length: map.length,
-    level: challengeLevelForRating(map.rating as number),
+    level: assignmentMap.get(map.id) ?? 1,
     completion: map.completions[0] ?? null,
   }));
 }
@@ -48,11 +62,17 @@ export async function checkAndAwardChallengeLevelMap(userId: string, challengeMa
   const profile = await prisma.rhythiaProfile.findUnique({ where: { userId } });
   if (!profile) return { status: "no_profile" as const };
 
+  const assignment = await prisma.$queryRawUnsafe<Array<{ level: number }>>(
+    'SELECT "level" FROM "ChallengeMapLevel" WHERE "challengeMapId" = $1 LIMIT 1',
+    challengeMapId,
+  );
+  const level = assignment[0]?.level;
+  if (!level || level < 1 || level > MAX_CHALLENGE_LEVEL) return { status: "not_available" as const };
+
   const map = await prisma.challengeMap.findUnique({ where: { id: challengeMapId } });
   if (!map || map.status !== "approved" || map.rating == null) return { status: "not_available" as const };
 
   const currentLevel = await getUserChallengeLevel(userId);
-  const level = challengeLevelForRating(map.rating);
   if (level > currentLevel + 1) return { status: "locked" as const, currentLevel, requiredLevel: currentLevel + 1, level };
 
   const existing = await prisma.challengeMapCompletion.findUnique({ where: { challengeMapId_userId: { challengeMapId, userId } } });
@@ -88,7 +108,7 @@ export async function checkAndAwardChallengeLevelMap(userId: string, challengeMa
       ? [
           prisma.user.update({ where: { id: userId }, data: { rhp: user.rhp + points, avgMapRating: newAvg } }),
           prisma.rhpTransaction.create({ data: { userId, amount: points, reason: "challenge_map", description: `Completed ranked map: ${map.title} (${map.rating.toFixed(2)})` } }),
-          prisma.notification.create({ data: { userId, type: "rhp_earned", title: "Challenge map completed", message: `You earned ${points} RHP for beating ${map.title} (${map.rating.toFixed(2)} rating).`, url: "/challenge" } }),
+          prisma.notification.create({ data: { userId, type: "rhp_earned", title: "Challenge map completed", message: `You earned ${points} RHP for beating ${map.title} (${map.rating.toFixed(2)} rating).`, url: "/categories?tab=challenge" } }),
         ]
       : []),
   ]);
