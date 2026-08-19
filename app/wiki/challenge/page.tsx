@@ -10,12 +10,6 @@ const CATEGORY_DESCRIPTIONS = {
 
 const CHALLENGE_LEVELS = Array.from({ length: MAX_CHALLENGE_LEVEL }, (_, index) => index + 1);
 
-function levelRatingRange(level: number): string {
-  const min = (level - 1) * 0.5;
-  const max = level * 0.5;
-  return level === MAX_CHALLENGE_LEVEL ? `${min.toFixed(2)}+` : `${min.toFixed(2)} – ${max.toFixed(2)}`;
-}
-
 export default function AboutChallengePage() {
   return (
     <div className="space-y-8">
@@ -60,14 +54,14 @@ export default function AboutChallengePage() {
           {CHALLENGE_LEVELS.map((level) => (
             <div key={level} className="rounded-2xl border border-border bg-background/70 p-4">
               <p className="text-sm font-semibold text-white">Level {level}</p>
-              <p className="mt-2 text-xs leading-5 text-muted">Rating band reference: {levelRatingRange(level)}</p>
+              <p className="mt-2 text-xs leading-5 text-muted">Main Challenge progression level</p>
             </div>
           ))}
         </div>
         <p className="mt-5 text-sm leading-7 text-muted">
-          The rating bands provide a difficulty reference for assigning Challenge levels, but the level itself
-          is the progression gate. Beating the next Challenge level advances you, while a higher level cannot
-          be used to skip the progression. This keeps the ladder focused on demonstrating skill step by step.
+          Main Challenge levels are progression gates, not ranked rating bands. Beating the next Challenge
+          level advances you, while a higher level cannot be used to skip the progression. Main Challenge
+          clears do not award RHP.
         </p>
       </section>
 
@@ -96,17 +90,10 @@ export default function AboutChallengePage() {
       </section>
 
       <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
-        <h2 className="text-2xl font-semibold text-white">Challenge and ranking are connected, but not identical</h2>
+        <h2 className="text-2xl font-semibold text-white">Challenge and ranking are separate</h2>
         <p className="mt-2 text-sm leading-7 text-muted">
-          Beating a Challenge map can award RHP when the map is inside your current ranked map-rating range.
-          When it is outside that range, the Challenge completion can still count toward Challenge progress,
-          but it does not award ranked RHP. This separates proof of skill from the ranked ladder&apos;s controlled
-          point economy.
-        </p>
-        <p className="mt-3 text-sm leading-7 text-muted">
-          When an eligible Challenge clear does award RHP, the amount uses the ranked weighting system:
-          map rating, map length, accuracy, and speed all influence the final reward. Challenge progression
-          itself, however, is about beating the assigned level rather than maximizing the RHP payout.
+          Challenge maps are not part of the ranked RHP economy. Passing a Main Challenge or skill-category
+          map is used for Challenge progression only and does not award RHP or ranked-map points.
         </p>
       </section>
 
@@ -114,14 +101,13 @@ export default function AboutChallengePage() {
         <h2 className="text-2xl font-semibold text-white">RP on Rhythia vs RHP on Rhythians</h2>
         <p className="mt-2 text-sm leading-7 text-muted">
           Rhythia RP and Rhythians RHP serve different purposes. RP is the performance value from Rhythia,
-          while RHP is Rhythians&apos; own ranked ladder value. Challenge is primarily a test of what you can
-          actually play, and ranked RHP is the separate progression currency when an eligible Challenge clear
-          qualifies for it.
+          while RHP is Rhythians&apos; own ranked ladder value. Challenge progression is separate from the ranked
+          ladder and does not award RHP.
         </p>
         <div className="mt-5 rounded-2xl border border-border bg-background/70 p-5 text-sm leading-6 text-muted">
           <p><span className="text-white">Rhythia:</span> RP represents your performance in the source game.</p>
           <p className="mt-2"><span className="text-white">Rhythians:</span> RHP represents your position in the Rhythians ranked ladder.</p>
-          <p className="mt-2"><span className="text-white">Challenge:</span> progression is primarily about proving that you can beat increasingly difficult maps with pure gameplay skill.</p>
+          <p className="mt-2"><span className="text-white">Challenge:</span> progression is about proving that you can beat increasingly difficult maps with pure gameplay skill.</p>
         </div>
       </section>
 
