@@ -52,8 +52,33 @@ export async function POST(request: Request) {
         reviewedById: admin.id,
         reviewedAt: new Date(),
       },
+      include: {
+        submittedBy: { select: { username: true, displayName: true, profileHandle: true } },
+        reviewedBy: { select: { username: true, displayName: true, profileHandle: true } },
+      },
     });
-    return NextResponse.json({ map }, { status: 201 });
+    return NextResponse.json(
+      {
+        map: {
+          id: map.id,
+          category: map.category,
+          level: map.level,
+          title: map.title,
+          artist: map.artist,
+          mapFileUrl: map.mapFileUrl,
+          mapperName: map.mapperName,
+          noteCount: map.noteCount,
+          length: map.length,
+          sourceBeatmapId: map.sourceBeatmapId,
+          status: map.status,
+          reviewerNote: map.reviewerNote,
+          createdAt: map.createdAt.toISOString(),
+          submittedBy: map.submittedBy,
+          reviewedBy: map.reviewedBy,
+        },
+      },
+      { status: 201 },
+    );
   } catch (error) {
     if ((error as { code?: string })?.code === "P2002") {
       return NextResponse.json({ error: "A map with that source beatmap id already exists." }, { status: 409 });

@@ -2,8 +2,16 @@ import Link from "next/link";
 import { Link2, LogIn, Layers } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
-import { CATEGORIES, getCategoryMapsWithCompletions, getCategoryStats, getUserCategoryLevels } from "@/lib/categories";
+import {
+  CATEGORIES,
+  getCategoryMapsWithCompletions,
+  getCategoryStats,
+  getUserCategoryLevels,
+  serializeCategoryMapForClient,
+  type Category,
+} from "@/lib/categories";
 import { CategoriesBrowser } from "@/components/categories/categories-browser";
+import { ErrorState } from "@/components/error-state";
 
 export const dynamic = "force-dynamic";
 
@@ -52,18 +60,33 @@ export default async function CategoriesPage() {
     );
   }
 
-  const [levels, stats, mapsByCategory] = await Promise.all([
-    getUserCategoryLevels(user.id),
-    getCategoryStats(user.id),
-    Promise.all(CATEGORIES.map((category) => getCategoryMapsWithCompletions(user.id, category))),
-  ]);
+  let levels: Awaited<ReturnType<typeof getUserCategoryLevels>>;
+  let stats: Awaited<ReturnType<typeof getCategoryStats>>;
+  let mapsByCategory: Awaited<ReturnType<typeof getCategoryMapsWithCompletions>>[];
 
-  const maps: Record<(typeof CATEGORIES)[number], typeof mapsByCategory[number]> = {
-    jumps: mapsByCategory[0],
-    stream: mapsByCategory[1],
-    tech: mapsByCategory[2],
-    off_grid: mapsByCategory[3],
-  };
+  try {
+    [levels, stats, mapsByCategory] = await Promise.all([
+      getUserCategoryLevels(user.id),
+      getCategoryStats(user.id),
+      Promise.all(CATEGORIES.map((category) => getCategoryMapsWithCompletions(user.id, category))),
+    ]);
+  } catch {
+    return (
+      <div className="mx-auto max-w-2xl space-y-6">
+        <ErrorState
+          title="Categories unavailable"
+          description="The categories database tables are missing or not migrated yet. Run npm run db:migrate (or ask an admin to run the database repair endpoint) and try again."
+        />
+      </div>
+    );
+  }
+
+  const maps = Object.fromEntries(
+    CATEGORIES.map((category, index) => [
+      category,
+      mapsByCategory[index].map(serializeCategoryMapForClient),
+    ]),
+  ) as Record<Category, ReturnType<typeof serializeCategoryMapForClient>[]>;
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">

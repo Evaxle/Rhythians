@@ -37,6 +37,39 @@ export type CategoryMapWithCompletion = Awaited<ReturnType<typeof getCategoryMap
   completion: { passed: boolean; accuracy: number | null } | null;
 };
 
+export type SerializedCategoryMap = {
+  id: string;
+  category: Category;
+  level: number;
+  title: string;
+  artist: string | null;
+  description: string | null;
+  mapFileUrl: string;
+  imageUrl: string | null;
+  mapperName: string | null;
+  noteCount: number | null;
+  length: number | null;
+  completion: { passed: boolean; accuracy: number | null } | null;
+};
+
+// Client components can't receive Prisma Date objects — pick only plain fields.
+export function serializeCategoryMapForClient(map: CategoryMapWithCompletion): SerializedCategoryMap {
+  return {
+    id: map.id,
+    category: map.category,
+    level: map.level,
+    title: map.title,
+    artist: map.artist,
+    description: map.description,
+    mapFileUrl: map.mapFileUrl,
+    imageUrl: map.imageUrl,
+    mapperName: map.mapperName,
+    noteCount: map.noteCount,
+    length: map.length,
+    completion: map.completion,
+  };
+}
+
 // All approved maps in a category with the user's completion state for each.
 export async function getCategoryMapsWithCompletions(userId: string, category: Category): Promise<CategoryMapWithCompletion[]> {
   const maps = await getCategoryMaps(category);
