@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, CheckCircle2, ChevronDown, Download, Map as MapIcon, RefreshCw, Search, Trophy } from "lucide-react";
+import { AlertTriangle, CheckCircle2, ChevronDown, Download, Map as MapIcon, RefreshCw, Search, Trophy, XCircle } from "lucide-react";
 import type { RankInfo } from "@/lib/ranks";
 import { RANKS, isMapInRankRange, rhpGainForMap } from "@/lib/ranks";
 import { MapLeaderboard } from "@/components/maps/map-leaderboard";
@@ -211,7 +211,7 @@ export function MapsBrowser({ maps, rankInfo, userRhp, currentUserId }: { maps: 
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = `${rankInfo.isExpert ? "Expert" : `${rankInfo.name}-${rankInfo.tier}`}-maps.zip`;
+      anchor.download = `${rankInfo.isExpert ? "Expert" : rankInfo.name}-maps.zip`;
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
