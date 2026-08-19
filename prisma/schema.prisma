@@ -207,7 +207,6 @@ model RhythiaProfileRequest {
   resolvedAt      DateTime?
   resolvedBy      String?
   resolvedByUser  User?                       @relation("resolvedRhythiaRequests", fields: [resolvedBy], references: [id], onDelete: SetNull)
-
   @@index([status])
 }
 
@@ -219,7 +218,6 @@ model UserWarning {
   actorId   String
   reason    String
   createdAt DateTime @default(now())
-
   @@index([userId])
 }
 
@@ -229,7 +227,7 @@ model Session {
   user       User     @relation(fields: [userId], references: [id])
   userId     String
   expiresAt  DateTime
-  createdAt  DateTime @default(now())
+  createdAt  DateTime  @default(now())
 }
 
 model Role {
@@ -245,8 +243,8 @@ model Role {
 }
 
 model Permission {
-  id          String      @id @default(uuid())
-  name        PermissionName @unique
+  id          String            @id @default(uuid())
+  name        PermissionName    @unique
   description String?
   rolePermissions RolePermission[]
 }
@@ -259,23 +257,150 @@ model RolePermission {
   permissionId String
 }
 
+model UserRole {
+  id     String  @id @default(uuid())
+  user   User    @relation(fields: [userId], references: [id])
+  userId String
+  role   Role    @relation(fields: [roleId], references: [id])
+  roleId String
+}
+
+model DiscordRoleMapping {
+  id            String   @id @default(uuid())
+  discordRoleId String   @unique
+  role          Role     @relation(fields: [roleId], references: [id])
+  roleId        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model PlayerRank {
+  id          String         @id @default(uuid())
+  name        String         @unique
+  slug        String         @unique
+  description String?
+  icon        String?
+  color       String?        @default("#7289da")
+  displayOrder Int           @default(0)
+  enabled     Boolean        @default(true)
+  users       User[]
+  discordRoleRankMappings DiscordRoleRankMapping[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model DiscordRoleRankMapping {
+  id            String     @id @default(uuid())
+  discordRoleId String     @unique
+  playerRank    PlayerRank @relation(fields: [playerRankId], references: [id])
+  playerRankId  String
+  priority      Int        @default(0)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Rule {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  description String?
+  content     String
+  order       Int      @default(0)
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model KnowledgeCategory {
+  id          String            @id @default(uuid())
+  name        String            @unique
+  slug        String            @unique
+  description String?
+  order       Int               @default(0)
+  articles    KnowledgeArticle[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+model KnowledgeArticle {
+  id           String            @id @default(uuid())
+  title        String
+  slug         String            @unique
+  description  String
+  content      String
+  published    Boolean           @default(false)
+  featured     Boolean           @default(false)
+  viewCount    Int               @default(0)
+  author       User              @relation("articleAuthor", fields: [authorId], references: [id])
+  authorId     String
+  category     KnowledgeCategory @relation(fields: [categoryId], references: [id])
+  categoryId   String
+  tags         ArticleTag[]
+  revisions    ArticleRevision[]
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+}
+
+model Tag {
+  id        String                 @id @default(uuid())
+  name      String                 @unique
+  slug      String                 @unique
+  clips     ClipTag[]
+  articles  ArticleTag[]
+  users     UserTag[]
+  discordRoleTagMappings DiscordRoleTagMapping[]
+  createdAt DateTime               @default(now())
+}
+
+model UserTag {
+  id        String    @id @default(uuid())
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String
+  tag       Tag       @relation(fields: [tagId], references: [id])
+  tagId     String
+  source    TagSource @default(discord)
+  createdAt DateTime  @default(now())
+  @@unique([userId, tagId])
+}
+
+model DiscordRoleTagMapping {
+  id            String   @id @default(uuid())
+  discordRoleId String   @unique
+  tag           Tag      @relation(fields: [tagId], references: [id])
+  tagId         String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model CoachComment {
+  id         String   @id @default(uuid())
+  text       String
+  clip       Clip     @relation(fields: [clipId], references: [id])
+  clipId     String
+  author     User     @relation(fields: [authorId], references: [id])
+  authorId   String
+  isEdited   Boolean  @default(false)
+  isDeleted  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
 model ArticleTag {
   id         String           @id @default(uuid())
   article    KnowledgeArticle @relation(fields: [articleId], references: [id])
   articleId  String
   tag        Tag              @relation(fields: [tagId], references: [id])
-  tagId      String
 }
 
 model ArticleRevision {
-  id         String   @id @default(uuid())
+  id         String           @id @default(uuid())
   article    KnowledgeArticle @relation(fields: [articleId], references: [id])
   articleId  String
-  author     User     @relation(fields: [authorId], references: [id])
+  author     User             @relation(fields: [authorId], references: [id])
   authorId   String
   title      String
   content    String
-  createdAt  DateTime @default(now())
+  createdAt  DateTime         @default(now())
 }
 
 model ClipCategory {
@@ -392,7 +517,83 @@ model Notification {
   title     String
   message   String
   url       String?
+  read      Boolean           @default(false)
   createdAt DateTime          @default(now())
+  @@index([userId, read])
+}
+
+model ModerationAction {
+  id         String   @id @default(uuid())
+  actor      User     @relation(fields: [actorId], references: [id])
+  actorId    String
+  action     String
+  targetType String
+  targetId   String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+}
+
+model SiteSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Conversation {
+  id          String               @id @default(uuid())
+  type        ConversationType     @default(direct)
+  name        String?
+  createdBy   User?                @relation("createdConversations", fields: [createdById], references: [id])
+  createdById String?
+  members     ConversationMember[]
+  messages    Message[]
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  @@index([createdById])
+}
+
+model ConversationMember {
+  id             String       @id @default(uuid())
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId String
+  user           User         @relation(fields: [userId], references: [id])
+  userId         String
+  role           String       @default("member")
+  lastReadAt     DateTime?
+  joinedAt       DateTime     @default(now())
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId String
+  sender         User         @relation(fields: [senderId], references: [id])
+  senderId       String
+  content        String
+  isEdited       Boolean      @default(false)
+  isDeleted      Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  @@index([conversationId, createdAt])
+}
+
+model FriendRequest {
+  id          String              @id @default(uuid())
+  sender      User                @relation("sentFriendRequests", fields: [senderId], references: [id])
+  senderId    String
+  receiver    User                @relation("receivedFriendRequests", fields: [receiverId], references: [id])
+  receiverId  String
+  status      FriendRequestStatus @default(pending)
+  createdAt   DateTime            @default(now())
+  respondedAt DateTime?
+  @@unique([senderId, receiverId])
+  @@index([receiverId])
+  @@index([senderId])
 }
 
 model DailyMap {
@@ -428,11 +629,9 @@ model DailyMapBeat {
   scoreId    Int?
   accuracy   Float?
   misses     Int?
-  cameraMode CameraMode?
   createdAt  DateTime @default(now())
   @@unique([dailyMapId, userId])
   @@index([userId])
-  @@index([cameraMode])
 }
 
 model RhpTransaction {
@@ -488,12 +687,10 @@ model ChallengeMapCompletion {
   passed          Boolean
   points          Int
   scoreId         Int?
-  cameraMode      CameraMode?
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
   @@unique([challengeMapId, userId])
   @@index([userId])
-  @@index([cameraMode])
 }
 
 model CategoryMap {
