@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Download, ExternalLink, Trophy } from "lucide-react";
-import { RANKS, type RankInfo } from "@/lib/ranks";
+import { RANKS, rhpGainForMap, type RankInfo } from "@/lib/ranks";
 import type { RankedMapLeaderboard } from "@/lib/ranked-map-leaderboard";
 
 type Props = {
@@ -13,8 +13,7 @@ type Props = {
 };
 
 function rankLabel(index: number) {
-  const rank = RANKS[index];
-  return rank?.name ?? "Unknown";
+  return RANKS[index]?.name ?? "Unknown";
 }
 
 function lengthLabel(length: number | null) {
@@ -48,7 +47,7 @@ export function MapDetail({ map, userRank, currentUserId }: Props) {
   }, [map.mapId, selectedRank]);
 
   const length = useMemo(() => lengthLabel(data.length), [data.length]);
-  const baseRhp = Math.max(5, Math.round(data.rating * 10));
+  const baseRhp = rhpGainForMap(data.rating, 100, null, data.rankIndex, data.length == null ? null : data.length / 1000);
 
   return (
     <div className="space-y-8">
@@ -70,14 +69,14 @@ export function MapDetail({ map, userRank, currentUserId }: Props) {
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">Rating</p><p className="mt-1 text-xl font-semibold" style={{ color: data.rankColor }}>{data.rating.toFixed(2)}</p></div>
             <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">Rank range</p><p className="mt-1 text-xl font-semibold text-white">{data.rangeMin.toFixed(2)}–{data.rangeMax.toFixed(2)}</p></div>
-            <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">Base RHP</p><p className="mt-1 text-xl font-semibold text-white">{baseRhp}</p></div>
+            <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">100% RHP</p><p className="mt-1 text-xl font-semibold text-white">{baseRhp}</p></div>
             <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">Length</p><p className="mt-1 text-xl font-semibold text-white">{length ?? "—"}</p></div>
           </div>
 
           <div className="mt-6 flex flex-wrap gap-2 text-xs text-muted">
             {data.noteCount != null && <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">{data.noteCount.toLocaleString()} notes</span>}
             {data.sourceBeatmapId != null && <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">Rhythia map #{data.sourceBeatmapId}</span>}
-            <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">Passes award RHP only while the map is in your current rank range</span>
+            <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">RHP is awarded only when this map is in your current rank range</span>
           </div>
         </div>
       </section>
