@@ -19,11 +19,13 @@ export type DailyLeaderboardRow = {
 export function DailyLeaderboard({
   leaderboards,
   currentUserId,
+  initialRankIndex,
 }: {
   leaderboards: DailyLeaderboardRow[][];
   currentUserId: string | null;
+  initialRankIndex: number;
 }) {
-  const [selected, setSelected] = useState(0);
+  const [selected, setSelected] = useState(() => Math.min(Math.max(initialRankIndex, 0), RANKS.length - 1));
 
   const rows = leaderboards[selected] ?? [];
   const rank = RANKS[selected];
