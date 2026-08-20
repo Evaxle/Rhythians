@@ -1,12 +1,10 @@
 import type { PrismaClient } from "../generated/prisma/client";
-import { ROLE_TO_TAG_MAP, getGuildMemberById, validateDiscordBot } from "./discord";
+import { ROLE_TO_TAG_MAP, DiscordApiError, getGuildMemberById, validateDiscordBot } from "./discord";
 
-export async function resolveDiscordRolesToTagIds(
-  prisma: PrismaClient,
-  roleIds: string[]
-): Promise<Set<string>> {
+const SYNC_DELAY_MS = 250;
+
+export async function resolveDiscordRolesToTagIds(prisma: PrismaClient, roleIds: string[]): Promise<Set<string>> {
   const tagIds = new Set<string>();
-
   if (roleIds.length === 0) return tagIds;
 
   const direct = await prisma.discordRoleTagMapping.findMany({
@@ -21,69 +19,42 @@ export async function resolveDiscordRolesToTagIds(
   });
   const slugs: string[] = [];
   for (const mapping of legacyMappings) {
-    const tagSlug = ROLE_TO_TAG_MAP[mapping.role.name.toLowerCase()];
-    if (tagSlug && !slugs.includes(tagSlug)) slugs.push(tagSlug);
+    const slug = ROLE_TO_TAG_MAP[mapping.role.name.toLowerCase()];
+    if (slug && !slugs.includes(slug)) slugs.push(slug);
   }
-
-  if (slugs.length > 0) {
-    const tags = await prisma.tag.findMany({
-      where: { slug: { in: slugs } },
-      select: { id: true },
-    });
+  if (slugs.length) {
+    const tags = await prisma.tag.findMany({ where: { slug: { in: slugs } }, select: { id: true } });
     for (const tag of tags) tagIds.add(tag.id);
   }
-
   return tagIds;
 }
 
-export async function syncUserTagsFromDiscord(
-  prisma: PrismaClient,
-  userId: string,
-  roleIds: string[]
-): Promise<{ applied: number; removed: number }> {
+export async function syncUserTagsFromDiscord(prisma: PrismaClient, userId: string, roleIds: string[]) {
   const desired = await resolveDiscordRolesToTagIds(prisma, roleIds);
   const existing = await prisma.userTag.findMany({
     where: { userId },
     select: { id: true, tagId: true, source: true },
   });
-
   const existingByTag = new Map(existing.map((entry) => [entry.tagId, entry]));
   const toRemove = existing.filter((entry) => entry.source === "discord" && !desired.has(entry.tagId));
-
-  if (toRemove.length > 0) {
-    await prisma.userTag.deleteMany({
-      where: { id: { in: toRemove.map((entry) => entry.id) } },
-    });
+  if (toRemove.length) {
+    await prisma.userTag.deleteMany({ where: { id: { in: toRemove.map((entry) => entry.id) } } });
   }
 
   let applied = 0;
   for (const tagId of desired) {
-    const existingRow = existingByTag.get(tagId);
-    if (!existingRow) {
-      await prisma.userTag.create({
-        data: { userId, tagId, source: "discord" },
-      });
+    if (!existingByTag.has(tagId)) {
+      await prisma.userTag.create({ data: { userId, tagId, source: "discord" } });
       applied++;
     }
   }
-
   return { applied, removed: toRemove.length };
 }
 
-export async function syncUserFromDiscordRoles(
-  prisma: PrismaClient,
-  discordUserId: string,
-  roleIds: string[],
-  inGuild: boolean
-): Promise<{ found: boolean; applied: number; removed: number } | null> {
+export async function syncUserFromDiscordRoles(prisma: PrismaClient, discordUserId: string, roleIds: string[], inGuild: boolean) {
   const user = await prisma.user.findUnique({ where: { discordId: discordUserId } });
   if (!user) return null;
-
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { discordRoles: roleIds, inGuild },
-  });
-
+  await prisma.user.update({ where: { id: user.id }, data: { discordRoles: roleIds, inGuild } });
   const result = await syncUserTagsFromDiscord(prisma, user.id, roleIds);
   return { found: true, ...result };
 }
@@ -91,21 +62,12 @@ export async function syncUserFromDiscordRoles(
 export async function markUserLeftGuild(prisma: PrismaClient, discordUserId: string) {
   const user = await prisma.user.findUnique({ where: { discordId: discordUserId } });
   if (!user) return null;
-
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { inGuild: false, discordRoles: [] },
-  });
+  await prisma.user.update({ where: { id: user.id }, data: { inGuild: false, discordRoles: [] } });
   await prisma.userTag.deleteMany({ where: { userId: user.id, source: "discord" } });
-
   return user;
 }
 
-export async function syncAllGuildMembers(
-  prisma: PrismaClient,
-  token: string,
-  guildId: string
-) {
+export async function syncAllGuildMembers(prisma: PrismaClient, token: string, guildId: string) {
   await validateDiscordBot(token, guildId);
 
   const users = await prisma.user.findMany({
@@ -113,39 +75,31 @@ export async function syncAllGuildMembers(
     select: { discordId: true },
   });
 
-  let applied = 0;
-  let removed = 0;
-  let found = 0;
-  let checked = 0;
+  let tagsApplied = 0;
+  let tagsRemoved = 0;
+  let matchedUsers = 0;
+  let checkedUsers = 0;
   let markedLeft = 0;
 
   for (const user of users) {
     if (!user.discordId) continue;
-    checked++;
+    checkedUsers++;
 
     const member = await getGuildMemberById(token, guildId, user.discordId);
-    const inGuild = member !== null;
-    const roleIds = member?.roles ?? [];
-    const result = await syncUserFromDiscordRoles(prisma, user.discordId, roleIds, inGuild);
-
+    const result = await syncUserFromDiscordRoles(prisma, user.discordId, member?.roles ?? [], member !== null);
     if (!result) continue;
 
-    if (inGuild) {
-      found++;
-      applied += result.applied;
-      removed += result.removed;
+    if (member) {
+      matchedUsers++;
+      tagsApplied += result.applied;
+      tagsRemoved += result.removed;
     } else {
       markedLeft++;
-      removed += result.removed;
+      tagsRemoved += result.removed;
     }
+
+    await new Promise((resolve) => setTimeout(resolve, SYNC_DELAY_MS));
   }
 
-  return {
-    totalMembers: found,
-    checkedUsers: checked,
-    matchedUsers: found,
-    tagsApplied: applied,
-    tagsRemoved: removed,
-    markedLeft,
-  };
+  return { totalMembers: matchedUsers, checkedUsers, matchedUsers, tagsApplied, tagsRemoved, markedLeft };
 }
