@@ -1,5 +1,15 @@
 const DISCORD_API_BASE = "https://discord.com/api/v10";
 
+export class DiscordApiError extends Error {
+  status: number;
+
+  constructor(status: number) {
+    super(`Discord API error: ${status}`);
+    this.name = "DiscordApiError";
+    this.status = status;
+  }
+}
+
 export interface DiscordGuildMember {
   user?: {
     id: string;
@@ -18,14 +28,13 @@ export async function getGuildMember(accessToken: string): Promise<DiscordGuildM
 
   try {
     const response = await fetch(`${DISCORD_API_BASE}/users/@me/guilds/${guildId}/member`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+      headers: { Authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
     });
 
     if (!response.ok) {
       if (response.status === 404) return null;
-      throw new Error(`Discord API error: ${response.status}`);
+      throw new DiscordApiError(response.status);
     }
 
     return await response.json();
@@ -90,11 +99,22 @@ function botAuth(token: string) {
   return { Authorization: `Bot ${token}`, "Content-Type": "application/json" };
 }
 
+export async function validateDiscordBot(token: string, guildId: string) {
+  const response = await fetch(`${DISCORD_API_BASE}/guilds/${guildId}`, {
+    headers: botAuth(token),
+    cache: "no-store",
+  });
+
+  if (response.status === 401) throw new DiscordApiError(401);
+  if (response.status === 404) throw new DiscordApiError(404);
+  if (!response.ok) throw new DiscordApiError(response.status);
+
+  return await response.json() as DiscordGuildInfo;
+}
+
 export async function getGuildInfo(token: string, guildId: string): Promise<DiscordGuildInfo | null> {
   try {
-    const response = await fetch(`${DISCORD_API_BASE}/guilds/${guildId}`, { headers: botAuth(token) });
-    if (!response.ok) throw new Error(`Discord API error: ${response.status}`);
-    return await response.json();
+    return await validateDiscordBot(token, guildId);
   } catch (error) {
     console.error("Failed to fetch guild info:", error);
     return null;
@@ -103,8 +123,8 @@ export async function getGuildInfo(token: string, guildId: string): Promise<Disc
 
 export async function getGuildRoles(token: string, guildId: string): Promise<DiscordRole[]> {
   try {
-    const response = await fetch(`${DISCORD_API_BASE}/guilds/${guildId}/roles`, { headers: botAuth(token) });
-    if (!response.ok) throw new Error(`Discord API error: ${response.status}`);
+    const response = await fetch(`${DISCORD_API_BASE}/guilds/${guildId}/roles`, { headers: botAuth(token), cache: "no-store" });
+    if (!response.ok) throw new DiscordApiError(response.status);
     return await response.json();
   } catch (error) {
     console.error("Failed to fetch guild roles:", error);
@@ -119,7 +139,7 @@ export async function getGuildMemberById(token: string, guildId: string, userId:
   });
 
   if (response.status === 404) return null;
-  if (!response.ok) throw new Error(`Discord API error: ${response.status}`);
+  if (!response.ok) throw new DiscordApiError(response.status);
   return await response.json();
 }
 
@@ -134,7 +154,7 @@ export async function getAllGuildMembers(token: string, guildId: string): Promis
       headers: botAuth(token),
       cache: "no-store",
     });
-    if (!response.ok) throw new Error(`Discord API error: ${response.status}`);
+    if (!response.ok) throw new DiscordApiError(response.status);
     const batch = await response.json();
     if (!Array.isArray(batch) || batch.length === 0) break;
     members.push(...batch);
