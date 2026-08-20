@@ -17,6 +17,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   const status = body?.status as "approved" | "rejected" | undefined;
   if (status !== "approved" && status !== "rejected") return NextResponse.json({ error: "Invalid review status." }, { status: 400 });
   const note = typeof body?.note === "string" ? body.note : null;
+  const finalRatingValue = body?.finalRating == null ? null : Number(body.finalRating);
+  if (status === "approved" && finalRatingValue != null && (!Number.isFinite(finalRatingValue) || finalRatingValue <= 0 || finalRatingValue > 9.99)) return NextResponse.json({ error: "Final rating must be between 0.1 and 9.99." }, { status: 400 });
   const placement = body?.challengePlacement as ChallengePlacement | null | undefined;
   const level = body?.challengeLevel == null ? null : Number(body.challengeLevel);
 
@@ -36,27 +38,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       if (challengePlacement === "main") {
         await prisma.$executeRawUnsafe('INSERT INTO "ChallengeMapLevel" ("id","challengeMapId","level","createdAt","updatedAt") VALUES ($1,$2,$3,NOW(),NOW()) ON CONFLICT ("challengeMapId") DO UPDATE SET "level"=EXCLUDED."level","updatedAt"=NOW()', crypto.randomUUID(), id, challengeLevel);
       } else {
-        await prisma.categoryMap.create({
-          data: {
-            category: challengePlacement,
-            level: challengeLevel,
-            title: map.title,
-            artist: map.artist,
-            description: map.description,
-            mapFileUrl: map.mapFileUrl,
-            imageUrl: map.imageUrl,
-            mapperName: map.mapperName,
-            noteCount: map.noteCount,
-            length: map.length,
-            sourceBeatmapId: map.sourceBeatmapId,
-            sourceUrl: map.sourceUrl,
-            submittedById: map.submittedById,
-            status: "approved",
-            reviewerNote: note,
-            reviewedById: user.id,
-            reviewedAt: new Date(),
-          },
-        });
+        await prisma.categoryMap.create({ data: { category: challengePlacement, level: challengeLevel, title: map.title, artist: map.artist, description: map.description, mapFileUrl: map.mapFileUrl, imageUrl: map.imageUrl, mapperName: map.mapperName, noteCount: map.noteCount, length: map.length, sourceBeatmapId: map.sourceBeatmapId, sourceUrl: map.sourceUrl, submittedById: map.submittedById, status: "approved", reviewerNote: note, reviewedById: user.id, reviewedAt: new Date() } });
       }
 
       await setMapSubmissionMetadata(id, "challenge", challengePlacement, challengeLevel);
@@ -64,7 +46,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       return NextResponse.json({ map: updated, submissionType: "challenge", challengePlacement, challengeLevel });
     }
 
-    const updated = await reviewChallengeMap(id, user.id, status, null, note);
+    const updated = await reviewChallengeMap(id, user.id, status, status === "approved" ? finalRatingValue : null, note);
     if (status === "approved") await setMapSubmissionMetadata(id, "ranked", null, null);
     return NextResponse.json({ map: updated, submissionType: metadata.submissionType });
   } catch (error) {
