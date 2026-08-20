@@ -58,8 +58,9 @@ export async function reviewChallengeMap(mapId: string, reviewerId: string, stat
   const map = await prisma.challengeMap.findUnique({ where: { id: mapId } });
   if (!map) throw new Error("Map not found.");
   if (map.status !== "pending") throw new Error("This map has already been reviewed.");
-  const rating = status === "approved" ? roundRating(map.requestedRating) : null;
-  const updated = await prisma.challengeMap.update({ where: { id: mapId }, data: { status, rating, reviewerNote: note?.trim() || null, reviewedById: reviewerId, reviewedAt: new Date() } });
+  if (status === "approved" && finalRating != null && (!Number.isFinite(finalRating) || finalRating <= 0 || finalRating > 9.99)) throw new Error("Final rating must be between 0.1 and 9.99.");
+  const rating = status === "approved" ? roundRating(finalRating ?? map.requestedRating) : null;
+  const updated = await prisma.challengeMap.update({ where: { id: mapId }, data: { status, rating, requestedRating: status === "approved" && finalRating != null ? rating : map.requestedRating, reviewerNote: note?.trim() || null, reviewedById: reviewerId, reviewedAt: new Date() } });
   await prisma.notification.create({ data: { userId: map.submittedById, type: status === "approved" ? "map_approved" : "map_rejected", title: status === "approved" ? "Your map was approved" : "Your map was rejected", message: status === "approved" ? `"${map.title}" was approved and is now playable with a rating of ${rating?.toFixed(2)}.` : `"${map.title}" was rejected.${note?.trim() ? `\n\nReason: ${note.trim()}` : ""}`, url: "/maps" } });
   return updated;
 }
@@ -74,10 +75,14 @@ export type ChallengeMapCheckResult =
   | { status: "failed"; points: number; rankInfo: RankInfo }
   | { status: "not_beat"; points: number };
 
+async function getMapForCheck(challengeMapId: string) {
+  return prisma.challengeMap.findUnique({ where: { id: challengeMapId } });
+}
+
 export async function checkAndAwardChallengeMap(userId: string, challengeMapId: string): Promise<ChallengeMapCheckResult> {
   const profile = await prisma.rhythiaProfile.findUnique({ where: { userId } });
   if (!profile) return { status: "no_profile", points: 0 };
-  const map = await prisma.challengeMap.findUnique({ where: { id: challengeMapId } });
+  const map = await getMapForCheck(challengeMapId);
   if (!map || map.status !== "approved" || map.rating == null) return { status: "not_available", points: 0 };
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true, avgMapRating: true } });
   if (!user) return { status: "not_available", points: 0 };
@@ -103,7 +108,7 @@ export async function checkAndAwardChallengeMap(userId: string, challengeMapId: 
       prisma.rhpTransaction.create({ data: { userId, amount: points, reason: "challenge_map", description: `Completed ranked map: ${map.title} (${map.rating.toFixed(2)})` } }),
       prisma.notification.create({ data: { userId, type: "rhp_earned", title: "Map completed", message: `You earned ${points} RHP for beating ${map.title} (${map.rating.toFixed(2)} rating).`, url: "/maps" } }),
     ]);
-    if (newRankInfo.index > rankInfo.index) await prisma.notification.create({ data: { userId, type: "rank_change", title: "Rank up!", message: `You reached ${newRankInfo.name} ${newRankInfo.isExpert ? "" : newRankInfo.tier}!`, url: "/leaderboards" } });
+    if (newRankInfo.index > rankInfo.index) await prisma.notification.create({ data: { userId, type: "rank_change", title: "Rank up!", message: `You reached ${newRankInfo.name} ${newRankInfo.isExpert ? "" : newRankInfo.tier}!`, url: "/leaderboards" });
     return { status: "beat", points, rankInfo: newRankInfo, accuracy };
   }
   const failHit = allScores.find((score) => !score.passed && matchesTitle(score.beatmapTitle, map.title));
@@ -143,7 +148,7 @@ export async function checkAndAwardAllChallengeMaps(userId: string) {
   for (const map of maps) {
     checked += 1;
     if (map.rating == null) continue;
-    const existing = await prisma.challengeMapCompletion.findUnique({ where: { challengeMapId_userId: { challengeMapId: map.id, userId } } });
+    const existing = await prisma.challengeMapCompletion.findUnique({ where: { challengeMapId_userId: map.id, userId } });
     if (existing?.passed) continue;
     const score = bestScores.get(normalizeTitle(map.title));
     if (!score) continue;
@@ -163,7 +168,7 @@ export async function checkAndAwardAllChallengeMaps(userId: string) {
     awarded += points;
   }
   await prisma.user.update({ where: { id: userId }, data: { scoreImportDone: true } });
-  return { checked, awarded, newlyCompleted: await prisma.challengeMapCompletion.count({ where: { userId, passed: true } }), totalPoints: awarded, rankIndex: rankInfo.index };
+  return { checked, awarded, newlyCompleted: await prisma.challengeMapCompletion.count({ where: { userId, passed: true }), totalPoints: awarded, rankIndex: rankInfo.index };
 }
 
 export { getApprovedMaps, getChallengeLeaderboard, getMapLeaderboard, getUserGlobalRank, resetUserRankedStatus } from "@/lib/maps-legacy";
