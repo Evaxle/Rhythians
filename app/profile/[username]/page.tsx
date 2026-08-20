@@ -16,6 +16,7 @@ import { RhythiaVerifiedBadge } from "@/components/rhythia-verified-badge";
 import { ProfileScoreRefresh } from "@/components/profile-score-refresh";
 import { getUserCategoryLevels } from "@/lib/categories";
 import { getUserChallengeLevel } from "@/lib/challenge";
+import { RhythKitRecentScores } from "@/components/rhythkit-recent-scores";
 
 export const dynamic = "force-dynamic";
 
@@ -96,6 +97,7 @@ export default async function ProfilePage({ params }: Props) {
         </div>
       </section>
       {user.rhythiaProfile && <RhythiaStats profile={user.rhythiaProfile} />}
+      <RhythKitRecentScores userId={user.id} />
       <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow"><div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-sm uppercase tracking-[0.3em] text-accent">Categories</p><h2 className="mt-2 text-2xl font-semibold text-white">Skill category levels</h2></div><Link href="/categories" className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent/20">View categories</Link></div><div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{categoryLevels.map(({ category, level }) => <div key={category} className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-[0.2em] text-accent">{category === "off_grid" ? "Off Grid" : category.charAt(0).toUpperCase() + category.slice(1)}</p><p className="mt-2 text-2xl font-semibold text-white">Level {level}</p></div>)}</div></section>
       <section className="space-y-4"><div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-sm uppercase tracking-[0.3em] text-accent">Clips</p><h2 className="mt-2 text-2xl font-semibold text-white">Approved clips from this creator</h2></div><p className="text-sm text-muted">{user.clips.length} approved clip{user.clips.length === 1 ? "" : "s"}</p></div>{user.clips.length === 0 ? <div className="rounded-3xl border border-border bg-background/80 p-8 text-sm text-muted">No approved clips are visible yet.</div> : <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">{user.clips.map((clip) => <Link key={clip.id} href={`/clips/${clip.id}`} className="overflow-hidden rounded-3xl border border-border bg-surface/95 p-5 transition hover:-translate-y-0.5 hover:border-accent/40"><div className="h-40 rounded-3xl bg-white/5" /><div className="mt-4"><p className="text-sm uppercase tracking-[0.24em] text-accent">{clip.category?.name ?? "Uncategorized"}</p><h3 className="mt-3 text-lg font-semibold text-white">{clip.title}</h3>{clip.reviewedBy && <p className="mt-2 text-xs text-muted">Approved by <span className="font-semibold text-white">{clip.reviewedBy.displayName ?? clip.reviewedBy.username}</span></p>}<p className="mt-2 text-sm text-muted">{clip.createdAt.toLocaleDateString()}</p></div></Link>)}</div>}</section>
     </div>

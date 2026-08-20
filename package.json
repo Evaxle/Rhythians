@@ -22,6 +22,7 @@
     "test:rhp-logic": "node scripts/test-rhp-logic.mjs",
     "test:rp-gain": "node scripts/test-rp-gain.mjs",
     "test:zip": "node scripts/test-zip.mjs",
+    "test:rhythkit-map-file": "tsx scripts/test-rhythkit-map-file.mjs",
     "test:rhp": "node scripts/test-rhp-formulas.mjs && node scripts/test-rhp-logic.mjs && node scripts/test-rp-gain.mjs",
     "test:profanity": "tsx scripts/test-profanity.ts",
     "bot:start": "tsx discord-bot/index.ts"
@@ -31,6 +32,7 @@
     "@prisma/client": "7.9.1",
     "@supabase/supabase-js": "2.39.8",
     "archiver": "^8.0.0",
+    "fflate": "^0.8.2",
     "clsx": "2.1.1",
     "dayjs": "1.11.10",
     "discord.js": "14.17.0",
