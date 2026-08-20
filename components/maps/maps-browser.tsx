@@ -2,10 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, CheckCircle2, ChevronDown, Download, Map as MapIcon, RefreshCw, Search, Trophy, XCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle2, ChevronDown, Download, Map as MapIcon, RefreshCw, Search, XCircle } from "lucide-react";
 import type { RankInfo } from "@/lib/ranks";
 import { RANKS, isMapInRankRange, rhpGainForMap } from "@/lib/ranks";
-import { MapLeaderboard } from "@/components/maps/map-leaderboard";
 
 const PAGE_SIZE = 40;
 
@@ -117,7 +116,6 @@ export function MapsBrowser({ maps, rankInfo, userRhp, currentUserId }: { maps: 
   const [query, setQuery] = useState("");
   const [autoChecking, setAutoChecking] = useState(false);
   const [didAutoCheck, setDidAutoCheck] = useState(false);
-  const [leaderboardId, setLeaderboardId] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
 
   const filtered = useMemo(() => {
@@ -267,33 +265,32 @@ export function MapsBrowser({ maps, rankInfo, userRhp, currentUserId }: { maps: 
               return (
                 <article key={map.id} className="flex flex-col rounded-3xl border-2 bg-surface/95 p-5 shadow-glow" style={{ borderColor: scored ? "#34d399" : `${map.rankColor}99`, boxShadow: scored ? "0 0 28px #34d39922" : `0 0 28px ${map.rankColor}14` }}>
                   <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
+                    <Link href={`/maps/${map.id}`} className="min-w-0 rounded-2xl transition hover:bg-background/40 focus:outline-none focus:ring-2 focus:ring-accent/50">
                       <p className="text-sm text-muted">{map.artist ?? "Unknown artist"}</p>
-                      <h3 className="mt-1 truncate text-xl font-semibold text-white">{map.title}</h3>
+                      <h3 className="mt-1 truncate text-xl font-semibold text-white hover:text-accent">{map.title}</h3>
                       <p className="mt-1 text-xs text-muted">Mapped by {map.mapperName ?? map.submittedBy?.displayName ?? "Unknown"}</p>
-                    </div>
+                    </Link>
                     {map.rating != null && <div className="flex shrink-0 flex-col items-end gap-1"><span className="inline-flex rounded-full px-2.5 py-1 text-sm font-semibold" style={{ color: scored ? "#34d399" : map.rankColor, border: `1px solid ${scored ? "#34d39980" : `${map.rankColor}80`}`, backgroundColor: `${scored ? "#34d399" : map.rankColor}14` }}>{map.rating.toFixed(2)}</span><span className="text-[11px] font-semibold" style={{ color: map.rankColor }}>{rank.name}</span></div>}
                   </div>
 
-                  <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted">
-                    {scored && <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 font-semibold text-emerald-300">Score found</span>}
-                    {map.noteCount != null && <span className="rounded-full border border-border bg-background/60 px-2.5 py-1">{map.noteCount.toLocaleString()} notes</span>}
-                    {lengthLabel && <span className="rounded-full border border-border bg-background/60 px-2.5 py-1">{lengthLabel}</span>}
-                    <span className="rounded-full border border-border bg-background/60 px-2.5 py-1">Rating: {map.rating != null ? map.rating.toFixed(2) : "—"}</span>
-                  </div>
-
-                  {map.rating != null && <p className="mt-3 inline-flex items-center gap-1.5 text-xs" style={{ color: map.rankColor }}><span className="font-semibold text-white">{rhpGainForMap(map.rating, 100, undefined, rankInfo.index).toLocaleString()} RHP</span><span className="text-muted">at 100% accuracy · {rhpGainForMap(map.rating, 100, 2, rankInfo.index).toLocaleString()} with a speed modifier</span></p>}
+                  <Link href={`/maps/${map.id}`} className="mt-3 block rounded-2xl transition hover:bg-background/20 focus:outline-none focus:ring-2 focus:ring-accent/50">
+                    <div className="flex flex-wrap gap-2 text-xs text-muted">
+                      {scored && <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 font-semibold text-emerald-300">Score found</span>}
+                      {map.noteCount != null && <span className="rounded-full border border-border bg-background/60 px-2.5 py-1">{map.noteCount.toLocaleString()} notes</span>}
+                      {lengthLabel && <span className="rounded-full border border-border bg-background/60 px-2.5 py-1">{lengthLabel}</span>}
+                      <span className="rounded-full border border-border bg-background/60 px-2.5 py-1">Rating: {map.rating != null ? map.rating.toFixed(2) : "—"}</span>
+                    </div>
+                    {map.rating != null && <p className="mt-3 inline-flex items-center gap-1.5 text-xs" style={{ color: map.rankColor }}><span className="font-semibold text-white">{rhpGainForMap(map.rating, 100, undefined, rankInfo.index).toLocaleString()} RHP</span><span className="text-muted">at 100% accuracy · {rhpGainForMap(map.rating, 100, 2, rankInfo.index).toLocaleString()} with a speed modifier</span></p>}
+                  </Link>
 
                   {map.reviewedBy && <p className="mt-3 text-xs text-muted">Approved by <Link href={`/profile/${map.reviewedBy.profileHandle}`} className="font-semibold text-white hover:text-accent">{map.reviewedBy.displayName ?? map.reviewedBy.username}</Link></p>}
 
                   <div className="mt-auto flex flex-wrap gap-2 pt-5">
                     <a href={map.mapFileUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent/20"><Download size={15} /> Download</a>
                     <button type="button" onClick={() => void checkMap(map.id)} disabled={busyId === map.id} className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent2 disabled:opacity-60"><RefreshCw size={15} className={busyId === map.id ? "animate-spin" : ""} />{busyId === map.id ? "Checking..." : "Check my score"}</button>
-                    <button type="button" onClick={() => setLeaderboardId((current) => current === map.id ? null : map.id)} className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent/20"><Trophy size={15} /> Leaderboard</button>
                   </div>
 
                   {message && <p className={`mt-3 rounded-2xl border p-3 text-sm ${message.tone === "ok" ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200" : message.tone === "warn" ? "border-amber-400/30 bg-amber-400/10 text-amber-200" : "border-red-400/30 bg-red-400/10 text-red-200"}`}>{message.text}</p>}
-                  {leaderboardId === map.id && <MapLeaderboard mapId={map.id} currentUserId={currentUserId} onClose={() => setLeaderboardId(null)} />}
                 </article>
               );
             })}
