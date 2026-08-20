@@ -1,5 +1,5 @@
 import type { PrismaClient } from "../generated/prisma/client";
-import { ROLE_TO_TAG_MAP, getAllGuildMembers } from "./discord";
+import { ROLE_TO_TAG_MAP, getGuildMemberById } from "./discord";
 
 export async function resolveDiscordRolesToTagIds(
   prisma: PrismaClient,
@@ -114,37 +114,40 @@ export async function syncAllGuildMembers(
   token: string,
   guildId: string
 ) {
-  const members = await getAllGuildMembers(token, guildId);
+  const users = await prisma.user.findMany({
+    where: { discordId: { not: null } },
+    select: { id: true, discordId: true, inGuild: true },
+  });
 
-  const memberIds = new Set<string>();
   let applied = 0;
   let removed = 0;
   let found = 0;
+  let checked = 0;
+  let markedLeft = 0;
 
-  for (const member of members) {
-    const discordUserId = member.user?.id;
-    if (!discordUserId) continue;
-    memberIds.add(discordUserId);
-    const roleIds = member.roles ?? [];
-    const result = await syncUserFromDiscordRoles(prisma, discordUserId, roleIds, true);
-    if (result) {
+  for (const user of users) {
+    if (!user.discordId) continue;
+    checked++;
+
+    const member = await getGuildMemberById(token, guildId, user.discordId);
+    const inGuild = member !== null;
+    const roleIds = member?.roles ?? [];
+    const result = await syncUserFromDiscordRoles(prisma, user.discordId, roleIds, inGuild);
+
+    if (!result) continue;
+    if (inGuild) {
       found++;
       applied += result.applied;
+      removed += result.removed;
+    } else if (user.inGuild) {
+      markedLeft++;
       removed += result.removed;
     }
   }
 
-  const guildMembers = await prisma.user.findMany({ where: { inGuild: true } });
-  let markedLeft = 0;
-  for (const user of guildMembers) {
-    if (user.discordId && !memberIds.has(user.discordId)) {
-      await markUserLeftGuild(prisma, user.discordId);
-      markedLeft++;
-    }
-  }
-
   return {
-    totalMembers: members.length,
+    totalMembers: found,
+    checkedUsers: checked,
     matchedUsers: found,
     tagsApplied: applied,
     tagsRemoved: removed,
