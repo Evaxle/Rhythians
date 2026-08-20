@@ -12,6 +12,7 @@
   - `DISCORD_REDIRECT_URI`
   - `DISCORD_BOT_TOKEN`
   - `DISCORD_GUILD_ID`
+  - `DISCORD_INVITE_URL`
   - `STORAGE_BUCKET`
   - `SESSION_COOKIE_NAME`
   - `SESSION_EXPIRES_DAYS`
@@ -53,10 +54,12 @@
 4. Configure these env vars:
    - `DISCORD_BOT_TOKEN`
    - `DISCORD_GUILD_ID`
-5. Run the bot so role changes sync in real time: `npm run bot:start`
+   - `DISCORD_INVITE_URL`
+5. `DISCORD_INVITE_URL` must be a valid invite users can use to join the Rhythians server.
+6. Run the bot so role changes sync in real time: `npm run bot:start`
    (host it on a server/VPS that stays online).
-6. Configure role → tag mappings at **Admin → Discord → Integration** as the owner.
-7. Also collect channel IDs for:
+7. Configure role → tag mappings at **Admin → Discord → Integration** as the owner.
+8. Also collect channel IDs for:
    - clip submissions
    - clip moderation
    - announcements
@@ -65,10 +68,10 @@
 1. Push the repository to GitHub.
 2. Create a Vercel project and import this repository. The project **must be named `rhythians`** so the production URL is `https://rhythians.vercel.app`.
    - Every deployment also gets a unique deployment URL (e.g. `rhythians-<hash>-evans-projects-<id>.vercel.app`). That is normal Vercel behavior — the canonical production URL `https://rhythians.vercel.app` always points to the latest production deployment.
-   - To deploy from the CLI instead: `vercel link --project rhythians --scope evans-projects-edff1a37` (this repo is already linked in `.vercel/project.json`), then `vercel --prod`.
+   - To deploy from the CLI instead: `vercel link --project rhythians --scope evans-projects-edff1a37`, then `vercel --prod`.
 3. Add production env vars in Vercel exactly as below:
    - `NEXT_PUBLIC_SITE_URL=https://rhythians.vercel.app`
-   - `OWNER_DISCORD_ID=<your Discord user ID>` (required — the admin panel and owner-only buttons use this)
+   - `OWNER_DISCORD_ID=<your Discord user ID>`
    - `NEXT_PUBLIC_SUPABASE_URL=...`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY=...`
    - `SUPABASE_SERVICE_ROLE_KEY=...`
@@ -76,30 +79,26 @@
    - `DISCORD_CLIENT_SECRET=...`
    - `DISCORD_BOT_TOKEN=...`
    - `DISCORD_GUILD_ID=...`
+   - `DISCORD_INVITE_URL=<your Discord invite URL>`
    - `DISCORD_REDIRECT_URI=https://YOUR-DOMAIN.com/api/auth/callback`
    - `DATABASE_URL=...`
    - `STORAGE_BUCKET=media`
-    - `SESSION_COOKIE_NAME=rhythians_session`
-    - `SESSION_EXPIRES_DAYS=30`
-    - `CRON_SECRET=<random string>` (optional — required if you want the scheduled Discord sync to require a secret)
-    - `SETUP_SECRET=<long random string>` (required — protects the `/api/setup` database bootstrap endpoint)
+   - `SESSION_COOKIE_NAME=rhythians_session`
+   - `SESSION_EXPIRES_DAYS=30`
+   - `CRON_SECRET=<random string>`
+   - `SETUP_SECRET=<long random string>`
 4. Deploy the app.
 
-> The scheduled Discord sync runs automatically via the cron job in `vercel.json` (daily at 03:30 UTC). If you set `CRON_SECRET`, append `?secret=<CRON_SECRET>` to the cron path in `vercel.json` so the request authenticates.
->
-> A daily database cleanup cron (`/api/internal/db-cleanup`, 3:00 UTC) also runs automatically. It prunes expired sessions, read notifications older than 30 days, dismissed reports and handled Rhythia link requests older than 90 days, and backfills the profanity filter over existing content the first time it runs.
->
-> If the first backfill times out on a large database, run it once manually: `npm run db:cleanup` (use `npm run db:cleanup -- --force` to re-run the backfill later after changing the word list).
->
-> Profanity filtering: comments, coach comments, and direct messages are censored server-side at write time by `lib/profanity.ts` (leetspeak, stretched words, separators, and spaced-out words are handled). Verify with `npm run test:profanity`.
+> The scheduled Discord sync runs automatically via the cron job in `vercel.json`.
 
 ### 5. Verification
 1. Visit `/login` and test Discord login.
 2. Confirm session persists and logout works.
 3. Visit `/clips/submit` and submit a test clip.
 4. Verify a clip record is created with status `pending`.
+5. In **Admin → Alerts**, use **Send tag setup alert** and verify it targets only users with zero tags.
+6. Open the notification, join Discord if necessary, return to `/setup-tags`, and confirm the page rechecks membership and displays the onboarding questions.
 
 ## Notes
 - The `service role key` is only used server-side in `lib/supabase.ts`.
 - The frontend uses `NEXT_PUBLIC_SUPABASE_ANON_KEY` for public Supabase access.
-- Clip moderation UI exists at `/admin/clips`, but approve/reject actions are not implemented yet.
