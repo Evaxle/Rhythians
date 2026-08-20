@@ -16,16 +16,17 @@ export default function MapSubmitForm() {
   const [success, setSuccess] = useState<string | null>(null);
 
   async function uploadFile(file: File) {
+    const contentType = file.type || "application/octet-stream";
     const response = await fetch("/api/maps/upload", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fileName: file.name, contentType: file.type, folder: "maps", fileSize: file.size }),
+      body: JSON.stringify({ fileName: file.name, contentType, folder: "maps", fileSize: file.size }),
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Upload URL generation failed.");
-    const uploadResponse = await fetch(data.uploadUrl, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
+    const data = await response.json().catch(() => null);
+    if (!response.ok || !data?.uploadUrl) throw new Error(data?.error || "Upload URL generation failed.");
+    const uploadResponse = await fetch(data.uploadUrl, { method: "PUT", headers: { "Content-Type": contentType }, body: file });
     if (!uploadResponse.ok) throw new Error("File upload failed.");
-    return data.path;
+    return data.path as string;
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -47,8 +48,8 @@ export default function MapSubmitForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ submissionType: "ranked", title: title.trim(), artist: artist.trim(), description: description.trim(), mapFileUrl: mapPath }),
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Map submission failed.");
+      const data = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(data?.error || "Map submission failed.");
       setSuccess(`Map submitted with Rhythians ID ${data.mapId}. It will be available as an SSPM download after approval.`);
       setTitle("");
       setArtist("");
