@@ -40,13 +40,13 @@ export async function POST(request: Request) {
 
   const result = await prisma.$transaction(async (tx) => {
     await tx.$executeRawUnsafe(`UPDATE "RhythKitInstallation" SET "lastSeenAt" = NOW() WHERE "installationId" = $1`, installation.installationId);
-    const insertedScore = await tx.$queryRawUnsafe<Array<{ id: string }>>(`INSERT INTO "RhythKitScore" ("id", "userId", "installationId", "challengeMapId", "clientScoreId", "accuracy", "misses", "speed", "points", "rhpAwarded") VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, 0) ON CONFLICT ("installationId", "clientScoreId") DO NOTHING RETURNING "id"` , installation.userId, installation.installationId, challengeMapId, clientScoreId, accuracy, misses, speed);
+    const insertedScore = await tx.$queryRawUnsafe<Array<{ id: string }>>(`INSERT INTO "RhythKitScore" ("id", "userId", "installationId", "challengeMapId", "clientScoreId", "accuracy", "misses", "speed", "points", "rhpAwarded") VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, 0, 0) ON CONFLICT ("installationId", "clientScoreId") DO NOTHING RETURNING "id"`, installation.userId, installation.installationId, challengeMapId, clientScoreId, accuracy, misses, speed);
     if (insertedScore.length === 0) return { duplicate: true, counted: false, points: 0, rhp: user.rhp };
 
     const insertedCompletion = await tx.$queryRawUnsafe<Array<{ id: string }>>(`INSERT INTO "ChallengeMapCompletion" ("id", "challengeMapId", "userId", "rating", "accuracy", "passed", "points", "createdAt", "updatedAt") VALUES (gen_random_uuid(), $1, $2, $3, $4, true, $5, NOW(), NOW()) ON CONFLICT ("challengeMapId", "userId") DO NOTHING RETURNING "id"`, challengeMapId, installation.userId, map.rating, accuracy, points);
     if (insertedCompletion.length === 0) return { duplicate: false, counted: false, points: 0, rhp: user.rhp };
 
-    await tx.$executeRawUnsafe(`UPDATE "RhythKitScore" SET "rhpAwarded" = $1 WHERE "id" = $2`, points, insertedScore[0].id);
+    await tx.$executeRawUnsafe(`UPDATE "RhythKitScore" SET "points" = $1, "rhpAwarded" = $1 WHERE "id" = $2`, points, insertedScore[0].id);
     const updated = await tx.$queryRawUnsafe<Array<{ rhp: number }>>(`UPDATE "User" SET "rhp" = "rhp" + $1, "updatedAt" = NOW() WHERE "id" = $2 RETURNING "rhp"`, points, installation.userId);
     await tx.$executeRawUnsafe(`INSERT INTO "RhpTransaction" ("id", "userId", "amount", "reason", "description", "createdAt") VALUES (gen_random_uuid(), $1, $2, 'ranked_map', $3, NOW())`, installation.userId, points, `RhythKit completed ranked map [${map.id}]: ${map.title} (${map.rating.toFixed(2)})`);
     return { duplicate: false, counted: true, points, rhp: updated[0]?.rhp ?? user.rhp + points };
