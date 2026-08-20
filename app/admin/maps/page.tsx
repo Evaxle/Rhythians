@@ -1,6 +1,7 @@
 import { MapAdminSearch } from "@/components/map-admin-search";
 import { MapCreator } from "@/components/admin/map-creator";
 import { AutoImportedMapCleanup } from "@/components/admin/auto-imported-map-cleanup";
+import { MapDeleteSearch } from "@/components/admin/map-delete-search";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,7 @@ export default function AdminManageMapsPage() {
       </section>
       <MapCreator />
       <AutoImportedMapCleanup />
+      <MapDeleteSearch />
       <MapAdminSearch />
     </div>
   );
