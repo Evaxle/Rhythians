@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 import { embedRhythiansId, extensionFromMapUrl } from "@/lib/rhythkit-map-file";
 import { supabaseAdmin } from "@/lib/supabase";
 
