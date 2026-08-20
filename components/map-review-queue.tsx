@@ -31,11 +31,7 @@ export function MapReviewQueue({ initialMaps }: { initialMaps: PendingMap[] }) {
     setError("");
     setBusyId(id);
     try {
-      const response = await fetch(`/api/maps/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status, note: rejectNote || null }),
-      });
+      const response = await fetch(`/api/maps/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status, note: rejectNote || null }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Could not review map.");
       setMaps((current) => current.filter((map) => map.id !== id));
@@ -57,6 +53,7 @@ export function MapReviewQueue({ initialMaps }: { initialMaps: PendingMap[] }) {
         const isRejecting = rejectingId === map.id;
         const lengthLabel = map.length != null ? `${Math.floor(map.length / 60_000)}:${String(Math.round((map.length % 60_000) / 1000)).padStart(2, "0")}` : null;
         const submitterName = map.submittedBy.displayName ?? map.submittedBy.username;
+        const isRhythiaUrl = Boolean(map.sourceUrl);
         return (
           <article key={map.id} className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
             <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
@@ -70,7 +67,7 @@ export function MapReviewQueue({ initialMaps }: { initialMaps: PendingMap[] }) {
                 </div>
                 <p className="mt-4 text-sm leading-7 text-muted">{map.description || "No description provided."}</p>
                 <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted">
-                  <span className="inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 font-semibold text-accent"><Star className="h-3 w-3" fill="currentColor" /> Rating: {map.requestedRating.toFixed(2)} · RHP is calculated automatically</span>
+                  <span className="inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 font-semibold text-accent"><Star className="h-3 w-3" fill="currentColor" /> {isRhythiaUrl ? "Auto-calculated rating" : "Requested rating"}: {map.requestedRating.toFixed(2)}</span>
                   {map.noteCount != null && <span className="rounded-full border border-border bg-background/60 px-3 py-1">{map.noteCount.toLocaleString()} notes</span>}
                   {lengthLabel && <span className="rounded-full border border-border bg-background/60 px-3 py-1">{lengthLabel}</span>}
                 </div>
@@ -92,7 +89,7 @@ export function MapReviewQueue({ initialMaps }: { initialMaps: PendingMap[] }) {
               </div>
             ) : (
               <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-background/40 p-4">
-                <p className="text-sm text-muted">Approval uses the submitted rating. Reviewers cannot change the RHP reward.</p>
+                <p className="text-sm text-muted">Approval uses the displayed rating. File uploads use the submitter&apos;s requested rating; Rhythia URL submissions use the star-based calculated rating.</p>
                 <div className="flex flex-wrap gap-2">
                   <button disabled={busyId === map.id} onClick={() => moderate(map.id, "approved")} className="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-400 disabled:opacity-50">{busyId === map.id ? "Approving..." : "Approve"}</button>
                   <button disabled={busyId === map.id} onClick={() => { setRejectNote(""); setRejectingId(map.id); }} className="rounded-full border border-red-400/40 px-4 py-2 text-sm font-semibold text-red-200 transition hover:bg-red-400/10 disabled:opacity-50">Reject</button>
