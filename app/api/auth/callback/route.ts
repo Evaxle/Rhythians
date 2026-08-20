@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { createSession, setSessionCookie } from "@/lib/auth";
-import { getGuildMember } from "@/lib/discord";
+import { getGuildMember, getGuildMemberById } from "@/lib/discord";
 import { syncUserTagsFromDiscord } from "@/lib/discord-sync";
 
 const DISCORD_TOKEN_URL = "https://discord.com/api/oauth2/token";
@@ -34,9 +34,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Discord OAuth not configured" }, { status: 500 });
   }
 
-  // Self-heal schema drift: the production DB was bootstrapped before several
-  // User columns existed, which made every Prisma user query throw P2022.
-  // These idempotent ALTERs are a no-op once the columns exist.
   await ensureUserColumns();
 
   try {
@@ -77,15 +74,12 @@ export async function GET(request: Request) {
     const inGuild = guildMember !== null;
     const discordRoles = guildMember?.roles ?? [];
 
-    // Match by Discord ID first, then fall back to the verified email so a
-    // password-registered account gets linked instead of colliding on email.
     let user = await prisma.user.findUnique({ where: { discordId: discordUser.id } });
     let profileHandle: string | undefined;
     if (!user && discordEmail) {
       user = await prisma.user.findUnique({ where: { email: discordEmail } });
     }
     if (!user) {
-      // New account: guarantee a unique profile handle.
       profileHandle = baseHandle;
       let suffix = 0;
       while (await prisma.user.findUnique({ where: { profileHandle } })) {
@@ -118,13 +112,32 @@ export async function GET(request: Request) {
           },
         });
 
-    await ensureTagsExist();
+    if (process.env.DISCORD_BOT_TOKEN && process.env.DISCORD_GUILD_ID) {
+      const botMember = await getGuildMemberById(
+        process.env.DISCORD_BOT_TOKEN,
+        process.env.DISCORD_GUILD_ID,
+        discordUser.id
+      );
+      const verifiedInGuild = botMember !== null;
+      const verifiedRoles = botMember?.roles ?? [];
 
-    if (inGuild) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { discordRoles: verifiedRoles, inGuild: verifiedInGuild },
+      });
+
+      if (verifiedInGuild) {
+        await syncUserTagsFromDiscord(prisma, user.id, verifiedRoles);
+      } else {
+        await prisma.userTag.deleteMany({ where: { userId: user.id, source: "discord" } });
+      }
+    } else if (inGuild) {
       await syncUserTagsFromDiscord(prisma, user.id, discordRoles);
     } else {
       await prisma.userTag.deleteMany({ where: { userId: user.id, source: "discord" } });
     }
+
+    await ensureTagsExist();
 
     if ((await prisma.role.count()) === 0) {
       const permissions = await prisma.permission.findMany({ select: { id: true } });
@@ -184,8 +197,6 @@ async function ensureUserColumns() {
     }
     userColumnsEnsured = true;
   } catch (error) {
-    // If the columns can't be added (permissions, connection), don't block the
-    // login attempt — the original error will surface and be logged below.
     console.error("Failed to ensure User columns exist:", error);
   }
 }
