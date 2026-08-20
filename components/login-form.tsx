@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 export function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next") ?? "/";
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -19,7 +21,7 @@ export function LoginForm() {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier, password }),
+        body: JSON.stringify({ identifier, password, next }),
       });
       const text = await response.text();
       let data: { error?: string; redirectTo?: string } = {};
@@ -41,46 +43,16 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="identifier" className="mb-1.5 block text-sm font-medium text-white">
-          Username
-        </label>
-        <input
-          id="identifier"
-          value={identifier}
-          onChange={(event) => setIdentifier(event.target.value)}
-          required
-          autoComplete="username"
-          className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-white outline-none transition focus:border-accent"
-        />
+        <label htmlFor="identifier" className="mb-1.5 block text-sm font-medium text-white">Username</label>
+        <input id="identifier" value={identifier} onChange={(event) => setIdentifier(event.target.value)} required autoComplete="username" className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-white outline-none transition focus:border-accent" />
       </div>
       <div>
-        <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-white">
-          Password
-        </label>
-        <input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          required
-          autoComplete="current-password"
-          className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-white outline-none transition focus:border-accent"
-        />
+        <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-white">Password</label>
+        <input id="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} required autoComplete="current-password" className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-white outline-none transition focus:border-accent" />
       </div>
       {error && <p className="rounded-xl border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-200">{error}</p>}
-      <button
-        type="submit"
-        disabled={busy}
-        className="w-full rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white transition hover:bg-accent/80 disabled:opacity-50"
-      >
-        {busy ? "Signing in..." : "Sign in"}
-      </button>
-      <p className="text-center text-sm text-muted">
-        New here?{" "}
-        <Link href="/register" className="font-semibold text-accent transition hover:text-accent/80">
-          Create an account
-        </Link>
-      </p>
+      <button type="submit" disabled={busy} className="w-full rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white transition hover:bg-accent/80 disabled:opacity-50">{busy ? "Signing in..." : "Sign in"}</button>
+      <p className="text-center text-sm text-muted">New here? <Link href={`/register?next=${encodeURIComponent(next)}`} className="font-semibold text-accent transition hover:text-accent/80">Create an account</Link></p>
     </form>
   );
 }
