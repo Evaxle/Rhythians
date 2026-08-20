@@ -18,10 +18,12 @@ export async function POST(request: Request) {
   const artist = typeof body?.artist === "string" ? body.artist.trim() : "";
   const description = typeof body?.description === "string" ? body.description.trim() : "";
   const mapFileUrl = typeof body?.mapFileUrl === "string" ? body.mapFileUrl.trim() : "";
+  const requestedRating = typeof body?.requestedRating === "number" ? body.requestedRating : Number(body?.requestedRating);
 
   if (!title || title.length > 120) return NextResponse.json({ error: "Map title is required and must be under 120 characters." }, { status: 400 });
   if (!artist || artist.length > 120) return NextResponse.json({ error: "Artist is required and must be under 120 characters." }, { status: 400 });
   if (!description || description.length > 2000) return NextResponse.json({ error: "Description is required and must be under 2000 characters." }, { status: 400 });
+  if (!Number.isFinite(requestedRating) || requestedRating <= 0) return NextResponse.json({ error: "Requested rating is required." }, { status: 400 });
   if (!mapFileUrl) return NextResponse.json({ error: "Upload an .SSPM or .RHM map file." }, { status: 400 });
   if (!/\.(sspm|rhm)(?:$|[?#])/i.test(mapFileUrl)) return NextResponse.json({ error: "Map file must be an .SSPM or .RHM file." }, { status: 400 });
 
@@ -33,7 +35,7 @@ export async function POST(request: Request) {
       description,
       mapFileUrl,
       imageUrl: null,
-      requestedRating: 0,
+      requestedRating,
       mapperName: null,
       noteCount: null,
       length: null,
@@ -54,9 +56,9 @@ export async function POST(request: Request) {
       action: "ranked_map_submitted",
       targetType: "map_submission",
       targetId: map.id,
-      metadata: { title: map.title, submissionType: "ranked" },
+      metadata: { title: map.title, submissionType: "ranked", requestedRating },
     },
   });
 
-  return NextResponse.json({ mapId: map.id, status: map.status, submissionType: "ranked" });
+  return NextResponse.json({ mapId: map.id, status: map.status, submissionType: "ranked", requestedRating });
 }
