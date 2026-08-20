@@ -48,6 +48,7 @@ export function MapDetail({ map, userRank, currentUserId }: Props) {
 
   const length = useMemo(() => lengthLabel(data.length), [data.length]);
   const baseRhp = rhpGainForMap(data.rating, 100, null, data.rankIndex, data.length == null ? null : data.length / 1000);
+  const downloadUrl = `/api/maps/download?id=${encodeURIComponent(data.mapId)}`;
 
   return (
     <div className="space-y-8">
@@ -61,7 +62,7 @@ export function MapDetail({ map, userRank, currentUserId }: Props) {
               <p className="mt-2 text-sm text-muted">{data.artist ?? "Unknown artist"} · Mapped by {data.mapperName ?? "Unknown"}</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <a href={data.mapFileUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-accent2"><Download size={15} /> Download map</a>
+              <a href={downloadUrl} className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-accent2"><Download size={15} /> Download map</a>
               {data.sourceUrl && <a href={data.sourceUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition hover:border-accent/40"><ExternalLink size={15} /> View on Rhythia</a>}
             </div>
           </div>
@@ -76,6 +77,7 @@ export function MapDetail({ map, userRank, currentUserId }: Props) {
           <div className="mt-6 flex flex-wrap gap-2 text-xs text-muted">
             {data.noteCount != null && <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">{data.noteCount.toLocaleString()} notes</span>}
             {data.sourceBeatmapId != null && <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">Rhythia map #{data.sourceBeatmapId}</span>}
+            <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">Rhythians ID: {data.mapId}</span>
             <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">RHP is awarded only when this map is in your current rank range</span>
           </div>
         </div>
