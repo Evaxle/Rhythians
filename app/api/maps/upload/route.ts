@@ -15,14 +15,15 @@ export async function POST(request: Request) {
 
   const body = await request.json().catch(() => null);
   const { fileName, contentType, folder, fileSize } = body as { fileName?: string; contentType?: string; folder?: string; fileSize?: number };
-  if (!fileName || !folder || !contentType) return NextResponse.json({ error: "Invalid upload request" }, { status: 400 });
+  if (!fileName || !folder) return NextResponse.json({ error: "Invalid upload request" }, { status: 400 });
 
   const extension = fileName.split(".").pop()?.toLowerCase() ?? "";
+  const normalizedContentType = contentType || "application/octet-stream";
   if (folder === "maps") {
     if (!VALID_MAP_EXTENSIONS.includes(extension)) return NextResponse.json({ error: "Map file must be .rhm or .sspm." }, { status: 400 });
-    if (fileSize && fileSize > 50 * 1024 * 1024) return NextResponse.json({ error: "Map file must be 50 MB or smaller." }, { status: 400 });
+    if (typeof fileSize === "number" && fileSize > 50 * 1024 * 1024) return NextResponse.json({ error: "Map file must be 50 MB or smaller." }, { status: 400 });
   } else if (folder === "map-images") {
-    if (!VALID_IMAGE_TYPES.includes(contentType)) return NextResponse.json({ error: "Image must be PNG, JPG, JPEG, or WEBP." }, { status: 400 });
+    if (!VALID_IMAGE_TYPES.includes(normalizedContentType)) return NextResponse.json({ error: "Image must be PNG, JPG, JPEG, or WEBP." }, { status: 400 });
   } else {
     return NextResponse.json({ error: "Invalid upload folder." }, { status: 400 });
   }
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
   try {
     const { data, error } = await supabaseAdmin.storage.from(process.env.STORAGE_BUCKET ?? "media").createSignedUploadUrl(path);
     if (error || !data) return NextResponse.json({ error: error?.message ?? "Could not create upload url" }, { status: 500 });
-    return NextResponse.json({ uploadUrl: data.signedUrl, path });
+    return NextResponse.json({ uploadUrl: data.signedUrl, path, contentType: normalizedContentType });
   } catch {
     return NextResponse.json({ error: "Upload service error" }, { status: 500 });
   }
