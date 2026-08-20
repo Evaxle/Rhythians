@@ -55,18 +55,14 @@ export const ROLE_TO_TAG_MAP: Record<string, string> = {
 
 export function mapDiscordRolesToTags(discordRoles: string[], roleMappings: Record<string, string>): string[] {
   const tags: string[] = [];
-  
   for (const roleId of discordRoles) {
     const roleName = roleMappings[roleId];
     if (roleName) {
       const normalizedRole = roleName.toLowerCase();
       const tagSlug = ROLE_TO_TAG_MAP[normalizedRole];
-      if (tagSlug && !tags.includes(tagSlug)) {
-        tags.push(tagSlug);
-      }
+      if (tagSlug && !tags.includes(tagSlug)) tags.push(tagSlug);
     }
   }
-  
   return tags;
 }
 
@@ -117,37 +113,33 @@ export async function getGuildRoles(token: string, guildId: string): Promise<Dis
 }
 
 export async function getGuildMemberById(token: string, guildId: string, userId: string): Promise<DiscordGuildMember | null> {
-  try {
-    const response = await fetch(`${DISCORD_API_BASE}/guilds/${guildId}/members/${userId}`, { headers: botAuth(token) });
-    if (response.status === 404) return null;
-    if (!response.ok) throw new Error(`Discord API error: ${response.status}`);
-    return await response.json();
-  } catch (error) {
-    console.error("Failed to fetch guild member:", error);
-    return null;
-  }
+  const response = await fetch(`${DISCORD_API_BASE}/guilds/${guildId}/members/${userId}`, {
+    headers: botAuth(token),
+    cache: "no-store",
+  });
+
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error(`Discord API error: ${response.status}`);
+  return await response.json();
 }
 
 export async function getAllGuildMembers(token: string, guildId: string): Promise<DiscordGuildMember[]> {
   const members: DiscordGuildMember[] = [];
   let after: string | undefined;
 
-  try {
-    for (let i = 0; i < 50; i++) {
-      const params = new URLSearchParams({ limit: "100" });
-      if (after) params.set("after", after);
-      const response = await fetch(`${DISCORD_API_BASE}/guilds/${guildId}/members?${params}`, {
-        headers: botAuth(token),
-      });
-      if (!response.ok) throw new Error(`Discord API error: ${response.status}`);
-      const batch = await response.json();
-      if (!Array.isArray(batch) || batch.length === 0) break;
-      members.push(...batch);
-      after = batch[batch.length - 1].user?.id;
-      if (!after || batch.length < 100) break;
-    }
-  } catch (error) {
-    console.error("Failed to fetch guild members:", error);
+  for (let i = 0; i < 50; i++) {
+    const params = new URLSearchParams({ limit: "100" });
+    if (after) params.set("after", after);
+    const response = await fetch(`${DISCORD_API_BASE}/guilds/${guildId}/members?${params}`, {
+      headers: botAuth(token),
+      cache: "no-store",
+    });
+    if (!response.ok) throw new Error(`Discord API error: ${response.status}`);
+    const batch = await response.json();
+    if (!Array.isArray(batch) || batch.length === 0) break;
+    members.push(...batch);
+    after = batch[batch.length - 1].user?.id;
+    if (!after || batch.length < 100) break;
   }
 
   return members;
