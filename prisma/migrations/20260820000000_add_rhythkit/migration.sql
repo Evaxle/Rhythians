@@ -1,11 +1,28 @@
+CREATE TABLE IF NOT EXISTS "RhythKitDevice" (
+  "id" TEXT NOT NULL,
+  "deviceCodeHash" TEXT NOT NULL,
+  "userCode" TEXT NOT NULL,
+  "userId" TEXT,
+  "status" TEXT NOT NULL DEFAULT 'pending',
+  "expiresAt" TIMESTAMP(3) NOT NULL,
+  "authorizedAt" TIMESTAMP(3),
+  CONSTRAINT "RhythKitDevice_pkey" PRIMARY KEY ("id"),
+  CONSTRAINT "RhythKitDevice_deviceCodeHash_key" UNIQUE ("deviceCodeHash"),
+  CONSTRAINT "RhythKitDevice_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS "RhythKitDevice_userCode_status_idx" ON "RhythKitDevice"("userCode", "status");
+
 CREATE TABLE IF NOT EXISTS "RhythKitInstallation" (
+  "id" TEXT NOT NULL,
   "installationId" TEXT NOT NULL,
   "userId" TEXT NOT NULL,
   "tokenHash" TEXT NOT NULL,
   "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "lastSeenAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "revokedAt" TIMESTAMP(3),
-  CONSTRAINT "RhythKitInstallation_pkey" PRIMARY KEY ("installationId"),
+  CONSTRAINT "RhythKitInstallation_pkey" PRIMARY KEY ("id"),
+  CONSTRAINT "RhythKitInstallation_installationId_key" UNIQUE ("installationId"),
   CONSTRAINT "RhythKitInstallation_tokenHash_key" UNIQUE ("tokenHash"),
   CONSTRAINT "RhythKitInstallation_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
