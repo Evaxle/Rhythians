@@ -9,14 +9,23 @@ export function AdminDiscordStatusCheck() {
   const [error, setError] = useState("");
 
   async function checkStatus() {
+    if (loading) return;
     setLoading(true);
     setMessage("");
     setError("");
     try {
-      const response = await fetch("/api/admin/discord/sync", { method: "POST", cache: "no-store" });
+      const response = await fetch("/api/admin/discord/sync", {
+        method: "POST",
+        cache: "no-store",
+        headers: { "Content-Type": "application/json" },
+      });
       const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error ?? "Unable to check Discord server status.");
-      setMessage(`${data.matchedUsers ?? 0} users matched, ${data.tagsApplied ?? 0} tags applied, ${data.tagsRemoved ?? 0} tags removed, ${data.markedLeft ?? 0} users marked not in server.`);
+      if (!response.ok) {
+        const retryAfter = response.headers.get("retry-after");
+        const suffix = retryAfter ? ` Try again in ${retryAfter} seconds.` : "";
+        throw new Error(`${data.error ?? "Unable to check Discord server status."}${suffix}`);
+      }
+      setMessage(`${data.matchedUsers ?? 0} users in server, ${data.checkedUsers ?? 0} users checked, ${data.tagsApplied ?? 0} Discord tags applied, ${data.tagsRemoved ?? 0} Discord tags removed, ${data.markedLeft ?? 0} users not in server.`);
     } catch (checkError) {
       setError(checkError instanceof Error ? checkError.message : "Unable to check Discord server status.");
     } finally {
