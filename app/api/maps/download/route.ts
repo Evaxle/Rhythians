@@ -31,16 +31,16 @@ export async function GET(request: Request) {
   if (!response.ok) return NextResponse.json({ error: "Map file is unavailable." }, { status: 404 });
   const original = new Uint8Array(await response.arrayBuffer());
   const extension = extensionFromMapUrl(map.mapFileUrl);
-  let data: Buffer;
+  let data: Uint8Array;
   try {
-    data = Buffer.from(embedRhythiansId(original, extension, id));
+    data = embedRhythiansId(original, extension, id);
   } catch {
     return NextResponse.json({ error: "The uploaded map file could not be processed safely." }, { status: 422 });
   }
 
   const originalName = fileNameFromUrl(map.mapFileUrl);
   const name = `rhythians-${id}-${safeFileName(map.title)}.sspm`;
-  return new NextResponse(data, {
+  return new NextResponse(new Uint8Array(data), {
     headers: {
       "Content-Type": "application/octet-stream",
       "Content-Disposition": `attachment; filename="${name.replace(/"/g, "")}"`,
