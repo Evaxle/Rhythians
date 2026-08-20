@@ -16,27 +16,37 @@ export async function POST(request: Request) {
     );
   }
 
-  const sessionUser = await getSessionUser();
+  try {
+    const sessionUser = await getSessionUser();
 
-  if (!sessionUser) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+    if (!sessionUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-  if (!(await canAccessAdmin(sessionUser))) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+    if (!(await canAccessAdmin(sessionUser))) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
-  const token = process.env.DISCORD_BOT_TOKEN;
-  const guildId = process.env.DISCORD_GUILD_ID;
+    const token = process.env.DISCORD_BOT_TOKEN;
+    const guildId = process.env.DISCORD_GUILD_ID;
 
-  if (!token || !guildId) {
+    if (!token || !guildId) {
+      return NextResponse.json(
+        { error: "Discord bot not configured. Set DISCORD_BOT_TOKEN and DISCORD_GUILD_ID in the server environment." },
+        { status: 500 }
+      );
+    }
+
+    const result = await syncAllGuildMembers(prisma, token, guildId);
+
+    return NextResponse.json({ success: true, ...result });
+  } catch (error) {
+    console.error("Discord admin sync failed:", error);
     return NextResponse.json(
-      { error: "Discord bot not configured" },
-      { status: 500 }
+      {
+        error: error instanceof Error ? error.message : "Unable to check Discord server status.",
+      },
+      { status: 502 }
     );
   }
-
-  const result = await syncAllGuildMembers(prisma, token, guildId);
-
-  return NextResponse.json({ success: true, ...result });
 }
