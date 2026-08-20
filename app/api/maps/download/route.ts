@@ -31,7 +31,7 @@ export async function GET(request: Request) {
   if (!response.ok) return NextResponse.json({ error: "Map file is unavailable." }, { status: 404 });
   const original = new Uint8Array(await response.arrayBuffer());
   const extension = extensionFromMapUrl(map.mapFileUrl);
-  let data = Buffer.from(original);
+  let data: Buffer;
   try {
     data = Buffer.from(embedRhythiansId(original, extension, id));
   } catch {
@@ -39,10 +39,10 @@ export async function GET(request: Request) {
   }
 
   const originalName = fileNameFromUrl(map.mapFileUrl);
-  const name = extension === ".sspm" ? `rhythians-${id}-${safeFileName(map.title)}.sspm` : `${safeFileName(map.title)}.rhm`;
+  const name = `rhythians-${id}-${safeFileName(map.title)}.sspm`;
   return new NextResponse(data, {
     headers: {
-      "Content-Type": response.headers.get("content-type") ?? "application/octet-stream",
+      "Content-Type": "application/octet-stream",
       "Content-Disposition": `attachment; filename="${name.replace(/"/g, "")}"`,
       "Content-Length": String(data.byteLength),
       "Cache-Control": "private, no-store",
