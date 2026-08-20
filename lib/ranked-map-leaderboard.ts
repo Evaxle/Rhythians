@@ -77,7 +77,7 @@ async function loadMap(mapId: string) {
 
 export async function getRankedMapDetail(mapId: string): Promise<RankedMapLeaderboard | null> {
   const map = await loadMap(mapId);
-  if (!map || !map.isAutoImported || map.status !== "approved" || map.rating == null) return null;
+  if (!map || map.status !== "approved" || map.rating == null) return null;
   const rankIndex = RANKS.findIndex((rank) => map.rating! >= rank.rangeMin && map.rating! <= rank.rangeMax);
   const rank = RANKS[rankIndex === -1 ? RANKS.length - 1 : rankIndex];
   return {
@@ -109,15 +109,9 @@ export async function upsertRankedMapScore(mapId: string, userId: string, score:
     WHERE "challengeMapId" = ${mapId} AND "userId" = ${userId}
     LIMIT 1
   `;
-
   const current = existing[0];
-  const shouldReplace = !current ||
-    score.passed !== current.passed ? score.passed :
-    score.points > current.points ||
-    (score.points === current.points && (score.accuracy ?? -1) > (current.accuracy ?? -1));
-
+  const shouldReplace = !current || score.passed !== current.passed ? score.passed : score.points > current.points || (score.points === current.points && (score.accuracy ?? -1) > (current.accuracy ?? -1));
   if (!shouldReplace) return false;
-
   await prisma.$executeRaw`
     INSERT INTO "RankedMapScore" ("challengeMapId", "userId", "rating", "accuracy", "passed", "points", "scoreId", "speed", "rankIndex")
     VALUES (${mapId}, ${userId}, ${score.rating}, ${score.accuracy}, ${score.passed}, ${score.points}, ${score.scoreId}, ${score.speed}, ${score.rankIndex})
@@ -137,18 +131,7 @@ export async function upsertRankedMapScore(mapId: string, userId: string, score:
 export async function getRankedMapLeaderboard(mapId: string, selectedRank: number | null, limit = 100): Promise<RankedMapLeaderboard | null> {
   const detail = await getRankedMapDetail(mapId);
   if (!detail) return null;
-
-  const rawRows = await prisma.$queryRaw<Array<{
-    userId: string;
-    username: string;
-    displayName: string | null;
-    profileHandle: string;
-    avatar: string | null;
-    accuracy: number | null;
-    points: number;
-    scoreId: number | null;
-    rhp: number;
-  }>>`
+  const rawRows = await prisma.$queryRaw<Array<{ userId: string; username: string; displayName: string | null; profileHandle: string; avatar: string | null; accuracy: number | null; points: number; scoreId: number | null; rhp: number }>>`
     SELECT r."userId", u."username", u."displayName", u."profileHandle", u."avatar", r."accuracy", r."points", r."scoreId", u."rhp"
     FROM "RankedMapScore" r
     INNER JOIN "User" u ON u."id" = r."userId"
@@ -156,23 +139,6 @@ export async function getRankedMapLeaderboard(mapId: string, selectedRank: numbe
     ORDER BY r."points" DESC, r."accuracy" DESC NULLS LAST, r."updatedAt" ASC
     LIMIT 500
   `;
-
-  const filtered = rawRows
-    .map((row) => ({ ...row, rankInfo: getRankInfo(row.rhp) }))
-    .filter((row) => selectedRank == null || row.rankInfo.index === selectedRank)
-    .slice(0, limit)
-    .map((row, index) => ({
-      position: index + 1,
-      userId: row.userId,
-      username: row.username,
-      displayName: row.displayName,
-      profileHandle: row.profileHandle,
-      avatar: row.avatar,
-      accuracy: row.accuracy,
-      points: row.points,
-      scoreId: row.scoreId,
-      rankInfo: row.rankInfo,
-    }));
-
+  const filtered = rawRows.map((row) => ({ ...row, rankInfo: getRankInfo(row.rhp) })).filter((row) => selectedRank == null || row.rankInfo.index === selectedRank).slice(0, limit).map((row, index) => ({ position: index + 1, userId: row.userId, username: row.username, displayName: row.displayName, profileHandle: row.profileHandle, avatar: row.avatar, accuracy: row.accuracy, points: row.points, scoreId: row.scoreId, rankInfo: row.rankInfo }));
   return { ...detail, rows: filtered };
 }
