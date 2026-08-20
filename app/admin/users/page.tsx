@@ -5,6 +5,7 @@ import { AdminUserSearch } from "@/components/admin-user-search";
 import { AdminUserProfileControls } from "@/components/admin-user-profile-controls";
 import { ResetRatingSystem } from "@/components/admin/reset-rating-system";
 import { AdminCheckUserScores } from "@/components/admin/check-user-scores";
+import { AdminDiscordStatusCheck } from "@/components/admin/discord-status-check";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,7 @@ export default async function AdminUsersPage() {
         <p className="mt-3 text-sm leading-7 text-muted">Search for a user to view full details, punish accounts, or assign tags. Use the profile editor on any user to change their challenge levels and, for the site owner, their profile title.</p>
       </section>
 
+      <AdminDiscordStatusCheck />
       <AdminCheckUserScores />
       <AdminUserSearch />
       <ResetRatingSystem />
