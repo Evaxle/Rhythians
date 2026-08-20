@@ -5,7 +5,7 @@ import { hashToken, calculateRhp, getRankIndex, getRankRange } from "@/lib/rhyth
 export const runtime = "nodejs";
 
 type Installation = { userId: string; installationId: string; revokedAt: Date | null };
-type MapRow = { id: string; title: string; rating: number | null; length: number | null; status: string; isAutoImported: boolean };
+type MapRow = { id: string; title: string; rating: number | null; length: number | null; status: string; isAutoImported: boolean; rhpOverride: number | null };
 
 export async function POST(request: Request) {
   const auth = request.headers.get("authorization") ?? "";
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   const speed = typeof body?.speed === "number" && Number.isFinite(body.speed) && body.speed > 0 ? body.speed : null;
   if (!challengeMapId || !clientScoreId) return NextResponse.json({ error: "challengeMapId and clientScoreId are required." }, { status: 400 });
 
-  const maps = await prisma.$queryRawUnsafe<MapRow[]>(`SELECT "id", "title", "rating", "length", "status", "isAutoImported" FROM "ChallengeMap" WHERE "id" = $1 LIMIT 1`, challengeMapId);
+  const maps = await prisma.$queryRawUnsafe<MapRow[]>(`SELECT "id", "title", "rating", "length", "status", "isAutoImported", "rhpOverride" FROM "ChallengeMap" WHERE "id" = $1 LIMIT 1`, challengeMapId);
   const map = maps[0];
   if (!map || map.status !== "approved" || !map.isAutoImported || map.rating == null) return NextResponse.json({ error: "Map is not an approved Rhythians ranked map." }, { status: 404 });
 
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
   const [rangeMin, rangeMax] = getRankRange(rankIndex);
   if (map.rating < rangeMin || map.rating > rangeMax) return NextResponse.json({ error: "Map is outside the user's current rank range." }, { status: 409 });
 
-  const points = calculateRhp(map.rating, accuracy, speed, rankIndex, map.length);
+  const points = map.rhpOverride ?? calculateRhp(map.rating, accuracy, speed, rankIndex, map.length);
 
   const result = await prisma.$transaction(async (tx) => {
     await tx.$executeRawUnsafe(`UPDATE "RhythKitInstallation" SET "lastSeenAt" = NOW() WHERE "installationId" = $1`, installation.installationId);
