@@ -10,6 +10,7 @@ export default function MapSubmitForm() {
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
   const [description, setDescription] = useState("");
+  const [requestedRating, setRequestedRating] = useState("");
   const [mapFile, setMapFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,6 +37,8 @@ export default function MapSubmitForm() {
     if (!title.trim()) return setError("Title is required.");
     if (!artist.trim()) return setError("Artist is required.");
     if (!description.trim()) return setError("Description is required.");
+    const rating = Number(requestedRating);
+    if (!requestedRating.trim() || !Number.isFinite(rating) || rating <= 0) return setError("Requested rating is required.");
     if (!mapFile) return setError("Choose a .rhm or .sspm file.");
     const extension = mapFile.name.split(".").pop()?.toLowerCase() ?? "";
     if (!validMapExtensions.includes(extension)) return setError("Map file must be .rhm or .sspm.");
@@ -46,7 +49,7 @@ export default function MapSubmitForm() {
       const response = await fetch("/api/maps/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ submissionType: "ranked", title: title.trim(), artist: artist.trim(), description: description.trim(), mapFileUrl: mapPath }),
+        body: JSON.stringify({ submissionType: "ranked", title: title.trim(), artist: artist.trim(), description: description.trim(), requestedRating: rating, mapFileUrl: mapPath }),
       });
       const data = await response.json().catch(() => null);
       if (!response.ok) throw new Error(data?.error || "Map submission failed.");
@@ -54,6 +57,7 @@ export default function MapSubmitForm() {
       setTitle("");
       setArtist("");
       setDescription("");
+      setRequestedRating("");
       setMapFile(null);
       const input = document.getElementById("ranked-map-file") as HTMLInputElement | null;
       if (input) input.value = "";
@@ -72,6 +76,7 @@ export default function MapSubmitForm() {
         <input value={artist} onChange={e => setArtist(e.target.value)} maxLength={120} placeholder="Artist" className="w-full rounded-3xl border border-border bg-background/80 px-4 py-3 text-sm text-white" />
       </div>
       <textarea value={description} onChange={e => setDescription(e.target.value)} maxLength={2000} rows={4} placeholder="Description" className="w-full rounded-3xl border border-border bg-background/80 px-4 py-3 text-sm text-white" />
+      <input type="number" min="0.1" step="0.1" value={requestedRating} onChange={e => setRequestedRating(e.target.value)} placeholder="Requested rating" className="w-full rounded-3xl border border-border bg-background/80 px-4 py-3 text-sm text-white" />
       <div>
         <label htmlFor="ranked-map-file" className="mb-2 block text-sm font-medium text-white">Map file</label>
         <input id="ranked-map-file" type="file" accept=".rhm,.sspm" onChange={e => setMapFile(e.target.files?.[0] ?? null)} className="w-full rounded-3xl border border-border bg-background/80 px-4 py-3 text-sm text-white" />
