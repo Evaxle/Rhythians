@@ -39,8 +39,8 @@ export async function checkRankedMap(userId: string, mapId: string) {
   ]);
   if (!profile || !user) return { status: "not_available" as const, points: 0 };
 
-  const map = await prisma.challengeMap.findUnique({ where: { id: mapId }, select: { id: true, title: true, rating: true, length: true, isAutoImported: true, status: true } });
-  if (!map || !map.isAutoImported || map.status !== "approved" || map.rating == null) return { status: "not_available" as const, points: 0 };
+  const map = await prisma.challengeMap.findUnique({ where: { id: mapId }, select: { id: true, title: true, rating: true, length: true, status: true } });
+  if (!map || map.status !== "approved" || map.rating == null) return { status: "not_available" as const, points: 0 };
 
   const rankInfo = getRankInfo(user.rhp);
   if (!isMapInRankRange(map.rating, rankInfo.index)) return { status: "out_of_range" as const, points: 0, rankInfo };
@@ -73,7 +73,7 @@ export async function checkAllRankedMaps(userId: string) {
   if (!profile || !user) return { checked: 0, foundScores: 0, alreadyCompleted: 0, newlyCompleted: 0, totalPoints: 0 };
 
   const rankInfo = getRankInfo(user.rhp);
-  const maps = await prisma.challengeMap.findMany({ where: { status: "approved", isAutoImported: true, rating: { not: null, gte: rankInfo.rangeMin, lte: rankInfo.rangeMax } }, select: { id: true, title: true, rating: true, length: true } });
+  const maps = await prisma.challengeMap.findMany({ where: { status: "approved", rating: { not: null, gte: rankInfo.rangeMin, lte: rankInfo.rangeMax } }, select: { id: true, title: true, rating: true, length: true } });
   let scores: RhythiaScoreEntry[];
   try { scores = await fetchAllRhythiaScores(profile.profileId); } catch { return { checked: maps.length, foundScores: 0, alreadyCompleted: 0, newlyCompleted: 0, totalPoints: 0, rankIndex: rankInfo.index }; }
 
