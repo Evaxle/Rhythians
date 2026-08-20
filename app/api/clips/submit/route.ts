@@ -21,14 +21,13 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { title, description, cameraMode, storagePath, thumbnailPath, songName, tagIds } = body as {
+  const { title, description, cameraMode, storagePath, thumbnailPath, songName } = body as {
     title?: string;
     description?: string;
     cameraMode?: string;
     storagePath?: string;
     thumbnailPath?: string;
     songName?: string;
-    tagIds?: string[];
   };
 
   const validCameraModes = new Set(["lock", "spin", "vr"]);
@@ -43,12 +42,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Video storage path is required." }, { status: 400 });
   }
 
-  // Validate tags against the available ones so users can only tag with real tags.
-  let validTagIds: string[] = [];
-  if (Array.isArray(tagIds) && tagIds.length > 0) {
-    const existing = await prisma.tag.findMany({ where: { id: { in: tagIds.slice(0, 10) } }, select: { id: true } });
-    validTagIds = existing.map((tag) => tag.id);
-  }
+  const userTags = await prisma.userTag.findMany({
+    where: { userId: user.id },
+    select: { tagId: true },
+  });
+  const tagIds = userTags.map((userTag) => userTag.tagId);
 
   const clip = await prisma.$transaction(async (tx) => {
     const created = await tx.clip.create({
@@ -60,7 +58,7 @@ export async function POST(request: Request) {
         thumbnailPath,
         cameraMode: validCameraModes.has(cameraMode ?? "") ? (cameraMode as "lock" | "spin" | "vr") : null,
         uploaderId: user.id,
-        tags: validTagIds.length > 0 ? { create: validTagIds.map((tagId) => ({ tagId })) } : undefined,
+        tags: tagIds.length > 0 ? { create: tagIds.map((tagId) => ({ tagId })) } : undefined,
       },
     });
     return created;
@@ -72,7 +70,7 @@ export async function POST(request: Request) {
       action: "clip_submitted",
       targetType: "clip",
       targetId: clip.id,
-      metadata: { title, songName: clip.songName, tagIds: validTagIds },
+      metadata: { title, songName: clip.songName, tagIds },
     },
   });
 
