@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { hashToken, randomToken } from "@/lib/rhythkit";
@@ -9,10 +10,7 @@ export async function POST(request: Request) {
   const deviceCode = typeof body?.deviceCode === "string" ? body.deviceCode : "";
   if (!deviceCode) return NextResponse.json({ error: "Device code is required." }, { status: 400 });
 
-  const rows = await prisma.$queryRawUnsafe<Array<{ id: string; userId: string | null; status: string; expiresAt: Date }>>(
-    `SELECT "id", "userId", "status", "expiresAt" FROM "RhythKitDevice" WHERE "deviceCodeHash" = $1 LIMIT 1`,
-    hashToken(deviceCode)
-  );
+  const rows = await prisma.$queryRawUnsafe<Array<{ id: string; userId: string | null; status: string; expiresAt: Date }>>(`SELECT "id", "userId", "status", "expiresAt" FROM "RhythKitDevice" WHERE "deviceCodeHash" = $1 LIMIT 1`, hashToken(deviceCode));
   const device = rows[0];
   if (!device) return NextResponse.json({ status: "invalid" }, { status: 404 });
   if (device.expiresAt < new Date()) return NextResponse.json({ status: "expired" }, { status: 410 });
