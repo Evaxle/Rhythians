@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { config as loadEnv } from "dotenv";
 import { defineConfig } from "prisma/config";
 import path from "node:path";
