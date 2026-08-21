@@ -1,8 +1,7 @@
-export const CATEGORIES = ["main_challenge", "jumps", "stream", "tech", "off_grid"] as const;
+export const CATEGORIES = ["jumps", "stream", "tech", "off_grid"] as const;
 export type Category = (typeof CATEGORIES)[number];
 
 export const CATEGORY_LABELS: Record<Category, string> = {
-  main_challenge: "Main Challenge",
   jumps: "Jumps",
   stream: "Stream",
   tech: "Tech",
