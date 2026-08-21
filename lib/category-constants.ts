@@ -1,11 +1,8 @@
-// Client-safe category constants and types. This module must NOT import any
-// server-only code (Prisma, DB, etc.) because it is imported by client
-// components. Server-side category logic lives in lib/categories.ts.
-
-export const CATEGORIES = ["jumps", "stream", "tech", "off_grid"] as const;
+export const CATEGORIES = ["main_challenge", "jumps", "stream", "tech", "off_grid"] as const;
 export type Category = (typeof CATEGORIES)[number];
 
 export const CATEGORY_LABELS: Record<Category, string> = {
+  main_challenge: "Main Challenge",
   jumps: "Jumps",
   stream: "Stream",
   tech: "Tech",
