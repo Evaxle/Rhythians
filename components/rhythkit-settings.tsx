@@ -64,19 +64,23 @@ export function RhythKitSettings() {
 
   const requestAgentStart = async (gameId: string) => {
     const game = GAMES.find(value => value.id === gameId);
-    if (!game) return;
+    if (!game) return false;
     setConnecting(gameId);
     try {
       const uri = `rhythkit://connect?game=${encodeURIComponent(game.id)}`;
       window.open(uri, "rhythkit-agent", "noopener,noreferrer");
-    } catch { }
-    await new Promise(resolve => window.setTimeout(resolve, 1000));
-    const deadline = Date.now() + 8000;
-    while (Date.now() < deadline) {
-      if (await check(gameId)) return;
       await new Promise(resolve => window.setTimeout(resolve, 1000));
+      const deadline = Date.now() + 8000;
+      while (Date.now() < deadline) {
+        if (await check(gameId)) return true;
+        await new Promise(resolve => window.setTimeout(resolve, 1000));
+      }
+      return false;
+    } catch {
+      return false;
+    } finally {
+      setConnecting(null);
     }
-    setConnecting(null);
   };
 
   const startServer = async () => {
@@ -92,7 +96,6 @@ export function RhythKitSettings() {
     } catch {
       setLocalServer(null);
     }
-    setConnecting(null);
   };
 
   const loadEvents = async () => {
@@ -108,7 +111,11 @@ export function RhythKitSettings() {
     try {
       const response = await fetch(getUrl("/test-connection"), { method: "POST" });
       if (!response.ok) await check(active);
-    } finally { await check(active); await loadEvents(); setTesting(null); }
+    } finally {
+      await check(active);
+      await loadEvents();
+      setTesting(null);
+    }
   };
 
   const clearEvents = async () => {
@@ -122,8 +129,8 @@ export function RhythKitSettings() {
     try {
       const agentAvailable = await check(gameId);
       if (!agentAvailable) {
-        await requestAgentStart(gameId);
-        if (!(await check(gameId))) throw new Error();
+        const started = await requestAgentStart(gameId);
+        if (!started || !(await check(gameId))) throw new Error();
       }
       const response = await fetch(`http://127.0.0.1:${game.port}/auth/start`, { method: "POST" });
       if (!response.ok) throw new Error();
@@ -139,8 +146,11 @@ export function RhythKitSettings() {
         if (data.loggedIn === true || data.authenticated === true) break;
       }
       await check(gameId);
-    } catch { await check(gameId); }
-    finally { setConnecting(null); }
+    } catch {
+      await check(gameId);
+    } finally {
+      setConnecting(null);
+    }
   };
 
   useEffect(() => {
