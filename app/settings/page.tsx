@@ -11,6 +11,7 @@ import { AvatarUploader } from "@/components/avatar-uploader";
 import { OnboardingForm } from "@/components/onboarding-form";
 import { CursorSettings } from "@/components/cursor-settings";
 import { CheckAllScoresButton } from "@/components/check-all-scores-button";
+import { RhythKitSettings } from "@/components/rhythkit-settings";
 
 export const dynamic = "force-dynamic";
 
@@ -43,10 +44,11 @@ export default async function SettingsPage() {
         <div className="mt-6"><AvatarUploader avatarUrl={avatarUrl} username={fullUser.username} /></div>
       </section>
       {fullUser.rhythiaProfile && <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow"><p className="text-sm uppercase tracking-[0.3em] text-accent">Rhythia scores</p><h2 className="mt-2 text-2xl font-semibold text-white">Import your old scores</h2><p className="mt-2 text-sm leading-7 text-muted">Your past Rhythia scores are imported automatically when you link your account. Only maps inside your current rank&apos;s rating range award RHP. If you&apos;ve played more ranked maps since then, run the scan again to claim the RHP for any new completions.</p><div className="mt-6 border-t border-border pt-6"><CheckAllScoresButton /></div></section>}
-      <section aria-disabled="true" className="rounded-3xl border border-border bg-surface/60 p-8 opacity-50 shadow-glow grayscale">
-        <p className="text-sm uppercase tracking-[0.3em] text-muted">RhythKit</p>
-        <div className="flex items-center gap-3"><h2 className="mt-2 text-2xl font-semibold text-muted">Game connection</h2><span className="rounded-full border border-border bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted">Disabled</span></div>
-        <p className="mt-4 max-w-2xl text-sm leading-7 text-muted">RhythKit connection controls are temporarily disabled here. Install and manage RhythKit through the desktop integration while the web connection panel is being finalized.</p>
+      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+        <p className="text-sm uppercase tracking-[0.3em] text-accent">RhythKit</p>
+        <h2 className="mt-2 text-2xl font-semibold text-white">Game connection</h2>
+        <p className="mt-3 text-sm leading-7 text-muted">Connect the installed RhythKit Agent, authenticate your account, start the local server, test the connection, and monitor each supported game integration.</p>
+        <div className="mt-6 border-t border-border pt-6"><RhythKitSettings /></div>
       </section>
       <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
         <p className="text-sm uppercase tracking-[0.3em] text-accent">Roles &amp; tags</p><h2 className="mt-2 text-2xl font-semibold text-white">Your answers and tags</h2><p className="mt-2 text-sm leading-7 text-muted">{fullUser.discordId ? "Your tags are synced from your Discord roles. You can also adjust your onboarding answers below." : "Change what you answered during onboarding — your tags update automatically."}</p>
