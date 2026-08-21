@@ -20,5 +20,13 @@ export async function GET(request: Request, { params }: { params: Promise<{ mapI
   const map = maps[0];
   if (!map || map.status !== "approved" || map.rating == null) return NextResponse.json({ error: "Map is not an approved Rhythians ranked map." }, { status: 404 });
 
-  return NextResponse.json({ id: map.id, rhythiaMapId: map.sourceBeatmapId?.toString() ?? mapId, title: map.title, rating: map.rating, length: map.length, eligible: true });
+  return NextResponse.json({
+    id: map.id,
+    rhythiaMapId: map.sourceBeatmapId?.toString() ?? mapId,
+    title: map.title,
+    rating: map.rating,
+    length: map.length,
+    eligible: true,
+    downloadUrl: `/api/maps/download?id=${encodeURIComponent(map.id)}`
+  });
 }
