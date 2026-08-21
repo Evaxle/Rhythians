@@ -11,9 +11,7 @@ export function CopyClipId({ clipId }: { clipId: string }) {
       await navigator.clipboard.writeText(clipId);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Clipboard API unavailable; ignore silently.
-    }
+    } catch {}
   }
 
   return (
