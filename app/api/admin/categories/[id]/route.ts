@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { canAccessAdmin } from "@/lib/admin-access";
 import { CATEGORY_LABELS, isCategory, MAX_CATEGORY_LEVEL, type Category } from "@/lib/categories";
+import type { Prisma } from "@/generated/prisma/client";
 
 export const dynamic = "force-dynamic";
 
@@ -19,11 +20,11 @@ export async function PATCH(request: Request, { params }: Props) {
   const map = await prisma.categoryMap.findUnique({ where: { id } });
   if (!map) return NextResponse.json({ error: "Map not found." }, { status: 404 });
 
-  const data: { status?: "approved" | "rejected" | "hidden"; level?: number; category?: Category; reviewerNote?: string | null; reviewedById?: string; reviewedAt?: Date } = {};
+  const data: Prisma.CategoryMapUpdateInput = {};
 
   if (body?.status === "approved" || body?.status === "rejected" || body?.status === "hidden") {
     data.status = body.status;
-    data.reviewedById = admin.id;
+    data.reviewedBy = { connect: { id: admin.id } };
     data.reviewedAt = new Date();
   }
 
@@ -37,7 +38,7 @@ export async function PATCH(request: Request, { params }: Props) {
 
   if (body?.category !== undefined) {
     if (typeof body.category !== "string" || !isCategory(body.category)) return NextResponse.json({ error: "Invalid category." }, { status: 400 });
-    data.category = body.category;
+    data.category = body.category as Category;
   }
 
   if (typeof body?.reviewerNote === "string") {
@@ -66,7 +67,7 @@ export async function PATCH(request: Request, { params }: Props) {
         userId: map.submittedById,
         type: "map_rejected",
         title: "Category map rejected",
-        message: `"${map.title}" was rejected.${data.reviewerNote ? `\n\nReason: ${data.reviewerNote}` : ""}`,
+        message: `"${map.title}" was rejected.${typeof data.reviewerNote === "string" && data.reviewerNote ? `\n\nReason: ${data.reviewerNote}` : ""}`,
         url: "/categories",
       },
     });
