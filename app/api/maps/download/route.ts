@@ -39,5 +39,6 @@ export async function GET(request: Request) {
   let data: Uint8Array;
   try { data = embedRhythiansId(original, source.extension, map.id); } catch { return NextResponse.json({ error: "The uploaded map file could not be converted into a Rhythians SSPM." }, { status: 422 }); }
   const name = `rhythians-${map.id}-${safeFileName(map.title)}.sspm`;
-  return new NextResponse(data, { headers: { "Content-Type": "application/octet-stream", "Content-Disposition": `attachment; filename="${name.replace(/"/g, "")}"`, "Content-Length": String(data.byteLength), "Cache-Control": "private, no-store", "X-Rhythians-Map-Id": map.id, "X-Rhythians-Original-File": source.originalName } });
+  const body = new Blob([data.buffer], { type: "application/octet-stream" });
+  return new NextResponse(body, { headers: { "Content-Type": "application/octet-stream", "Content-Disposition": `attachment; filename="${name.replace(/"/g, "")}"`, "Content-Length": String(data.byteLength), "Cache-Control": "private, no-store", "X-Rhythians-Map-Id": map.id, "X-Rhythians-Original-File": source.originalName } });
 }
