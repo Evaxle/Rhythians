@@ -2,7 +2,22 @@ import { Client } from "pg";
 import { execFileSync } from "node:child_process";
 import { readdirSync } from "node:fs";
 
-const client = new Client({ connectionString: process.env.DATABASE_URL });
+const rawDatabaseUrl = process.env.DATABASE_URL;
+if (!rawDatabaseUrl) throw new Error("DATABASE_URL is required");
+
+let databaseUrl = rawDatabaseUrl;
+if (process.env.VERCEL === "1") {
+  const url = new URL(rawDatabaseUrl);
+  const directHost = /^db\.([a-z0-9]+)\.supabase\.co$/i.exec(url.hostname);
+  if (directHost) {
+    url.hostname = "aws-0-us-east-1.pooler.supabase.com";
+    if (url.username === "postgres") url.username = `postgres.${directHost[1]}`;
+    url.port = "5432";
+    databaseUrl = url.toString();
+  }
+}
+
+const client = new Client({ connectionString: databaseUrl });
 await client.connect();
 
 try {
@@ -16,7 +31,7 @@ try {
     for (const migration of migrations) {
       execFileSync(process.platform === "win32" ? "npx.cmd" : "npx", ["prisma", "migrate", "resolve", "--applied", migration], {
         stdio: "inherit",
-        env: process.env,
+        env: { ...process.env, DATABASE_URL: databaseUrl },
       });
     }
   }
@@ -26,5 +41,5 @@ try {
 
 execFileSync(process.platform === "win32" ? "npx.cmd" : "npx", ["prisma", "migrate", "deploy"], {
   stdio: "inherit",
-  env: process.env,
+  env: { ...process.env, DATABASE_URL: databaseUrl },
 });
