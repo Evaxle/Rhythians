@@ -44,7 +44,7 @@ export function RhythKitSettings() {
       const data = await response.json() as AgentStatus;
       if (!data.installed || !data.running) throw new Error();
       const authenticated = data.loggedIn === true || data.authenticated === true;
-      const connected = data.connected === true && data.gameRunning === true && authenticated;
+      const connected = authenticated;
       setGame(data.game ?? "unknown");
       setGameVersion(data.gameVersion ?? null);
       setGameRunning(data.gameRunning === true);
@@ -124,11 +124,11 @@ export function RhythKitSettings() {
           <div className="flex items-center gap-3">
             <span className={`h-3 w-3 rounded-full ${status === "connected" ? "bg-green-400" : status === "not_connected" ? "bg-red-400" : "bg-yellow-400"}`} />
             <p className="font-semibold text-white">
-              {status === "connected" ? "Live connection" : status === "not_connected" ? "Not connected" : "Checking..."}
+              {status === "connected" ? "Rhythians connected" : status === "not_connected" ? "Not connected" : "Checking..."}
             </p>
           </div>
           <p className="mt-2 text-sm text-muted">
-            {status === "connected" ? `Rhythia is running and RhythKit is connected to Rhythians as ${username ?? "your account"}.` : gameRunning ? "Rhythia is running, but RhythKit is not currently connected to Rhythians." : "Start Rhythia with RhythKit installed to establish a live connection."}
+            {status === "connected" ? `Rhythians account connected as ${username ?? "your account"}. ${gameRunning ? "Rhythia is running and the live game connection is active." : "Start Rhythia to activate the live game connection."}` : gameRunning ? "Rhythia is running, but RhythKit is not currently connected to Rhythians." : "Start Rhythia with RhythKit installed to establish the game connection."}
           </p>
         </div>
 
@@ -168,7 +168,7 @@ export function RhythKitSettings() {
         <div className="flex flex-wrap gap-3">
           <button onClick={() => void connect()} disabled={connecting} className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent/80 disabled:opacity-50">
             <Wifi size={16} />
-            {connecting ? "Waiting for authorization..." : gameRunning ? "Try connecting again" : "Connect RhythKit"}
+            {connecting ? "Waiting for authorization..." : "Connect RhythKit"}
           </button>
           <a href="https://github.com/Evaxle/RhythKit/releases" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:border-accent/40">
             <Download size={16} />
@@ -177,7 +177,7 @@ export function RhythKitSettings() {
         </div>
       )}
 
-      {status === "connected" && <p className="text-xs text-muted">Live status refreshes automatically while this settings page is open.</p>}
+      {status === "connected" && <p className="text-xs text-muted">Live account status refreshes automatically. Game status is shown separately.</p>}
     </div>
   );
 }
