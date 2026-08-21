@@ -26,14 +26,10 @@ export function WarningPopups() {
         let dismissed: string[] = [];
         try {
           dismissed = JSON.parse(window.localStorage.getItem(DISMISSED_KEY) ?? "[]") as string[];
-        } catch {
-          // ignore
-        }
+        } catch {}
         const dismissedSet = new Set(dismissed);
         setWarnings((data.warnings as WarningItem[]).filter((w) => !dismissedSet.has(w.id)));
-      } catch {
-        // ignore
-      }
+      } catch {}
     }
     void load();
     return () => {
@@ -47,9 +43,7 @@ export function WarningPopups() {
       const dismissed = JSON.parse(window.localStorage.getItem(DISMISSED_KEY) ?? "[]") as string[];
       dismissed.push(id);
       window.localStorage.setItem(DISMISSED_KEY, JSON.stringify(dismissed));
-    } catch {
-      // ignore
-    }
+    } catch {}
   };
 
   if (warnings.length === 0) return null;
