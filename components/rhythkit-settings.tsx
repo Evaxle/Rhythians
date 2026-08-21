@@ -9,6 +9,7 @@ const AUTH_URL = "http://127.0.0.1:45872/auth/start";
 export function RhythKitSettings() {
   const [status, setStatus] = useState<"checking" | "connected" | "not_connected">("checking");
   const [authenticated, setAuthenticated] = useState(false);
+  const [username, setUsername] = useState<string | null>(null);
   const [game, setGame] = useState("unknown");
   const [connecting, setConnecting] = useState(false);
 
@@ -17,13 +18,15 @@ export function RhythKitSettings() {
     try {
       const response = await fetch(STATUS_URL, { cache: "no-store" });
       if (!response.ok) throw new Error();
-      const data = await response.json() as { installed?: boolean; running?: boolean; authenticated?: boolean; game?: string };
+      const data = await response.json() as { installed?: boolean; running?: boolean; authenticated?: boolean; username?: string | null; game?: string };
       if (!data.installed || !data.running) throw new Error();
       setGame(data.game ?? "unknown");
-      setAuthenticated(data.authenticated === true);
-      setStatus(data.authenticated === true ? "connected" : "not_connected");
+      setUsername(data.username ?? null);
+      setAuthenticated(data.authenticated === true && Boolean(data.username));
+      setStatus(data.authenticated === true && Boolean(data.username) ? "connected" : "not_connected");
     } catch {
       setGame("unknown");
+      setUsername(null);
       setAuthenticated(false);
       setStatus("not_connected");
     }
@@ -67,7 +70,7 @@ export function RhythKitSettings() {
             {status === "connected" ? "Connected" : status === "not_connected" ? "Not connected" : "Checking..."}
           </p>
         </div>
-        {status === "connected" && <p className="mt-2 text-sm text-muted">RhythKit is authenticated and ready. Game: {game}</p>}
+        {status === "connected" && <p className="mt-2 text-sm text-muted">RhythKit is authenticated as <span className="font-semibold text-white">{username}</span>. Game: {game}</p>}
         {status === "not_connected" && <p className="mt-2 text-sm text-muted">Start Rhythia with RhythKit installed, then connect your account.</p>}
       </div>
 
@@ -84,7 +87,7 @@ export function RhythKitSettings() {
         </div>
       )}
 
-      {authenticated && <p className="text-xs text-muted">Connection is checked automatically while this page is open.</p>}
+      {authenticated && <p className="text-xs text-muted">Connection is verified against Rhythians automatically while this page is open.</p>}
     </div>
   );
 }
