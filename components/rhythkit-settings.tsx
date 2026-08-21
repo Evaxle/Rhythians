@@ -7,28 +7,43 @@ const STATUS_URL = "http://127.0.0.1:45872/status";
 const AUTH_URL = "http://127.0.0.1:45872/auth/start";
 const POLL_URL = "http://127.0.0.1:45872/auth/poll";
 
+type AgentStatus = {
+  installed?: boolean;
+  running?: boolean;
+  gameRunning?: boolean;
+  loggedIn?: boolean;
+  connected?: boolean;
+  authenticated?: boolean;
+  username?: string | null;
+  game?: string;
+};
+
 export function RhythKitSettings() {
   const [status, setStatus] = useState<"checking" | "connected" | "not_connected">("checking");
-  const [authenticated, setAuthenticated] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [gameRunning, setGameRunning] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
   const [game, setGame] = useState("unknown");
   const [connecting, setConnecting] = useState(false);
 
   const check = async () => {
-    setStatus("checking");
     try {
       const response = await fetch(STATUS_URL, { cache: "no-store" });
       if (!response.ok) throw new Error();
-      const data = await response.json() as { installed?: boolean; running?: boolean; authenticated?: boolean; username?: string | null; game?: string };
+      const data = await response.json() as AgentStatus;
       if (!data.installed || !data.running) throw new Error();
+      const authenticated = data.loggedIn === true || data.authenticated === true;
+      const connected = data.connected === true && data.gameRunning === true && authenticated;
       setGame(data.game ?? "unknown");
+      setGameRunning(data.gameRunning === true);
       setUsername(data.username ?? null);
-      setAuthenticated(data.authenticated === true && Boolean(data.username));
-      setStatus(data.authenticated === true && Boolean(data.username) ? "connected" : "not_connected");
+      setLoggedIn(authenticated);
+      setStatus(connected ? "connected" : "not_connected");
     } catch {
       setGame("unknown");
+      setGameRunning(false);
       setUsername(null);
-      setAuthenticated(false);
+      setLoggedIn(false);
       setStatus("not_connected");
     }
   };
@@ -60,7 +75,7 @@ export function RhythKitSettings() {
       throw new Error();
     } catch {
       setStatus("not_connected");
-      setAuthenticated(false);
+      setLoggedIn(false);
       setUsername(null);
     } finally {
       setConnecting(false);
@@ -70,7 +85,7 @@ export function RhythKitSettings() {
 
   useEffect(() => {
     void check();
-    const timer = window.setInterval(() => void check(), 3000);
+    const timer = window.setInterval(() => void check(), 2000);
     return () => window.clearInterval(timer);
   }, []);
 
@@ -86,22 +101,38 @@ export function RhythKitSettings() {
         </button>
       </div>
 
-      <div className="rounded-2xl border border-border bg-background/60 p-5">
-        <div className="flex items-center gap-3">
-          <span className={`h-3 w-3 rounded-full ${status === "connected" ? "bg-green-400" : status === "not_connected" ? "bg-red-400" : "bg-yellow-400"}`} />
-          <p className="font-semibold text-white">
-            {status === "connected" ? "Connected" : status === "not_connected" ? "Not connected" : "Checking..."}
+      <div className="rounded-2xl border border-border bg-background/60 p-5 space-y-4">
+        <div>
+          <div className="flex items-center gap-3">
+            <span className={`h-3 w-3 rounded-full ${status === "connected" ? "bg-green-400" : status === "not_connected" ? "bg-red-400" : "bg-yellow-400"}`} />
+            <p className="font-semibold text-white">
+              {status === "connected" ? "Live connection" : status === "not_connected" ? "Not connected" : "Checking..."}
+            </p>
+          </div>
+          <p className="mt-2 text-sm text-muted">
+            {status === "connected" ? `Rhythia is running and RhythKit is connected to Rhythians as ${username ?? "your account"}.` : gameRunning ? "Rhythia is running, but RhythKit is not currently connected to Rhythians." : "Start Rhythia with RhythKit installed to establish a live connection."}
           </p>
         </div>
-        {status === "connected" && <p className="mt-2 text-sm text-muted">RhythKit is authenticated as <span className="font-semibold text-white">{username}</span>. Game: {game}</p>}
-        {status === "not_connected" && <p className="mt-2 text-sm text-muted">Start Rhythia with RhythKit installed, then connect your account.</p>}
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="rounded-xl border border-border bg-white/5 p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted">Rhythia</p>
+            <p className="mt-2 font-semibold text-white">{gameRunning ? "Running" : "Not running"}</p>
+            <p className="mt-1 text-xs text-muted">{game}</p>
+          </div>
+          <div className="rounded-xl border border-border bg-white/5 p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted">RhythKit login</p>
+            <p className="mt-2 font-semibold text-white">{loggedIn ? "Logged in" : "Not logged in"}</p>
+            <p className="mt-1 text-xs text-muted">{loggedIn && username ? username : "No Rhythians account linked"}</p>
+          </div>
+        </div>
       </div>
 
       {status === "not_connected" && (
         <div className="flex flex-wrap gap-3">
           <button onClick={() => void connect()} disabled={connecting} className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent/80 disabled:opacity-50">
             <Wifi size={16} />
-            {connecting ? "Waiting for authorization..." : "Connect RhythKit"}
+            {connecting ? "Waiting for authorization..." : gameRunning ? "Try connecting again" : "Connect RhythKit"}
           </button>
           <a href="https://github.com/Evaxle/RhythKit/releases" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:border-accent/40">
             <Download size={16} />
@@ -110,7 +141,7 @@ export function RhythKitSettings() {
         </div>
       )}
 
-      {authenticated && <p className="text-xs text-muted">Connection is verified against Rhythians automatically while this page is open.</p>}
+      {status === "connected" && <p className="text-xs text-muted">Live status refreshes automatically while this settings page is open.</p>}
     </div>
   );
 }
