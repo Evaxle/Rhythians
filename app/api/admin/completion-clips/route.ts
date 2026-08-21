@@ -5,6 +5,7 @@ import { canAccessAdmin } from "@/lib/admin-access";
 import { supabaseAdmin } from "@/lib/supabase";
 import { randomUUID } from "crypto";
 import { getUserChallengeLevel } from "@/lib/challenge";
+import { ensureCompletionClipTables } from "@/lib/completion-clips";
 
 async function authorize() {
   const user = await getSessionUser();
@@ -15,6 +16,7 @@ async function authorize() {
 export async function GET() {
   const reviewer = await authorize();
   if (!reviewer) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  await ensureCompletionClipTables();
   const categoryRows = await prisma.$queryRawUnsafe<Array<{ id: string; userId: string; username: string; category: string; level: number; mapName: string; storagePath: string; status: string; createdAt: Date }>>(`SELECT c."id", c."userId", u."username", c."category"::text AS "category", c."level", c."mapName", c."storagePath", c."status"::text AS "status", c."createdAt" FROM "CompletionClip" c INNER JOIN "User" u ON u."id" = c."userId" WHERE c."status" = 'pending' ORDER BY c."createdAt" ASC`);
   const challengeRows = await prisma.$queryRawUnsafe<Array<{ id: string; userId: string; username: string; level: number; mapName: string; storagePath: string; status: string; createdAt: Date }>>(`SELECT c."id", c."userId", u."username", c."level", c."mapName", c."storagePath", c."status"::text AS "status", c."createdAt" FROM "ChallengeCompletionClip" c INNER JOIN "User" u ON u."id" = c."userId" WHERE c."status" = 'pending' ORDER BY c."createdAt" ASC`);
   const bucket = process.env.STORAGE_BUCKET ?? "media";
@@ -25,6 +27,7 @@ export async function GET() {
 export async function PATCH(request: Request) {
   const reviewer = await authorize();
   if (!reviewer) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  await ensureCompletionClipTables();
   const body = await request.json().catch(() => null) as { kind?: string; id?: string; decision?: string; note?: string } | null;
   if (!body?.id || !["approved", "rejected"].includes(body.decision ?? "")) return NextResponse.json({ error: "Invalid review request." }, { status: 400 });
   const kind = body.kind === "challenge" ? "challenge" : "category";
