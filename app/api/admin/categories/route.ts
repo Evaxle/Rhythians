@@ -32,11 +32,9 @@ export async function POST(request: Request) {
   if (!mapFileUrl) return NextResponse.json({ error: "Map file URL is required." }, { status: 400 });
 
   try {
-    // Category maps are curated manually by admins, so they go live immediately
-    // (no pending review step) with the admin as both submitter and reviewer.
     const map = await prisma.categoryMap.create({
       data: {
-        category,
+        category: category as never,
         level,
         title,
         artist,
