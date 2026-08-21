@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { unzipSync, zipSync } from "fflate";
+import { unzipSync } from "fflate";
 
 const RHYTHIANS_ID = "RhythiansId";
 const SSPM_FIELD = "rhythians_id_enc_v1";
@@ -27,35 +27,11 @@ function encryptMapId(mapId: string) {
   return Buffer.concat([Buffer.from([1]), nonce, cipher.getAuthTag(), ciphertext]);
 }
 
-function u16(value: number) {
-  const buffer = Buffer.alloc(2);
-  buffer.writeUInt16LE(value & 0xffff);
-  return buffer;
-}
-
-function u32(value: number) {
-  const buffer = Buffer.alloc(4);
-  buffer.writeUInt32LE(value >>> 0);
-  return buffer;
-}
-
-function u64(value: number) {
-  const buffer = Buffer.alloc(8);
-  buffer.writeBigUInt64LE(BigInt(value));
-  return buffer;
-}
-
-function f32(value: number) {
-  const buffer = Buffer.alloc(4);
-  buffer.writeFloatLE(value);
-  return buffer;
-}
-
-function string16(value: string) {
-  const data = Buffer.from(value, "utf8");
-  if (data.length > 0xffff) throw new Error("Map string is too large.");
-  return Buffer.concat([u16(data.length), data]);
-}
+function u16(value: number) { const buffer = Buffer.alloc(2); buffer.writeUInt16LE(value & 0xffff); return buffer; }
+function u32(value: number) { const buffer = Buffer.alloc(4); buffer.writeUInt32LE(value >>> 0); return buffer; }
+function u64(value: number) { const buffer = Buffer.alloc(8); buffer.writeBigUInt64LE(BigInt(value)); return buffer; }
+function f32(value: number) { const buffer = Buffer.alloc(4); buffer.writeFloatLE(value); return buffer; }
+function string16(value: string) { const data = Buffer.from(value, "utf8"); if (data.length > 0xffff) throw new Error("Map string is too large."); return Buffer.concat([u16(data.length), data]); }
 
 function encodeCustomField(id: string, type: number, value: Buffer) {
   const name = Buffer.from(id, "utf8");
@@ -63,9 +39,7 @@ function encodeCustomField(id: string, type: number, value: Buffer) {
   return Buffer.concat([u16(name.length), name, Buffer.from([type]), u16(value.length), value]);
 }
 
-function encodeIdentityField(mapId: string) {
-  return encodeCustomField(SSPM_FIELD, 0x08, encryptMapId(mapId));
-}
+function encodeIdentityField(mapId: string) { return encodeCustomField(SSPM_FIELD, 0x08, encryptMapId(mapId)); }
 
 function readCustomFields(data: Buffer, offset: number, length: number) {
   if (length === 0) return Buffer.from([0, 0]);
@@ -76,6 +50,7 @@ function readCustomFields(data: Buffer, offset: number, length: number) {
   cursor += 2;
   const fields: Buffer[] = [];
   for (let i = 0; i < count; i += 1) {
+    const fieldStart = cursor;
     if (cursor + 3 > end) throw new Error("Invalid SSPM custom field.");
     const nameLength = data.readUInt16LE(cursor);
     cursor += 2;
@@ -83,7 +58,6 @@ function readCustomFields(data: Buffer, offset: number, length: number) {
     const name = data.subarray(cursor, cursor + nameLength).toString("utf8");
     cursor += nameLength;
     const type = data[cursor++];
-    const start = cursor;
     if (type === 0x01) cursor += 1;
     else if (type === 0x02) cursor += 2;
     else if (type === 0x03 || type === 0x05) cursor += 4;
@@ -91,18 +65,18 @@ function readCustomFields(data: Buffer, offset: number, length: number) {
     else if (type === 0x07) {
       if (cursor + 1 > end) throw new Error("Invalid SSPM position field.");
       const flag = data[cursor++];
-      cursor += flag === 0 ? 2 : flag === 1 ? 8 : end;
+      if (flag === 0) cursor += 2;
+      else if (flag === 1) cursor += 8;
+      else throw new Error("Invalid SSPM position field.");
     } else if (type === 0x08 || type === 0x09) {
       if (cursor + 2 > end) throw new Error("Invalid SSPM buffer field.");
       cursor += 2 + data.readUInt16LE(cursor);
     } else if (type === 0x0a || type === 0x0b || type === 0x0c) {
       if (cursor + 4 > end) throw new Error("Invalid SSPM long field.");
       cursor += 4 + data.readUInt32LE(cursor);
-    } else {
-      throw new Error("Unsupported SSPM custom field type.");
-    }
+    } else throw new Error("Unsupported SSPM custom field type.");
     if (cursor > end) throw new Error("Invalid SSPM custom field length.");
-    if (name !== SSPM_FIELD) fields.push(data.subarray(start - 1, cursor));
+    if (name !== SSPM_FIELD) fields.push(data.subarray(fieldStart, cursor));
   }
   return Buffer.concat([u16(fields.length), ...fields]);
 }
@@ -147,17 +121,10 @@ function convertRhmToSspm(data: Uint8Array, mapId: string) {
     maxMs = Math.max(maxMs, time);
     const quantized = Number.isFinite(x) && Number.isFinite(y) && Number.isInteger(x) && Number.isInteger(y) && x >= 0 && x <= 255 && y >= 0 && y <= 255;
     markerParts.push(u32(time), Buffer.from([0]), Buffer.from([quantized ? 0 : 1]));
-    if (quantized) markerParts.push(Buffer.from([x, y]));
-    else markerParts.push(f32(x), f32(y));
+    if (quantized) markerParts.push(Buffer.from([x, y])); else markerParts.push(f32(x), f32(y));
   }
   const markerData = Buffer.concat(markerParts);
-  const metadata = Buffer.concat([
-    string16(legacyId),
-    string16(title),
-    string16(songName),
-    u16(mappers.length),
-    ...mappers.map(string16),
-  ]);
+  const metadata = Buffer.concat([string16(legacyId), string16(title), string16(songName), u16(mappers.length), ...mappers.map(string16)]);
   const customFields = [encodeIdentityField(mapId)];
   if (customDifficultyName) customFields.unshift(encodeCustomField("difficulty_name", 0x09, Buffer.from(customDifficultyName, "utf8")));
   const custom = Buffer.concat([u16(customFields.length), ...customFields]);
@@ -171,26 +138,8 @@ function convertRhmToSspm(data: Uint8Array, mapId: string) {
   const definition = Buffer.concat([Buffer.from([1]), string16("ssp_note"), Buffer.from([1, 0x07, 0])]);
   const markerOffset = definitionOffset + definition.length;
   const lastMs = duration > 0 ? duration : maxMs;
-  const header = Buffer.concat([
-    u32(0x6d2b5353),
-    u16(2),
-    Buffer.alloc(4),
-    Buffer.alloc(20),
-    u32(lastMs),
-    u32(notes.length),
-    u32(notes.length),
-    Buffer.from([difficulty]),
-    u16(Math.round(starRating * 10)),
-    Buffer.from([audio.length ? 1 : 0, cover.length ? 1 : 0, 0]),
-    u64(customOffset), u64(custom.length),
-    u64(audio.length ? audioOffset : 0), u64(audio.length),
-    u64(cover.length ? coverOffset : 0), u64(cover.length),
-    u64(definitionOffset), u64(definition.length),
-    u64(markerOffset), u64(markerData.length),
-  ]);
+  const header = Buffer.concat([u32(0x6d2b5353), u16(2), Buffer.alloc(4), Buffer.alloc(20), u32(lastMs), u32(notes.length), u32(notes.length), Buffer.from([difficulty]), u16(Math.round(starRating * 10)), Buffer.from([audio.length ? 1 : 0, cover.length ? 1 : 0, 0]), u64(customOffset), u64(custom.length), u64(audio.length ? audioOffset : 0), u64(audio.length), u64(cover.length ? coverOffset : 0), u64(cover.length), u64(definitionOffset), u64(definition.length), u64(markerOffset), u64(markerData.length)]);
   return new Uint8Array(Buffer.concat([header, metadata, custom, Buffer.from(audio), Buffer.from(cover), definition, markerData]));
 }
 
-export function isSupportedMapExtension(extension: string) {
-  return extension === ".rhm" || extension === ".sspm";
-}
+export function isSupportedMapExtension(extension: string) { return extension === ".rhm" || extension === ".sspm"; }
