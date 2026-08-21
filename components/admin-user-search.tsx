@@ -314,3 +314,125 @@ export function AdminUserSearch() {
                 <InfoRow label="Login method" value={[user.discordId ? "Discord" : null, user.hasPassword ? "Password" : null].filter(Boolean).join(" + ") || "Unknown"} />
                 <InfoRow label="Email" value={user.email ?? "—"} />
                 <InfoRow label="Joined" value={formatDate(user.joinedAt)} />
+                <InfoRow label="Last updated" value={formatDate(user.updatedAt)} />
+                <InfoRow label="In Discord server" value={user.inGuild ? "Yes" : "No"} />
+                <InfoRow label="Onboarding" value={user.onboardingCompleted ? "Completed" : "Pending"} />
+                <InfoRow label="Player rank" value={user.playerRank ?? "—"} />
+                <InfoRow label="Roles" value={user.roles.length ? user.roles.join(", ") : "None"} />
+              </div>
+
+              <div className="space-y-3 rounded-3xl border border-border bg-background/60 p-5">
+                <p className="text-xs uppercase tracking-[0.24em] text-accent">Rhythia profile</p>
+                {user.rhythiaProfile ? (
+                  <>
+                    <InfoRow label="Player" value={<span className="inline-flex items-center gap-2">{user.rhythiaProfile.username ?? `#${user.rhythiaProfile.profileId}`}<FlagIcon flag={user.rhythiaProfile.flag} country={user.rhythiaProfile.country} /></span>} />
+                    <InfoRow label="Status" value={user.rhythiaProfile.isOnline ? "Online" : "Offline"} />
+                    <InfoRow label="Last active" value={formatDate(user.rhythiaProfile.lastActiveAt)} />
+                    <InfoRow label="Global rank" value={user.rhythiaProfile.globalRank ? `#${user.rhythiaProfile.globalRank.toLocaleString()}` : "—"} />
+                    <InfoRow label="Country rank" value={user.rhythiaProfile.countryRank ? `#${user.rhythiaProfile.countryRank.toLocaleString()}` : "—"} />
+                    <InfoRow label="Rhythm points" value={user.rhythiaProfile.rhythmPoints === null ? "—" : user.rhythiaProfile.rhythmPoints.toLocaleString()} />
+                    <InfoRow label="Synced" value={formatDate(user.rhythiaProfile.syncedAt)} />
+                    <a href={user.rhythiaProfile.profileUrl} target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm font-semibold text-accent hover:text-white">View on Rhythia →</a>
+                  </>
+                ) : <p className="text-sm text-muted">No linked Rhythia profile.</p>}
+              </div>
+
+              <div className="space-y-3 rounded-3xl border border-border bg-background/60 p-5">
+                <p className="text-xs uppercase tracking-[0.24em] text-accent">Stats</p>
+                <InfoRow label="Clips" value={user.stats.clips} />
+                <InfoRow label="Comments" value={user.stats.comments} />
+                <InfoRow label="Messages" value={user.stats.messages} />
+                <InfoRow label="Reports filed" value={user.stats.reportsFiled} />
+                <InfoRow label="Warnings" value={user.stats.warnings} />
+              </div>
+
+              <div className="space-y-3 rounded-3xl border border-border bg-background/60 p-5">
+                <p className="text-xs uppercase tracking-[0.24em] text-accent">Ranked status</p>
+                {(() => {
+                  const rankInfo = getRankInfo(user.ranked.rhp);
+                  const rankLabel = rankInfo.isExpert ? "Expert" : `${rankInfo.name} ${rankInfo.tier}`;
+                  return (
+                    <>
+                      <InfoRow label="RHP" value={user.ranked.rhp.toLocaleString()} />
+                      <InfoRow label="Rank / tier" value={rankLabel} />
+                      <InfoRow label="Avg map rating" value={user.ranked.avgMapRating == null ? "—" : user.ranked.avgMapRating.toFixed(2)} />
+                      <InfoRow label="Daily streak" value={user.ranked.dailyStreak} />
+                      <InfoRow label="Maps completed" value={user.ranked.completions} />
+                      <InfoRow label="Daily maps beaten" value={user.ranked.dailyBeats} />
+                      <InfoRow label="RHP transactions" value={user.ranked.rhpTransactions} />
+                      <InfoRow label="Score import" value={user.ranked.scoreImportDone ? "Done" : "Pending"} />
+                      <InfoRow label="Rhythia verified" value={user.ranked.rhythiaVerified ? "Yes" : "No"} />
+                      <InfoRow label="Last daily beat" value={formatDate(user.ranked.lastDailyBeatAt)} />
+                      <InfoRow label="Last RP check" value={formatDate(user.ranked.lastRhythiaRpCheckAt)} />
+                    </>
+                  );
+                })()}
+                <div className="mt-2 border-t border-border pt-3">
+                  <p className="text-xs text-muted">Set RHP directly</p>
+                  <div className="mt-2 flex gap-2">
+                    <input value={rhpInput} onChange={(e) => setRhpInput(e.target.value)} type="number" min={0} placeholder={String(user.ranked.rhp)} className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-white outline-none focus:border-accent" />
+                    <button onClick={saveRhp} disabled={busy || rhpInput === ""} className="shrink-0 rounded-xl bg-accent px-4 py-2 text-xs font-semibold text-white transition hover:bg-accent2 disabled:opacity-50">{busy ? "Saving…" : "Save"}</button>
+                  </div>
+                </div>
+                <button onClick={resetRanked} disabled={resetting || busy} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-red-400/40 bg-red-400/10 px-4 py-2 text-xs font-semibold text-red-200 transition hover:bg-red-400/20 disabled:opacity-50"><RotateCcw size={13} /> {resetting ? "Resetting…" : "Reset ranked status to zero"}</button>
+              </div>
+
+              <div className="space-y-3 rounded-3xl border border-border bg-background/60 p-5">
+                <p className="text-xs uppercase tracking-[0.24em] text-accent">Warnings</p>
+                {user.warnings.length === 0 ? <p className="text-sm text-muted">No warnings recorded.</p> : user.warnings.map((warning) => (
+                  <div key={warning.id} className="rounded-xl border border-yellow-400/20 bg-yellow-400/5 p-3">
+                    <p className="text-sm text-white">{warning.reason}</p>
+                    <p className="mt-1 text-xs text-muted">{formatDate(warning.createdAt)} · by {warning.actor}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div className="rounded-3xl border border-red-400/20 bg-red-400/5 p-6 shadow-glow">
+              <div className="flex items-center gap-3"><ShieldAlert className="h-5 w-5 text-red-300" /><p className="font-semibold text-white">Moderation</p></div>
+              <div className="mt-4 space-y-3">
+                <div className="rounded-2xl border border-border bg-background/60 p-4">
+                  <p className="text-sm font-semibold text-white">Ban / Suspend</p>
+                  <p className="mt-1 text-xs text-muted">{user.moderation.isSuspended ? timeUntil(user.moderation.suspensionExpiry) ?? "Banned permanently" : "Ban removes access immediately. Suspensions are time-limited."}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {!user.moderation.isSuspended && <>
+                      <button disabled={busy} onClick={() => act({ action: "ban" })} className="rounded-full bg-red-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-red-400 disabled:opacity-50">Ban permanently</button>
+                      {durationOptions.map((days) => <button key={days} disabled={busy} onClick={() => act({ action: "suspend", days })} className="rounded-full border border-red-400/40 px-3 py-2 text-xs font-semibold text-red-200 transition hover:bg-red-400/10 disabled:opacity-50">{days}d</button>)}
+                    </>}
+                    {user.moderation.isSuspended && <button disabled={busy} onClick={() => act({ action: "unsuspend" })} className="rounded-full bg-emerald-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-emerald-400 disabled:opacity-50"><span className="inline-flex items-center gap-1.5"><ShieldOff size={14} /> Reinstate</span></button>}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-border bg-background/60 p-4">
+                  <p className="text-sm font-semibold text-white">Mute (messages & comments)</p>
+                  <p className="mt-1 text-xs text-muted">{user.moderation.isMuted ? `Muted ${timeUntil(user.moderation.muteExpiry) ?? "indefinitely"}` : "Prevents sending messages and comments."}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {!user.moderation.isMuted && hourOptions.map((hours) => <button key={hours} disabled={busy} onClick={() => act({ action: "mute", hours })} className="rounded-full border border-yellow-400/40 px-3 py-2 text-xs font-semibold text-yellow-200 transition hover:bg-yellow-400/10 disabled:opacity-50">{hours >= 24 ? `${hours / 24}d` : `${hours}h`}</button>)}
+                    {user.moderation.isMuted && <button disabled={busy} onClick={() => act({ action: "unmute" })} className="rounded-full bg-emerald-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-emerald-400 disabled:opacity-50"><span className="inline-flex items-center gap-1.5"><Bell size={14} /> Unmute</span></button>}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-border bg-background/60 p-4">
+                  <p className="text-sm font-semibold text-white">Warning</p>
+                  <p className="mt-1 text-xs text-muted">Sends the user a warning notification that appears on their page.</p>
+                  <textarea id="warning-reason" placeholder="Reason for the warning…" rows={2} value={warningReason} onChange={(e) => setWarningReason(e.target.value)} className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-white outline-none focus:border-accent" />
+                  <button disabled={busy || !warningReason.trim()} onClick={() => { act({ action: "warn", reason: warningReason }); setWarningReason(""); }} className="mt-2 rounded-full bg-amber-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-amber-400 disabled:opacity-50"><span className="inline-flex items-center gap-1.5"><TriangleAlert size={14} /> Send warning</span></button>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-border bg-background/60 p-6 shadow-glow">
+              <div className="flex items-center gap-3"><BellOff className="h-5 w-5 text-muted" /><p className="font-semibold text-white">Quick actions</p></div>
+              <div className="mt-4 space-y-3 text-sm">
+                <a href={`/profile/${user.profileHandle}`} target="_blank" rel="noreferrer" className="block rounded-2xl border border-border bg-background p-4 text-white transition hover:border-accent/40">View public profile →</a>
+                <a href={`/messages?user=${encodeURIComponent(user.profileHandle)}`} className="block rounded-2xl border border-border bg-background p-4 text-white transition hover:border-accent/40">Open conversation →</a>
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
+    </div>
+  );
+}
