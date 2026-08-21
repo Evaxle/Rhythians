@@ -2,7 +2,7 @@ import { prisma } from "@/lib/db";
 import { fetchRhythiaScores, findScoreForMap } from "@/lib/daily";
 import { accuracyFromMisses } from "@/lib/ranks";
 
-export const MAX_CHALLENGE_LEVEL = 20;
+export const MAX_CHALLENGE_LEVEL = 10;
 
 export function challengeLevelForRating(rating: number): number {
   return Math.min(MAX_CHALLENGE_LEVEL, Math.max(1, Math.ceil(Math.max(0, rating) / 0.5)));
@@ -16,14 +16,14 @@ export async function ensureChallengeLevelTable() {
 
 async function getAssignedLevels() {
   await ensureChallengeLevelTable();
-  return prisma.$queryRawUnsafe<Array<{ challengeMapId: string; level: number }>>('SELECT "challengeMapId", "level" FROM "ChallengeMapLevel" WHERE "level" BETWEEN 1 AND 20');
+  return prisma.$queryRawUnsafe<Array<{ challengeMapId: string; level: number }>>('SELECT "challengeMapId", "level" FROM "ChallengeMapLevel" WHERE "level" BETWEEN 1 AND 10');
 }
 
 export async function getUserChallengeLevel(userId: string): Promise<number> {
   const override = await prisma.$queryRawUnsafe<Array<{ level: number }>>('SELECT "level" FROM "UserChallengeLevelOverride" WHERE "userId" = $1 LIMIT 1', userId).catch(() => []);
   if (override[0]) return Math.min(MAX_CHALLENGE_LEVEL, Math.max(0, override[0].level));
   await ensureChallengeLevelTable();
-  const completed = await prisma.$queryRawUnsafe<Array<{ level: number }>>(`SELECT DISTINCT l."level" FROM "ChallengeMapLevel" l INNER JOIN "ChallengeMapCompletion" c ON c."challengeMapId" = l."challengeMapId" WHERE c."userId" = $1 AND c."passed" = true AND l."level" BETWEEN 1 AND 20`, userId);
+  const completed = await prisma.$queryRawUnsafe<Array<{ level: number }>>(`SELECT DISTINCT l."level" FROM "ChallengeMapLevel" l INNER JOIN "ChallengeMapCompletion" c ON c."challengeMapId" = l."challengeMapId" WHERE c."userId" = $1 AND c."passed" = true AND l."level" BETWEEN 1 AND 10`, userId);
   const completedLevels = new Set(completed.map((row) => row.level));
   let level = 0;
   for (let next = 1; next <= MAX_CHALLENGE_LEVEL; next += 1) {
