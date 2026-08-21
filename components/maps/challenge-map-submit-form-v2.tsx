@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 const validMapExtensions = ["sspm", "rhm", "osu", "zip"];
 type SourceMode = "file" | "rhythia" | "rhythians";
-const categories = [["main_challenge", "Main Challenge"], ["jumps", "Jumps"], ["stream", "Stream"], ["tech", "Tech"], ["off_grid", "Off Grid"]] as const;
+const categories = [["main_challenge", "Main Challenge"], ["jumps", "Jumps"], ["stream", "Stream"], ["tech", "Tech"], ["off_grid", "Off Grid"], ["vibro", "Vibro"]] as const;
 
 async function uploadFile(file: File) {
   const response = await fetch("/api/maps/upload", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fileName: file.name, contentType: file.type || "application/octet-stream", folder: "maps", fileSize: file.size }) });
