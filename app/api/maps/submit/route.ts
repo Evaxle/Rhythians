@@ -13,6 +13,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 
 export const runtime = "nodejs";
 const bucket = () => process.env.STORAGE_BUCKET ?? "media";
+const challengeCategories = new Set(["main_challenge", "jumps", "stream", "tech", "off_grid"]);
 
 function extensionFromPath(value: string) {
   const extension = value.split("?")[0].split("#")[0].split(".").pop()?.toLowerCase();
@@ -53,6 +54,29 @@ async function validateMapFile(value: string, mapId: string) {
   if (normalized.byteLength === 0) throw new Error("Map file could not be prepared for Rhythians.");
 }
 
+function parseRhythiansMapId(value: string) {
+  try {
+    const url = new URL(value);
+    const match = url.pathname.match(/\/(?:maps?|map)\/([^/]+)/i);
+    return match?.[1] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function findExistingByRhythiaId(id: number) {
+  const map = await prisma.challengeMap.findUnique({ where: { sourceBeatmapId: id }, select: { id: true, title: true, status: true } });
+  return map;
+}
+
+async function findExistingByRhythiansId(id: string) {
+  const [challenge, category] = await Promise.all([
+    prisma.challengeMap.findUnique({ where: { id }, select: { id: true, title: true, status: true } }),
+    prisma.categoryMap.findUnique({ where: { id }, select: { id: true, title: true, status: true } }),
+  ]);
+  return challenge ?? category;
+}
+
 export async function POST(request: Request) {
   const rate = checkRateLimit(request, "map_submit", 10, 60 * 60 * 1000);
   if (!rate.allowed) return NextResponse.json({ error: "You've submitted too many maps recently. Please try again later." }, { status: 429, headers: { "Retry-After": String(rate.retryAfterSec) } });
@@ -63,19 +87,50 @@ export async function POST(request: Request) {
 
   const body = await request.json().catch(() => null);
   const submissionType: MapSubmissionType = body?.submissionType === "challenge" ? "challenge" : "ranked";
-  const title = typeof body?.title === "string" ? body.title.trim() : "";
-  const artist = typeof body?.artist === "string" ? body.artist.trim() : "";
-  const description = typeof body?.description === "string" ? body.description.trim() : "";
-  const mapFileUrl = typeof body?.mapFileUrl === "string" ? body.mapFileUrl.trim() : "";
   const rhythiaUrl = typeof body?.rhythiaUrl === "string" ? body.rhythiaUrl.trim() : "";
+  const rhythiansUrl = typeof body?.rhythiansUrl === "string" ? body.rhythiansUrl.trim() : "";
   const parsedMapUrl = rhythiaUrl ? parseRhythiaMapUrl(rhythiaUrl) : null;
-  const fileRating = typeof body?.requestedRating === "number" ? body.requestedRating : Number(body?.requestedRating);
 
-  if (submissionType === "challenge") return NextResponse.json({ error: "Challenge submissions are not handled by this ranked form." }, { status: 400 });
+  if (submissionType === "ranked") {
+    if (!parsedMapUrl) return NextResponse.json({ error: "Submit a valid Rhythia map URL." }, { status: 400 });
+    const existing = await findExistingByRhythiaId(parsedMapUrl.id);
+    if (existing) return NextResponse.json({ error: `This Rhythia map has already been submitted as ${existing.title}. It cannot be submitted again.` }, { status: 409 });
+
+    const fetched = await fetchRhythiaMapById(parsedMapUrl.id);
+    if (!fetched) return NextResponse.json({ error: "That Rhythia map could not be found." }, { status: 404 });
+    if (!fetched.downloadUrl) return NextResponse.json({ error: "That Rhythia map does not have a downloadable map file." }, { status: 422 });
+
+    const mapId = crypto.randomUUID();
+    const title = fetched.title?.trim() || "Untitled map";
+    const dash = title.indexOf(" - ");
+    const artist = dash > 0 ? title.slice(0, dash).trim() : null;
+    const requestedRating = fairRatingFromStars(Number(fetched.starRating ?? 0));
+
+    try {
+      await validateMapFile(fetched.downloadUrl, mapId);
+      const map = await submitChallengeMap({ id: mapId, title, artist, description: null, mapFileUrl: fetched.downloadUrl, imageUrl: fetched.imageUrl, requestedRating, mapperName: fetched.ownerUsername, noteCount: fetched.noteCount, length: fetched.length, submittedById: user.id, sourceBeatmapId: fetched.id, sourceUrl: parsedMapUrl.url, isAutoImported: true });
+      await setMapSubmissionMetadata(map.id, submissionType);
+      await prisma.moderationAction.create({ data: { actorId: user.id, action: "ranked_map_submitted", targetType: "map_submission", targetId: map.id, metadata: { title: map.title, submissionType, requestedRating: map.requestedRating, sourceUrl: parsedMapUrl.url, sourceBeatmapId: fetched.id } } });
+      return NextResponse.json({ mapId: map.id, status: map.status, submissionType, requestedRating: map.requestedRating, downloadUrl: `/api/maps/download?id=${encodeURIComponent(map.id)}` });
+    } catch (error: any) {
+      if (error?.code === "P2002") return NextResponse.json({ error: "This Rhythia map has already been submitted." }, { status: 409 });
+      return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to submit this map." }, { status: 422 });
+    }
+  }
+
+  const challengeCategory = typeof body?.challengeCategory === "string" ? body.challengeCategory : "";
+  const requestedLevel = Number(body?.requestedLevel);
+  const title = typeof body?.title === "string" ? body.title.trim() : "";
+  const description = typeof body?.description === "string" ? body.description.trim() : null;
+  const mapFileUrl = typeof body?.mapFileUrl === "string" ? body.mapFileUrl.trim() : "";
+
+  if (!challengeCategories.has(challengeCategory)) return NextResponse.json({ error: "Choose one of the five challenge categories." }, { status: 400 });
+  if (!Number.isInteger(requestedLevel) || requestedLevel < 1 || requestedLevel > 10) return NextResponse.json({ error: "Requested level must be between 1 and 10." }, { status: 400 });
+  if (!mapFileUrl && !parsedMapUrl && !rhythiansUrl) return NextResponse.json({ error: "Submit a Rhythia URL, Rhythians URL, or map file." }, { status: 400 });
 
   let resolvedTitle = title;
-  let resolvedArtist = artist || null;
-  let resolvedDescription = description || null;
+  let resolvedArtist: string | null = null;
+  let resolvedDescription = description;
   let resolvedMapFile = mapFileUrl;
   let resolvedImage: string | null = null;
   let resolvedMapper: string | null = null;
@@ -83,76 +138,64 @@ export async function POST(request: Request) {
   let resolvedLength: number | null = null;
   let sourceBeatmapId: number | null = null;
   let sourceUrl: string | null = null;
-  let requestedRating = fileRating;
-  let isAutoImported = false;
 
   if (parsedMapUrl) {
+    const existing = await findExistingByRhythiaId(parsedMapUrl.id);
+    if (existing) return NextResponse.json({ error: `This Rhythia map has already been uploaded as ${existing.title}.` }, { status: 409 });
     const fetched = await fetchRhythiaMapById(parsedMapUrl.id);
     if (!fetched) return NextResponse.json({ error: "That Rhythia map could not be found." }, { status: 404 });
     sourceBeatmapId = fetched.id;
     sourceUrl = parsedMapUrl.url;
     resolvedTitle = fetched.title?.trim() || resolvedTitle;
     const dash = resolvedTitle.indexOf(" - ");
-    resolvedArtist = resolvedArtist ?? (dash > 0 ? resolvedTitle.slice(0, dash).trim() : null);
+    resolvedArtist = dash > 0 ? resolvedTitle.slice(0, dash).trim() : null;
     resolvedMapFile = fetched.downloadUrl || resolvedMapFile;
     resolvedImage = fetched.imageUrl;
     resolvedMapper = fetched.ownerUsername;
     resolvedNotes = fetched.noteCount;
     resolvedLength = fetched.length;
-    requestedRating = fairRatingFromStars(Number(fetched.starRating ?? 0));
-    isAutoImported = true;
-  } else {
-    if (!resolvedTitle || resolvedTitle.length > 120) return NextResponse.json({ error: "Map title is required and must be under 120 characters." }, { status: 400 });
-    if (!resolvedArtist || resolvedArtist.length > 120) return NextResponse.json({ error: "Artist is required and must be under 120 characters." }, { status: 400 });
-    if (!resolvedDescription || resolvedDescription.length > 2000) return NextResponse.json({ error: "Description is required and must be under 2000 characters." }, { status: 400 });
-    if (!Number.isFinite(requestedRating) || requestedRating <= 0 || requestedRating > 9.99) return NextResponse.json({ error: "Requested rating must be between 0.1 and 9.99." }, { status: 400 });
-    if (!resolvedMapFile) return NextResponse.json({ error: "Upload an .SSPM or .RHM map file." }, { status: 400 });
+  } else if (rhythiansUrl) {
+    const existing = await findExistingByRhythiansId(parseRhythiansMapId(rhythiansUrl) ?? "");
+    if (existing) return NextResponse.json({ error: `This Rhythians map has already been uploaded as ${existing.title}.` }, { status: 409 });
+    const id = parseRhythiansMapId(rhythiansUrl);
+    if (!id) return NextResponse.json({ error: "Submit a valid Rhythians map URL." }, { status: 400 });
+    const source = await prisma.challengeMap.findUnique({ where: { id } }) ?? await prisma.categoryMap.findUnique({ where: { id } });
+    if (!source) return NextResponse.json({ error: "That Rhythians map could not be found." }, { status: 404 });
+    resolvedTitle = source.title;
+    resolvedArtist = source.artist;
+    resolvedMapFile = source.mapFileUrl;
+    resolvedImage = source.imageUrl;
+    resolvedMapper = source.mapperName;
+    resolvedNotes = source.noteCount;
+    resolvedLength = source.length;
+    sourceUrl = rhythiansUrl;
   }
 
   if (!resolvedTitle || resolvedTitle.length > 120) return NextResponse.json({ error: "Map title is required and must be under 120 characters." }, { status: 400 });
   if (!resolvedMapFile) return NextResponse.json({ error: "The map file could not be found." }, { status: 400 });
-  if (!Number.isFinite(requestedRating) || requestedRating < 0 || requestedRating > 9.99) return NextResponse.json({ error: "The calculated rating is invalid." }, { status: 400 });
 
   const mapId = crypto.randomUUID();
-  try {
-    await validateMapFile(resolvedMapFile, mapId);
-  } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "The map file could not be prepared for Rhythians." }, { status: 422 });
+  if (!rhythiansUrl) {
+    try {
+      await validateMapFile(resolvedMapFile, mapId);
+    } catch (error) {
+      return NextResponse.json({ error: error instanceof Error ? error.message : "The map file could not be prepared for Rhythians." }, { status: 422 });
+    }
   }
 
-  let map;
   try {
-    map = await submitChallengeMap({
-      id: mapId,
-      title: resolvedTitle,
-      artist: resolvedArtist,
-      description: resolvedDescription,
-      mapFileUrl: resolvedMapFile,
-      imageUrl: resolvedImage,
-      requestedRating,
-      mapperName: resolvedMapper,
-      noteCount: resolvedNotes,
-      length: resolvedLength,
-      submittedById: user.id,
-      sourceBeatmapId,
-      sourceUrl,
-      isAutoImported,
-    });
-    await setMapSubmissionMetadata(map.id, submissionType);
+    if (challengeCategory === "main_challenge") {
+      const map = await submitChallengeMap({ id: mapId, title: resolvedTitle, artist: resolvedArtist, description: resolvedDescription, mapFileUrl: resolvedMapFile, imageUrl: resolvedImage, requestedRating: 0, mapperName: resolvedMapper, noteCount: resolvedNotes, length: resolvedLength, submittedById: user.id, sourceBeatmapId, sourceUrl, isAutoImported: false });
+      await setMapSubmissionMetadata(map.id, submissionType);
+      await prisma.moderationAction.create({ data: { actorId: user.id, action: "challenge_map_submitted", targetType: "map_submission", targetId: map.id, metadata: { title: map.title, submissionType, challengeCategory, requestedLevel, sourceUrl, sourceBeatmapId } } });
+      return NextResponse.json({ mapId: map.id, status: map.status, challengeCategory, requestedLevel });
+    }
+
+    const map = await prisma.categoryMap.create({ data: { id: mapId, category: challengeCategory as "jumps" | "stream" | "tech" | "off_grid", level: requestedLevel, title: resolvedTitle, artist: resolvedArtist, description: resolvedDescription, mapFileUrl: resolvedMapFile, imageUrl: resolvedImage, mapperName: resolvedMapper, noteCount: resolvedNotes, length: resolvedLength, submittedById: user.id, sourceBeatmapId, sourceUrl } });
+    await prisma.moderationAction.create({ data: { actorId: user.id, action: "category_map_submitted", targetType: "category_map_submission", targetId: map.id, metadata: { title: map.title, submissionType, challengeCategory, requestedLevel, sourceUrl, sourceBeatmapId } } });
+    return NextResponse.json({ mapId: map.id, status: map.status, challengeCategory, requestedLevel });
   } catch (error: any) {
-    if (error?.code === "P2002") return NextResponse.json({ error: "This map is already on the site." }, { status: 409 });
+    if (error?.code === "P2002") return NextResponse.json({ error: "This map has already been uploaded and cannot be submitted again." }, { status: 409 });
     return NextResponse.json({ error: "Unable to submit this map. Please try again." }, { status: 500 });
   }
-
-  await prisma.moderationAction.create({
-    data: {
-      actorId: user.id,
-      action: "ranked_map_submitted",
-      targetType: "map_submission",
-      targetId: map.id,
-      metadata: { title: map.title, submissionType, requestedRating: map.requestedRating, sourceUrl },
-    },
-  });
-
-  return NextResponse.json({ mapId: map.id, status: map.status, submissionType, requestedRating: map.requestedRating, downloadUrl: `/api/maps/download?id=${encodeURIComponent(map.id)}` });
 }
