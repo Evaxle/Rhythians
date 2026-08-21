@@ -1,0 +1,1 @@
+ALTER TYPE "CategoryType" ADD VALUE IF NOT EXISTS 'vibro';
