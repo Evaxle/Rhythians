@@ -48,6 +48,7 @@ enum CategoryType {
   stream
   tech
   off_grid
+  vibro
 }
 
 enum CategoryMapStatus {
@@ -390,7 +391,7 @@ model ArticleTag {
   article    KnowledgeArticle @relation(fields: [articleId], references: [id])
   articleId  String
   tag        Tag              @relation(fields: [tagId], references: [id])
-  tagId      String
+  tagId     String
 }
 
 model ArticleRevision {
@@ -579,7 +580,7 @@ model Message {
   isEdited       Boolean      @default(false)
   isDeleted      Boolean      @default(false)
   createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  updatedAt     DateTime      @updatedAt
   @@index([conversationId, createdAt])
 }
 
