@@ -5,7 +5,6 @@ import { Download, RefreshCw, Wifi } from "lucide-react";
 
 const STATUS_URL = "http://127.0.0.1:45872/status";
 const AUTH_URL = "http://127.0.0.1:45872/auth/start";
-const POLL_URL = "http://127.0.0.1:45872/auth/poll";
 
 type AgentStatus = {
   installed?: boolean;
@@ -16,14 +15,26 @@ type AgentStatus = {
   authenticated?: boolean;
   username?: string | null;
   game?: string;
+  gameVersion?: string | null;
+  integrationConnected?: boolean;
+  mapCaptureReady?: boolean;
+  mapId?: string | null;
+  lastEvent?: string | null;
+  lastSeenAt?: string;
 };
 
 export function RhythKitSettings() {
   const [status, setStatus] = useState<"checking" | "connected" | "not_connected">("checking");
   const [loggedIn, setLoggedIn] = useState(false);
   const [gameRunning, setGameRunning] = useState(false);
+  const [integrationConnected, setIntegrationConnected] = useState(false);
+  const [mapCaptureReady, setMapCaptureReady] = useState(false);
+  const [mapId, setMapId] = useState<string | null>(null);
+  const [lastEvent, setLastEvent] = useState<string | null>(null);
+  const [lastSeenAt, setLastSeenAt] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [game, setGame] = useState("unknown");
+  const [gameVersion, setGameVersion] = useState<string | null>(null);
   const [connecting, setConnecting] = useState(false);
 
   const check = async () => {
@@ -35,13 +46,25 @@ export function RhythKitSettings() {
       const authenticated = data.loggedIn === true || data.authenticated === true;
       const connected = data.connected === true && data.gameRunning === true && authenticated;
       setGame(data.game ?? "unknown");
+      setGameVersion(data.gameVersion ?? null);
       setGameRunning(data.gameRunning === true);
+      setIntegrationConnected(data.integrationConnected === true);
+      setMapCaptureReady(data.mapCaptureReady === true);
+      setMapId(data.mapId ?? null);
+      setLastEvent(data.lastEvent ?? null);
+      setLastSeenAt(data.lastSeenAt ?? null);
       setUsername(data.username ?? null);
       setLoggedIn(authenticated);
       setStatus(connected ? "connected" : "not_connected");
     } catch {
       setGame("unknown");
+      setGameVersion(null);
       setGameRunning(false);
+      setIntegrationConnected(false);
+      setMapCaptureReady(false);
+      setMapId(null);
+      setLastEvent(null);
+      setLastSeenAt(null);
       setUsername(null);
       setLoggedIn(false);
       setStatus("not_connected");
@@ -53,21 +76,16 @@ export function RhythKitSettings() {
     try {
       const response = await fetch(AUTH_URL, { method: "POST" });
       if (!response.ok) throw new Error();
-      const auth = await response.json() as { deviceCode?: string; verificationUrl?: string; expiresIn?: number };
-      if (!auth.deviceCode || !auth.verificationUrl) throw new Error();
+      const auth = await response.json() as { verificationUrl?: string; expiresIn?: number };
+      if (!auth.verificationUrl) throw new Error();
       window.open(auth.verificationUrl, "_blank", "noopener,noreferrer");
       const deadline = Date.now() + Math.max(30, auth.expiresIn ?? 600) * 1000;
       while (Date.now() < deadline) {
         await new Promise(resolve => window.setTimeout(resolve, 2000));
-        const poll = await fetch(POLL_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ deviceCode: auth.deviceCode }),
-          cache: "no-store",
-        });
-        if (!poll.ok) continue;
-        const result = await poll.json() as { status?: string };
-        if (result.status === "authorized") {
+        const response = await fetch(STATUS_URL, { cache: "no-store" });
+        if (!response.ok) continue;
+        const data = await response.json() as AgentStatus;
+        if (data.loggedIn === true || data.authenticated === true) {
           await check();
           return;
         }
@@ -114,11 +132,16 @@ export function RhythKitSettings() {
           </p>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <div className="rounded-xl border border-border bg-white/5 p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-muted">Rhythia</p>
             <p className="mt-2 font-semibold text-white">{gameRunning ? "Running" : "Not running"}</p>
-            <p className="mt-1 text-xs text-muted">{game}</p>
+            <p className="mt-1 text-xs text-muted">{game}{gameVersion ? ` · ${gameVersion}` : ""}</p>
+          </div>
+          <div className="rounded-xl border border-border bg-white/5 p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted">Game integration</p>
+            <p className="mt-2 font-semibold text-white">{integrationConnected ? "Connected" : "Waiting"}</p>
+            <p className="mt-1 text-xs text-muted">{mapCaptureReady ? "Map capture ready" : "Map capture unavailable"}</p>
           </div>
           <div className="rounded-xl border border-border bg-white/5 p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-muted">RhythKit login</p>
@@ -126,6 +149,19 @@ export function RhythKitSettings() {
             <p className="mt-1 text-xs text-muted">{loggedIn && username ? username : "No Rhythians account linked"}</p>
           </div>
         </div>
+
+        {(mapId || lastEvent || lastSeenAt) && (
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-xl border border-border bg-white/5 p-4">
+              <p className="text-xs uppercase tracking-[0.2em] text-muted">Current map</p>
+              <p className="mt-2 break-all font-semibold text-white">{mapId ?? "No map detected"}</p>
+            </div>
+            <div className="rounded-xl border border-border bg-white/5 p-4">
+              <p className="text-xs uppercase tracking-[0.2em] text-muted">Integration event</p>
+              <p className="mt-2 font-semibold text-white">{lastEvent ?? "No event"}</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {status === "not_connected" && (
