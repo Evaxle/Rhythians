@@ -20,8 +20,9 @@ export async function POST(request: Request, context: Context) {
 
 export async function PATCH(request: Request, context: Context) {
   const user = await getSessionUser();
-  if (!user || !(await canAccessAdmin(user))) return NextResponse.json({ error: "Forbidden." }, { status: 403 });
-  if (!hasPermission(user, "clips_moderate") && !isOwner(user)) return NextResponse.json({ error: "Map reviewer permission required." }, { status: 403 });
+  if (!user) return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+  const admin = await canAccessAdmin(user);
+  if (!admin && !hasPermission(user, "clips_moderate") && !isOwner(user)) return NextResponse.json({ error: "Map reviewer or admin permission required." }, { status: 403 });
   const { id } = await context.params;
   const body = await request.json().catch(() => null) as { ranked?: boolean } | null;
   if (typeof body?.ranked !== "boolean") return NextResponse.json({ error: "Ranked status is required." }, { status: 400 });
