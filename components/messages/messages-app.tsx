@@ -139,7 +139,7 @@ export function MessagesApp({
     }
   }
 
-  const loadConversations = useCallback(async () => {
+  Conversations = useCallback(async () => {
     try {
       const response = await fetch("/api/messages/conversations", { cache: "no-store" });
       if (!response.ok) return;
@@ -152,32 +152,75 @@ export function MessagesApp({
     }
   }, []);
 
-  const loadDetail = useCallback(async (conversationId: string) => {
+ const loadDetail = useCallback(async (conversationId: string, showLoading = true) => {
+  if (showLoading) {
     setLoadingDetail(true);
-    setError("");
-    try {
-      const response = await fetch(`/api/messages/conversations/${conversationId}`, { cache: "no-store" });
-      if (!response.ok) {
+  }
+
+  setError("");
+
+  try {
+    const response = await fetch(`/api/messages/conversations/${conversationId}`, {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      if (showLoading) {
         setError("Could not load this conversation.");
         setActiveId(null);
-        return;
       }
-      const data = await response.json();
-      setDetail(data.conversation);
-      setActiveId(conversationId);
-      await fetch(`/api/messages/conversations/${conversationId}/read`, { method: "POST" });
+      return;
+    }
+
+    const data = await response.json();
+    const nextDetail = data.conversation;
+
+    setDetail((current) => {
+      if (!current || current.id !== nextDetail.id) {
+        return nextDetail;
+      }
+
+      if (
+        current.messages.length === nextDetail.messages.length &&
+        current.messages.every(
+          (message, index) => message.id === nextDetail.messages[index]?.id &&
+            message.content === nextDetail.messages[index]?.content &&
+            message.isDeleted === nextDetail.messages[index]?.isDeleted
+        )
+      ) {
+        return current;
+      }
+
+      return nextDetail;
+    });
+
+    setActiveId(conversationId);
+
+    if (showLoading) {
+      await fetch(`/api/messages/conversations/${conversationId}/read`, {
+        method: "POST",
+      });
+
       setConversations((current) =>
-        current.map((c) => (c.id === conversationId ? { ...c, unreadCount: 0 } : c)),
+        current.map((c) =>
+          c.id === conversationId
+            ? { ...c, unreadCount: 0 }
+            : c
+        )
       );
-    } catch {
+    }
+  } catch {
+    if (showLoading) {
       setError("Could not load this conversation.");
-    } finally {
+    }
+  } finally {
+    if (showLoading) {
       setLoadingDetail(false);
     }
-  }, []);
-
+  }
+}, []);
+  
   const openOrCreateDirect = useCallback(
-    // eslint-disable-next-line react-hooks/preserve-manual-memoization
     async (targetUser: UserLite) => {
       setComposing(true);
       setError("");
@@ -223,17 +266,18 @@ export function MessagesApp({
       }
       return undefined;
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (!activeId) return;
-    const timer = setInterval(() => {
-      loadDetail(activeId);
-      loadConversations();
-    }, POLL_INTERVAL);
-    return () => clearInterval(timer);
-  }, [activeId, loadDetail, loadConversations]);
+ useEffect(() => {
+  if (!activeId) return;
+
+  const timer = setInterval(() => {
+    loadDetail(activeId, false);
+    loadConversations();
+  }, POLL_INTERVAL);
+
+  return () => clearInterval(timer);
+}, [activeId, loadDetail, loadConversations]);
 
   useEffect(() => {
     if (detail) {
@@ -244,7 +288,6 @@ export function MessagesApp({
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [detail?.messages.length]);
 
   async function sendMessage() {
