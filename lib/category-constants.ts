@@ -1,4 +1,4 @@
-export const CATEGORIES = ["jumps", "stream", "tech", "off_grid"] as const;
+export const CATEGORIES = ["jumps", "stream", "tech", "off_grid", "vibro"] as const;
 export type Category = (typeof CATEGORIES)[number];
 
 export const CATEGORY_LABELS: Record<Category, string> = {
@@ -6,6 +6,7 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   stream: "Stream",
   tech: "Tech",
   off_grid: "Off Grid",
+  vibro: "Vibro",
 };
 
 export const MAX_CATEGORY_LEVEL = 10;
