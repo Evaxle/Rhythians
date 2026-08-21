@@ -6,11 +6,6 @@ function rankLabel(rhp: number): string {
   return info.isExpert ? "Expert" : `${info.name} ${info.tier}`;
 }
 
-// ---------------------------------------------------------------------------
-// Candidate formulas
-// ---------------------------------------------------------------------------
-
-// F1: Current weight — 0.8 - 0.05/500, then 0.02/500 below 0.4, floor 0.2
 function f1(rp: number): number {
   if (rp <= 0) return 0;
   const steps = Math.floor(rp / 500);
@@ -20,7 +15,6 @@ function f1(rp: number): number {
   return Math.round(rp * w);
 }
 
-// F2: Weight, floor 0.3
 function f2(rp: number): number {
   if (rp <= 0) return 0;
   const steps = Math.floor(rp / 500);
@@ -30,7 +24,6 @@ function f2(rp: number): number {
   return Math.round(rp * w);
 }
 
-// F3: Weight, floor 0.35
 function f3(rp: number): number {
   if (rp <= 0) return 0;
   const steps = Math.floor(rp / 500);
@@ -40,7 +33,6 @@ function f3(rp: number): number {
   return Math.round(rp * w);
 }
 
-// F4: Weight, transition at 0.5 (not 0.4), floor 0.35
 function f4(rp: number): number {
   if (rp <= 0) return 0;
   const steps = Math.floor(rp / 500);
@@ -50,14 +42,11 @@ function f4(rp: number): number {
   return Math.round(rp * w);
 }
 
-// F5: Old piecewise (title-aligned 1:1 at low end)
 const F5_ANCHORS: [number, number][] = [
   [0, 0], [500, 500], [1000, 1000], [1500, 1500], [2000, 2000], [2500, 2500],
   [3500, 3000], [5000, 3500], [7500, 4000], [10000, 4500], [15000, 5500], [20000, 6500],
 ];
 
-// F6: Balanced piecewise (recommended) — keeps user's low-mid examples,
-//     places high skill properly
 const F6_ANCHORS: [number, number][] = [
   [0, 0], [500, 375], [1000, 700], [2000, 1200], [5000, 2500], [10000, 3500], [20000, 5000],
 ];
@@ -83,16 +72,13 @@ function piecewise(rp: number, anchors: [number, number][]): number {
 function f5(rp: number): number { return piecewise(rp, F5_ANCHORS); }
 function f6(rp: number): number { return piecewise(rp, F6_ANCHORS); }
 
-// F7: Power curve — RHP = A * RP^p, fit to 500->375 and 2000->1200
 function f7(rp: number): number {
   if (rp <= 0) return 0;
   return Math.round(2.01 * Math.pow(rp, 0.839));
 }
 
-// F8: Log curve — RHP = A * ln(1 + RP/C), fit to 500->375 and 2000->1200
 function f8(rp: number): number {
   if (rp <= 0) return 0;
-  // A and C solved so 500->375 and 2000->1200
   const A = 375 / Math.log(1 + 500 / 200);
   return Math.round(A * Math.log(1 + rp / 200));
 }
@@ -108,14 +94,8 @@ const FORMULAS: Array<{ name: string; fn: (rp: number) => number }> = [
   { name: "F8 log curve", fn: f8 },
 ];
 
-// ---------------------------------------------------------------------------
-// Ideal anchors (balanced target based on the rank system)
-// ---------------------------------------------------------------------------
 const IDEAL: [number, number][] = F6_ANCHORS;
 
-// ---------------------------------------------------------------------------
-// Evaluation
-// ---------------------------------------------------------------------------
 function isMonotonic(fn: (rp: number) => number): boolean {
   let prev = -1;
   for (let rp = 0; rp <= 50000; rp += 100) {
@@ -131,7 +111,6 @@ function main() {
   console.log("  RHYTHIA RP -> RHP FORMULA ANALYSIS");
   console.log("============================================================");
 
-  // 1. Comparison table at key RP values
   console.log("\n--- COMPARISON AT KEY RP VALUES (RHP / rank) ---");
   const keyRp = [0, 100, 250, 500, 1000, 1500, 2000, 2500, 3000, 4000, 5000, 7500, 10000, 15000, 20000, 30000];
   const header = `  ${"RP".padStart(6)} | ${FORMULAS.map((f) => f.name.padEnd(24)).join(" | ")}`;
@@ -145,7 +124,6 @@ function main() {
     console.log(`  ${String(rp).padStart(6)} | ${cells.join(" | ")}`);
   }
 
-  // 2. Error vs ideal anchors
   console.log("\n--- ERROR VS BALANCED IDEAL (lower is better) ---");
   const idealRp = IDEAL.map(([rp]) => rp);
   const scores: Array<{ name: string; score: number; maxErr: number }> = [];
@@ -165,17 +143,13 @@ function main() {
   scores.sort((a, b) => a.score - b.score);
   console.log(`\n  Best by mean error: ${scores[0].name}`);
 
-  // 3. Constraints
   console.log("\n--- CONSTRAINTS ---");
   for (const f of FORMULAS) {
     const mono = isMonotonic(f.fn);
-    // No over-boost: 100 RP (very low skill) must stay in Copper
     const low = f.fn(100);
     const lowOk = getRankInfo(low).index === 0;
-    // No under-place: 10000 RP (Candidate Grandmaster) must be at least Platinum
     const high = f.fn(10000);
     const highOk = getRankInfo(high).index >= 4;
-    // 20000 RP should be Expert
     const top = f.fn(20000);
     const topOk = getRankInfo(top).index === 8;
     console.log(
@@ -183,7 +157,6 @@ function main() {
     );
   }
 
-  // 4. Dense grid: verify monotonic + weight bounds for the recommended formula
   console.log("\n--- DENSE GRID CHECK (recommended F6) ---");
   let monoOk = true;
   let prev = -1;
