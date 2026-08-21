@@ -30,9 +30,6 @@ const STATE_CHANGING = new Set(["POST", "PATCH", "PUT", "DELETE"]);
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Block cross-origin state-changing requests to API routes (CSRF defense-in-depth).
-  // SameSite=Lax on the session cookie already blocks the cookie cross-site; this rejects
-  // forged requests outright. Requests without an Origin header (server-side, cron) are allowed.
   if (pathname.startsWith("/api/") && STATE_CHANGING.has(request.method)) {
     const origin = request.headers.get("origin");
     const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
