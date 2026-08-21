@@ -20,9 +20,7 @@ export function CursorSettings() {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setPrefs({ enabled: Boolean(parsed.enabled), trail: parsed.trail !== false });
       }
-    } catch {
-      // ignore
-    }
+    } catch {}
     setMounted(true);
   }, []);
 
@@ -31,9 +29,7 @@ export function CursorSettings() {
     setPrefs(merged);
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-    } catch {
-      // ignore
-    }
+    } catch {}
     window.dispatchEvent(new CustomEvent<Prefs>(PREFS_EVENT, { detail: merged }));
   };
 
