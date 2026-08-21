@@ -1,12 +1,13 @@
-import { CATEGORIES, CATEGORY_LABELS, MAX_CATEGORY_LEVEL } from "@/lib/category-constants";
+import { CATEGORIES, CATEGORY_LABELS, MAX_CATEGORY_LEVEL, type Category } from "@/lib/category-constants";
 import { MAX_CHALLENGE_LEVEL } from "@/lib/challenge";
 
-const CATEGORY_DESCRIPTIONS = {
+const CATEGORY_DESCRIPTIONS: Record<Category, string> = {
   jumps: "Maps focused on jump patterns, spacing, aim transitions, and the ability to move cleanly between demanding note positions.",
   stream: "Maps centered around continuous streams, stamina, rhythm control, alternating movement, and maintaining consistency through sustained patterns.",
   tech: "Maps that emphasize reading, control, unusual rhythms, precision movement, complex pattern interactions, and mechanical adaptability.",
   off_grid: "Maps built around off-grid movement and patterns that challenge conventional reading, requiring stronger spatial awareness and adaptation.",
-} as const;
+  vibro: "Maps focused on vibro patterns, rapid repeated inputs, controlled alternating movement, and maintaining consistency through high-frequency patterns.",
+};
 
 const CHALLENGE_LEVELS = Array.from({ length: MAX_CHALLENGE_LEVEL }, (_, index) => index + 1);
 
