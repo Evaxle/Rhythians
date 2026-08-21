@@ -38,7 +38,7 @@ export async function PATCH(request: Request, { params }: Props) {
 
   if (body?.category !== undefined) {
     if (typeof body.category !== "string" || !isCategory(body.category)) return NextResponse.json({ error: "Invalid category." }, { status: 400 });
-    data.category = body.category as unknown as Prisma.CategoryType;
+    data.category = body.category as never;
   }
 
   if (typeof body?.reviewerNote === "string") {
