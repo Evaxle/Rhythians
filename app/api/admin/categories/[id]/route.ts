@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { canAccessAdmin } from "@/lib/admin-access";
-import { CATEGORY_LABELS, isCategory, MAX_CATEGORY_LEVEL } from "@/lib/categories";
+import { CATEGORY_LABELS, isCategory, MAX_CATEGORY_LEVEL, type Category } from "@/lib/categories";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +19,7 @@ export async function PATCH(request: Request, { params }: Props) {
   const map = await prisma.categoryMap.findUnique({ where: { id } });
   if (!map) return NextResponse.json({ error: "Map not found." }, { status: 404 });
 
-  const data: { status?: "approved" | "rejected" | "hidden"; level?: number; category?: "jumps" | "stream" | "tech" | "off_grid"; reviewerNote?: string | null; reviewedById?: string; reviewedAt?: Date } = {};
+  const data: { status?: "approved" | "rejected" | "hidden"; level?: number; category?: Category; reviewerNote?: string | null; reviewedById?: string; reviewedAt?: Date } = {};
 
   if (body?.status === "approved" || body?.status === "rejected" || body?.status === "hidden") {
     data.status = body.status;
