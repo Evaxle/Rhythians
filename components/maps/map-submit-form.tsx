@@ -46,7 +46,7 @@ export default function MapSubmitForm() {
       {error && <div className="rounded-3xl border border-red-600/30 bg-red-500/10 px-4 py-3 text-sm text-red-100">{error}</div>}
       {success && <div className="rounded-3xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">{success}</div>}
       {submittedMapId && <p className="text-sm text-muted">Rhythians ID: <span className="font-mono text-white">{submittedMapId}</span></p>}
-      <div className="flex justify-end"><button type="submit" disabled={loading} className="rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white disabled:opacity-60">{loading ? "Submitting…" : "Submit ranked map"}</button></div>
+      <div className="flex justify-end"><button type="submit" disabled={loading} className="rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white disabled:opacity-60">{loading ? "Checking map…" : "Submit ranked map"}</button></div>
     </form>
   );
 }
