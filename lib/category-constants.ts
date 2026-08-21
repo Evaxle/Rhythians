@@ -1,8 +1,8 @@
-export type Category = "jumps" | "stream" | "tech" | "off_grid";
+export type Category = "jumps" | "stream" | "tech" | "off_grid" | "vibro";
 
-export const CATEGORIES = ["jumps", "stream", "tech", "off_grid", "vibro" as Category] as const;
+export const CATEGORIES = ["jumps", "stream", "tech", "off_grid", "vibro"] as const satisfies readonly Category[];
 
-export const CATEGORY_LABELS: Record<string, string> = {
+export const CATEGORY_LABELS: Record<Category, string> = {
   jumps: "Jumps",
   stream: "Stream",
   tech: "Tech",
