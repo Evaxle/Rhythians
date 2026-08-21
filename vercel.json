@@ -11,6 +11,10 @@
     {
       "path": "/api/internal/db-cleanup",
       "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/internal/rhythia-map-sync",
+      "schedule": "0 4 * * *"
     }
   ]
 }
