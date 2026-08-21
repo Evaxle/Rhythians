@@ -7,7 +7,6 @@ import { ensureChallengeLevelTable } from "@/lib/challenge";
 import { ensureCompletionClipTables } from "@/lib/completion-clips";
 
 const tabs = ["challenge", "jumps", "stream", "tech", "off_grid", "vibro"] as const;
-
 type Tab = typeof tabs[number];
 
 async function authorize() {
@@ -22,13 +21,16 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const tab = (url.searchParams.get("tab") ?? "challenge") as Tab;
   const q = (url.searchParams.get("q") ?? "").trim();
+  const levelValue = url.searchParams.get("level");
+  const level = levelValue ? Number(levelValue) : null;
   if (!tabs.includes(tab)) return NextResponse.json({ error: "Invalid tab." }, { status: 400 });
+  if (level != null && (!Number.isInteger(level) || level < 1 || level > 10)) return NextResponse.json({ error: "Invalid level." }, { status: 400 });
   if (tab === "challenge") {
     await ensureChallengeLevelTable();
-    return NextResponse.json(await prisma.$queryRawUnsafe(`SELECT m."id", m."title", m."artist", m."mapperName", m."mapFileUrl", m."rating", m."status", l."level" FROM "ChallengeMap" m LEFT JOIN "ChallengeMapLevel" l ON l."challengeMapId" = m."id" WHERE ($1 = '' OR m."title" ILIKE '%' || $1 || '%' OR COALESCE(m."artist",'') ILIKE '%' || $1 || '%' OR COALESCE(m."mapperName",'') ILIKE '%' || $1 || '%') ORDER BY m."createdAt" DESC LIMIT 100`, q));
+    return NextResponse.json(await prisma.$queryRawUnsafe(`SELECT m."id", m."title", m."artist", m."mapperName", m."mapFileUrl", m."rating", m."status", l."level" FROM "ChallengeMap" m LEFT JOIN "ChallengeMapLevel" l ON l."challengeMapId" = m."id" WHERE ($1 = '' OR m."title" ILIKE '%' || $1 || '%' OR COALESCE(m."artist",'') ILIKE '%' || $1 || '%' OR COALESCE(m."mapperName",'') ILIKE '%' || $1 || '%') AND ($2::integer IS NULL OR l."level" = $2) ORDER BY m."createdAt" DESC LIMIT 100`, q, level));
   }
   await ensureCompletionClipTables();
-  return NextResponse.json(await prisma.$queryRawUnsafe(`SELECT m."id", m."title", m."artist", m."mapperName", m."mapFileUrl", m."status", m."level", m."category"::text AS "category" FROM "CategoryMap" m WHERE ($1 = '' OR m."title" ILIKE '%' || $1 || '%' OR COALESCE(m."artist",'') ILIKE '%' || $1 || '%' OR COALESCE(m."mapperName",'') ILIKE '%' || $1 || '%') ORDER BY m."createdAt" DESC LIMIT 100`, q));
+  return NextResponse.json(await prisma.$queryRawUnsafe(`SELECT m."id", m."title", m."artist", m."mapperName", m."mapFileUrl", m."status", m."level", m."category"::text AS "category" FROM "CategoryMap" m WHERE m."category"::text = $1 AND ($2 = '' OR m."title" ILIKE '%' || $2 || '%' OR COALESCE(m."artist",'') ILIKE '%' || $2 || '%' OR COALESCE(m."mapperName",'') ILIKE '%' || $2 || '%') AND ($3::integer IS NULL OR m."level" = $3) ORDER BY m."createdAt" DESC LIMIT 100`, tab, q, level));
 }
 
 export async function PATCH(request: Request) {
