@@ -56,7 +56,7 @@ export async function PATCH(request: Request, { params }: Props) {
   await prisma.$transaction(async (tx) => {
     await tx.$executeRawUnsafe('DELETE FROM "UserChallengeLevelOverride" WHERE "userId" = $1', id);
     await tx.$executeRawUnsafe('INSERT INTO "UserChallengeLevelOverride" ("id", "userId", "level", "createdAt", "updatedAt") VALUES ($1, $2, $3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)', randomUUID(), id, challengeLevel);
-    for (const entry of categoryLevels) await tx.userCategoryLevel.upsert({ where: { userId_category: { userId: id, category: entry.category } }, create: { userId: id, category: entry.category, level: entry.level }, update: { level: entry.level } });
+    for (const entry of categoryLevels) await tx.userCategoryLevel.upsert({ where: { userId_category: { userId: id, category: entry.category as never } }, create: { userId: id, category: entry.category as never, level: entry.level }, update: { level: entry.level } });
   });
 
   await prisma.moderationAction.create({ data: { actorId: admin.id, action: "user_levels_edited", targetType: "user", targetId: id, metadata: { challengeLevel, categoryLevels } } });
