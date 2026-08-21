@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Download, RefreshCw, Wifi, Terminal, Play, Trash2, Server } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Download, RefreshCw, Wifi, Terminal, Play, Trash2, Server, ExternalLink } from "lucide-react";
 
 const GAMES = [
   { id: "RhythiaSteam", name: "Rhythia Steam", port: 45872 },
@@ -40,13 +40,14 @@ export function RhythKitSettings() {
   const [advanced, setAdvanced] = useState(false);
   const [events, setEvents] = useState<DebugEvent[]>([]);
   const [localServer, setLocalServer] = useState<string | null>(null);
+  const launchRequested = useRef(new Set<string>());
 
   const getGame = () => GAMES.find(game => game.id === active) ?? GAMES[0];
   const getUrl = (path: string) => `http://127.0.0.1:${getGame().port}${path}`;
 
   const check = async (gameId: string) => {
     const game = GAMES.find(value => value.id === gameId);
-    if (!game) return;
+    if (!game) return false;
     try {
       const response = await fetch(`http://127.0.0.1:${game.port}/status`, { cache: "no-store" });
       if (!response.ok) throw new Error();
@@ -54,13 +55,34 @@ export function RhythKitSettings() {
       if (!data.installed || !data.running) throw new Error();
       const authenticated = data.loggedIn === true || data.authenticated === true;
       setGames(current => ({ ...current, [gameId]: { ...data, state: authenticated ? "connected" : "not_connected" } }));
+      return true;
     } catch {
       setGames(current => ({ ...current, [gameId]: { state: "not_connected" } }));
+      return false;
     }
+  };
+
+  const requestAgentStart = async (gameId: string) => {
+    const game = GAMES.find(value => value.id === gameId);
+    if (!game) return;
+    setConnecting(gameId);
+    try {
+      const uri = `rhythkit://connect?game=${encodeURIComponent(game.id)}`;
+      window.open(uri, "rhythkit-agent", "noopener,noreferrer");
+    } catch { }
+    await new Promise(resolve => window.setTimeout(resolve, 1000));
+    const deadline = Date.now() + 8000;
+    while (Date.now() < deadline) {
+      if (await check(gameId)) return;
+      await new Promise(resolve => window.setTimeout(resolve, 1000));
+    }
+    setConnecting(null);
   };
 
   const startServer = async () => {
     const game = getGame();
+    setLocalServer(null);
+    await requestAgentStart(game.id);
     try {
       const response = await fetch(`http://127.0.0.1:${game.port}/status`, { cache: "no-store" });
       if (!response.ok) throw new Error();
@@ -70,6 +92,7 @@ export function RhythKitSettings() {
     } catch {
       setLocalServer(null);
     }
+    setConnecting(null);
   };
 
   const loadEvents = async () => {
@@ -82,8 +105,10 @@ export function RhythKitSettings() {
 
   const testConnection = async () => {
     setTesting(active);
-    try { await fetch(getUrl("/test-connection"), { method: "POST" }); }
-    finally { await check(active); await loadEvents(); setTesting(null); }
+    try {
+      const response = await fetch(getUrl("/test-connection"), { method: "POST" });
+      if (!response.ok) await check(active);
+    } finally { await check(active); await loadEvents(); setTesting(null); }
   };
 
   const clearEvents = async () => {
@@ -95,6 +120,11 @@ export function RhythKitSettings() {
     if (!game) return;
     setConnecting(gameId);
     try {
+      const agentAvailable = await check(gameId);
+      if (!agentAvailable) {
+        await requestAgentStart(gameId);
+        if (!(await check(gameId))) throw new Error();
+      }
       const response = await fetch(`http://127.0.0.1:${game.port}/auth/start`, { method: "POST" });
       if (!response.ok) throw new Error();
       const auth = await response.json() as { verificationUrl?: string; expiresIn?: number };
@@ -118,6 +148,16 @@ export function RhythKitSettings() {
     const timer = window.setInterval(() => GAMES.forEach(game => void check(game.id)), 2000);
     return () => window.clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(async () => {
+      if (launchRequested.current.has(active)) return;
+      launchRequested.current.add(active);
+      if (await check(active)) return;
+      await requestAgentStart(active);
+    }, 500);
+    return () => window.clearTimeout(timer);
+  }, [active]);
 
   useEffect(() => {
     void loadEvents();
@@ -153,13 +193,14 @@ export function RhythKitSettings() {
       </div>
 
       <div className="flex flex-wrap gap-3">
-        {current.state === "not_connected" && <><button onClick={() => void connect(active)} disabled={connecting !== null} className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent/80 disabled:opacity-50"><Wifi size={16} />{connecting === active ? "Waiting for authorization..." : "Connect RhythKit"}</button><a href="https://github.com/Evaxle/RhythKit/releases" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:border-accent/40"><Download size={16} />Install RhythKit</a></>}
-        <button onClick={() => void startServer()} disabled={current.state === "checking"} className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:border-accent/40"><Server size={16} />Start Server</button>
+        {current.state === "not_connected" && <><button onClick={() => void connect(active)} disabled={connecting !== null} className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent/80 disabled:opacity-50"><Wifi size={16} />{connecting === active ? "Connecting..." : "Connect RhythKit"}</button><a href="https://github.com/Evaxle/RhythKit/releases" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:border-accent/40"><Download size={16} />Install RhythKit</a></>}
+        <button onClick={() => void startServer()} disabled={connecting !== null} className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:border-accent/40 disabled:opacity-50"><Server size={16} />{connecting === active ? "Starting Agent..." : "Start / Connect Agent"}</button>
         <button onClick={() => void testConnection()} disabled={testing !== null || current.state === "checking"} className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:border-accent/40 disabled:opacity-50"><Play size={16} />{testing === active ? "Testing..." : "Test Connection"}</button>
         <button onClick={() => setAdvanced(value => !value)} className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:border-accent/40"><Terminal size={16} />{advanced ? "Close Advanced Settings" : "Advanced Settings"}</button>
       </div>
 
-      {localServer && <div className="rounded-xl border border-border bg-white/5 p-4"><p className="text-xs uppercase tracking-[0.2em] text-muted">Local server</p><p className="mt-2 break-all font-mono text-sm text-white">{localServer}</p><p className="mt-1 text-xs text-muted">Put this URL into the RhythKit agent. The agent will use it as its Rhythians server endpoint.</p></div>}
+      {localServer && <div className="rounded-xl border border-border bg-white/5 p-4"><p className="text-xs uppercase tracking-[0.2em] text-muted">Local server</p><p className="mt-2 break-all font-mono text-sm text-white">{localServer}</p><p className="mt-1 text-xs text-muted">The RhythKit Agent is reachable locally. Its saved server endpoint is used for Rhythians requests.</p></div>}
+      {!localServer && current.state === "not_connected" && <div className="rounded-xl border border-border bg-white/5 p-4"><p className="text-sm font-semibold text-white">RhythKit agent not detected</p><p className="mt-1 text-sm leading-6 text-muted">Rhythians automatically checks the local agent and attempts the installed RhythKit launcher. Use Start / Connect Agent as the manual failsafe if the automatic connection does not start it.</p><a href="https://github.com/Evaxle/RhythKit/releases" target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline"><ExternalLink size={14} />Open RhythKit releases</a></div>}
 
       {advanced && <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_430px]"><div className="rounded-2xl border border-border bg-background/60 p-5 space-y-3"><p className="font-semibold text-white">Integration diagnostics</p><p className="text-sm text-muted">Live events from {game.name}. The console updates while the game is running.</p><div className="flex gap-2"><button onClick={() => void loadEvents()} className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-4 py-2 text-sm font-semibold text-white"><RefreshCw size={14} />Refresh</button><button onClick={() => void clearEvents()} className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-4 py-2 text-sm font-semibold text-white"><Trash2 size={14} />Clear</button></div></div><div className="min-h-[520px] overflow-hidden rounded-2xl border border-border bg-black"><div className="flex items-center justify-between border-b border-white/10 px-4 py-3"><div className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-green-400" /><span className="text-xs font-semibold uppercase tracking-[0.18em] text-white">Live RhythKit Console</span></div><span className="text-xs text-white/40">{game.name}</span></div><div className="h-[470px] overflow-y-auto p-4 font-mono text-[11px] leading-5 text-green-300">{events.length === 0 ? <div className="text-white/40">Waiting for integration events...</div> : events.slice().reverse().map((event, index) => <div key={`${event.timestamp}-${index}`} className="mb-3 border-b border-white/5 pb-2"><div><span className="text-white/40">[{new Date(event.timestamp).toLocaleTimeString()}]</span> <span className="text-cyan-300">{event.event}</span>{event.mapId && <span className="text-yellow-300"> map={event.mapId}</span>}</div><div className="text-white/70">{event.message}</div>{event.gameVersion && <div className="text-white/40">game={event.game ?? "unknown"} version={event.gameVersion}</div>}{event.data != null && <div className="break-all text-white/40">{JSON.stringify(event.data)}</div>}</div>)}</div></div></div>}
     </div>
