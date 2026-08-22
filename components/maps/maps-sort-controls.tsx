@@ -18,9 +18,11 @@ export function MapsSortControls({ maps, rankInfo, userRhp, currentUserId }: Com
   const [sortKey, setSortKey] = useState<SortKey>("rating");
   const [direction, setDirection] = useState<Direction>("asc");
   const [scoreFilter, setScoreFilter] = useState<ScoreFilter>("all");
+  const [showUnranked, setShowUnranked] = useState(false);
 
-  const sortedMaps = useMemo(() => {
+  const filteredMaps = useMemo(() => {
     const filtered = maps.filter((map) => {
+      if (!showUnranked && !map.isRanked) return false;
       if (scoreFilter === "scored") return map.hasScore || Boolean(map.completion?.passed);
       if (scoreFilter === "unscored") return !(map.hasScore || Boolean(map.completion?.passed));
       return true;
@@ -34,49 +36,10 @@ export function MapsSortControls({ maps, rankInfo, userRhp, currentUserId }: Com
       if (sortKey === "artist") result = textValue(a.artist).localeCompare(textValue(b.artist));
       if (sortKey === "length") result = (a.length ?? -Infinity) - (b.length ?? -Infinity);
       if (sortKey === "notes") result = (a.noteCount ?? -Infinity) - (b.noteCount ?? -Infinity);
-      if (sortKey === "rhp") result = (a.rating == null ? -Infinity : a.rating) - (b.rating == null ? -Infinity : b.rating);
+      if (sortKey === "rhp") result = a.isRanked ? (a.rating ?? -Infinity) - (b.rating ?? -Infinity) : 0;
       return direction === "asc" ? result : -result;
     });
-  }, [maps, sortKey, direction, scoreFilter]);
+  }, [maps, sortKey, direction, scoreFilter, showUnranked]);
 
-  return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-3 rounded-3xl border border-border bg-surface/95 p-4 shadow-glow sm:flex-row sm:items-end sm:justify-between">
-        <div className="flex items-center gap-2 text-sm font-semibold text-white">
-          <SlidersHorizontal size={16} className="text-accent" />
-          Map filters & sorting
-        </div>
-        <div className="grid gap-3 sm:grid-cols-3">
-          <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-muted">
-            Sort by
-            <select value={sortKey} onChange={(event) => setSortKey(event.target.value as SortKey)} className="min-w-40 rounded-xl border border-border bg-background/70 px-3 py-2 text-sm font-normal normal-case tracking-normal text-white focus:border-accent/50 focus:outline-none">
-              <option value="rating">Rating</option>
-              <option value="name">Map name</option>
-              <option value="mapper">Mapper</option>
-              <option value="artist">Artist</option>
-              <option value="length">Length</option>
-              <option value="notes">Notes</option>
-              <option value="rhp">RHP value</option>
-            </select>
-          </label>
-          <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-muted">
-            Order
-            <select value={direction} onChange={(event) => setDirection(event.target.value as Direction)} className="min-w-32 rounded-xl border border-border bg-background/70 px-3 py-2 text-sm font-normal normal-case tracking-normal text-white focus:border-accent/50 focus:outline-none">
-              <option value="asc">Ascending</option>
-              <option value="desc">Descending</option>
-            </select>
-          </label>
-          <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-muted">
-            Scores
-            <select value={scoreFilter} onChange={(event) => setScoreFilter(event.target.value as ScoreFilter)} className="min-w-32 rounded-xl border border-border bg-background/70 px-3 py-2 text-sm font-normal normal-case tracking-normal text-white focus:border-accent/50 focus:outline-none">
-              <option value="all">All maps</option>
-              <option value="scored">Already scored</option>
-              <option value="unscored">Not scored</option>
-            </select>
-          </label>
-        </div>
-      </div>
-      <MapsBrowser maps={sortedMaps} rankInfo={rankInfo} userRhp={userRhp} currentUserId={currentUserId} />
-    </div>
-  );
+  return <div className="space-y-4"><div className="flex flex-col gap-3 rounded-3xl border border-border bg-surface/95 p-4 shadow-glow"><div className="flex flex-wrap items-center justify-between gap-3"><div className="flex items-center gap-2 text-sm font-semibold text-white"><SlidersHorizontal size={16} className="text-accent" /> Map filters & sorting</div><label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-border bg-background/60 px-4 py-2.5"><input type="checkbox" checked={showUnranked} onChange={(event) => setShowUnranked(event.target.checked)} className="h-4 w-4 accent-accent" /><span className="text-sm font-semibold text-white">Show unranked maps</span></label></div><div className="grid gap-3 sm:grid-cols-3"><label className="grid gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-muted">Sort by<select value={sortKey} onChange={(event) => setSortKey(event.target.value as SortKey)} className="min-w-40 rounded-xl border border-border bg-background/70 px-3 py-2 text-sm font-normal normal-case tracking-normal text-white focus:border-accent/50 focus:outline-none"><option value="rating">Rating</option><option value="name">Map name</option><option value="mapper">Mapper</option><option value="artist">Artist</option><option value="length">Length</option><option value="notes">Notes</option><option value="rhp">RHP value</option></select></label><label className="grid gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-muted">Order<select value={direction} onChange={(event) => setDirection(event.target.value as Direction)} className="min-w-32 rounded-xl border border-border bg-background/70 px-3 py-2 text-sm font-normal normal-case tracking-normal text-white focus:border-accent/50 focus:outline-none"><option value="asc">Ascending</option><option value="desc">Descending</option></select></label><label className="grid gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-muted">Scores<select value={scoreFilter} onChange={(event) => setScoreFilter(event.target.value as ScoreFilter)} className="min-w-32 rounded-xl border border-border bg-background/70 px-3 py-2 text-sm font-normal normal-case tracking-normal text-white focus:border-accent/50 focus:outline-none"><option value="all">All maps</option><option value="scored">Already scored</option><option value="unscored">Not scored</option></select></label></div></div><MapsBrowser maps={filteredMaps} rankInfo={rankInfo} userRhp={userRhp} currentUserId={currentUserId} /></div>;
 }
