@@ -5,7 +5,6 @@ import type { ComponentProps } from "react";
 import { SlidersHorizontal } from "lucide-react";
 import { MapsBrowser } from "@/components/maps/maps-browser";
 
-type MapEntry = ComponentProps<typeof MapsBrowser>["maps"][number];
 type SortKey = "rating" | "name" | "mapper" | "artist" | "length" | "notes" | "rhp";
 type Direction = "asc" | "desc";
 type ScoreFilter = "all" | "scored" | "unscored";
@@ -22,7 +21,7 @@ export function MapsSortControls({ maps, rankInfo, userRhp, currentUserId }: Com
 
   const filteredMaps = useMemo(() => {
     const filtered = maps.filter((map) => {
-      if (!showUnranked && !map.isRanked) return false;
+      if (!showUnranked && !map.isRanked && !map.isLegacy) return false;
       if (scoreFilter === "scored") return map.hasScore || Boolean(map.completion?.passed);
       if (scoreFilter === "unscored") return !(map.hasScore || Boolean(map.completion?.passed));
       return true;
