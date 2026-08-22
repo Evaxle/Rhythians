@@ -16,50 +16,31 @@ type Props = { params: Promise<{ conversationId: string }> };
 
 export async function GET(_request: Request, { params }: Props) {
   const user = await getSessionUser();
-  if (!user) {
-    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
-  }
+  if (!user) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
 
   const { conversationId } = await params;
-
-  const membership = await prisma.conversationMember.findUnique({
-    where: {
-      conversationId_userId: { conversationId, userId: user.id },
-    },
-  });
-
-  if (!membership) {
-    return NextResponse.json({ error: "Conversation not found." }, { status: 404 });
-  }
-
-  const conversation = await prisma.conversation.findUnique({
-    where: { id: conversationId },
+  const conversation = await prisma.conversation.findFirst({
+    where: { id: conversationId, members: { some: { userId: user.id } } },
     include: {
-      members: {
-        include: { user: { select: PUBLIC_USER_FIELDS } },
-      },
-      messages: {
-        orderBy: { createdAt: "asc" },
-        take: 100,
-      },
+      members: { include: { user: { select: PUBLIC_USER_FIELDS } }, orderBy: { joinedAt: "asc" } },
+      messages: { orderBy: { createdAt: "asc" }, take: 100 },
     },
   });
 
-  if (!conversation) {
-    return NextResponse.json({ error: "Conversation not found." }, { status: 404 });
-  }
+  if (!conversation) return NextResponse.json({ error: "Conversation not found." }, { status: 404 });
 
-  const members = conversation.members.map((m) => ({
-    id: m.user.id,
-    discordId: m.user.discordId,
-    username: m.user.username,
-    discriminator: m.user.discriminator,
-    avatar: m.user.avatar,
-    displayName: m.user.displayName,
-    profileHandle: m.user.profileHandle,
-    role: m.role,
-    joinedAt: m.joinedAt.toISOString(),
+  const members = conversation.members.map((member) => ({
+    id: member.user.id,
+    discordId: member.user.discordId,
+    username: member.user.username,
+    discriminator: member.user.discriminator,
+    avatar: member.user.avatar,
+    displayName: member.user.displayName,
+    profileHandle: member.user.profileHandle,
+    role: member.role,
+    joinedAt: member.joinedAt.toISOString(),
   }));
+  const otherUsers = members.filter((member) => member.id !== user.id).map(({ role: _role, joinedAt: _joinedAt, ...publicUser }) => publicUser);
 
   return NextResponse.json({
     conversation: {
@@ -68,6 +49,7 @@ export async function GET(_request: Request, { params }: Props) {
       name: conversation.name,
       createdById: conversation.createdById,
       members,
+      otherUsers,
       messages: conversation.messages.map((message) => ({
         id: message.id,
         content: message.content,
