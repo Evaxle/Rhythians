@@ -12,6 +12,7 @@ const REPORT_REASONS = [
   "Impersonation",
   "Broken or misleading content",
   "Map is not ranked",
+  "Path map needs to be reset",
   "Other",
 ];
 
