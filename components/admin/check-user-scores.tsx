@@ -54,7 +54,7 @@ export function AdminCheckUserScores() {
     <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
       <p className="text-sm uppercase tracking-[0.3em] text-accent">Ranked score tools</p>
       <h2 className="mt-2 text-xl font-semibold text-white">Recheck completed maps</h2>
-      <p className="mt-2 max-w-3xl text-sm leading-7 text-muted">Search for one user and scan their eligible Rhythia scores, or run the scan for every linked user. The scan uses the current rating, weighting, and rank system and repeats after rank-ups so newly unlocked maps can be discovered.</p>
+      <p className="mt-2 max-w-3xl text-sm leading-7 text-muted">Search for one user and scan only maps in that user&apos;s current rank range. The scan never awards RHP for maps outside the user&apos;s rank. After a rank-up, it starts a new pass using the user&apos;s new rank so newly unlocked maps can be discovered without mixing rank ranges.</p>
       <div className="mt-5 flex flex-col gap-3 lg:flex-row">
         <input value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") void search(); }} placeholder="Search username, handle, Discord ID, or email" className="min-w-0 flex-1 rounded-2xl border border-border bg-background px-4 py-3 text-sm text-white outline-none focus:border-accent" />
         <button type="button" onClick={() => void search()} disabled={busy || query.trim().length < 2} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:border-accent/40 disabled:opacity-50"><Search size={16} /> Find user</button>
