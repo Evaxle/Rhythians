@@ -64,6 +64,20 @@ function parseRhythiansMapId(value: string) {
   }
 }
 
+function normalizeTitle(value: string) {
+  return value.trim().replace(/\s+/g, " ").toLocaleLowerCase();
+}
+
+async function findExistingByTitle(title: string) {
+  const normalized = normalizeTitle(title);
+  if (!normalized) return null;
+  const [challengeMaps, categoryMaps] = await Promise.all([
+    prisma.challengeMap.findMany({ select: { id: true, title: true, status: true }, orderBy: { createdAt: "asc" } }),
+    prisma.categoryMap.findMany({ select: { id: true, title: true, status: true }, orderBy: { createdAt: "asc" } }),
+  ]);
+  return [...challengeMaps, ...categoryMaps].find((map) => normalizeTitle(map.title) === normalized) ?? null;
+}
+
 async function findExistingByRhythiaId(id: number) {
   const [challenge, category] = await Promise.all([
     prisma.challengeMap.findUnique({ where: { sourceBeatmapId: id }, select: { id: true, title: true, status: true } }),
@@ -78,6 +92,12 @@ async function findExistingByRhythiansId(id: string) {
     prisma.categoryMap.findUnique({ where: { id }, select: { id: true, title: true, status: true } }),
   ]);
   return challenge ?? category;
+}
+
+async function rejectDuplicate(title: string) {
+  const existing = await findExistingByTitle(title);
+  if (!existing) return null;
+  return NextResponse.json({ error: `A map with the same name already exists: ${existing.title}. Please use the existing map instead of submitting a duplicate.` }, { status: 409 });
 }
 
 export async function POST(request: Request) {
@@ -101,8 +121,10 @@ export async function POST(request: Request) {
     const fetched = await fetchRhythiaMapById(parsedMapUrl.id);
     if (!fetched) return NextResponse.json({ error: "That Rhythia map could not be found." }, { status: 404 });
     if (!fetched.downloadUrl) return NextResponse.json({ error: "That Rhythia map does not have a downloadable map file." }, { status: 422 });
-    const mapId = crypto.randomUUID();
     const title = fetched.title?.trim() || "Untitled map";
+    const duplicate = await rejectDuplicate(title);
+    if (duplicate) return duplicate;
+    const mapId = crypto.randomUUID();
     const dash = title.indexOf(" - ");
     const artist = dash > 0 ? title.slice(0, dash).trim() : null;
     const requestedRating = fairRatingFromStars(Number(fetched.starRating ?? 0));
@@ -113,7 +135,7 @@ export async function POST(request: Request) {
       await prisma.moderationAction.create({ data: { actorId: user.id, action: "ranked_map_submitted", targetType: "map_submission", targetId: map.id, metadata: { title: map.title, submissionType, requestedRating: map.requestedRating, sourceUrl: parsedMapUrl.url, sourceBeatmapId: fetched.id } } });
       return NextResponse.json({ mapId: map.id, status: map.status, submissionType, requestedRating: map.requestedRating, downloadUrl: `/api/maps/download?id=${encodeURIComponent(map.id)}` });
     } catch (error: any) {
-      if (error?.code === "P2002") return NextResponse.json({ error: "This Rhythia map has already been submitted." }, { status: 409 });
+      if (error?.code === "P2002") return NextResponse.json({ error: "This map has already been submitted." }, { status: 409 });
       return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to submit this map." }, { status: 422 });
     }
   }
@@ -162,6 +184,8 @@ export async function POST(request: Request) {
   }
 
   if (!resolvedTitle || resolvedTitle.length > 120) return NextResponse.json({ error: "Map title is required and must be under 120 characters." }, { status: 400 });
+  const duplicate = await rejectDuplicate(resolvedTitle);
+  if (duplicate) return duplicate;
   if (!resolvedMapFile) return NextResponse.json({ error: "The map file could not be found." }, { status: 400 });
   const mapId = crypto.randomUUID();
   try {
