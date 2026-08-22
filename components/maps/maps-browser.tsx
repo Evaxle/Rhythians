@@ -80,12 +80,15 @@ export function MapsBrowser({ maps, rankInfo, userRhp }: { maps: MapEntry[]; ran
     if (!rankMaps.length) return;
     setMessages((current) => ({ ...current, __download: `Downloading ${rankMaps.length} ranked maps...` }));
     const failures: string[] = [];
-    const files: Array<{ name: string; data: Uint8Array }> = [];
+    const files: Array<{ name: string; data: Uint8Array<ArrayBuffer> }> = [];
     for (const map of rankMaps) {
       try {
         const response = await fetch(map.mapFileUrl, { mode: "cors", cache: "no-store" });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        files.push({ name: `${safeName(map.title)}${extensionFromUrl(map.mapFileUrl)}`, data: new Uint8Array(await response.arrayBuffer()) });
+        const source = new Uint8Array(await response.arrayBuffer());
+        const data = new Uint8Array(new ArrayBuffer(source.byteLength));
+        data.set(source);
+        files.push({ name: `${safeName(map.title)}${extensionFromUrl(map.mapFileUrl)}`, data });
       } catch (error) {
         failures.push(`${map.title}: ${error instanceof Error ? error.message : "download failed"}`);
       }
@@ -94,7 +97,7 @@ export function MapsBrowser({ maps, rankInfo, userRhp }: { maps: MapEntry[]; ran
       setMessages((current) => ({ ...current, __download: "Could not fetch the map files. Use the individual Download buttons." }));
       return;
     }
-    const archive = new Blob(files.map((file) => file.data), { type: "application/octet-stream" });
+    const archive = new Blob(files.map((file) => file.data.buffer), { type: "application/octet-stream" });
     const url = URL.createObjectURL(archive);
     const anchor = document.createElement("a");
     anchor.href = url;
