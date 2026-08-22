@@ -1,0 +1,89 @@
+name: Fix Prisma schema
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.event.head_commit.message != 'Fix Prisma schema formatting for deployment'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix schema
+        run: |
+          python3 <<'PY'
+          import re
+          from pathlib import Path
+
+          path = Path('prisma/schema.prisma')
+          source = path.read_text()
+          type_names = set(re.findall(r'^(?:model|enum)\s+(\w+)', source, re.MULTILINE))
+          type_names.update({'String', 'Int', 'Float', 'Boolean', 'DateTime', 'Json', 'Decimal', 'BigInt', 'Bytes'})
+
+          def format_model(match):
+              name = match.group(1)
+              body = match.group(2)
+              tokens = body.split()
+              lines = []
+              current = []
+              i = 0
+
+              def flush_field():
+                  nonlocal current
+                  if current:
+                      lines.append('  ' + ' '.join(current))
+                      current = []
+
+              while i < len(tokens):
+                  token = tokens[i]
+                  if token.startswith('@@'):
+                      flush_field()
+                      directive = [token]
+                      i += 1
+                      while i < len(tokens) and not tokens[i].startswith('@@'):
+                          if i + 1 < len(tokens) and re.fullmatch(r'[A-Za-z_]\w*', tokens[i]) and tokens[i + 1].rstrip('?',).rstrip('[]') in type_names:
+                              break
+                          directive.append(tokens[i])
+                          i += 1
+                      lines.append('  ' + ' '.join(directive))
+                      continue
+
+                  is_field = False
+                  if i + 1 < len(tokens) and re.fullmatch(r'[A-Za-z_]\w*', token):
+                      candidate = tokens[i + 1]
+                      candidate = candidate.rstrip('?')
+                      if candidate.endswith('[]'):
+                          candidate = candidate[:-2]
+                      if candidate in type_names:
+                          is_field = True
+
+                  if is_field:
+                      flush_field()
+                      current = [token, tokens[i + 1]]
+                      i += 2
+                      continue
+
+                  current.append(token)
+                  i += 1
+
+              flush_field()
+              return 'model ' + name + ' {\n' + '\n'.join(lines) + '\n}'
+
+          source = re.sub(r'model\s+(\w+)\s*\{([^{}]*)\}', format_model, source, flags=re.DOTALL)
+          path.write_text(source.rstrip() + '\n')
+          PY
+          npx -y prisma@7.9.1 format --schema=prisma/schema.prisma
+      - name: Commit fix and remove workflow
+        run: |
+          rm -f .github/workflows/fix-prisma-schema.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add prisma/schema.prisma .github/workflows/fix-prisma-schema.yml
+          git diff --cached --quiet && exit 0
+          git commit -m 'Fix Prisma schema formatting for deployment'
+          git push
