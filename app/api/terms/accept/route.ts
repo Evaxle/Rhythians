@@ -14,7 +14,8 @@ export async function POST() {
   await prisma.$executeRaw`
     INSERT INTO "TermsAcceptance" ("id", "userId", "version", "acceptedAt")
     VALUES (${randomUUID()}, ${user.id}, ${TERMS_VERSION}, CURRENT_TIMESTAMP)
-    ON CONFLICT ("userId") DO UPDATE SET "version" = EXCLUDED."version", "acceptedAt" = CURRENT_TIMESTAMP
+    ON CONFLICT ("userId") DO UPDATE
+    SET "version" = EXCLUDED."version", "acceptedAt" = CURRENT_TIMESTAMP
   `;
 
   return NextResponse.json({ accepted: true, version: TERMS_VERSION });
