@@ -16,6 +16,12 @@
   - `STORAGE_BUCKET`
   - `SESSION_COOKIE_NAME`
   - `SESSION_EXPIRES_DAYS`
+  - `AUTH_SECRET`
+  - `RESEND_API_KEY`
+  - `RESEND_FROM_EMAIL`
+- Added email verification and email 2FA for local username/password accounts.
+- Added account security notices for local accounts without email 2FA.
+- Added origin checks, rate limits, secure cookies, and security response headers.
 - Verified the upload flow is server-driven via `/api/clip-upload`.
 
 ## Manual tasks you must complete
@@ -36,7 +42,7 @@
    - `npm run db:migrate`
 7. Run seed only if you want baseline categories, roles, rules, and settings:
    - `npm run db:seed`
-8. The database bootstrap endpoint `/api/setup` is now locked. To use it, set a long random `SETUP_SECRET` and call `/api/setup?secret=<SETUP_SECRET>`.
+8. The database bootstrap endpoint `/api/setup` is locked. To use it, set a long random `SETUP_SECRET` and call `/api/setup?secret=<SETUP_SECRET>`.
 
 ### 2. Discord OAuth
 1. Create or select a Discord app in the Developer Portal.
@@ -64,10 +70,23 @@
    - clip moderation
    - announcements
 
-### 4. Vercel Deployment
+### 4. Email 2FA
+1. Create a Resend account and verify the domain you will use as the sender.
+2. Create a Resend API key with sending access only when possible.
+3. Add these Vercel environment variables:
+   - `RESEND_API_KEY=<sending API key>`
+   - `RESEND_FROM_EMAIL=Rhythians <security@YOUR-VERIFIED-DOMAIN>`
+4. Generate a long random `AUTH_SECRET` and add it to Vercel.
+5. Keep `RESEND_API_KEY` and `AUTH_SECRET` server-only.
+6. Local username/password users can add their email from **Settings → Email two-factor authentication**.
+7. The user must enter their current password before the verification email is sent.
+8. After the six-digit code is verified, email 2FA is enabled automatically.
+9. Future local-account logins require the email security code before a session is created.
+
+### 5. Vercel Deployment
 1. Push the repository to GitHub.
 2. Create a Vercel project and import this repository. The project **must be named `rhythians`** so the production URL is `https://rhythians.vercel.app`.
-   - Every deployment also gets a unique deployment URL (e.g. `rhythians-<hash>-evans-projects-<id>.vercel.app`). That is normal Vercel behavior — the canonical production URL `https://rhythians.vercel.app` always points to the latest production deployment.
+   - Every deployment also gets a unique deployment URL. That is normal Vercel behavior — the canonical production URL `https://rhythians.vercel.app` always points to the latest production deployment.
    - To deploy from the CLI instead: `vercel link --project rhythians --scope evans-projects-edff1a37`, then `vercel --prod`.
 3. Add production env vars in Vercel exactly as below:
    - `NEXT_PUBLIC_SITE_URL=https://rhythians.vercel.app`
@@ -85,20 +104,29 @@
    - `STORAGE_BUCKET=media`
    - `SESSION_COOKIE_NAME=rhythians_session`
    - `SESSION_EXPIRES_DAYS=30`
+   - `AUTH_SECRET=<long random secret>`
+   - `RESEND_API_KEY=<sending API key>`
+   - `RESEND_FROM_EMAIL=Rhythians <security@YOUR-VERIFIED-DOMAIN>`
    - `CRON_SECRET=<random string>`
    - `SETUP_SECRET=<long random string>`
 4. Deploy the app.
 
 > The scheduled Discord sync runs automatically via the cron job in `vercel.json`.
 
-### 5. Verification
+### 6. Verification
 1. Visit `/login` and test Discord login.
 2. Confirm session persists and logout works.
-3. Visit `/clips/submit` and submit a test clip.
-4. Verify a clip record is created with status `pending`.
-5. In **Admin → Alerts**, use **Send tag setup alert** and verify it targets only users with zero tags.
-6. Open the notification, join Discord if necessary, return to `/setup-tags`, and confirm the page rechecks membership and displays the onboarding questions.
+3. Create or use a local username/password account.
+4. Open `/settings`, add an email, and verify the emailed code.
+5. Sign out and sign in again with the local account.
+6. Confirm the second-factor screen appears and the emailed code is required before a session is created.
+7. Confirm an incorrect code is rejected and the challenge locks after repeated failures.
+8. Confirm the account security notice disappears after email 2FA is enabled.
+9. Visit `/clips/submit` and submit a test clip.
+10. Verify a clip record is created with status `pending`.
 
 ## Notes
 - The `service role key` is only used server-side in `lib/supabase.ts`.
 - The frontend uses `NEXT_PUBLIC_SUPABASE_ANON_KEY` for public Supabase access.
+- Email is intentionally used only for local-account 2FA; Discord accounts continue to use Discord authentication.
+- Email 2FA is weaker than authenticator-app or passkey MFA because the security of the factor depends on the user's email account. It is still a substantial improvement over password-only authentication. 

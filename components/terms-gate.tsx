@@ -1,16 +1,14 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { ExternalLink, FileText } from "lucide-react";
 
 export function TermsGate({ required }: { required: boolean }) {
-  const pathname = usePathname();
-  const [open, setOpen] = useState(required && pathname !== "/terms");
+  const [open, setOpen] = useState(required);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  if (!open || pathname === "/terms") return null;
+  if (!open) return null;
 
   async function accept() {
     setSubmitting(true);

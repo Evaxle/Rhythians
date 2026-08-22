@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { cookies } from "next/headers";
 import type { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
@@ -13,7 +14,6 @@ export async function getSessionUser() {
     include: { user: { include: { roles: { include: { role: { include: { permissions: { include: { permission: true } } } } } } } } },
   });
   if (!session || session.expiresAt < new Date()) return null;
-  // The owner can never be locked out, even if a suspension flag was set in error.
   if (!isOwner(session.user)) {
     if (session.user.isSuspended) return null;
     if (session.user.suspendedUntil && session.user.suspendedUntil > new Date()) return null;
@@ -34,7 +34,7 @@ export function hasPermission(user: { roles: Array<any> } | null, permission: st
 }
 
 export async function createSession(userId: string) {
-  const token = crypto.randomUUID();
+  const token = randomBytes(32).toString("hex");
   const expiresAt = new Date(Date.now() + Number(process.env.SESSION_EXPIRES_DAYS ?? 30) * 24 * 60 * 60 * 1000);
   await prisma.session.create({ data: { token, userId, expiresAt } });
   return token;

@@ -28,6 +28,8 @@ model User {
   avatar String?
   locale String?
   email String? @unique
+  emailVerifiedAt DateTime?
+  emailTwoFactorEnabled Boolean @default(false)
   passwordHash String?
   displayName String?
   profileHandle String @unique
@@ -44,6 +46,8 @@ model User {
   mutedUntil DateTime?
   roles UserRole[]
   sessions Session[]
+  emailVerifications EmailVerification[]
+  emailMfaChallenges EmailMfaChallenge[]
   clips Clip[] @relation("uploadedClips")
   reviewedClips Clip[] @relation("clipReviewer")
   comments Comment[]
@@ -87,6 +91,32 @@ model User {
   categoryLevels UserCategoryLevel[]
 }
 
+model EmailVerification {
+  id String @id @default(uuid())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  email String
+  codeHash String
+  expiresAt DateTime
+  attempts Int @default(0)
+  usedAt DateTime?
+  createdAt DateTime @default(now())
+  @@index([userId, createdAt])
+}
+
+model EmailMfaChallenge {
+  id String @id @default(uuid())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  codeHash String
+  expiresAt DateTime
+  attempts Int @default(0)
+  redirectTo String?
+  usedAt DateTime?
+  createdAt DateTime @default(now())
+  @@index([userId, createdAt])
+}
+
 model RhythiaProfile { id String @id @default(uuid()) user User @relation(fields: [userId], references: [id], onDelete: Cascade) userId String @unique profileId Int @unique profileUrl String username String? country String? flag String? globalRank Int? countryRank Int? rhythmPoints Float? title String scores Json isOnline Boolean? lastActiveAt DateTime? statusCheckedAt DateTime? syncedAt DateTime @default(now()) createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
 model RhythiaProfileRequest { id String @id @default(uuid()) user User @relation(fields: [userId], references: [id], onDelete: Cascade) userId String profileId Int profileUrl String rhythiaUsername String claimedUsername String status RhythiaProfileRequestStatus @default(pending) adminNote String? createdAt DateTime @default(now()) resolvedAt DateTime? resolvedBy String? resolvedByUser User? @relation("resolvedRhythiaRequests", fields: [resolvedBy], references: [id], onDelete: SetNull) @@index([status]) }
 model UserWarning { id String @id @default(uuid()) user User @relation("warnedUser", fields: [userId], references: [id], onDelete: Cascade) userId String actor User @relation("warningActor", fields: [actorId], references: [id]) actorId String reason String createdAt DateTime @default(now()) @@index([userId]) }
@@ -122,11 +152,11 @@ model Conversation { id String @id @default(uuid()) type ConversationType @defau
 model ConversationMember { id String @id @default(uuid()) conversation Conversation @relation(fields: [conversationId], references: [id]) conversationId String user User @relation(fields: [userId], references: [id]) userId String role String @default("member") lastReadAt DateTime? joinedAt DateTime @default(now()) @@unique([conversationId, userId]) @@index([userId]) }
 model Message { id String @id @default(uuid()) conversation Conversation @relation(fields: [conversationId], references: [id]) conversationId String sender User @relation(fields: [senderId], references: [id]) senderId String content String isEdited Boolean @default(false) isDeleted Boolean @default(false) createdAt DateTime @default(now()) updatedAt DateTime @updatedAt @@index([conversationId, createdAt]) }
 model FriendRequest { id String @id @default(uuid()) sender User @relation("sentFriendRequests", fields: [senderId], references: [id]) senderId String receiver User @relation("receivedFriendRequests", fields: [receiverId], references: [id]) receiverId String status FriendRequestStatus @default(pending) createdAt DateTime @default(now()) respondedAt DateTime? @@unique([senderId, receiverId]) @@index([receiverId]) @@index([senderId]) }
-model DailyMap { id String @id @default(uuid()) date DateTime rankIndex Int @default(0) beatmapId Int title String artist String? difficulty Int? starRating Float noteCount Int? length Int? playcount Int? mapHash String? downloadUrl String imageUrl String? mapperName String? beats DailyMapBeat[] createdAt DateTime @default(now()) @@unique([date, rankIndex]) @@index([date]) @@index([rankIndex]) }
+model DailyMap { id String @id @default(uuid()) date DateTime rankIndex Int @default(0) beatmapId Int title String artist String? difficulty Int? starRating Float noteCount Int? length Int? playcount Int? mapHash String? downloadUrl String imageUrl String? mapperName String? beats DailyMapBeat[] createdAt DateTime @default(now()) @@unique([date, rankIndex]) @@index([rankIndex]) }
 model DailyMapBeat { id String @id @default(uuid()) dailyMap DailyMap @relation(fields: [dailyMapId], references: [id], onDelete: Cascade) dailyMapId String user User @relation(fields: [userId], references: [id], onDelete: Cascade) userId String points Int scoreId Int? accuracy Float? misses Int? createdAt DateTime @default(now()) @@unique([dailyMapId, userId]) @@index([userId]) }
 model RhpTransaction { id String @id @default(uuid()) user User @relation(fields: [userId], references: [id], onDelete: Cascade) userId String amount Int reason String description String? dailyMapBeatId String? createdAt DateTime @default(now()) @@index([userId]) @@index([createdAt]) }
 model ChallengeMap { id String @id @default(uuid()) title String artist String? description String? mapFileUrl String imageUrl String? requestedRating Float rating Float? mapperName String? noteCount Int? length Int? sourceBeatmapId Int? @unique sourceUrl String? isAutoImported Boolean @default(false) submittedBy User @relation("challengeMapSubmissions", fields: [submittedById], references: [id]) submittedById String status ChallengeMapStatus @default(pending) reviewerNote String? reviewedBy User? @relation("challengeMapReviews", fields: [reviewedById], references: [id], onDelete: SetNull) reviewedById String? reviewedAt DateTime? completions ChallengeMapCompletion[] createdAt DateTime @default(now()) updatedAt DateTime @updatedAt @@index([status]) @@index([rating]) }
 model ChallengeMapCompletion { id String @id @default(uuid()) challengeMap ChallengeMap @relation(fields: [challengeMapId], references: [id], onDelete: Cascade) challengeMapId String user User @relation(fields: [userId], references: [id], onDelete: Cascade) userId String rating Float accuracy Float? passed Boolean points Int scoreId Int? createdAt DateTime @default(now()) updatedAt DateTime @updatedAt @@unique([challengeMapId, userId]) @@index([userId]) }
 model CategoryMap { id String @id @default(uuid()) category CategoryType level Int title String artist String? description String? mapFileUrl String imageUrl String? mapperName String? noteCount Int? length Int? sourceBeatmapId Int? @unique sourceUrl String? submittedBy User @relation("categoryMapSubmissions", fields: [submittedById], references: [id]) submittedById String status CategoryMapStatus @default(pending) reviewerNote String? reviewedBy User? @relation("categoryMapReviews", fields: [reviewedById], references: [id], onDelete: SetNull) reviewedById String? reviewedAt DateTime? completions CategoryMapCompletion[] createdAt DateTime @default(now()) updatedAt DateTime @updatedAt @@index([category, level]) @@index([status]) }
-model CategoryMapCompletion { id String @id @default(uuid()) categoryMap CategoryMap @relation(fields: [categoryMapId], references: [id], onDelete: Cascade) categoryMapId String user User @relation(fields: [userId], references: [id], onDelete: Cascade) userId String passed Boolean accuracy Float? scoreId Int? createdAt DateTime @default(now()) @@unique([categoryMapId, userId]) @@index([userId]) }
+model CategoryMapCompletion { id String @id @default(uuid()) categoryMap CategoryMap @relation(fields: [categoryMapId], references: [id], onDelete: Cascade) categoryMapId String user User @relation(fields: [userId], references: [id], onDelete: Cascade) userId String passed Boolean accuracy Float? scoreId Int? createdAt DateTime @default(now()) @@unique([categoryMapId, userId]) }
 model UserCategoryLevel { id String @id @default(uuid()) user User @relation(fields: [userId], references: [id], onDelete: Cascade) userId String category CategoryType level Int @default(0) updatedAt DateTime @updatedAt @@unique([userId, category]) }
