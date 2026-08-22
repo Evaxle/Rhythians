@@ -19,30 +19,25 @@ function tokenize(text: string): Token[] {
   for (const match of text.matchAll(TOKEN_REGEX)) {
     const index = match.index as number;
     if (index < last) continue;
-    if (index > last) {
-      tokens.push({ type: "text", value: text.slice(last, index) });
-    }
-    if (match[1]) {
-      tokens.push({ type: "clip", value: match[0], id: match[1] });
-    } else {
-      tokens.push({ type: "url", value: match[0] });
-    }
+    if (index > last) tokens.push({ type: "text", value: text.slice(last, index) });
+    if (match[1]) tokens.push({ type: "clip", value: match[0], id: match[1] });
+    else tokens.push({ type: "url", value: match[0] });
     last = index + match[0].length;
   }
-  if (last < text.length) {
-    tokens.push({ type: "text", value: text.slice(last) });
-  }
+  if (last < text.length) tokens.push({ type: "text", value: text.slice(last) });
   return tokens;
 }
 
 export function RichText({
   text,
+  content,
   className = "",
 }: {
-  text: string;
+  text?: string;
+  content?: string;
   className?: string;
 }) {
-  const tokens = tokenize(text);
+  const tokens = tokenize(content ?? text ?? "");
 
   return (
     <p className={`whitespace-pre-wrap break-words ${className}`}>
@@ -61,11 +56,7 @@ export function RichText({
           );
         }
         if (token.type === "url") {
-          return (
-            <span key={index} className="text-muted" title="Off-site links are shown as plain text and are not clickable">
-              {token.value}
-            </span>
-          );
+          return <span key={index} className="text-muted" title="Off-site links are shown as plain text and are not clickable">{token.value}</span>;
         }
         return <span key={index}>{token.value}</span>;
       })}
