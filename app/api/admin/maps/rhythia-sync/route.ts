@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   if (!admin) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
   if (!(await canAccessAdmin(admin))) return NextResponse.json({ error: "Forbidden." }, { status: 403 });
   const body = await request.json().catch(() => null) as { status?: unknown } | null;
-  const status = body?.status === "RANKED" || body?.status === "UNRANKED" ? body.status : undefined;
+  const status = body?.status === "RANKED" || body?.status === "UNRANKED" || body?.status === "LEGACY" ? body.status : undefined;
   try {
     return NextResponse.json({ success: true, status: status ?? "ALL", ...(await syncRhythiaMaps(status)) });
   } catch (error) {
