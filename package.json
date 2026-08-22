@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "preinstall": "node scripts/normalize-prisma-schema.mjs",
-    "postinstall": "prisma generate",
+    "postinstall": "node scripts/normalize-prisma-schema.mjs && prisma generate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
