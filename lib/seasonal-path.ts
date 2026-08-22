@@ -27,7 +27,7 @@ async function ensureCurrentSeason() {
 }
 
 async function awardSeasonTags(seasonId: string, seasonNumber: number) {
-  const users = await prisma.$queryRawUnsafe<Array<{ userId: string; maxRank: number }>>('SELECT "userId", MAX("rankIndex")::int AS "maxRank" FROM "SeasonalPathCompletion" WHERE "seasonId" = $1 GROUP BY "userId"', seasonId);
+  const users = await prisma.$queryRawUnsafe<Array<{ userId: string; maxRank: number }>>('SELECT "userId", MAX("rankIndex")::int AS "maxRank" FROM "SeasonalPathCompletion" WHERE "seasonId" = $1 GROUP BY "userId"');
   for (const user of users) {
     for (let index = 0; index <= Math.min(RANKS.length - 1, user.maxRank); index += 1) {
       const name = `Season ${seasonNumber} ${RANK_NAMES[index]}`;
@@ -40,7 +40,7 @@ async function awardSeasonTags(seasonId: string, seasonNumber: number) {
 }
 
 async function finalizeExpiredSeasons() {
-  const expired = await prisma.$queryRawUnsafe<Array<{ id: string; seasonNumber: number }>>('SELECT "id", "seasonNumber" FROM "SeasonalPathSeason" WHERE "endsAt" <= $1 AND ("finalizedAt" IS NULL OR "finalizedAt" = NULL) ORDER BY "seasonNumber" ASC', new Date());
+  const expired = await prisma.$queryRawUnsafe<Array<{ id: string; seasonNumber: number }>>('SELECT "id", "seasonNumber" FROM "SeasonalPathSeason" WHERE "endsAt" <= $1 AND "finalizedAt" IS NULL ORDER BY "seasonNumber" ASC', new Date());
   for (const season of expired) await awardSeasonTags(season.id, season.seasonNumber);
 }
 
