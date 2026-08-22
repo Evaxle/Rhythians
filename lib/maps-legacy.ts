@@ -87,13 +87,18 @@ export async function getChallengeLeaderboard(rankIndex: number, limit = 100) {
   return users.map((user, index) => ({ position: index + 1, userId: user.id, username: user.username, displayName: user.displayName, profileHandle: user.profileHandle, avatar: user.avatar, rhp: user.rhp, avgMapRating: user.avgMapRating, completions: countMap.get(user.id) ?? 0, rankInfo: getRankInfo(user.rhp) }));
 }
 
-export async function getApprovedMaps(includeAll: boolean, userId: string | null) {
+export async function getApprovedMaps(includeAll: boolean, userId: string | null, includeUnranked = false) {
   await restoreAutoImportedMaps();
-  const maps = await prisma.challengeMap.findMany({ where: { status: "approved", rating: { not: null } }, orderBy: [{ rating: "asc" }, { createdAt: "desc" }], include: { submittedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } }, reviewedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } } } });
-  const user = userId ? await prisma.user.findUnique({ where: { id: userId, }, select: { id: true, rhp: true } }) : null;
+  const maps = await prisma.challengeMap.findMany({
+    where: includeUnranked ? { status: { in: ["approved", "pending"] }, rating: { not: null } } : { status: "approved", rating: { not: null } },
+    orderBy: [{ rating: "asc" }, { createdAt: "desc" }],
+    include: { submittedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } }, reviewedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } } },
+  });
+  const user = userId ? await prisma.user.findUnique({ where: { id: userId }, select: { id: true, rhp: true } }) : null;
   const rankInfo: RankInfo | null = user ? getRankInfo(user.rhp) : null;
-  const visible = includeAll || !rankInfo ? maps : maps.filter((map) => isMapInRankRange(map.rating ?? 0, rankInfo.index));
-  const realMapIds = visible.filter((map) => !map.isAutoImported).map((map) => map.id);
+  const visible = includeAll || !rankInfo ? maps : maps.filter((map) => map.status !== "approved" || isMapInRankRange(map.rating ?? 0, rankInfo.index));
+  const rankedVisible = visible.filter((map) => map.status === "approved");
+  const realMapIds = rankedVisible.filter((map) => !map.isAutoImported).map((map) => map.id);
   const completionState = userId && realMapIds.length > 0 ? await prisma.challengeMapCompletion.findMany({ where: { userId, challengeMapId: { in: realMapIds } }, select: { challengeMapId: true, passed: true, points: true } }) : [];
   const stateMap = new Map(completionState.map((entry) => [entry.challengeMapId, entry]));
 
@@ -114,6 +119,7 @@ export async function getApprovedMaps(includeAll: boolean, userId: string | null
     rankInfo,
     maps: visible.map((map) => {
       const mapRankIndex = rankIndexForRating(map.rating ?? 0);
+      const isRanked = map.status === "approved";
       return {
         id: map.id,
         title: map.title,
@@ -123,16 +129,17 @@ export async function getApprovedMaps(includeAll: boolean, userId: string | null
         imageUrl: map.imageUrl,
         rating: map.rating,
         rankIndex: mapRankIndex,
-        rankName: RANKS[mapRankIndex]?.name ?? "Expert",
-        rankColor: RANKS[mapRankIndex]?.color ?? RANKS[RANKS.length - 1].color,
+        rankName: isRanked ? RANKS[mapRankIndex]?.name ?? "Expert" : "Unranked",
+        rankColor: isRanked ? RANKS[mapRankIndex]?.color ?? RANKS[RANKS.length - 1].color : "#f59e0b",
         mapperName: map.mapperName,
         noteCount: map.noteCount,
         length: map.length,
         submittedBy: map.submittedBy,
         reviewedBy: map.reviewedBy,
-        completion: stateMap.get(map.id) ?? null,
-        hasScore: scoredTitles.has(normalizeTitle(map.title)),
+        completion: isRanked ? stateMap.get(map.id) ?? null : null,
+        hasScore: isRanked && scoredTitles.has(normalizeTitle(map.title)),
         isAutoImported: map.isAutoImported,
+        isRanked,
       };
     }),
   };
