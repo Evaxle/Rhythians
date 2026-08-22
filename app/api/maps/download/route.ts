@@ -30,14 +30,14 @@ export async function GET(request: Request) {
   const id = new URL(request.url).searchParams.get("id")?.trim();
   if (!id) return NextResponse.json({ error: "Map id is required." }, { status: 400 });
   const map = await findMap(id);
-  if (!map || map.status !== "approved") return NextResponse.json({ error: "Map not found." }, { status: 404 });
+  if (!map) return NextResponse.json({ error: "Map not found." }, { status: 404 });
   let source: Awaited<ReturnType<typeof resolveMapSource>>;
   try { source = await resolveMapSource(map.mapFileUrl); } catch { return NextResponse.json({ error: "Map file is unavailable." }, { status: 404 }); }
   const response = await fetch(source.url, { cache: "no-store", redirect: "follow" });
   if (!response.ok) return NextResponse.json({ error: `Map file is unavailable (${response.status}).` }, { status: 404 });
   const original = new Uint8Array(await response.arrayBuffer());
   let data: Uint8Array;
-  try { data = embedRhythiansId(original, source.extension, map.id); } catch { return NextResponse.json({ error: "The uploaded map file could not be converted into a Rhythians SSPM." }, { status: 422 }); }
+  try { data = embedRhythiansId(original, source.extension, map.id); } catch { return NextResponse.json({ error: "The map file could not be converted into a Rhythians SSPM." }, { status: 422 }); }
   const name = `rhythians-${map.id}-${safeFileName(map.title)}.sspm`;
   const buffer = new ArrayBuffer(data.byteLength);
   new Uint8Array(buffer).set(data);
