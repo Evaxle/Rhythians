@@ -15,14 +15,13 @@ function pathTargetRating(rankIndex: number) {
   return rankIndex === RANKS.length - 1 ? 4 : RANKS[rankIndex + 1].rangeMin;
 }
 
-function isUnmodifiedScore(score: { speed?: number | null }) {
-  // Rhythia represents normal speed as 1.0. A missing value is not treated as
-  // safe because we cannot prove that the score was played without a modifier.
-  return score.speed === 1;
+function normalizeScoreTitle(value: string | null | undefined) {
+  return (value ?? "").trim().toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 }
 
 function findRecentPathScore(scores: Awaited<ReturnType<typeof fetchRhythiaScores>>["recent"], title: string) {
-  return findScoreForMap(scores, title) && scores.find((score) => score.passed && score.speed === 1 && (score.beatmapTitle ?? "").trim().toLowerCase().replace(/[^a-z0-9]+/g, " ").trim() === title.trim().toLowerCase().replace(/[^a-z0-9]+/g, " ").trim()) ?? null;
+  const target = normalizeScoreTitle(title);
+  return scores.find((score) => score.passed === true && score.speed === 1 && normalizeScoreTitle(score.beatmapTitle) === target) ?? null;
 }
 
 async function ensureCurrentSeason() {
@@ -81,11 +80,6 @@ async function ensureSeasonMaps(seasonId: string) {
   return prisma.$queryRawUnsafe<Array<{ id: string; rankIndex: number; challengeMapId: string }>>('SELECT "id", "rankIndex", "challengeMapId" FROM "SeasonalPathMap" WHERE "seasonId" = $1 ORDER BY "rankIndex" ASC', seasonId);
 }
 
-async function getPathMapRecord(seasonId: string, rankIndex: number) {
-  const rows = await prisma.$queryRawUnsafe<Array<{ id: string; rankIndex: number; challengeMapId: string }>>('SELECT "id", "rankIndex", "challengeMapId" FROM "SeasonalPathMap" WHERE "seasonId" = $1 AND "rankIndex" = $2 LIMIT 1', seasonId, rankIndex);
-  return rows[0] ?? null;
-}
-
 async function syncUserCompletions(userId: string, seasonId: string, maps: Array<{ id: string; rankIndex: number; challengeMapId: string }>, maxPlayableRank: number) {
   const profile = await prisma.rhythiaProfile.findUnique({ where: { userId }, select: { profileId: true } });
   if (!profile) return;
@@ -100,8 +94,8 @@ async function syncUserCompletions(userId: string, seasonId: string, maps: Array
     if (pathMap.rankIndex > 0 && !completed.has(pathMap.rankIndex - 1)) break;
     const map = await prisma.challengeMap.findUnique({ where: { id: pathMap.challengeMapId }, select: { title: true, status: true } });
     if (!map || map.status !== "approved") break;
-    // IMPORTANT: only the recent-score list is eligible. Top/old scores never
-    // unlock a path rank, and modified-speed scores are never eligible.
+    // Only recent scores can unlock a path rank. Top/older scores are ignored.
+    // speed must be exactly 1.0x; modified-speed passes never count.
     const hit = findRecentPathScore(scores.recent, map.title);
     if (!hit) break;
     await prisma.$executeRawUnsafe('INSERT INTO "SeasonalPathCompletion" ("id", "seasonId", "userId", "rankIndex", "seasonalPathMapId", "scoreId") VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT ("seasonId", "userId", "rankIndex") DO NOTHING', randomUUID(), seasonId, userId, pathMap.rankIndex, pathMap.id, hit.id);
