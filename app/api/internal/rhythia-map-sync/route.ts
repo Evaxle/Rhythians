@@ -6,11 +6,10 @@ export const dynamic = "force-dynamic";
 
 function isAuthorized(request: Request) {
   const secret = process.env.CRON_SECRET;
-  if (secret) {
-    const url = new URL(request.url);
-    return (url.searchParams.get("secret") ?? request.headers.get("x-cron-secret")) === secret;
-  }
-  return request.headers.get("x-vercel-cron") === "1";
+  if (!secret) return request.headers.get("x-vercel-cron") === "1";
+  const url = new URL(request.url);
+  const bearer = request.headers.get("authorization");
+  return bearer === `Bearer ${secret}` || url.searchParams.get("secret") === secret || request.headers.get("x-cron-secret") === secret;
 }
 
 export async function GET(request: Request) {
