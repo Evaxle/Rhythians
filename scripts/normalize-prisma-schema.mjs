@@ -60,6 +60,15 @@ function formatModel(_match, name, body) {
   return `model ${name} {\n${lines.join("\n")}\n}`;
 }
 
-const normalized = source.replace(/model\s+(\w+)\s*\{([^{}\n]*)\}/g, formatModel).replace(/\n{3,}/g, "\n\n").trim() + "\n";
+function formatEnum(_match, name, body) {
+  const values = body.split(/\s+/).filter(Boolean);
+  return `enum ${name} {\n${values.map((value) => `  ${value}`).join("\n")}\n}`;
+}
+
+const normalized = source
+  .replace(/enum\s+(\w+)\s*\{([^{}\n]*)\}/g, formatEnum)
+  .replace(/model\s+(\w+)\s*\{([^{}\n]*)\}/g, formatModel)
+  .replace(/\n{3,}/g, "\n\n")
+  .trim() + "\n";
 
 if (normalized !== source) fs.writeFileSync(path, normalized);
