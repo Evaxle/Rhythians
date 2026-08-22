@@ -5,9 +5,9 @@ import { RANKS, getRankInfo } from "@/lib/ranks";
 
 const RANK_NAMES = RANKS.map((rank) => rank.name);
 
-function addOneMonth(date: Date) {
+function addThreeMonths(date: Date) {
   const next = new Date(date);
-  next.setMonth(next.getMonth() + 1);
+  next.setMonth(next.getMonth() + 3);
   return next;
 }
 
@@ -22,7 +22,7 @@ async function ensureCurrentSeason() {
   const latest = await prisma.$queryRawUnsafe<Array<{ seasonNumber: number; endsAt: Date }>>('SELECT "seasonNumber", "endsAt" FROM "SeasonalPathSeason" ORDER BY "seasonNumber" DESC LIMIT 1');
   const start = latest[0]?.endsAt && latest[0].endsAt <= now ? latest[0].endsAt : now;
   const seasonNumber = (latest[0]?.seasonNumber ?? 0) + 1;
-  await prisma.$executeRawUnsafe('INSERT INTO "SeasonalPathSeason" ("id", "seasonNumber", "startsAt", "endsAt") VALUES ($1, $2, $3, $4) ON CONFLICT ("seasonNumber") DO NOTHING', randomUUID(), seasonNumber, start, addOneMonth(start));
+  await prisma.$executeRawUnsafe('INSERT INTO "SeasonalPathSeason" ("id", "seasonNumber", "startsAt", "endsAt") VALUES ($1, $2, $3, $4) ON CONFLICT ("seasonNumber") DO NOTHING', randomUUID(), seasonNumber, start, addThreeMonths(start));
   return ensureCurrentSeason();
 }
 
