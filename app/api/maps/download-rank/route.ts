@@ -121,7 +121,7 @@ export async function GET() {
   if (!data.rankInfo) return NextResponse.json({ error: "Unable to determine your rank." }, { status: 400 });
 
   const rankInfo = getRankInfo(user.rhp);
-  const maps = data.maps.filter((map) => map.isAutoImported && map.rating != null && map.rating >= rankInfo.rangeMin && map.rating <= rankInfo.rangeMax);
+  const maps = data.maps.filter((map) => map.isRanked && map.isAutoImported && map.rating != null && map.rating >= rankInfo.rangeMin && map.rating <= rankInfo.rangeMax);
   if (maps.length === 0) return NextResponse.json({ error: "No ranked maps are available for your current rank." }, { status: 404 });
 
   const files: Array<{ name: string; data: Buffer }> = [];
@@ -143,9 +143,7 @@ export async function GET() {
   });
 
   await Promise.all(workers);
-  if (files.length === 0) {
-    return NextResponse.json({ error: `Rhythia's map files could not be downloaded. ${failures.slice(0, 3).join(" | ")}`, failed: failures.length, total: maps.length }, { status: 502 });
-  }
+  if (files.length === 0) return NextResponse.json({ error: `Rhythia's map files could not be downloaded. ${failures.slice(0, 3).join(" | ")}`, failed: failures.length, total: maps.length }, { status: 502 });
   if (failures.length > 0) files.push({ name: "download-errors.txt", data: Buffer.from(`${failures.join("\n")}\n`, "utf8") });
 
   const zip = buildZip(files);
