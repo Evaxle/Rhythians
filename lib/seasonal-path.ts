@@ -36,10 +36,11 @@ async function awardSeasonTags(seasonId: string, seasonNumber: number) {
       await prisma.userTag.upsert({ where: { userId_tagId: { userId: user.userId, tagId: tag.id } }, update: { source: "manual" }, create: { userId: user.userId, tagId: tag.id, source: "manual" } });
     }
   }
+  await prisma.$executeRawUnsafe('UPDATE "SeasonalPathSeason" SET "finalizedAt" = CURRENT_TIMESTAMP WHERE "id" = $1 AND "finalizedAt" IS NULL', seasonId);
 }
 
 async function finalizeExpiredSeasons() {
-  const expired = await prisma.$queryRawUnsafe<Array<{ id: string; seasonNumber: number }>>('SELECT "id", "seasonNumber" FROM "SeasonalPathSeason" WHERE "endsAt" <= $1 ORDER BY "seasonNumber" ASC', new Date());
+  const expired = await prisma.$queryRawUnsafe<Array<{ id: string; seasonNumber: number }>>('SELECT "id", "seasonNumber" FROM "SeasonalPathSeason" WHERE "endsAt" <= $1 AND ("finalizedAt" IS NULL OR "finalizedAt" = NULL) ORDER BY "seasonNumber" ASC', new Date());
   for (const season of expired) await awardSeasonTags(season.id, season.seasonNumber);
 }
 
@@ -49,7 +50,7 @@ async function ensureSeasonMaps(seasonId: string) {
   for (let rankIndex = 0; rankIndex < RANKS.length; rankIndex += 1) {
     if (byRank.has(rankIndex)) continue;
     const target = pathTargetRating(rankIndex);
-    const range = rankIndex === RANKS.length - 1 ? { gte: 3.7 } : { gte: RANKS[rankIndex + 1].rangeMin, lte: RANKS[rankIndex + 1].rangeMax };
+    const range = rankIndex === RANKS.length - 1 ? { gte: 4 } : { gte: RANKS[rankIndex + 1].rangeMin, lte: RANKS[rankIndex + 1].rangeMax };
     const candidates = await prisma.challengeMap.findMany({ where: { status: "approved", rating: range }, orderBy: [{ rating: "asc" }, { createdAt: "asc" }], take: 100, select: { id: true, rating: true } });
     const map = candidates.sort((a, b) => Math.abs((a.rating ?? target) - target) - Math.abs((b.rating ?? target) - target))[0];
     if (!map) continue;
