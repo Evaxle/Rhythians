@@ -10,7 +10,7 @@ datasource db {
 enum ClipStatus { pending approved rejected hidden deleted }
 enum ReportStatus { open reviewing resolved dismissed }
 enum NotificationType { clip_approved clip_rejected comment_reply clip_like article_published announcement moderation rhp_earned map_approved map_rejected rank_change }
-enum ChallengeMapStatus { pending approved rejected hidden }
+enum ChallengeMapStatus { pending approved rejected hidden legacy }
 enum CategoryType { jumps stream tech off_grid vibro }
 enum CategoryMapStatus { pending approved rejected hidden }
 enum ConversationType { direct group }
