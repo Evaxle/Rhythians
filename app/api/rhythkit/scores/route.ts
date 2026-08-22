@@ -57,7 +57,7 @@ export async function POST(request: Request) {
     await tx.$executeRawUnsafe(`UPDATE "RhythKitScore" SET "points" = $1, "rhpAwarded" = $1 WHERE "id" = $2`, points, insertedScore[0].id);
     const updated = await tx.$queryRawUnsafe<Array<{ rhp: number }>>(`UPDATE "User" SET "rhp" = "rhp" + $1, "updatedAt" = NOW() WHERE "id" = $2 RETURNING "rhp"`, points, installation.userId);
     await tx.$executeRawUnsafe(`INSERT INTO "RhpTransaction" ("id", "userId", "amount", "reason", "description", "createdAt") VALUES (gen_random_uuid(), $1, $2, 'ranked_map', $3, NOW())`, installation.userId, points, `RhythKit completed ranked map [${map.id}]: ${map.title} (${rating.toFixed(2)})`);
-    await tx.$executeRawUnsafe(`INSERT INTO public.rhythkit_maps (user_id, map_id, map_name, completed_at, matched_map_id, ranked, rhp_awarded) VALUES ($1, $2, $3, $4, $2, true, $5)`, installation.userId, map.id, map.title, completedAt, points);
+    await tx.$executeRawUnsafe(`INSERT INTO public.rhythkit_maps (user_id, map_id, map_name, completed_at, matched_map_id, ranked, rhp_awarded, processed_at) VALUES ($1, $2, $3, $4, $2, true, $5, NOW())`, installation.userId, map.id, map.title, completedAt, points);
     return { duplicate: false, counted: true, alreadyCompleted: false, points, rhp: updated[0]?.rhp ?? user.rhp + points };
   });
   return NextResponse.json({ ok: true, duplicate: result.duplicate, counted: result.counted, alreadyCompleted: result.alreadyCompleted, map: { id: map.id, title: map.title, rating }, points: result.points, rhp: result.rhp, gameVersion: gameVersion || null, integrationVersion: integrationVersion || null });
