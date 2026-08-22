@@ -67,7 +67,7 @@ export default async function PathPage() {
                         {map.completed && <span className="inline-flex shrink-0 items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-sm font-semibold text-emerald-300"><Check size={15} /> Passed</span>}
                       </div>
                       {user && !locked && !map.completed && <CheckRecentScoreButton rankIndex={rank.index} completed={false} />}
-                      {!ranked && <div className="mt-4"><ReportButton targetType="challenge_map" targetId={map.map.id} targetLabel="this path map" reasons={["Map is not ranked", "Broken or misleading content", "Other"]} /></div>}
+                      <div className="mt-4"><ReportButton targetType="challenge_map" targetId={map.map.id} targetLabel="this path map" reasons={["Path map needs to be reset", "Map is not ranked", "Broken or misleading content", "Other"]} /></div>
                     </div>
                   ) : (
                     <div className="mt-5 rounded-2xl border border-dashed border-border p-4 text-sm text-muted">No approved ranked map is currently available for this path rank.</div>
