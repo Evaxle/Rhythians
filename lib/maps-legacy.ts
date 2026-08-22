@@ -94,12 +94,13 @@ export async function getApprovedMaps(includeAll: boolean, userId: string | null
     orderBy: [{ rating: "asc" }, { createdAt: "desc" }],
     include: { submittedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } }, reviewedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } } },
   });
+  const legacyMaps = await prisma.$queryRawUnsafe<Array<{ id: string; title: string; artist: string | null; description: string | null; mapFileUrl: string; imageUrl: string | null; rating: number | null; mapperName: string | null; noteCount: number | null; length: number | null; isAutoImported: boolean; submittedUsername: string; submittedDisplayName: string | null; submittedProfileHandle: string; submittedAvatar: string | null; reviewedUsername: string | null; reviewedDisplayName: string | null; reviewedProfileHandle: string | null; reviewedAvatar: string | null }>>('SELECT c."id", c."title", c."artist", c."description", c."mapFileUrl", c."imageUrl", c."rating", c."mapperName", c."noteCount", c."length", c."isAutoImported", s."username" AS "submittedUsername", s."displayName" AS "submittedDisplayName", s."profileHandle" AS "submittedProfileHandle", s."avatar" AS "submittedAvatar", r."username" AS "reviewedUsername", r."displayName" AS "reviewedDisplayName", r."profileHandle" AS "reviewedProfileHandle", r."avatar" AS "reviewedAvatar" FROM "ChallengeMap" c JOIN "User" s ON s."id" = c."submittedById" LEFT JOIN "User" r ON r."id" = c."reviewedById" WHERE c."status" = \'legacy\' AND c."rating" IS NOT NULL ORDER BY c."rating" ASC, c."createdAt" DESC');
   const user = userId ? await prisma.user.findUnique({ where: { id: userId }, select: { id: true, rhp: true } }) : null;
   const rankInfo: RankInfo | null = user ? getRankInfo(user.rhp) : null;
   const visible = includeAll || !rankInfo ? maps : maps.filter((map) => map.status !== "approved" || isMapInRankRange(map.rating ?? 0, rankInfo.index));
-  const rankedVisible = visible.filter((map) => map.status === "approved");
-  const realMapIds = rankedVisible.filter((map) => !map.isAutoImported).map((map) => map.id);
-  const completionState = userId && realMapIds.length > 0 ? await prisma.challengeMapCompletion.findMany({ where: { userId, challengeMapId: { in: realMapIds } }, select: { challengeMapId: true, passed: true, points: true } }) : [];
+  const allVisibleMaps = [...visible, ...legacyMaps];
+  const completionIds = allVisibleMaps.map((map) => map.id);
+  const completionState = userId && completionIds.length > 0 ? await prisma.challengeMapCompletion.findMany({ where: { userId, challengeMapId: { in: completionIds } }, select: { challengeMapId: true, passed: true, points: true } }) : [];
   const stateMap = new Map(completionState.map((entry) => [entry.challengeMapId, entry]));
 
   let scoredTitles = new Set<string>();
@@ -117,9 +118,12 @@ export async function getApprovedMaps(includeAll: boolean, userId: string | null
 
   return {
     rankInfo,
-    maps: visible.map((map) => {
+    maps: allVisibleMaps.map((map) => {
+      const isLegacy = "submittedUsername" in map;
+      const isRanked = !isLegacy && map.status === "approved";
       const mapRankIndex = rankIndexForRating(map.rating ?? 0);
-      const isRanked = map.status === "approved";
+      const submittedBy = isLegacy ? { username: map.submittedUsername, displayName: map.submittedDisplayName, profileHandle: map.submittedProfileHandle, avatar: map.submittedAvatar } : map.submittedBy;
+      const reviewedBy = isLegacy ? { username: map.reviewedUsername, displayName: map.reviewedDisplayName, profileHandle: map.reviewedProfileHandle, avatar: map.reviewedAvatar } : map.reviewedBy;
       return {
         id: map.id,
         title: map.title,
@@ -129,15 +133,15 @@ export async function getApprovedMaps(includeAll: boolean, userId: string | null
         imageUrl: map.imageUrl,
         rating: map.rating,
         rankIndex: mapRankIndex,
-        rankName: isRanked ? RANKS[mapRankIndex]?.name ?? "Expert" : "Unranked",
-        rankColor: isRanked ? RANKS[mapRankIndex]?.color ?? RANKS[RANKS.length - 1].color : "#f59e0b",
+        rankName: isLegacy ? "Legacy" : isRanked ? RANKS[mapRankIndex]?.name ?? "Expert" : "Unranked",
+        rankColor: isLegacy ? "#a78bfa" : isRanked ? RANKS[mapRankIndex]?.color ?? RANKS[RANKS.length - 1].color : "#f59e0b",
         mapperName: map.mapperName,
         noteCount: map.noteCount,
         length: map.length,
-        submittedBy: map.submittedBy,
-        reviewedBy: map.reviewedBy,
-        completion: isRanked ? stateMap.get(map.id) ?? null : null,
-        hasScore: isRanked && scoredTitles.has(normalizeTitle(map.title)),
+        submittedBy,
+        reviewedBy,
+        completion: stateMap.get(map.id) ?? null,
+        hasScore: scoredTitles.has(normalizeTitle(map.title)),
         isAutoImported: map.isAutoImported,
         isRanked,
       };
