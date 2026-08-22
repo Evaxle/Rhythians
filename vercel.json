@@ -15,6 +15,10 @@
     {
       "path": "/api/internal/rhythia-map-sync",
       "schedule": "0 4 * * *"
+    },
+    {
+      "path": "/api/internal/seasonal-path",
+      "schedule": "15 3 * * *"
     }
   ]
 }
