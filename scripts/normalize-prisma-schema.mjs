@@ -15,9 +15,8 @@ const typeNames = new Set([
   "Bytes",
 ]);
 
-function formatModel(match) {
-  const name = match[1];
-  const tokens = match[2].split(/\s+/).filter(Boolean);
+function formatModel(_match, name, body) {
+  const tokens = body.split(/\s+/).filter(Boolean);
   const lines = [];
   let current = [];
 
