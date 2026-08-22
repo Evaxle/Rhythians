@@ -138,85 +138,28 @@ export default async function ClipPage({ params }: Props) {
           <div className="max-w-3xl">
             <h1 className="text-3xl font-semibold text-white">{clip.title}</h1>
             <div className="mt-2 flex items-center gap-3">
-              <CopyClipId clipId={clip.id} />
-              <p className="text-xs text-muted">Tag it with <span className="font-semibold text-white">/clip {clip.id.slice(0, 8)}…</span></p>
-            </div>
-            <div className="mt-3 flex items-center gap-3">
-              {getAvatarUrl(clip.uploader, 64) ? (
-                <img
-                  src={getAvatarUrl(clip.uploader, 64)!}
-                  alt=""
-                  className="h-8 w-8 rounded-full"
-                />
-              ) : (
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/20 text-xs font-semibold text-accent">
-                  {clip.uploader.username.charAt(0).toUpperCase()}
-                </div>
-              )}
-              <div>
-                <p className="flex items-center gap-2 text-sm font-medium text-white">
-                  {clip.uploader.username}#{clip.uploader.discriminator}
-                  {clip.uploader.rhythiaProfile && (
-                    <FlagIcon flag={clip.uploader.rhythiaProfile.flag} country={clip.uploader.rhythiaProfile.country} />
-                  )}
-                  {uploaderPresence && (
-                    <span
-                      title={uploaderPresence.isOnline ? "Online" : "Offline"}
-                      className={`inline-block h-2 w-2 rounded-full ${
-                        uploaderPresence.isOnline
-                          ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]"
-                          : "bg-red-400/70"
-                      }`}
-                    />
-                  )}
-                </p>
-                <p className="text-xs text-muted">
-                  {clip.createdAt.toLocaleDateString()}
-                </p>
-              </div>
-              {clip.uploader.userTags.length > 0 && (
-                <UserTags tags={clip.uploader.userTags} size="sm" />
-              )}
-            </div>
-            {clip.status === "approved" && clip.reviewedBy && (
-              <p className="mt-3 inline-flex flex-wrap items-center gap-2 text-xs text-muted">
-                <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">
-                  Approved
+              <a href={`/users/${clip.uploader.profileHandle}`} className="text-sm font-semibold text-accent transition hover:text-accent/80">
+                {clip.uploader.displayName ?? clip.uploader.username}
+              </a>
+              {uploaderPresence && (
+                <span className={`text-xs ${uploaderPresence.isOnline ? "text-green-300" : "text-muted"}`}>
+                  {uploaderPresence.isOnline ? "Online" : "Offline"}
                 </span>
-                Approved by <span className="font-semibold text-white">{clip.reviewedBy.displayName ?? clip.reviewedBy.username}</span>
-              </p>
-            )}
-            {clip.status === "rejected" && (
-              <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-400/10 p-4">
-                <p className="text-sm font-semibold text-red-200">
-                  Denied by {clip.reviewedBy ? (clip.reviewedBy.displayName ?? clip.reviewedBy.username) : "a reviewer"}
-                </p>
-                {clip.rejectionReason && <p className="mt-1 text-sm leading-6 text-red-100/80">{clip.rejectionReason}</p>}
-              </div>
-            )}
-            <p className="mt-4 text-sm text-muted">{clip.description}</p>
-
+              )}
+            </div>
+            <p className="mt-4 whitespace-pre-wrap text-sm leading-7 text-muted">{clip.description}</p>
             {clip.songName && (
-              <div className="mt-4 flex flex-wrap items-center gap-2">
-                <a
-                  href={`/clips?song=${encodeURIComponent(clip.songName)}`}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-sm font-semibold text-accent transition hover:bg-accent/20"
-                  title="View clips for this song"
-                >
-                  <Music size={15} /> {clip.songName}
-                </a>
+              <div className="mt-5 flex items-center gap-2 text-sm text-muted">
+                <Music className="h-4 w-4 text-accent" />
+                <span>{clip.songName}</span>
               </div>
             )}
-
             {clip.tags.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-1.5">
+              <div className="mt-5 flex flex-wrap gap-2">
                 {clip.tags.map(({ tag }) => (
-                  <a
-                    key={tag.id}
-                    href={`/clips?tag=${encodeURIComponent(tag.slug)}`}
-                    className="inline-flex items-center gap-1 rounded-full border border-border bg-background/60 px-2.5 py-0.5 text-xs font-medium text-muted transition hover:border-accent/40 hover:text-white"
-                  >
-                    <TagIcon className="h-3 w-3" /> {tag.name}
+                  <a key={tag.id} href={`/clips?tag=${encodeURIComponent(tag.slug)}`} className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/70 px-3 py-1.5 text-xs text-muted transition hover:border-accent/50 hover:text-white">
+                    <TagIcon className="h-3.5 w-3.5" />
+                    {tag.name}
                   </a>
                 ))}
               </div>
@@ -265,8 +208,10 @@ export default async function ClipPage({ params }: Props) {
                 text: comment.text,
                 createdAt: comment.createdAt.toISOString(),
                 author: {
+                  id: comment.author.id,
                   username: comment.author.username,
                   discriminator: comment.author.discriminator,
+                  profileHandle: comment.author.profileHandle,
                   country: comment.author.rhythiaProfile?.country ?? null,
                   flag: comment.author.rhythiaProfile?.flag ?? null,
                   userTags: comment.author.userTags.map((ut) => ({
@@ -290,7 +235,7 @@ export default async function ClipPage({ params }: Props) {
                   id: comment.author.id,
                   username: comment.author.username,
                   discriminator: comment.author.discriminator,
-                  avatar: comment.author.avatar,
+                  profileHandle: comment.author.profileHandle,
                   country: comment.author.rhythiaProfile?.country ?? null,
                   flag: comment.author.rhythiaProfile?.flag ?? null,
                   userTags: comment.author.userTags.map((ut) => ({
@@ -298,8 +243,6 @@ export default async function ClipPage({ params }: Props) {
                   })),
                 },
               }))}
-              isCoach={isCoach}
-              isAuthenticated={Boolean(sessionUser)}
             />
           </div>
         </aside>
