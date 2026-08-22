@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { prisma } from "@/lib/db";
-import { fetchRhythiaScores, findScoreForMap } from "@/lib/daily";
+import { fetchRhythiaScores } from "@/lib/daily";
 import { RANKS, getRankInfo } from "@/lib/ranks";
 
 const RANK_NAMES = RANKS.map((rank) => rank.name);
