@@ -18,12 +18,14 @@ export default async function PathPage() {
         <p className="mt-3 text-sm leading-7 text-muted">Complete one ranked map at a time to progress through this season's path. Each completed rank earns its seasonal rank at the end of the season.</p>
         <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-5 py-2.5 text-sm font-semibold text-accent"><Sparkles size={16} /> Season {path.season.seasonNumber}</div>
         <p className="mt-3 text-xs text-muted">{path.season.startsAt.toLocaleDateString()} – {path.season.endsAt.toLocaleDateString()}</p>
+        {user && <p className="mt-4 text-sm text-muted">Your regular rank allows you to play through <span className="font-semibold text-white">{path.ranks[path.maxPlayableRank]?.name}</span> on the path.</p>}
       </section>
 
       <section className="relative space-y-4">
         {path.ranks.map((rank) => {
           const map = rank.map;
           const targetName = rank.index === path.ranks.length - 1 ? "4.00 rating" : path.ranks[rank.index + 1].name;
+          const aboveRegularRank = Boolean(user) && rank.index > path.maxPlayableRank;
           const locked = !map || !map.unlocked;
           const ranked = map?.ranked === true;
           return (
@@ -37,6 +39,7 @@ export default async function PathPage() {
                     <h2 className="text-2xl font-semibold" style={{ color: locked ? undefined : rank.color }}>{rank.name}</h2>
                     {map?.completed && <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 text-xs font-semibold text-emerald-300">Completed</span>}
                     {!map?.completed && !locked && <span className="rounded-full border border-accent/30 bg-accent/10 px-2.5 py-1 text-xs font-semibold text-accent">Next path map</span>}
+                    {aboveRegularRank && <span className="rounded-full border border-border bg-white/5 px-2.5 py-1 text-xs font-semibold text-muted">Requires {rank.name} rank</span>}
                   </div>
                   <p className="mt-1 text-sm text-muted">Complete a {targetName} map to earn the {rank.name} seasonal rank.</p>
                   {map?.map ? (
