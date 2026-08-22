@@ -16,11 +16,23 @@ export type SyncedRhythiaMap = {
   ownerUsername: string | null;
 };
 
-type BeatmapResponse = { total?: number; beatmaps?: SyncedRhythiaMap[] };
+type BeatmapResponse = {
+  total?: number;
+  count?: number;
+  pages?: number;
+  page?: number;
+  hasNextPage?: boolean;
+  hasMore?: boolean;
+  beatmaps?: unknown;
+  maps?: unknown;
+  data?: unknown;
+};
 type RhythiaMapStatus = "RANKED" | "UNRANKED" | "LEGACY";
 
 const MAX_RHYTHIA_SOURCE_ID = 0xffffffff;
 const SIGNED_INT_OFFSET = 0x100000000;
+const RHYTHIA_PAGE_SIZE = 100;
+const MAX_PAGES = 10000;
 
 function sourceIdForDatabase(id: number) {
   if (!Number.isSafeInteger(id) || id < 0 || id > MAX_RHYTHIA_SOURCE_ID) throw new Error(`Rhythia map ID ${id} is outside the supported 32-bit unsigned range.`);
@@ -31,25 +43,96 @@ export function normalizeRhythiaSourceId(value: string | number) {
   return sourceIdForDatabase(typeof value === "number" ? value : Number(value));
 }
 
+function asMapArray(value: unknown): SyncedRhythiaMap[] {
+  if (Array.isArray(value)) return value as SyncedRhythiaMap[];
+  if (!value || typeof value !== "object") return [];
+  const record = value as Record<string, unknown>;
+  for (const key of ["beatmaps", "maps", "items", "results", "data"]) {
+    if (Array.isArray(record[key])) return record[key] as SyncedRhythiaMap[];
+  }
+  return [];
+}
+
+function normalizeMap(raw: SyncedRhythiaMap): SyncedRhythiaMap | null {
+  const value = raw as unknown as Record<string, unknown>;
+  const id = Number(value.id ?? value.mapId ?? value.beatmapId);
+  if (!Number.isSafeInteger(id) || id <= 0) return null;
+
+  const title = value.title ?? value.name ?? value.beatmapTitle;
+  const stars = value.starRating ?? value.stars ?? value.rating ?? value.difficultyRating;
+  const noteCount = value.noteCount ?? value.notes ?? value.beatmapNotes;
+  const length = value.length ?? value.duration ?? value.durationMs;
+  const beatmapFile = value.beatmapFile ?? value.downloadUrl ?? value.mapFileUrl ?? value.fileUrl;
+  const image = value.image ?? value.imageUrl ?? value.coverUrl ?? value.cover;
+  const ownerUsername = value.ownerUsername ?? value.mapperName ?? value.authorUsername ?? value.author;
+
+  return {
+    id,
+    title: typeof title === "string" ? title : null,
+    starRating: stars == null ? null : Number(stars),
+    difficulty: value.difficulty == null ? null : Number(value.difficulty),
+    noteCount: noteCount == null ? null : Number(noteCount),
+    length: length == null ? null : Number(length),
+    playcount: value.playcount == null ? null : Number(value.playcount),
+    beatmapFile: typeof beatmapFile === "string" ? beatmapFile : null,
+    image: typeof image === "string" ? image : null,
+    mapHash: typeof value.mapHash === "string" ? value.mapHash : typeof value.hash === "string" ? value.hash : null,
+    ownerUsername: typeof ownerUsername === "string" ? ownerUsername : null,
+  };
+}
+
 async function fetchStatus(status: RhythiaMapStatus) {
+  // Rhythia's public maps page uses APPROVED for the legacy-map source. The
+  // local "legacy" status is intentionally different from Rhythia's API status.
   const apiStatus = status === "LEGACY" ? "APPROVED" : status;
   const maps: SyncedRhythiaMap[] = [];
   const seenIds = new Set<number>();
   let page = 1;
   let total: number | null = null;
 
-  while ((total === null || maps.length < total) && page <= 1000) {
-    const data = await rhythiaRequest<BeatmapResponse>("getBeatmaps", { status: apiStatus, page, session: "" });
-    const pageMaps = data.beatmaps ?? [];
+  while (page <= MAX_PAGES) {
+    const data = await rhythiaRequest<BeatmapResponse>("getBeatmaps", {
+      status: apiStatus,
+      page,
+      limit: RHYTHIA_PAGE_SIZE,
+      minStars: 0,
+      maxStars: 20,
+      sort: "newest",
+      sortDirection: "asc",
+      session: "",
+    });
+
+    const pageMaps = asMapArray(data).map(normalizeMap).filter((map): map is SyncedRhythiaMap => map !== null);
     if (pageMaps.length === 0) break;
+
+    let addedThisPage = 0;
     for (const map of pageMaps) {
-      if (!map.id || seenIds.has(map.id)) continue;
+      if (seenIds.has(map.id)) continue;
       seenIds.add(map.id);
       maps.push(map);
+      addedThisPage += 1;
     }
+
     if (typeof data.total === "number" && Number.isFinite(data.total)) total = data.total;
+
+    const hasExplicitMore = data.hasNextPage === true || data.hasMore === true;
+    const hasExplicitEnd = data.hasNextPage === false || data.hasMore === false;
+    const reachedTotal = total !== null && maps.length >= total;
+    const reportedPages = typeof data.pages === "number" && Number.isFinite(data.pages) ? data.pages : null;
+    const reachedReportedPages = reportedPages !== null && page >= reportedPages;
+
+    if (reachedTotal || hasExplicitEnd || reachedReportedPages) break;
+    // If the API does not expose pagination metadata, a short page is the
+    // normal end-of-results signal. Otherwise continue until the explicit
+    // pagination metadata says we are done.
+    if (!hasExplicitMore && total === null && reportedPages === null && pageMaps.length < RHYTHIA_PAGE_SIZE) break;
+    // Protect against an API that ignores page/limit and keeps returning the
+    // same page forever.
+    if (addedThisPage === 0) break;
+
     page += 1;
   }
+
   return maps;
 }
 
