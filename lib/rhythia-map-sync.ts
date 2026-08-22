@@ -102,11 +102,27 @@ export async function syncRhythiaMaps(status?: RhythiaMapStatus) {
       const existing = await prisma.challengeMap.findUnique({ where: { sourceBeatmapId }, select: { id: true, status: true, isAutoImported: true } });
 
       if (!existing) {
-        if (currentStatus === "LEGACY") {
-          await prisma.$executeRawUnsafe('INSERT INTO "ChallengeMap" ("id", "title", "artist", "description", "mapFileUrl", "imageUrl", "requestedRating", "rating", "mapperName", "noteCount", "length", "sourceBeatmapId", "sourceUrl", "isAutoImported", "submittedById", "status", "reviewedById", "reviewedAt", "createdAt", "updatedAt") VALUES (gen_random_uuid(), $1, $2, NULL, $3, $4, $5, $5, $6, $7, $8, $9, $10, true, $11, 'legacy', $11, NOW(), NOW(), NOW())', title, artistFromTitle(title), mapFileUrl, map.image, rating, map.ownerUsername, map.noteCount, map.length, sourceBeatmapId, sourceUrl, importer.id);
-        } else {
-          await prisma.challengeMap.create({ data: { title, artist: artistFromTitle(title), description: null, mapFileUrl, imageUrl: map.image, requestedRating: rating, rating, mapperName: map.ownerUsername, noteCount: map.noteCount, length: map.length, sourceBeatmapId, sourceUrl, isAutoImported: true, submittedById: importer.id, status: currentStatus === "RANKED" ? "approved" : "pending", reviewedById: currentStatus === "RANKED" ? importer.id : null, reviewedAt: currentStatus === "RANKED" ? new Date() : null } });
-        }
+        await prisma.challengeMap.create({
+          data: {
+            title,
+            artist: artistFromTitle(title),
+            description: null,
+            mapFileUrl,
+            imageUrl: map.image,
+            requestedRating: rating,
+            rating,
+            mapperName: map.ownerUsername,
+            noteCount: map.noteCount,
+            length: map.length,
+            sourceBeatmapId,
+            sourceUrl,
+            isAutoImported: true,
+            submittedById: importer.id,
+            status: currentStatus === "RANKED" ? "approved" : currentStatus === "LEGACY" ? "legacy" : "pending",
+            reviewedById: currentStatus === "UNRANKED" ? null : importer.id,
+            reviewedAt: currentStatus === "UNRANKED" ? null : new Date(),
+          },
+        });
         results.created += 1;
         continue;
       }
@@ -117,18 +133,27 @@ export async function syncRhythiaMaps(status?: RhythiaMapStatus) {
       }
 
       if (currentStatus === "LEGACY") {
-        await prisma.$executeRawUnsafe('UPDATE "ChallengeMap" SET "title" = $1, "artist" = $2, "mapFileUrl" = $3, "imageUrl" = $4, "requestedRating" = $5, "rating" = $5, "mapperName" = $6, "noteCount" = $7, "length" = $8, "sourceUrl" = $9, "status" = \'legacy\', "reviewedById" = $10, "reviewedAt" = NOW(), "updatedAt" = NOW() WHERE "id" = $11', title, artistFromTitle(title), mapFileUrl, map.image, rating, map.ownerUsername, map.noteCount, map.length, sourceUrl, importer.id, existing.id);
+        await prisma.challengeMap.update({
+          where: { id: existing.id },
+          data: { title, artist: artistFromTitle(title), mapFileUrl, imageUrl: map.image, requestedRating: rating, rating, mapperName: map.ownerUsername, noteCount: map.noteCount, length: map.length, sourceUrl, status: "legacy", reviewedById: importer.id, reviewedAt: new Date() },
+        });
         results.updated += 1;
         continue;
       }
 
       if (currentStatus === "RANKED" && existing.status === "pending") {
-        await prisma.challengeMap.update({ where: { id: existing.id }, data: { title, artist: artistFromTitle(title), mapFileUrl, imageUrl: map.image, requestedRating: rating, rating, mapperName: map.ownerUsername, noteCount: map.noteCount, length: map.length, sourceUrl, status: "approved", reviewedById: importer.id, reviewedAt: new Date() } });
+        await prisma.challengeMap.update({
+          where: { id: existing.id },
+          data: { title, artist: artistFromTitle(title), mapFileUrl, imageUrl: map.image, requestedRating: rating, rating, mapperName: map.ownerUsername, noteCount: map.noteCount, length: map.length, sourceUrl, status: "approved", reviewedById: importer.id, reviewedAt: new Date() },
+        });
         results.promoted += 1;
         continue;
       }
 
-      await prisma.challengeMap.update({ where: { id: existing.id }, data: { title, artist: artistFromTitle(title), mapFileUrl, imageUrl: map.image, requestedRating: rating, rating, mapperName: map.ownerUsername, noteCount: map.noteCount, length: map.length, sourceUrl, status: currentStatus === "RANKED" ? "approved" : existing.status === "approved" ? "approved" : "pending" } });
+      await prisma.challengeMap.update({
+        where: { id: existing.id },
+        data: { title, artist: artistFromTitle(title), mapFileUrl, imageUrl: map.image, requestedRating: rating, rating, mapperName: map.ownerUsername, noteCount: map.noteCount, length: map.length, sourceUrl, status: currentStatus === "RANKED" ? "approved" : existing.status === "approved" ? "approved" : "pending" },
+      });
       results.updated += 1;
     }
   }
