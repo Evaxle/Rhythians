@@ -20,7 +20,7 @@ async function fetchStatus(status: "RANKED" | "UNRANKED") {
   const maps: SyncedRhythiaMap[] = [];
   let page = 1;
   let total = Infinity;
-  while (maps.length < total && page <= 100) {
+  while (maps.length < total) {
     const data = await rhythiaRequest<{ total?: number; beatmaps?: SyncedRhythiaMap[] }>("getBeatmaps", { status, page, session: "" });
     if (!data.beatmaps?.length) break;
     if (typeof data.total === "number") total = data.total;
