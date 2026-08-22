@@ -45,7 +45,8 @@ function tagColor(slug: string) {
 }
 
 export function UserTags({ tags, size = "sm" }: UserTagsProps) {
-  if (tags.length === 0) return null;
+  const visibleTags = tags.filter(({ tag }) => tag.slug !== "rhythian-coach").slice(0, 3);
+  if (visibleTags.length === 0) return null;
 
   const sizeClasses = {
     sm: "px-2 py-0.5 text-xs",
@@ -53,14 +54,5 @@ export function UserTags({ tags, size = "sm" }: UserTagsProps) {
     lg: "px-3 py-1.5 text-sm",
   };
 
-  return (
-    <div className="flex flex-wrap gap-1.5">
-      {tags.map(({ tag }) => (
-        <span key={tag.slug} className={`inline-flex items-center gap-1 rounded-full border ${tagColor(tag.slug)} ${sizeClasses[size]}`}>
-          <TagIcon className="h-3 w-3" />
-          {tag.name}
-        </span>
-      ))}
-    </div>
-  );
+  return <div className="flex flex-wrap gap-1.5">{visibleTags.map(({ tag }) => <span key={tag.slug} className={`inline-flex items-center gap-1 rounded-full border ${tagColor(tag.slug)} ${sizeClasses[size]}`}><TagIcon className="h-3 w-3" />{tag.name}</span>)}</div>;
 }
