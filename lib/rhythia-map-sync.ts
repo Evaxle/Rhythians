@@ -31,7 +31,6 @@ type RhythiaMapStatus = "RANKED" | "UNRANKED" | "LEGACY";
 
 const MAX_RHYTHIA_SOURCE_ID = 0xffffffff;
 const SIGNED_INT_OFFSET = 0x100000000;
-const RHYTHIA_PAGE_SIZE = 100;
 const MAX_PAGES = 10000;
 
 function sourceIdForDatabase(id: number) {
@@ -82,8 +81,6 @@ function normalizeMap(raw: SyncedRhythiaMap): SyncedRhythiaMap | null {
 }
 
 async function fetchStatus(status: RhythiaMapStatus) {
-  // Rhythia's public maps page uses APPROVED for the legacy-map source. The
-  // local "legacy" status is intentionally different from Rhythia's API status.
   const apiStatus = status === "LEGACY" ? "APPROVED" : status;
   const maps: SyncedRhythiaMap[] = [];
   const seenIds = new Set<number>();
@@ -91,10 +88,11 @@ async function fetchStatus(status: RhythiaMapStatus) {
   let total: number | null = null;
 
   while (page <= MAX_PAGES) {
+    // Rhythia rejects `limit`; its getBeatmaps endpoint controls page size itself.
+    // Keep only parameters accepted by the endpoint and paginate with `page`.
     const data = await rhythiaRequest<BeatmapResponse>("getBeatmaps", {
       status: apiStatus,
       page,
-      limit: RHYTHIA_PAGE_SIZE,
       minStars: 0,
       maxStars: 20,
       sort: "newest",
@@ -122,12 +120,8 @@ async function fetchStatus(status: RhythiaMapStatus) {
     const reachedReportedPages = reportedPages !== null && page >= reportedPages;
 
     if (reachedTotal || hasExplicitEnd || reachedReportedPages) break;
-    // If the API does not expose pagination metadata, a short page is the
-    // normal end-of-results signal. Otherwise continue until the explicit
-    // pagination metadata says we are done.
-    if (!hasExplicitMore && total === null && reportedPages === null && pageMaps.length < RHYTHIA_PAGE_SIZE) break;
-    // Protect against an API that ignores page/limit and keeps returning the
-    // same page forever.
+    // When the endpoint doesn't expose pagination metadata, an empty response
+    // ends the sync. `addedThisPage` prevents an API that ignores `page` from looping forever.
     if (addedThisPage === 0) break;
 
     page += 1;
