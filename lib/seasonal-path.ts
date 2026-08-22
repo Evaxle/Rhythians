@@ -27,7 +27,7 @@ async function ensureCurrentSeason() {
 }
 
 async function awardSeasonTags(seasonId: string, seasonNumber: number) {
-  const users = await prisma.$queryRawUnsafe<Array<{ userId: string; maxRank: number }>>('SELECT "userId", MAX("rankIndex")::int AS "maxRank" FROM "SeasonalPathCompletion" WHERE "seasonId" = $1 GROUP BY "userId"');
+  const users = await prisma.$queryRawUnsafe<Array<{ userId: string; maxRank: number }>>('SELECT "userId", MAX("rankIndex")::int AS "maxRank" FROM "SeasonalPathCompletion" WHERE "seasonId" = $1 GROUP BY "userId"', seasonId);
   for (const user of users) {
     for (let index = 0; index <= Math.min(RANKS.length - 1, user.maxRank); index += 1) {
       const name = `Season ${seasonNumber} ${RANK_NAMES[index]}`;
@@ -51,7 +51,7 @@ async function ensureSeasonMaps(seasonId: string) {
     if (byRank.has(rankIndex)) continue;
     const target = pathTargetRating(rankIndex);
     const range = rankIndex === RANKS.length - 1 ? { gte: 4 } : { gte: RANKS[rankIndex + 1].rangeMin, lte: RANKS[rankIndex + 1].rangeMax };
-    const candidates = await prisma.challengeMap.findMany({ where: { status: "approved", rating: range }, orderBy: [{ rating: "asc" }, { createdAt: "asc" }], take: 100, select: { id: true, rating: true } });
+    const candidates = await prisma.challengeMap.findMany({ where: { status: "approved", isAutoImported: true, rating: range }, orderBy: [{ rating: "asc" }, { createdAt: "asc" }], take: 100, select: { id: true, rating: true } });
     const map = candidates.sort((a, b) => Math.abs((a.rating ?? target) - target) - Math.abs((b.rating ?? target) - target))[0];
     if (!map) continue;
     await prisma.$executeRawUnsafe('INSERT INTO "SeasonalPathMap" ("id", "seasonId", "rankIndex", "challengeMapId") VALUES ($1, $2, $3, $4) ON CONFLICT ("seasonId", "rankIndex") DO NOTHING', randomUUID(), seasonId, rankIndex, map.id);
