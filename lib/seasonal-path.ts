@@ -31,7 +31,7 @@ async function awardSeasonTags(seasonId: string, seasonNumber: number) {
   for (const user of users) {
     for (let index = 0; index <= Math.min(RANKS.length - 1, user.maxRank); index += 1) {
       const name = `Season ${seasonNumber} ${RANK_NAMES[index]}`;
-      const slug = name.toLowerCase().replaceAll(" ", "-");
+      const slug = name.toLowerCase().replace(/ /g, "-");
       const tag = await prisma.tag.upsert({ where: { slug }, update: { name }, create: { name, slug } });
       await prisma.userTag.upsert({ where: { userId_tagId: { userId: user.userId, tagId: tag.id } }, update: { source: "manual" }, create: { userId: user.userId, tagId: tag.id, source: "manual" } });
     }
