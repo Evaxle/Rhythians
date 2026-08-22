@@ -101,7 +101,12 @@ export default async function ClipsPage({
                     </span>
                   )}
                 </div>
-                <div className="p-5">
+                <div className="px-5 pt-3">
+                  <p className="text-xs text-muted">
+                    Posted {clip.createdAt.toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="p-5 pt-2">
                   <div className="flex items-center justify-between text-xs uppercase tracking-[0.24em] text-accent">
                     <span>{clip.category?.name ?? "Uncategorized"}</span>
                     <span>{clip.uploader.username}</span>
@@ -128,9 +133,6 @@ export default async function ClipsPage({
                       Approved by <span className="font-semibold text-white">{clip.reviewedBy.displayName ?? clip.reviewedBy.username}</span>
                     </p>
                   )}
-                  <p className="mt-3 text-sm text-muted">
-                    {clip.createdAt.toLocaleDateString()}
-                  </p>
                 </div>
               </Link>
             );
