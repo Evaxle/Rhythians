@@ -144,6 +144,7 @@ export async function getApprovedMaps(includeAll: boolean, userId: string | null
         hasScore: scoredTitles.has(normalizeTitle(map.title)),
         isAutoImported: map.isAutoImported,
         isRanked,
+        isLegacy,
       };
     }),
   };
