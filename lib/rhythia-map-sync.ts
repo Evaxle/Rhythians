@@ -21,27 +21,37 @@ type BeatmapResponse = {
   beatmaps?: SyncedRhythiaMap[];
 };
 
+const MAX_RHYTHIA_SOURCE_ID = 0xffffffff;
+const SIGNED_INT_OFFSET = 0x100000000;
+
+function sourceIdForDatabase(id: number) {
+  if (!Number.isSafeInteger(id) || id < 0 || id > MAX_RHYTHIA_SOURCE_ID) throw new Error(`Rhythia map ID ${id} is outside the supported 32-bit unsigned range.`);
+  return id > 0x7fffffff ? id - SIGNED_INT_OFFSET : id;
+}
+
+export function normalizeRhythiaSourceId(value: string | number) {
+  const id = typeof value === "number" ? value : Number(value);
+  return sourceIdForDatabase(id);
+}
+
 async function fetchStatus(status: "RANKED" | "UNRANKED") {
   const maps: SyncedRhythiaMap[] = [];
   const seenIds = new Set<number>();
   let page = 1;
   let total: number | null = null;
 
-  while (total === null || maps.length < total) {
+  while ((total === null || maps.length < total) && page <= 1000) {
     const data = await rhythiaRequest<BeatmapResponse>("getBeatmaps", { status, page, session: "" });
     const pageMaps = data.beatmaps ?? [];
     if (pageMaps.length === 0) break;
 
-    let newMaps = 0;
     for (const map of pageMaps) {
       if (!map.id || seenIds.has(map.id)) continue;
       seenIds.add(map.id);
       maps.push(map);
-      newMaps += 1;
     }
 
     if (typeof data.total === "number" && Number.isFinite(data.total)) total = data.total;
-    if (newMaps === 0 || (total !== null && maps.length >= total)) break;
     page += 1;
   }
 
@@ -59,7 +69,7 @@ function ratingForMap(map: SyncedRhythiaMap) {
 
 export async function syncRhythiaMaps(status?: "RANKED" | "UNRANKED") {
   const statuses = status ? [status] : ["RANKED", "UNRANKED"] as const;
-  const results = { ranked: 0, unranked: 0, created: 0, updated: 0, promoted: 0, skipped: 0 };
+  const results = { ranked: 0, unranked: 0, created: 0, updated: 0, promoted: 0, skipped: 0, failed: 0 };
   const importer = await prisma.user.findFirst({ where: { profileHandle: "rhythia-imports" }, select: { id: true } });
   if (!importer) throw new Error("The rhythia-imports system user does not exist.");
 
@@ -74,14 +84,22 @@ export async function syncRhythiaMaps(status?: "RANKED" | "UNRANKED") {
         continue;
       }
 
+      let sourceBeatmapId: number;
+      try {
+        sourceBeatmapId = sourceIdForDatabase(map.id);
+      } catch {
+        results.failed += 1;
+        continue;
+      }
+
       const title = map.title?.trim() || `Rhythia map ${map.id}`;
       const sourceUrl = `https://www.rhythia.com/maps/${map.id}`;
       const mapFileUrl = map.beatmapFile?.trim() || sourceUrl;
       const rating = ratingForMap(map);
-      const existing = await prisma.challengeMap.findUnique({ where: { sourceBeatmapId: map.id }, select: { id: true, status: true, isAutoImported: true } });
+      const existing = await prisma.challengeMap.findUnique({ where: { sourceBeatmapId }, select: { id: true, status: true, isAutoImported: true } });
 
       if (!existing) {
-        await prisma.challengeMap.create({ data: { title, artist: artistFromTitle(title), description: null, mapFileUrl, imageUrl: map.image, requestedRating: rating, rating, mapperName: map.ownerUsername, noteCount: map.noteCount, length: map.length, sourceBeatmapId: map.id, sourceUrl, isAutoImported: true, submittedById: importer.id, status: currentStatus === "RANKED" ? "approved" : "pending", reviewedById: currentStatus === "RANKED" ? importer.id : null, reviewedAt: currentStatus === "RANKED" ? new Date() : null } });
+        await prisma.challengeMap.create({ data: { title, artist: artistFromTitle(title), description: null, mapFileUrl, imageUrl: map.image, requestedRating: rating, rating, mapperName: map.ownerUsername, noteCount: map.noteCount, length: map.length, sourceBeatmapId, sourceUrl, isAutoImported: true, submittedById: importer.id, status: currentStatus === "RANKED" ? "approved" : "pending", reviewedById: currentStatus === "RANKED" ? importer.id : null, reviewedAt: currentStatus === "RANKED" ? new Date() : null } });
         results.created += 1;
         continue;
       }
