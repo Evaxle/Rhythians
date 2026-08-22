@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { prisma } from "@/lib/db";
 import { fetchRhythiaScores, findScoreForMap } from "@/lib/daily";
-import { RANKS } from "@/lib/ranks";
+import { RANKS, getRankInfo } from "@/lib/ranks";
 
 const RANK_NAMES = RANKS.map((rank) => rank.name);
 
@@ -71,7 +71,7 @@ async function ensureSeasonMaps(seasonId: string) {
   return prisma.$queryRawUnsafe<Array<{ id: string; rankIndex: number; challengeMapId: string }>>('SELECT "id", "rankIndex", "challengeMapId" FROM "SeasonalPathMap" WHERE "seasonId" = $1 ORDER BY "rankIndex" ASC', seasonId);
 }
 
-async function syncUserCompletions(userId: string, seasonId: string, maps: Array<{ id: string; rankIndex: number; challengeMapId: string }>) {
+async function syncUserCompletions(userId: string, seasonId: string, maps: Array<{ id: string; rankIndex: number; challengeMapId: string }>, maxPlayableRank: number) {
   const profile = await prisma.rhythiaProfile.findUnique({ where: { userId }, select: { profileId: true } });
   if (!profile) return;
   let scores: Awaited<ReturnType<typeof fetchRhythiaScores>>;
@@ -79,6 +79,7 @@ async function syncUserCompletions(userId: string, seasonId: string, maps: Array
   const existing = await prisma.$queryRawUnsafe<Array<{ rankIndex: number }>>('SELECT "rankIndex" FROM "SeasonalPathCompletion" WHERE "seasonId" = $1 AND "userId" = $2', seasonId, userId);
   const completed = new Set(existing.map((entry) => entry.rankIndex));
   for (const pathMap of [...maps].sort((a, b) => a.rankIndex - b.rankIndex)) {
+    if (pathMap.rankIndex > maxPlayableRank) break;
     if (completed.has(pathMap.rankIndex)) continue;
     if (pathMap.rankIndex > 0 && !completed.has(pathMap.rankIndex - 1)) break;
     const map = await prisma.challengeMap.findUnique({ where: { id: pathMap.challengeMapId }, select: { title: true, status: true } });
@@ -94,16 +95,20 @@ export async function getSeasonalPath(userId?: string) {
   await finalizeExpiredSeasons();
   const season = await ensureCurrentSeason();
   const maps = await ensureSeasonMaps(season.id);
-  if (userId) await syncUserCompletions(userId, season.id, maps);
+  const user = userId ? await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } }) : null;
+  const regularRankIndex = user ? getRankInfo(user.rhp).index : RANKS.length - 1;
+  const maxPlayableRank = Math.min(RANKS.length - 1, regularRankIndex + 1);
+  if (userId) await syncUserCompletions(userId, season.id, maps, maxPlayableRank);
   const completions = userId ? await prisma.$queryRawUnsafe<Array<{ rankIndex: number }>>('SELECT "rankIndex" FROM "SeasonalPathCompletion" WHERE "seasonId" = $1 AND "userId" = $2 ORDER BY "rankIndex" ASC', season.id, userId) : [];
   const completedRanks = new Set(completions.map((entry) => entry.rankIndex));
   const completedRank = completions.length ? Math.max(...completions.map((entry) => entry.rankIndex)) : -1;
   const ranks = await Promise.all(RANKS.map(async (rank, index) => {
     const pathMap = maps.find((entry) => entry.rankIndex === index);
     const map = pathMap ? await prisma.challengeMap.findUnique({ where: { id: pathMap.challengeMapId }, select: { id: true, title: true, artist: true, rating: true, imageUrl: true, mapperName: true, length: true, mapFileUrl: true, status: true, isAutoImported: true } }) : null;
-    return { index, name: rank.name, color: rank.color, map: pathMap ? { ...pathMap, map, ranked: map?.status === "approved" && map.isAutoImported, completed: completedRanks.has(index), unlocked: index <= completedRank + 1 } : null };
+    const unlocked = index <= completedRank + 1 && index <= maxPlayableRank;
+    return { index, name: rank.name, color: rank.color, map: pathMap ? { ...pathMap, map, ranked: map?.status === "approved" && map.isAutoImported, completed: completedRanks.has(index), unlocked } : null };
   }));
-  return { season, ranks, completedRank };
+  return { season, ranks, completedRank, regularRankIndex, maxPlayableRank };
 }
 
 export async function getUserPathRank(userId: string) {
