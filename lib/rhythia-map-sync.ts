@@ -21,6 +21,8 @@ type BeatmapResponse = {
   beatmaps?: SyncedRhythiaMap[];
 };
 
+type RhythiaMapStatus = "RANKED" | "UNRANKED" | "LEGACY";
+
 const MAX_RHYTHIA_SOURCE_ID = 0xffffffff;
 const SIGNED_INT_OFFSET = 0x100000000;
 
@@ -34,7 +36,7 @@ export function normalizeRhythiaSourceId(value: string | number) {
   return sourceIdForDatabase(id);
 }
 
-async function fetchStatus(status: "RANKED" | "UNRANKED") {
+async function fetchStatus(status: RhythiaMapStatus) {
   const maps: SyncedRhythiaMap[] = [];
   const seenIds = new Set<number>();
   let page = 1;
@@ -67,16 +69,17 @@ function ratingForMap(map: SyncedRhythiaMap) {
   return fairRatingFromStars(Number.isFinite(map.starRating ?? NaN) ? map.starRating ?? 0 : 0);
 }
 
-export async function syncRhythiaMaps(status?: "RANKED" | "UNRANKED") {
-  const statuses = status ? [status] : ["RANKED", "UNRANKED"] as const;
-  const results = { ranked: 0, unranked: 0, created: 0, updated: 0, promoted: 0, skipped: 0, failed: 0 };
+export async function syncRhythiaMaps(status?: RhythiaMapStatus) {
+  const statuses: RhythiaMapStatus[] = status ? [status] : ["RANKED", "UNRANKED", "LEGACY"];
+  const results = { ranked: 0, unranked: 0, legacy: 0, created: 0, updated: 0, promoted: 0, skipped: 0, failed: 0 };
   const importer = await prisma.user.findFirst({ where: { profileHandle: "rhythia-imports" }, select: { id: true } });
   if (!importer) throw new Error("The rhythia-imports system user does not exist.");
 
   for (const currentStatus of statuses) {
     const maps = await fetchStatus(currentStatus);
     if (currentStatus === "RANKED") results.ranked = maps.length;
-    else results.unranked = maps.length;
+    else if (currentStatus === "UNRANKED") results.unranked = maps.length;
+    else results.legacy = maps.length;
 
     for (const map of maps) {
       if (!map.id) {
@@ -99,13 +102,23 @@ export async function syncRhythiaMaps(status?: "RANKED" | "UNRANKED") {
       const existing = await prisma.challengeMap.findUnique({ where: { sourceBeatmapId }, select: { id: true, status: true, isAutoImported: true } });
 
       if (!existing) {
-        await prisma.challengeMap.create({ data: { title, artist: artistFromTitle(title), description: null, mapFileUrl, imageUrl: map.image, requestedRating: rating, rating, mapperName: map.ownerUsername, noteCount: map.noteCount, length: map.length, sourceBeatmapId, sourceUrl, isAutoImported: true, submittedById: importer.id, status: currentStatus === "RANKED" ? "approved" : "pending", reviewedById: currentStatus === "RANKED" ? importer.id : null, reviewedAt: currentStatus === "RANKED" ? new Date() : null } });
+        if (currentStatus === "LEGACY") {
+          await prisma.$executeRawUnsafe('INSERT INTO "ChallengeMap" ("id", "title", "artist", "description", "mapFileUrl", "imageUrl", "requestedRating", "rating", "mapperName", "noteCount", "length", "sourceBeatmapId", "sourceUrl", "isAutoImported", "submittedById", "status", "reviewedById", "reviewedAt", "createdAt", "updatedAt") VALUES (gen_random_uuid(), $1, $2, NULL, $3, $4, $5, $5, $6, $7, $8, $9, $10, true, $11, 'legacy', $11, NOW(), NOW(), NOW())', title, artistFromTitle(title), mapFileUrl, map.image, rating, map.ownerUsername, map.noteCount, map.length, sourceBeatmapId, sourceUrl, importer.id);
+        } else {
+          await prisma.challengeMap.create({ data: { title, artist: artistFromTitle(title), description: null, mapFileUrl, imageUrl: map.image, requestedRating: rating, rating, mapperName: map.ownerUsername, noteCount: map.noteCount, length: map.length, sourceBeatmapId, sourceUrl, isAutoImported: true, submittedById: importer.id, status: currentStatus === "RANKED" ? "approved" : "pending", reviewedById: currentStatus === "RANKED" ? importer.id : null, reviewedAt: currentStatus === "RANKED" ? new Date() : null } });
+        }
         results.created += 1;
         continue;
       }
 
       if (!existing.isAutoImported) {
         results.skipped += 1;
+        continue;
+      }
+
+      if (currentStatus === "LEGACY") {
+        await prisma.$executeRawUnsafe('UPDATE "ChallengeMap" SET "title" = $1, "artist" = $2, "mapFileUrl" = $3, "imageUrl" = $4, "requestedRating" = $5, "rating" = $5, "mapperName" = $6, "noteCount" = $7, "length" = $8, "sourceUrl" = $9, "status" = \'legacy\', "reviewedById" = $10, "reviewedAt" = NOW(), "updatedAt" = NOW() WHERE "id" = $11', title, artistFromTitle(title), mapFileUrl, map.image, rating, map.ownerUsername, map.noteCount, map.length, sourceUrl, importer.id, existing.id);
+        results.updated += 1;
         continue;
       }
 
@@ -121,7 +134,7 @@ export async function syncRhythiaMaps(status?: "RANKED" | "UNRANKED") {
   }
 
   const now = new Date().toISOString();
-  await prisma.siteSetting.upsert({ where: { key: "rhythia_map_sync_last_run" }, update: { value: now }, create: { key: "rhythia_map_sync_last_run", value: now, description: "Last successful Rhythia ranked and unranked map synchronization." } });
+  await prisma.siteSetting.upsert({ where: { key: "rhythia_map_sync_last_run" }, update: { value: now }, create: { key: "rhythia_map_sync_last_run", value: now, description: "Last successful Rhythia ranked, unranked, and legacy map synchronization." } });
   if (status) await prisma.siteSetting.upsert({ where: { key: `rhythia_map_sync_last_${status.toLowerCase()}` }, update: { value: now }, create: { key: `rhythia_map_sync_last_${status.toLowerCase()}`, value: now, description: `Last successful Rhythia ${status.toLowerCase()} map synchronization.` } });
   return results;
 }
