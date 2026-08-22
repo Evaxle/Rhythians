@@ -45,6 +45,7 @@ export type ConversationDetail = {
   name: string | null;
   createdById: string | null;
   members: ConversationMember[];
+  otherUsers: UserLite[];
   messages: MessageItem[];
 };
 
@@ -54,12 +55,8 @@ export function userDisplayName(user: Pick<UserLite, "displayName" | "username">
 
 export function userAvatarUrl(user: Pick<UserLite, "avatar" | "discordId" | "username">) {
   if (!user.avatar) return null;
-  if (user.avatar.startsWith("http://") || user.avatar.startsWith("https://")) {
-    return user.avatar;
-  }
-  if (user.discordId) {
-    return `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png?size=64`;
-  }
+  if (user.avatar.startsWith("http://") || user.avatar.startsWith("https://")) return user.avatar;
+  if (user.discordId) return `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png?size=64`;
   return null;
 }
 
