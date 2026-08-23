@@ -4,6 +4,13 @@ import { getSessionUser } from "@/lib/auth";
 
 const categories = new Set(["jumps", "stream", "tech", "vibro", "off_grid"]);
 
+export async function GET() {
+  const user = await getSessionUser();
+  if (!user) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  const rows = await prisma.$queryRawUnsafe<Array<{ favoriteCategory: string | null }>>('SELECT "favoriteCategory" FROM "User" WHERE "id" = $1 LIMIT 1', user.id);
+  return NextResponse.json({ category: rows[0]?.favoriteCategory ?? null });
+}
+
 export async function POST(request: Request) {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
