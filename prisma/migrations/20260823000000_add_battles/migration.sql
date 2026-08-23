@@ -3,6 +3,7 @@ CREATE TABLE "BattleLobby" (
   "name" TEXT NOT NULL,
   "hostId" TEXT NOT NULL REFERENCES "User"("id") ON DELETE CASCADE,
   "mode" TEXT NOT NULL DEFAULT '1v1',
+  "teamMode" TEXT NOT NULL DEFAULT 'regular',
   "matchType" TEXT NOT NULL DEFAULT 'casual',
   "status" TEXT NOT NULL DEFAULT 'open',
   "maxPlayers" INTEGER NOT NULL DEFAULT 30,
