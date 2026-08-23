@@ -13,8 +13,12 @@ async function getRewards(userId: string) {
     const maxRank = rows[0]?.maxRank ?? -1;
     for (let rankIndex = 0; rankIndex <= Math.min(maxRank, RANKS.length - 1); rankIndex += 1) {
       const slug = `season-${season.seasonNumber}-${RANKS[rankIndex].name.toLowerCase()}`;
-      const owned = await prisma.tag.findUnique({ where: { slug }, select: { id: true, userTags: { where: { userId }, select: { id: true } } } });
-      if (!owned?.userTags.length) rewards.push({ seasonNumber: season.seasonNumber, rankIndex, rankName: RANKS[rankIndex].name, color: RANKS[rankIndex].color });
+      const tag = await prisma.tag.findUnique({ where: { slug }, select: { id: true } });
+      if (!tag) rewards.push({ seasonNumber: season.seasonNumber, rankIndex, rankName: RANKS[rankIndex].name, color: RANKS[rankIndex].color });
+      else {
+        const userTag = await prisma.userTag.findUnique({ where: { userId_tagId: { userId, tagId: tag.id } }, select: { id: true } });
+        if (!userTag) rewards.push({ seasonNumber: season.seasonNumber, rankIndex, rankName: RANKS[rankIndex].name, color: RANKS[rankIndex].color });
+      }
     }
   }
   return rewards.sort((a, b) => a.seasonNumber - b.seasonNumber || a.rankIndex - b.rankIndex);
