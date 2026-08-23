@@ -76,7 +76,8 @@ export async function POST(request: Request) {
     const creator = await prisma.$queryRawUnsafe<any[]>(`SELECT u.rhp FROM "BattleMatchPlayer" bp JOIN "User" u ON u.id=bp."userId" WHERE bp."matchId"=$1 AND bp.team=1`, body.matchId);
     if (!creator[0]) return NextResponse.json({ error: "Battle creator not found." }, { status: 404 });
     if (match[0].matchType === "ranked") { const a = getRankInfo(creator[0].rhp); const b = getRankInfo(user.rhp); if (a.index !== b.index || a.tier !== b.tier) return NextResponse.json({ error: "Not matching ranks." }, { status: 400 }); }
-    await startMatch(body.matchId, getRankInfo(creator[0].rhp).index);
+    const mapRankIndex = match[0].matchType === "casual" ? Math.min(getRankInfo(creator[0].rhp).index, getRankInfo(user.rhp).index) : getRankInfo(creator[0].rhp).index;
+    await startMatch(body.matchId, mapRankIndex);
     return NextResponse.json({ ok: true, matchId: body.matchId, status: "active" });
   }
   return NextResponse.json({ error: "Unknown action." }, { status: 400 });
