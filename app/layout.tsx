@@ -7,6 +7,8 @@ import { TailwindIndicator } from "@/components/tailwind-indicator";
 import { CursorFX } from "@/components/cursor-fx";
 import { WarningPopups } from "@/components/warning-popups";
 import { AccountSecurityNotice } from "@/components/account-security-notice";
+import { getSessionUser } from "@/lib/auth";
+import { getRankInfo } from "@/lib/ranks";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,7 +34,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const user = await getSessionUser();
+  const rankColor = user ? getRankInfo(user.rhp).color : "#7c8ff0";
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} bg-background text-white`}>
@@ -40,7 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Script id="vercel-speed-insights-init">{`window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };`}</Script>
         <Script src="/_vercel/insights/script.js" strategy="afterInteractive" />
         <Script src="/_vercel/speed-insights/script.js" strategy="afterInteractive" />
-        <div className="min-h-screen bg-background text-white">
+        <div className="min-h-screen text-white" style={{ background: `radial-gradient(circle at 50% -10%, ${rankColor}18, transparent 36%), radial-gradient(circle at 0% 35%, ${rankColor}0b, transparent 28%), linear-gradient(180deg, ${rankColor}06 0%, transparent 45%), var(--page-bg)` }}>
           <AccountSecurityNotice />
           <SiteHeader />
           <main className="mx-auto max-w-7xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
