@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { getAvatarUrl } from "@/lib/avatar";
 import { getRankInfo } from "@/lib/ranks";
 
 export const BATTLE_MODES = ["1v1", "2v2", "3v3", "15v15"] as const;
@@ -11,7 +12,11 @@ export function playerCount(mode: BattleMode) { return Number(mode.split("v")[0]
 export function rankKey(rhp: number) { const rank = getRankInfo(rhp); return `${rank.index}:${rank.tier}`; }
 export function teamScore(scores: Array<number | null>, mode: TeamMode) { const values = scores.filter((score): score is number => score != null && Number.isFinite(score)); if (!values.length) return null; return mode === "captains" ? Math.max(...values) : values.reduce((sum, score) => sum + score, 0) / values.length; }
 export function rankedLoss(winnerScore: number, loserScore: number) { const difference = Math.max(0, winnerScore - loserScore); return Math.max(10, Math.min(20, Math.round(10 + Math.min(1, difference / 100) * 10))); }
-export async function getBattleUser(userId: string) { return prisma.user.findUnique({ where: { id: userId }, select: { id: true, username: true, displayName: true, profileHandle: true, avatar: true, rhp: true, userTags: { select: { tag: { select: { name: true, slug: true } } } } } }); }
+export async function getBattleUser(userId: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, username: true, displayName: true, profileHandle: true, avatar: true, discordId: true, rhp: true, userTags: { select: { tag: { select: { name: true, slug: true } } } } } });
+  if (!user) return null;
+  return { ...user, avatar: getAvatarUrl(user, 256) };
+}
 export async function selectBattleMap(rankIndex: number) {
   const rank = getRankInfo(rankIndex * 500);
   const maps = await prisma.$queryRawUnsafe<any[]>(`SELECT id,title,artist,rating,length,"mapFileUrl","imageUrl" FROM "ChallengeMap" WHERE status::text IN ('approved','legacy') AND rating >= $1 AND rating <= $2 ORDER BY "updatedAt" DESC LIMIT 50`, rank.rangeMin, rank.rangeMax);
