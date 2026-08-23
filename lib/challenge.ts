@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { fetchRhythiaScores, findScoreForMap } from "@/lib/daily";
 import { accuracyFromMisses } from "@/lib/ranks";
+import { getAvatarUrl } from "@/lib/avatar";
 
 export const MAX_CHALLENGE_LEVEL = 10;
 
@@ -59,20 +60,16 @@ export async function checkAndAwardChallengeLevelMap(userId: string, challengeMa
   const hit = findScoreForMap(scores.recent, map.title) ?? findScoreForMap(scores.top, map.title);
   if (!hit) return { status: "not_beat" as const, level };
   const accuracy = hit.accuracy ?? accuracyFromMisses(hit.beatmapNotes, hit.misses);
-  await prisma.challengeMapCompletion.upsert({
-    where: { challengeMapId_userId: { challengeMapId, userId } },
-    create: { challengeMapId, userId, rating: map.rating ?? 0, accuracy, passed: true, points: 0, scoreId: hit.id },
-    update: { accuracy, passed: true, points: 0, scoreId: hit.id },
-  });
+  await prisma.challengeMapCompletion.upsert({ where: { challengeMapId_userId: { challengeMapId, userId } }, create: { challengeMapId, userId, rating: map.rating ?? 0, accuracy, passed: true, points: 0, scoreId: hit.id }, update: { accuracy, passed: true, points: 0, scoreId: hit.id } });
   const newLevel = await getUserChallengeLevel(userId);
   return { status: level === currentLevel + 1 && newLevel > currentLevel ? "level_up" as const : "passed" as const, level: newLevel, mapLevel: level, points: 0, earnsRhp: false };
 }
 
-export type ChallengeLeaderboardRow = { position: number; userId: string; username: string; displayName: string | null; profileHandle: string; level: number; completions: number };
+export type ChallengeLeaderboardRow = { position: number; userId: string; username: string; displayName: string | null; profileHandle: string; avatarUrl: string | null; level: number; completions: number };
 
 export async function getChallengeLevelLeaderboard(limit = 100): Promise<ChallengeLeaderboardRow[]> {
-  const users = await prisma.user.findMany({ where: { rhythiaProfile: { isNot: null } }, select: { id: true, username: true, displayName: true, profileHandle: true } });
-  const rows = await Promise.all(users.map(async (user) => ({ userId: user.id, username: user.username, displayName: user.displayName, profileHandle: user.profileHandle, level: await getUserChallengeLevel(user.id), completions: await prisma.challengeMapCompletion.count({ where: { userId: user.id, passed: true } }) })));
+  const users = await prisma.user.findMany({ where: { rhythiaProfile: { isNot: null } }, select: { id: true, username: true, displayName: true, profileHandle: true, avatar: true, discordId: true } });
+  const rows = await Promise.all(users.map(async (user) => ({ userId: user.id, username: user.username, displayName: user.displayName, profileHandle: user.profileHandle, avatarUrl: getAvatarUrl(user), level: await getUserChallengeLevel(user.id), completions: await prisma.challengeMapCompletion.count({ where: { userId: user.id, passed: true } }) })));
   return rows.sort((a, b) => b.level - a.level || b.completions - a.completions).slice(0, limit).map((row, index) => ({ position: index + 1, ...row }));
 }
 
