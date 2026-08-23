@@ -9,22 +9,28 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#0b0f19",
-        surface: "#12182c",
-        muted: "#7b8aaf",
-        border: "#1d263b",
-        accent: "#7289da",
-        accent2: "#42b983"
+        background: "#070a12",
+        surface: "#101629",
+        muted: "#8d99b5",
+        border: "rgba(148, 163, 184, 0.13)",
+        accent: "#7c8ff0",
+        accent2: "#55d6a0"
       },
       boxShadow: {
-        glow: "0 20px 60px rgba(46, 74, 196, 0.12)",
+        glow: "0 24px 70px rgba(67, 82, 180, 0.16)",
+        card: "0 18px 50px rgba(0, 0, 0, 0.18)"
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: ["Inter", "system-ui", "sans-serif"]
       },
-    },
+      borderRadius: {
+        xl: "0.9rem",
+        "2xl": "1.15rem",
+        "3xl": "1.5rem"
+      }
+    }
   },
-  plugins: [],
+  plugins: []
 };
 
 export default config;
