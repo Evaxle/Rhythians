@@ -57,12 +57,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <p className="font-semibold text-white">Rhythians</p>
                 <p>Powered by Discord, Supabase, and Next.js.</p>
               </div>
-              <div className="flex flex-wrap gap-3 text-sm text-muted">
+              <div className="flex flex-wrap items-center gap-3 text-sm text-muted">
                 <a href="/" className="hover:text-white">Home</a>
                 <a href="/wiki" className="hover:text-white">Wiki</a>
                 <a href="/clips" className="hover:text-white">Clips</a>
                 <a href="/rules" className="hover:text-white">Rules</a>
                 <a href="/community" className="hover:text-white">Community</a>
+                <a href="/profile/lc727-0" className="rounded-full border border-border bg-white/5 px-3 py-1.5 font-medium transition hover:border-accent/40 hover:bg-white/10 hover:text-white">Daily maps and Rank icons made by lc727</a>
               </div>
             </div>
           </footer>
