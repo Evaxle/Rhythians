@@ -33,21 +33,7 @@ export function DownloadRankedMapsButton({ rankLabel }: { rankLabel: string }) {
   }
 
   return <div className="relative">
-    <button type="button" onClick={() => setOpen(true)} disabled={busy} className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-4 py-2 text-sm font-semibold text-accent transition hover:bg-accent/20 disabled:cursor-wait disabled:opacity-50">
-      <Download size={16} />
-      {busy ? "Preparing maps..." : `Download all ${rankLabel} maps`}
-    </button>
-    {open && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onMouseDown={() => !busy && setOpen(false)}>
-      <div className="w-full max-w-md rounded-3xl border border-border bg-surface p-6 shadow-2xl" onMouseDown={(event) => event.stopPropagation()}>
-        <h2 className="text-xl font-semibold text-white">Download {rankLabel} maps</h2>
-        <p className="mt-2 text-sm leading-6 text-muted">Choose which maps to include in your download.</p>
-        <div className="mt-5 grid gap-2">
-          <button type="button" onClick={() => void handleDownload("ranked")} disabled={busy} className="rounded-2xl border border-border bg-background/60 px-4 py-3 text-left text-sm font-semibold text-white transition hover:border-accent/40">Download all ranked</button>
-          <button type="button" onClick={() => void handleDownload("ranked-legacy")} disabled={busy} className="rounded-2xl border border-border bg-background/60 px-4 py-3 text-left text-sm font-semibold text-white transition hover:border-accent/40">Ranked plus legacy</button>
-          <button type="button" onClick={() => void handleDownload("legacy")} disabled={busy} className="rounded-2xl border border-border bg-background/60 px-4 py-3 text-left text-sm font-semibold text-white transition hover:border-accent/40">Download just legacy maps</button>
-          <button type="button" onClick={() => setOpen(false)} disabled={busy} className="rounded-2xl border border-border bg-white/5 px-4 py-3 text-left text-sm font-semibold text-muted transition hover:text-white">Cancel</button>
-        </div>
-      </div>
-    </div>}
+    <button type="button" onClick={() => setOpen(true)} disabled={busy} className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-4 py-2 text-sm font-semibold text-accent transition hover:bg-accent/20 disabled:cursor-wait disabled:opacity-50"><Download size={16} />{busy ? "Preparing maps..." : `Download all ${rankLabel} maps`}</button>
+    {open && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onMouseDown={() => !busy && setOpen(false)}><div className="w-full max-w-md rounded-3xl border border-border bg-surface p-6 shadow-2xl" onMouseDown={(event) => event.stopPropagation()}><h2 className="text-xl font-semibold text-white">Download {rankLabel} maps</h2><p className="mt-2 text-sm leading-6 text-muted">Choose which maps to include in your download.</p><div className="mt-5 grid gap-2"><button type="button" onClick={() => setOpen(false)} disabled={busy} className="rounded-2xl border border-border bg-white/5 px-4 py-3 text-left text-sm font-semibold text-muted transition hover:text-white">Cancel</button><button type="button" onClick={() => void handleDownload("ranked")} disabled={busy} className="rounded-2xl border border-border bg-background/60 px-4 py-3 text-left text-sm font-semibold text-white transition hover:border-accent/40">Download all ranked</button><button type="button" onClick={() => void handleDownload("ranked-legacy")} disabled={busy} className="rounded-2xl border border-border bg-background/60 px-4 py-3 text-left text-sm font-semibold text-white transition hover:border-accent/40">Ranked plus legacy</button><button type="button" onClick={() => void handleDownload("legacy")} disabled={busy} className="rounded-2xl border border-border bg-background/60 px-4 py-3 text-left text-sm font-semibold text-white transition hover:border-accent/40">Download just legacy maps</button></div></div></div>}
   </div>;
 }
