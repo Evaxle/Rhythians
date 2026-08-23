@@ -61,30 +61,18 @@ function buildZip(files: Array<{ name: string; data: Buffer }>) {
   const centralParts: Buffer[] = [];
   let offset = 0;
   const { time, day } = dosTimeAndDate();
-
   for (const file of files) {
     const name = Buffer.from(file.name, "utf8");
     const size = file.data.length;
     const checksum = crc32(file.data);
-    const local = Buffer.concat([
-      u32(0x04034b50), u16(20), u16(0x0800), u16(0), u16(time), u16(day),
-      u32(checksum), u32(size), u32(size), u16(name.length), u16(0), name, file.data,
-    ]);
+    const local = Buffer.concat([u32(0x04034b50), u16(20), u16(0x0800), u16(0), u16(time), u16(day), u32(checksum), u32(size), u32(size), u16(name.length), u16(0), name, file.data]);
     localParts.push(local);
-    centralParts.push(Buffer.concat([
-      u32(0x02014b50), u16(20), u16(20), u16(0x0800), u16(0), u16(time), u16(day),
-      u32(checksum), u32(size), u32(size), u16(name.length), u16(0), u16(0), u16(0), u16(0),
-      u32(0), u32(offset), name,
-    ]));
+    centralParts.push(Buffer.concat([u32(0x02014b50), u16(20), u16(20), u16(0x0800), u16(0), u16(time), u16(day), u32(checksum), u32(size), u32(size), u16(name.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(offset), name]));
     offset += local.length;
   }
-
   const local = Buffer.concat(localParts);
   const central = Buffer.concat(centralParts);
-  const end = Buffer.concat([
-    u32(0x06054b50), u16(0), u16(0), u16(files.length), u16(files.length),
-    u32(central.length), u32(local.length), u16(0),
-  ]);
+  const end = Buffer.concat([u32(0x06054b50), u16(0), u16(0), u16(files.length), u16(files.length), u32(central.length), u32(local.length), u16(0)]);
   return Buffer.concat([local, central, end]);
 }
 
@@ -92,16 +80,7 @@ async function fetchMap(url: string, referer: string) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 15_000);
   try {
-    const response = await fetch(url, {
-      cache: "no-store",
-      redirect: "follow",
-      signal: controller.signal,
-      headers: {
-        accept: "application/octet-stream,application/x-sspm,*/*",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151.0.0.0 Safari/537.36",
-        referer,
-      },
-    });
+    const response = await fetch(url, { cache: "no-store", redirect: "follow", signal: controller.signal, headers: { accept: "application/octet-stream,application/x-sspm,*/*", "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151.0.0.0 Safari/537.36", referer } });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const contentType = response.headers.get("content-type") ?? "";
     if (contentType.includes("text/html")) throw new Error("Rhythia returned an HTML page instead of an SSPM file");
@@ -113,16 +92,26 @@ async function fetchMap(url: string, referer: string) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "You must be signed in." }, { status: 401 });
+
+  const mode = new URL(request.url).searchParams.get("mode") ?? "ranked";
+  if (!["ranked", "ranked-legacy", "legacy"].includes(mode)) return NextResponse.json({ error: "Invalid download mode." }, { status: 400 });
 
   const data = await getApprovedMaps(true, user.id);
   if (!data.rankInfo) return NextResponse.json({ error: "Unable to determine your rank." }, { status: 400 });
 
   const rankInfo = getRankInfo(user.rhp);
-  const maps = data.maps.filter((map) => map.isRanked && map.isAutoImported && map.rating != null && map.rating >= rankInfo.rangeMin && map.rating <= rankInfo.rangeMax);
-  if (maps.length === 0) return NextResponse.json({ error: "No ranked maps are available for your current rank." }, { status: 404 });
+  const maps = data.maps.filter((map) => {
+    const inRank = map.rating != null && map.rating >= rankInfo.rangeMin && map.rating <= rankInfo.rangeMax;
+    if (!inRank) return false;
+    if (mode === "legacy") return map.isLegacy;
+    if (mode === "ranked-legacy") return map.isRanked || map.isLegacy;
+    return map.isRanked;
+  });
+
+  if (maps.length === 0) return NextResponse.json({ error: `No ${mode === "legacy" ? "legacy" : "ranked"} maps are available for your current rank.` }, { status: 404 });
 
   const files: Array<{ name: string; data: Buffer }> = [];
   const failures: string[] = [];
@@ -147,12 +136,7 @@ export async function GET() {
   if (failures.length > 0) files.push({ name: "download-errors.txt", data: Buffer.from(`${failures.join("\n")}\n`, "utf8") });
 
   const zip = buildZip(files);
-  return new NextResponse(zip as unknown as BodyInit, {
-    headers: {
-      "Content-Type": "application/zip",
-      "Content-Disposition": `attachment; filename="${safeName(rankInfo.isExpert ? "Expert" : `${rankInfo.name} ${rankInfo.tier}`)}-maps.zip"`,
-      "Content-Length": String(zip.length),
-      "Cache-Control": "no-store",
-    },
-  });
+  const rankName = rankInfo.isExpert ? "Expert" : rankInfo.name;
+  const suffix = mode === "legacy" ? "legacy" : mode === "ranked-legacy" ? "ranked-plus-legacy" : "ranked";
+  return new NextResponse(zip as unknown as BodyInit, { headers: { "Content-Type": "application/zip", "Content-Disposition": `attachment; filename="${safeName(`${rankName}-${suffix}-maps`)}.zip"`, "Content-Length": String(zip.length), "Cache-Control": "no-store" } });
 }
