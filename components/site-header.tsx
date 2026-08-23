@@ -5,6 +5,7 @@ import { canAccessApproval } from "@/lib/approval";
 import { canAccessAdmin } from "@/lib/admin-access";
 import { NotificationsBell } from "@/components/notifications-bell";
 import { ProfileMenu } from "@/components/profile-menu";
+import { UnreadIndicator } from "@/components/messages/unread-indicator";
 import { version } from "@/package.json";
 
 const links = [
@@ -21,13 +22,17 @@ export async function SiteHeader() {
     ...(isAdmin ? [["/admin", "Admin"] as const] : [])
   ];
 
+  function navLabel(label: string) {
+    return <>{label}{label === "Friends" && <UnreadIndicator />}</>;
+  }
+
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-[#080b14]/82 shadow-[0_10px_40px_rgba(0,0,0,0.18)] backdrop-blur-2xl">
       <div className="mx-auto flex max-w-[1700px] items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-5 lg:px-7 2xl:px-9">
         <Link href="/" className="group flex shrink-0 items-center gap-2.5 rounded-2xl px-1.5 py-1.5 sm:gap-3"><span className="relative grid h-10 w-10 place-items-center overflow-hidden rounded-2xl bg-gradient-to-br from-accent to-indigo-400 shadow-[0_8px_30px_rgba(124,143,240,0.25)] ring-1 ring-white/10 sm:h-11 sm:w-11"><img src="/favicon.ico" alt="Rhythians" className="h-full w-full object-cover transition duration-300 group-hover:scale-105" /></span><span className="hidden text-[15px] font-bold tracking-tight text-white sm:block sm:text-base">Rhythians</span><span className="hidden rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-muted xl:inline">Beta</span><span className="hidden text-[10px] font-medium text-muted 2xl:inline">v{version}</span></Link>
-        <nav className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 xl:flex">{[...links, ...extraLinks].map(([href, label]) => <Link key={href} href={href} className={`rounded-xl px-2.5 py-2 text-[11px] font-medium hover:bg-white/[0.05] hover:text-white 2xl:px-3 2xl:text-xs ${label === "Admin" || label === "Review" ? "text-accent" : "text-muted"}`}>{label}</Link>)}</nav>
+        <nav className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 xl:flex">{[...links, ...extraLinks].map(([href, label]) => <Link key={href} href={href} className={`rounded-xl px-2.5 py-2 text-[11px] font-medium hover:bg-white/[0.05] hover:text-white 2xl:px-3 2xl:text-xs ${label === "Admin" || label === "Review" ? "text-accent" : "text-muted"}`}>{navLabel(label)}</Link>)}</nav>
         <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
-          <details className="relative xl:hidden"><summary className="flex h-10 cursor-pointer list-none items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm text-muted hover:border-white/20 hover:bg-white/[0.07] hover:text-white [&::-webkit-details-marker]:hidden" aria-label="Open navigation menu"><Menu size={17} /><span className="hidden sm:inline">Menu</span><ChevronDown size={14} className="hidden sm:inline" /></summary><nav className="absolute right-0 mt-2 grid w-64 gap-1 rounded-2xl border border-white/10 bg-[#101629]/95 p-2 shadow-2xl backdrop-blur-2xl">{[...links, ...extraLinks].map(([href, label]) => <Link key={href} href={href} className={`rounded-xl px-3.5 py-2.5 text-sm font-medium hover:bg-white/[0.06] hover:text-white ${label === "Admin" || label === "Review" ? "text-accent" : "text-muted"}`}>{label}</Link>)}</nav></details>
+          <details className="relative xl:hidden"><summary className="flex h-10 cursor-pointer list-none items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm text-muted hover:border-white/20 hover:bg-white/[0.07] hover:text-white [&::-webkit-details-marker]:hidden" aria-label="Open navigation menu"><Menu size={17} /><span className="hidden sm:inline">Menu</span><ChevronDown size={14} className="hidden sm:inline" /></summary><nav className="absolute right-0 mt-2 grid w-64 gap-1 rounded-2xl border border-white/10 bg-[#101629]/95 p-2 shadow-2xl backdrop-blur-2xl">{[...links, ...extraLinks].map(([href, label]) => <Link key={href} href={href} className={`rounded-xl px-3.5 py-2.5 text-sm font-medium hover:bg-white/[0.06] hover:text-white ${label === "Admin" || label === "Review" ? "text-accent" : "text-muted"}`}>{navLabel(label)}</Link>)}</nav></details>
           <Link href="/search" aria-label="Search" className="inline-flex h-10 shrink-0 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm text-muted hover:border-white/20 hover:bg-white/[0.07] hover:text-white sm:px-3.5"><Search size={16} /><span className="hidden lg:inline">Search</span></Link>
           {user && <NotificationsBell />}{user ? <ProfileMenu user={user} /> : <Link href="/login" className="inline-flex h-10 shrink-0 items-center gap-2 rounded-xl bg-accent px-3.5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(124,143,240,0.2)] hover:bg-accent2 sm:px-4"><MessageCircle size={16} /><span className="hidden sm:inline">Login</span></Link>}
         </div>
