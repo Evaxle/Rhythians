@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { RankInfo } from "@/lib/ranks";
 import { isMapInRankRange, rankIndexForRating, rhpGainForMap, RANKS } from "@/lib/ranks";
@@ -15,13 +15,24 @@ type MapEntry = {
   isRanked: boolean; isLegacy: boolean;
 };
 
-export function MapsBrowser({ maps, rankInfo, userRhp }: { maps: MapEntry[]; rankInfo: RankInfo; userRhp: number; currentUserId: string | null }) {
+type Props = { maps: MapEntry[]; rankInfo: RankInfo; userRhp: number; currentUserId: string | null; showLegacy?: boolean; onShowLegacyChange?: (value: boolean) => void };
+
+export function MapsBrowser({ maps, rankInfo, userRhp, showLegacy: externalShowLegacy, onShowLegacyChange }: Props) {
   const [showAll, setShowAll] = useState(false);
-  const [showLegacy, setShowLegacy] = useState(false);
+  const [showLegacy, setShowLegacy] = useState(externalShowLegacy ?? false);
   const [query, setQuery] = useState("");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [busyId, setBusyId] = useState("");
   const [messages, setMessages] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (externalShowLegacy !== undefined) setShowLegacy(externalShowLegacy);
+  }, [externalShowLegacy]);
+
+  function setLegacy(value: boolean) {
+    setShowLegacy(value);
+    onShowLegacyChange?.(value);
+  }
 
   const filtered = useMemo(() => {
     let list = showAll ? maps : maps.filter((map) => {
@@ -53,9 +64,9 @@ export function MapsBrowser({ maps, rankInfo, userRhp }: { maps: MapEntry[]; ran
   return <div className="space-y-6">
     <div className="flex flex-col gap-4 rounded-3xl border border-border bg-surface/95 p-5 shadow-glow sm:flex-row sm:items-center sm:justify-between">
       <div><p className="text-sm text-muted">Your rank: <span className="font-semibold" style={{ color: rankInfo.color }}>{rankInfo.isExpert ? "Expert" : `${rankInfo.name} ${rankInfo.tier}`}</span> · {userRhp.toLocaleString()} RHP</p><p className="mt-1 text-xs text-muted">Allowed rating range: <span className="font-semibold text-white">{rankInfo.rangeMin.toFixed(2)} – {rankInfo.rangeMax.toFixed(2)}</span></p></div>
-      <div className="flex flex-wrap gap-2"><label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-border bg-background/60 px-4 py-3"><input type="checkbox" checked={showLegacy} onChange={(event) => setShowLegacy(event.target.checked)} className="h-4 w-4 accent-accent" /><span className="text-sm font-semibold text-white">Show legacy maps</span></label><label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-border bg-background/60 px-4 py-3"><input type="checkbox" checked={showAll} onChange={(event) => setShowAll(event.target.checked)} className="h-4 w-4 accent-accent" /><span className="text-sm font-semibold text-white">Show all maps</span></label></div>
+      <div className="flex flex-wrap gap-2"><label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-border bg-background/60 px-4 py-3"><input type="checkbox" checked={showLegacy} onChange={(event) => setLegacy(event.target.checked)} className="h-4 w-4 accent-accent" /><span className="text-sm font-semibold text-white">Show legacy maps</span></label><label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-border bg-background/60 px-4 py-3"><input type="checkbox" checked={showAll} onChange={(event) => setShowAll(event.target.checked)} className="h-4 w-4 accent-accent" /><span className="text-sm font-semibold text-white">Show all maps</span></label></div>
     </div>
-    <div className="relative"><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search maps by title, artist, or mapper..." className="w-full rounded-full border border-border bg-surface/95 py-3 px-4 text-sm text-white placeholder:text-muted focus:border-accent/50 focus:outline-none" /></div>
+    <div className="relative"><input type="search" value={query} onChange={(event) => { setQuery(event.target.value); setVisibleCount(PAGE_SIZE); }} placeholder="Search maps by title, artist, or mapper..." className="w-full rounded-full border border-border bg-surface/95 py-3 px-4 text-sm text-white placeholder:text-muted focus:border-accent/50 focus:outline-none" /></div>
     {showAll && outOfRangeCount > 0 && <div className="rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm text-amber-200">Showing ranked maps outside your rank's rating range. Those maps do not award RHP.</div>}
     {filtered.length === 0 ? <div className="rounded-3xl border border-dashed border-border bg-background/50 p-10 text-center text-sm text-muted">{query.trim() ? `No maps match "${query.trim()}".` : "No maps are available."}</div> : <div className="grid gap-5 lg:grid-cols-2">{visibleMaps.map((map) => {
       const message = messages[map.id];
