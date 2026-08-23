@@ -22,7 +22,7 @@ export async function POST(request: Request, { params }: Props) {
   const content = typeof body?.content === "string" ? body.content.trim() : "";
   if (!content || content.length > 4000) return NextResponse.json({ error: "Message must be between 1 and 4000 characters." }, { status: 400 });
   const message = await prisma.message.create({ data: { conversationId, senderId: user.id, content: censorProfanity(content).filtered } });
-  await prisma.$executeRawUnsafe(`INSERT INTO "MessageReply" ("id", "messageId", "repliedToId") VALUES (gen_random_uuid()::text, $1, $2)`, message.id, messageId);
+  await prisma.$executeRawUnsafe(`INSERT INTO "MessageReply" ("id", "messageId", "repliedToId") VALUES ($1, $2, $3)`, crypto.randomUUID(), message.id, messageId);
   await prisma.conversation.update({ where: { id: conversationId }, data: { updatedAt: new Date() } });
   return NextResponse.json({ message: { id: message.id, content: message.content, senderId: message.senderId, createdAt: message.createdAt.toISOString(), isEdited: message.isEdited, isDeleted: message.isDeleted }, replyToId: messageId }, { status: 201 });
 }
