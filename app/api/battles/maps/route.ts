@@ -13,6 +13,12 @@ export async function GET(request: Request) {
   if (lobbyId) {
     const members = await prisma.$queryRawUnsafe<Array<{ rhp: number }>>(`SELECT u.rhp FROM "BattleLobbyMember" m JOIN "User" u ON u.id=m."userId" WHERE m."lobbyId"=$1`, lobbyId);
     if (members.length) defaultRankIndex = Math.min(...members.map((member) => getRankInfo(member.rhp).index));
+  } else {
+    const membership = await prisma.$queryRawUnsafe<Array<{ lobbyId: string }>>(`SELECT "lobbyId" FROM "BattleLobbyMember" WHERE "userId"=$1 ORDER BY "joinedAt" DESC LIMIT 1`, user.id);
+    if (membership[0]) {
+      const members = await prisma.$queryRawUnsafe<Array<{ rhp: number }>>(`SELECT u.rhp FROM "BattleLobbyMember" m JOIN "User" u ON u.id=m."userId" WHERE m."lobbyId"=$1`, membership[0].lobbyId);
+      if (members.length) defaultRankIndex = Math.min(...members.map((member) => getRankInfo(member.rhp).index));
+    }
   }
   const rank = getRankInfo(defaultRankIndex);
   const maps = await prisma.$queryRawUnsafe<any[]>(`SELECT id,title,artist,rating,length,"mapFileUrl","imageUrl" FROM "ChallengeMap" WHERE status::text IN ('approved','legacy') AND rating IS NOT NULL AND ($1='' OR LOWER(title) LIKE '%' || $1 || '%' OR LOWER(COALESCE(artist,'')) LIKE '%' || $1 || '%' OR CAST("sourceBeatmapId" AS TEXT) LIKE '%' || $1 || '%') ORDER BY CASE WHEN rating >= $2 AND rating <= $3 THEN 0 ELSE 1 END,rating NULLS LAST,title LIMIT 100`, query, rank.rangeMin, rank.rangeMax);
