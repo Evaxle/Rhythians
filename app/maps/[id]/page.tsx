@@ -6,6 +6,7 @@ import { getRankInfo } from "@/lib/ranks";
 import { getRankedMapDetail } from "@/lib/ranked-map-leaderboard";
 import { MapDetail } from "@/components/maps/map-detail";
 import { MapRankingControls } from "@/components/maps/map-ranking-controls";
+import { CopyMapId } from "@/components/copy-map-id";
 
 export const dynamic = "force-dynamic";
 
@@ -21,5 +22,5 @@ export default async function RankedMapPage({ params }: Props) {
 
   const userRank = getRankInfo(userRow?.rhp ?? 0);
   const canRank = hasPermission(user, "clips_moderate") || hasPermission(user, "admin_access") || isOwner(user);
-  return <div className="mx-auto max-w-6xl space-y-4"><div className={`rounded-2xl border p-4 text-sm ${map.isRanked ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200" : "border-amber-400/30 bg-amber-400/10 text-amber-200"}`}><div>{map.isRanked ? "Ranked map — this map is eligible to award RHP." : "Unranked map — this map does not award RHP until a map reviewer, admin, or owner approves it as ranked."}</div>{!map.isRanked && <div className="mt-4"><MapRankingControls mapId={map.mapId} canRank={canRank} /></div>}</div><MapDetail map={map} userRank={userRank} currentUserId={user.id} /></div>;
+  return <div className="mx-auto max-w-6xl space-y-4"><div className={`rounded-2xl border p-4 text-sm ${map.isRanked ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200" : "border-amber-400/30 bg-amber-400/10 text-amber-200"}`}><div className="flex flex-wrap items-center justify-between gap-3"><span>{map.isRanked ? "Ranked map — this map is eligible to award RHP." : "Unranked map — this map does not award RHP until a map reviewer, admin, or owner approves it as ranked."}</span><CopyMapId mapId={map.mapId} /></div>{!map.isRanked && <div className="mt-4"><MapRankingControls mapId={map.mapId} canRank={canRank} /></div>}</div><MapDetail map={map} userRank={userRank} currentUserId={user.id} /></div>;
 }
