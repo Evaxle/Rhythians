@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { createSession, setSessionCookie } from "@/lib/auth";
 import { hashPassword } from "@/lib/password";
 import { checkRateLimit } from "@/lib/security";
+import { recordReferral, REFERRAL_COOKIE_NAME } from "@/lib/referrals";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const USERNAME_REGEX = /^[a-zA-Z0-9_ ]{3,32}$/;
@@ -53,6 +54,7 @@ export async function POST(request: Request) {
     profileHandle = `${baseHandle}-${Math.random().toString(36).slice(2, 6)}`;
   }
 
+  const referralCookie = request.headers.get("cookie")?.match(new RegExp(`${REFERRAL_COOKIE_NAME}=([^;]+)`))?.[1];
   const user = await prisma.user.create({
     data: {
       username,
@@ -64,12 +66,21 @@ export async function POST(request: Request) {
     },
   });
 
+  if (referralCookie) {
+    try {
+      await recordReferral(decodeURIComponent(referralCookie), user.id);
+    } catch (error) {
+      console.error("Failed to record referral:", error);
+    }
+  }
+
   const token = await createSession(user.id);
   const response = NextResponse.json({
     user: { id: user.id, username: user.username, profileHandle: user.profileHandle, onboardingCompleted: user.onboardingCompleted },
     redirectTo: "/onboarding",
   });
   setSessionCookie(response, token);
+  response.cookies.set({ name: REFERRAL_COOKIE_NAME, value: "", httpOnly: false, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: 0 });
 
   return response;
 }
