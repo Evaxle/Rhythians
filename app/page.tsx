@@ -17,7 +17,7 @@ async function getStats() {
   const [members, clips, maps, online] = await Promise.allSettled([
     prisma.user.count(),
     prisma.clip.count({ where: { status: "approved" } }),
-    prisma.challengeMap.count({ where: { status: "approved" } }),
+    prisma.challengeMap.count({ where: { status: "approved", isAutoImported: false } }),
     getOnlineUserCount(),
   ]);
   if (members.status === "rejected") console.error("Member count unavailable:", members.reason);
