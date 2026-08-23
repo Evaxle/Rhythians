@@ -6,6 +6,12 @@ import { RhythianPathResetButton } from "@/components/admin/rhythian-path-reset-
 
 export const dynamic = "force-dynamic";
 
+function formatLength(length: number | null | undefined) {
+  if (length == null || !Number.isFinite(length)) return "—";
+  const totalSeconds = Math.max(0, Math.round(length / 1000));
+  return `${Math.floor(totalSeconds / 60)}:${String(totalSeconds % 60).padStart(2, "0")}`;
+}
+
 export default async function AdminRhythianPathPage() {
   const path = await getSeasonalPath();
   const rows = await prisma.$queryRawUnsafe<Array<{ userId: string; username: string; displayName: string | null; profileHandle: string; rhp: number; maxRank: number | null }>>(`SELECT u."id" AS "userId", u."username", u."displayName", u."profileHandle", u."rhp", MAX(c."rankIndex")::int AS "maxRank" FROM "User" u LEFT JOIN "SeasonalPathCompletion" c ON c."userId" = u."id" AND c."seasonId" = $1 GROUP BY u."id" ORDER BY "maxRank" DESC NULLS LAST, u."username" ASC`, path.season.id);
@@ -32,7 +38,7 @@ export default async function AdminRhythianPathPage() {
               </div>
               <div className="mt-5 rounded-2xl border border-border bg-background/70 p-4">
                 <p className="text-xs uppercase tracking-[0.2em] text-accent">Required map</p>
-                {map ? <><p className="mt-2 text-lg font-semibold text-white">{map.title}</p>{map.artist && <p className="mt-1 text-sm text-muted">{map.artist}</p>}<div className="mt-3 grid grid-cols-2 gap-3 text-xs text-muted sm:grid-cols-4"><div><p>Rating</p><p className="mt-1 font-semibold text-white">{map.rating?.toFixed(2)}</p></div><div><p>Target</p><p className="mt-1 font-semibold text-white">{target}</p></div><div><p>Mapper</p><p className="mt-1 truncate font-semibold text-white">{map.mapperName ?? "Unknown"}</p></div><div><p>Length</p><p className="mt-1 font-semibold text-white">{map.length ? `${Math.round(map.length)}s` : "—"}</p></div></div><div className="mt-4 flex flex-wrap gap-2"><Link href={`/maps/${map.id}`} className="inline-flex rounded-full border border-border bg-white/5 px-4 py-2 text-xs font-semibold text-white hover:border-accent/40">View map</Link><RhythianPathResetButton rankIndex={rank.index} rankName={rank.name} /></div></> : <><p className="mt-2 text-sm text-muted">No map assigned.</p><div className="mt-4"><RhythianPathResetButton rankIndex={rank.index} rankName={rank.name} /></div></>}
+                {map ? <><p className="mt-2 text-lg font-semibold text-white">{map.title}</p>{map.artist && <p className="mt-1 text-sm text-muted">{map.artist}</p>}<div className="mt-3 grid grid-cols-2 gap-3 text-xs text-muted sm:grid-cols-4"><div><p>Rating</p><p className="mt-1 font-semibold text-white">{map.rating?.toFixed(2)}</p></div><div><p>Target</p><p className="mt-1 font-semibold text-white">{target}</p></div><div><p>Mapper</p><p className="mt-1 truncate font-semibold text-white">{map.mapperName ?? "Unknown"}</p></div><div><p>Length</p><p className="mt-1 inline-flex rounded-lg border border-border bg-white/5 px-2 py-1 font-semibold text-white">{formatLength(map.length)}</p></div></div><div className="mt-4 flex flex-wrap gap-2"><Link href={`/maps/${map.id}`} className="inline-flex rounded-full border border-border bg-white/5 px-4 py-2 text-xs font-semibold text-white hover:border-accent/40">View map</Link><RhythianPathResetButton rankIndex={rank.index} rankName={rank.name} /></div></> : <><p className="mt-2 text-sm text-muted">No map assigned.</p><div className="mt-4"><RhythianPathResetButton rankIndex={rank.index} rankName={rank.name} /></div></>}
               </div>
               <div className="mt-5"><p className="text-xs uppercase tracking-[0.2em] text-accent">Users at this path rank</p>{users.length === 0 ? <p className="mt-3 text-sm text-muted">No users have completed through this rank.</p> : <div className="mt-3 max-h-72 space-y-2 overflow-y-auto">{users.map((user) => <Link key={user.userId} href={`/profile/${user.profileHandle}`} className="flex items-center justify-between rounded-2xl border border-border bg-background/60 px-4 py-3 transition hover:border-accent/40"><span className="min-w-0 truncate font-semibold text-white">{user.displayName ?? user.username}</span><span className="ml-3 shrink-0 text-xs text-muted">@{user.profileHandle}</span></Link>)}</div>}</div>
             </article>
