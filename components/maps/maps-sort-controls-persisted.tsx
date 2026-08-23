@@ -81,6 +81,6 @@ export function MapsSortControlsPersisted({ maps, rankInfo, userRhp, currentUser
         <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-muted">Scores<select value={scoreFilter} onChange={(event) => setScoreFilter(event.target.value as ScoreFilter)} className="min-w-32 rounded-xl border border-border bg-background/70 px-3 py-2 text-sm font-normal normal-case tracking-normal text-white focus:border-accent/50 focus:outline-none"><option value="all">All maps</option><option value="scored">Already scored</option><option value="unscored">Not scored</option></select></label>
       </div>
     </div>
-    <MapsBrowser maps={filteredMaps} rankInfo={rankInfo} userRhp={userRhp} currentUserId={currentUserId} />
+    <MapsBrowser maps={filteredMaps} rankInfo={rankInfo} userRhp={userRhp} currentUserId={currentUserId} showLegacy={showLegacy} onShowLegacyChange={setShowLegacy} />
   </div>;
 }
