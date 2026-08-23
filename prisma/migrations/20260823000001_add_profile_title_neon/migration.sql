@@ -1,0 +1,1 @@
+ALTER TABLE "UserProfileTitle" ADD COLUMN "neon" BOOLEAN NOT NULL DEFAULT false;
