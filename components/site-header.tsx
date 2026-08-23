@@ -8,7 +8,7 @@ import { ProfileMenu } from "@/components/profile-menu";
 import { version } from "@/package.json";
 
 const links = [
-  ["/", "Home"], ["/daily", "Daily"], ["/path", "Path"], ["/maps", "Maps"], ["/categories?tab=challenge", "Challenge"], ["/online", "Online"], ["/leaderboards", "Leaderboards"], ["/wiki", "Wiki"], ["/clips", "Clips"], ["/rules", "Rules"], ["/community", "Community"]
+  ["/", "Home"], ["/daily", "Daily"], ["/path", "Path"], ["/maps", "Maps"], ["/categories?tab=challenge", "Challenge"], ["/battles", "Battles"], ["/online", "Online"], ["/leaderboards", "Leaderboards"], ["/wiki", "Wiki"], ["/clips", "Clips"], ["/rules", "Rules"], ["/community", "Community"]
 ] as const;
 
 export async function SiteHeader() {
