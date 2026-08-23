@@ -3,51 +3,9 @@ import { settingsSections } from "@/lib/knowledge";
 export default function SettingsGuidePage() {
   return (
     <div className="space-y-8">
-      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
-        <p className="text-sm uppercase tracking-[0.3em] text-accent">Settings Guide</p>
-        <h1 className="mt-3 text-3xl font-semibold text-white">Game settings that change your aim</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
-          Rhythia&rsquo;s settings control how notes are drawn, how far ahead you read them, and how
-          your cursor moves. Tuning them changes how easy or hard every map feels. These are the
-          settings that make the biggest difference to your gameplay.
-        </p>
-      </section>
-
-      {settingsSections.map((section, index) => (
-        <section key={section.slug} id={section.slug} className="scroll-mt-24 rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
-          <div className="flex items-start gap-4">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/15 text-sm font-semibold text-accent">
-              {index + 1}
-            </span>
-            <div className="min-w-0">
-              <h2 className="text-2xl font-semibold text-white">{section.title}</h2>
-              <p className="mt-2 text-sm font-medium text-accent">{section.summary}</p>
-            </div>
-          </div>
-
-          <div className="mt-6 space-y-4">
-            {section.content.map((paragraph, paragraphIndex) => (
-              <p key={paragraphIndex} className="text-sm leading-7 text-muted">
-                {paragraph}
-              </p>
-            ))}
-          </div>
-
-          {section.tips && section.tips.length > 0 ? (
-            <div className="mt-6 rounded-3xl border border-border bg-background/70 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-accent">Quick tips</p>
-              <ul className="mt-3 space-y-2">
-                {section.tips.map((tip, tipIndex) => (
-                  <li key={tipIndex} className="flex gap-3 text-sm leading-6 text-muted">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
-                    <span>{tip}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-        </section>
-      ))}
+      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow"><p className="text-sm uppercase tracking-[0.3em] text-accent">Settings Guide</p><h1 className="mt-3 text-3xl font-semibold text-white">Game settings that change your aim</h1><p className="mt-3 max-w-3xl text-sm leading-7 text-muted">Rhythia&apos;s settings control how notes are drawn, how far ahead you read them, and how your cursor moves. Tuning them changes how easy or hard every map feels.</p></section>
+      <section className="rounded-3xl border border-accent/30 bg-accent/5 p-8 shadow-glow"><p className="text-sm uppercase tracking-[0.3em] text-accent">Sensitivity guide</p><h2 className="mt-3 text-2xl font-semibold text-white">Build your sensitivity gradually</h2><div className="mt-4 space-y-4 text-sm leading-7 text-muted"><p>As a beginner, starting at a lower in-game sensitivity can make it easier to learn patterns and develop controlled movement. As you improve, gradually increasing your sensitivity can make faster patterns and larger movements easier to execute.</p><p>New players should pick a consistent, sensible DPI and keep it the same if possible. A practical starting range is <span className="font-semibold text-white">400 DPI to 4000 DPI</span>. Your in-game sensitivity is the setting that should change as you find what works for you.</p><p>Many players use roughly <span className="font-semibold text-white">0.4 to 0.8 in-game sensitivity</span>, but sensitivity is completely correlated with DPI. The same in-game number can feel very different at different DPI values, so do not copy a sensitivity value without considering your DPI.</p><p>Do not start with an extremely high sensitivity or an extremely low sensitivity. Start somewhere controllable, learn the patterns, and slowly increase or adjust the in-game sensitivity as your skill and comfort improve.</p></div><div className="mt-6 grid gap-3 sm:grid-cols-3"><div className="rounded-2xl border border-border bg-background/70 p-4"><p className="text-sm font-semibold text-white">Start controlled</p><p className="mt-2 text-xs leading-5 text-muted">Choose a comfortable sensitivity that lets you learn patterns without fighting your cursor.</p></div><div className="rounded-2xl border border-border bg-background/70 p-4"><p className="text-sm font-semibold text-white">Keep DPI consistent</p><p className="mt-2 text-xs leading-5 text-muted">Changing DPI and in-game sensitivity together makes it harder to understand what actually improved your control.</p></div><div className="rounded-2xl border border-border bg-background/70 p-4"><p className="text-sm font-semibold text-white">Increase gradually</p><p className="mt-2 text-xs leading-5 text-muted">When your current sensitivity starts limiting faster patterns, make small adjustments instead of jumping to an extreme value.</p></div></div></section>
+      {settingsSections.map((section, index) => <section key={section.slug} id={section.slug} className="scroll-mt-24 rounded-3xl border border-border bg-surface/95 p-8 shadow-glow"><div className="flex items-start gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/15 text-sm font-semibold text-accent">{index + 1}</span><div className="min-w-0"><h2 className="text-2xl font-semibold text-white">{section.title}</h2><p className="mt-2 text-sm font-medium text-accent">{section.summary}</p></div></div><div className="mt-6 space-y-4">{section.content.map((paragraph, paragraphIndex) => <p key={paragraphIndex} className="text-sm leading-7 text-muted">{paragraph}</p>)}</div>{section.tips && section.tips.length > 0 ? <div className="mt-6 rounded-3xl border border-border bg-background/70 p-5"><p className="text-xs font-semibold uppercase tracking-[0.24em] text-accent">Quick tips</p><ul className="mt-3 space-y-2">{section.tips.map((tip, tipIndex) => <li key={tipIndex} className="flex gap-3 text-sm leading-6 text-muted"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" /><span>{tip}</span></li>)}</ul></div> : null}</section>)}
     </div>
   );
 }
