@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 
 export type ChallengeLevelRow = {
@@ -28,7 +27,7 @@ export function ChallengeLevelLeaderboard({ rows, currentUserId }: { rows: Chall
           return <div key={row.userId} className={`grid grid-cols-[2.5rem_2.75rem_minmax(0,1fr)_auto] items-center gap-3 border-b border-border px-4 py-3 last:border-0 ${current ? "bg-accent/10" : "bg-background/60"}`}>
             <span className="text-sm font-bold text-muted">{row.position}</span>
             <Link href={`/profile/${row.profileHandle}`} aria-label={`View ${row.displayName ?? row.username}'s profile`} className="relative h-10 w-10 overflow-hidden rounded-full border border-border bg-white/5">
-              {row.avatarUrl ? <Image src={row.avatarUrl} alt="" fill sizes="40px" className="object-cover" /> : <span className="flex h-full w-full items-center justify-center text-sm font-bold text-muted">{(row.displayName ?? row.username).slice(0, 1).toUpperCase()}</span>}
+              {row.avatarUrl ? <img src={row.avatarUrl} alt="" className="h-full w-full object-cover" /> : <span className="flex h-full w-full items-center justify-center text-sm font-bold text-muted">{(row.displayName ?? row.username).slice(0, 1).toUpperCase()}</span>}
             </Link>
             <div className="min-w-0">
               <Link href={`/profile/${row.profileHandle}`} className={`truncate text-sm font-semibold hover:text-accent ${current ? "text-accent" : "text-white"}`}>{row.displayName ?? row.username}{current ? " (you)" : ""}</Link>
