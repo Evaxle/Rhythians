@@ -9,7 +9,8 @@ export function ProfileShare({ userId, progress, earned }: { userId: string; pro
   const [redeemed, setRedeemed] = useState(earned);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const link = `${typeof window !== "undefined" ? window.location.origin : ""}/share-${userId}`;
+  const origin = process.env.NEXT_PUBLIC_SITE_URL ?? (typeof window !== "undefined" ? window.location.origin : "https://rhythians.vercel.app");
+  const link = `${origin.replace(/\/$/, "")}/share-${userId}`;
 
   async function copyLink() {
     setError("");
