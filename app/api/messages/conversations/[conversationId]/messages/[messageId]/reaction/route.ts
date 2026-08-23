@@ -17,6 +17,6 @@ export async function POST(request: Request, { params }: Props) {
   if (!emoji || emoji.length > 16) return NextResponse.json({ error: "Invalid reaction." }, { status: 400 });
   const existing = await prisma.$queryRawUnsafe<Array<{ id: string }>>(`SELECT "id" FROM "MessageReaction" WHERE "messageId" = $1 AND "userId" = $2 AND "emoji" = $3 LIMIT 1`, messageId, user.id, emoji);
   if (existing[0]) await prisma.$executeRawUnsafe(`DELETE FROM "MessageReaction" WHERE "id" = $1`, existing[0].id);
-  else await prisma.$executeRawUnsafe(`INSERT INTO "MessageReaction" ("id", "messageId", "userId", "emoji") VALUES (gen_random_uuid()::text, $1, $2, $3)`, messageId, user.id, emoji);
+  else await prisma.$executeRawUnsafe(`INSERT INTO "MessageReaction" ("id", "messageId", "userId", "emoji") VALUES ($1, $2, $3, $4)`, crypto.randomUUID(), messageId, user.id, emoji);
   return NextResponse.json({ ok: true, active: !existing[0] });
 }
