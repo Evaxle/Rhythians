@@ -11,13 +11,17 @@ export async function GET(request: Request) {
   if (!players.some((player) => player.userId === user.id)) return NextResponse.json({ error: "You are not part of this battle." }, { status: 403 });
   const memberIds = players.map((player) => player.userId);
   const name = `battle:${matchId}`;
-  let conversation = await prisma.conversation.findFirst({ where: { type: "group", name }, select: { id: true } });
-  if (!conversation) {
-    conversation = await prisma.conversation.create({ data: { type: "group", name, createdById: user.id, members: { create: memberIds.map((userId) => ({ userId })) } }, select: { id: true } });
-  } else {
-    const existing = await prisma.conversationMember.findMany({ where: { conversationId: conversation.id }, select: { userId: true } });
-    const missing = memberIds.filter((userId) => !existing.some((member) => member.userId === userId));
-    if (missing.length) await prisma.conversationMember.createMany({ data: missing.map((userId) => ({ conversationId: conversation!.id, userId })) });
-  }
-  return NextResponse.json({ conversationId: conversation.id });
+  const conversationId = await prisma.$transaction(async (tx) => {
+    await tx.$executeRawUnsafe("SELECT pg_advisory_xact_lock(hashtext($1))", name);
+    let conversation = await tx.conversation.findFirst({ where: { type: "group", name }, select: { id: true } });
+    if (!conversation) {
+      conversation = await tx.conversation.create({ data: { type: "group", name, createdById: user.id, members: { create: memberIds.map((userId) => ({ userId })) } }, select: { id: true } });
+    } else {
+      const existing = await tx.conversationMember.findMany({ where: { conversationId: conversation.id }, select: { userId: true } });
+      const missing = memberIds.filter((userId) => !existing.some((member) => member.userId === userId));
+      if (missing.length) await tx.conversationMember.createMany({ data: missing.map((userId) => ({ conversationId: conversation!.id, userId })) });
+    }
+    return conversation.id;
+  });
+  return NextResponse.json({ conversationId });
 }
