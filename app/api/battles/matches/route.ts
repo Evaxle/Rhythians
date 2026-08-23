@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   if (action === "queue") {
     const mode = typeof body?.mode === "string" ? body.mode : "1v1";
     const matchType = body?.matchType === "ranked" ? "ranked" : "casual";
-    const teamMode = body?.teamMode === "captains" ? "captains" : "regular";
+    const teamMode = matchType === "ranked" ? "regular" : body?.teamMode === "captains" ? "captains" : "regular";
     if (!isBattleMode(mode)) return NextResponse.json({ error: "Invalid mode." }, { status: 400 });
     const count = playerCount(mode) * 2;
     const rank = getRankInfo(user.rhp);
@@ -106,7 +106,7 @@ async function startMatch(matchId: string, rankIndex: number) { const map = awai
 async function finishMatch(matchId: string, matchType: string, modeValue: string) {
   const players = await prisma.$queryRawUnsafe<any[]>(`SELECT * FROM "BattleMatchPlayer" WHERE "matchId"=$1`);
   const mode = modeValue.includes(":") ? modeValue.split(":")[0] : modeValue;
-  const teamMode = modeValue.endsWith(":captains") ? "captains" : "regular";
+  const teamMode = matchType === "ranked" ? "regular" : modeValue.endsWith(":captains") ? "captains" : "regular";
   const scoreOne = teamScore(players.filter((p) => p.team === 1).map((p) => p.accuracy), teamMode);
   const scoreTwo = teamScore(players.filter((p) => p.team === 2).map((p) => p.accuracy), teamMode);
   if (scoreOne == null || scoreTwo == null) return;
