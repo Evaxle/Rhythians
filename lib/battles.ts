@@ -14,6 +14,6 @@ export function rankedLoss(winnerScore: number, loserScore: number) { const diff
 export async function getBattleUser(userId: string) { return prisma.user.findUnique({ where: { id: userId }, select: { id: true, username: true, displayName: true, profileHandle: true, avatar: true, rhp: true, userTags: { select: { tag: { select: { name: true, slug: true } } } } } }); }
 export async function selectBattleMap(rankIndex: number) {
   const rank = getRankInfo(rankIndex * 500);
-  const maps = await prisma.challengeMap.findMany({ where: { status: { in: ["approved", "legacy"] }, rating: { gte: rank.rangeMin, lte: rank.rangeMax } }, orderBy: { updatedAt: "desc" }, take: 50, select: { id: true, title: true, artist: true, rating: true, length: true, mapFileUrl: true, imageUrl: true } });
+  const maps = await prisma.$queryRawUnsafe<any[]>(`SELECT id,title,artist,rating,length,"mapFileUrl","imageUrl" FROM "ChallengeMap" WHERE status IN ('approved','legacy') AND rating >= $1 AND rating <= $2 ORDER BY "updatedAt" DESC LIMIT 50`, rank.rangeMin, rank.rangeMax);
   return maps[Math.floor(Math.random() * maps.length)] ?? null;
 }
