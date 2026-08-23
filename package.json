@@ -1,6 +1,6 @@
 {
   "name": "rhythians",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -63,7 +63,6 @@
     "prisma": "7.9.1",
     "tailwindcss": "3.4.17",
     "ts-node": "10.9.0",
-    "tsx": "^4.23.12",
     "typescript": "5.9.2"
   },
   "engines": {
