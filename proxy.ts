@@ -2,7 +2,6 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const SECURITY_HEADERS: Record<string, string> = {
   "X-Content-Type-Options": "nosniff",
-  "X-Frame-Options": "DENY",
   "X-XSS-Protection": "1; mode=block",
   "Referrer-Policy": "strict-origin-when-cross-origin",
   "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
@@ -10,7 +9,7 @@ const SECURITY_HEADERS: Record<string, string> = {
     "default-src 'self'",
     "base-uri 'self'",
     "form-action 'self'",
-    "frame-ancestors 'none'",
+    "frame-ancestors http://tauri.localhost https://tauri.localhost http://localhost:1420 http://127.0.0.1:1420",
     "object-src 'none'",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
     "style-src 'self' 'unsafe-inline'",
