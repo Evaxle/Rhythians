@@ -28,6 +28,7 @@ export async function PATCH(request: Request, { params }: Props) {
   const accessRow = await access(lobbyId, user.id); if (!accessRow) return NextResponse.json({ error: "You are not in this lobby." }, { status: 403 });
   if (action === "invite") {
     if (!accessRow.isHost || typeof body?.userId !== "string") return NextResponse.json({ error: "Only the host can invite users." }, { status: 403 }); const target = await prisma.user.findUnique({ where: { id: body.userId }, select: { id: true } }); if (!target) return NextResponse.json({ error: "User not found." }, { status: 404 });
+    const count = await prisma.$queryRawUnsafe<any[]>(`SELECT COUNT(*)::int AS count FROM "BattleLobbyMember" WHERE "lobbyId"=$1`, lobbyId); if (count[0].count >= accessRow.maxPlayers) return NextResponse.json({ error: "Lobby is full." }, { status: 400 });
     await prisma.$executeRawUnsafe(`INSERT INTO "BattleLobbyMember" ("id","lobbyId","userId") VALUES ($1,$2,$3) ON CONFLICT DO NOTHING`, uid(), lobbyId, target.id); await prisma.notification.create({ data: { userId: target.id, type: "announcement", title: "Lobby invite", message: `${user.displayName ?? user.username} invited you to ${accessRow.name}.`, url: `/battles/lobby/${lobbyId}` } }); return NextResponse.json({ ok: true });
   }
   if (action === "leave") { await prisma.$executeRawUnsafe(`DELETE FROM "BattleLobbyMember" WHERE "lobbyId"=$1 AND "userId"=$2`, lobbyId, user.id); return NextResponse.json({ ok: true }); }
