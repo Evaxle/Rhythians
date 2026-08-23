@@ -1,0 +1,1 @@
+ALTER TABLE "BattleLobby" ADD COLUMN IF NOT EXISTS "teamMode" TEXT NOT NULL DEFAULT 'regular';
