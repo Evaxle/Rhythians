@@ -4,6 +4,7 @@ import { getSessionUser } from "@/lib/auth";
 import { getRankInfo } from "@/lib/ranks";
 import { fetchRhythiaScores, findScoreForMap } from "@/lib/daily";
 import { isBattleMode, playerCount, selectBattleMap, teamScore, rankedLoss } from "@/lib/battles";
+import { getAvatarUrl } from "@/lib/avatar";
 
 function uid() { return crypto.randomUUID(); }
 
@@ -96,14 +97,15 @@ export async function GET(request: Request) {
   if (!matchId) return NextResponse.json({ error: "Match required." }, { status: 400 });
   const match = await prisma.$queryRawUnsafe<any[]>(`SELECT * FROM "BattleMatch" WHERE id=$1`, matchId);
   if (!match[0]) return NextResponse.json({ error: "Match not found." }, { status: 404 });
-  const players = await prisma.$queryRawUnsafe<any[]>(`SELECT bp.*,u.username,u."displayName",u."profileHandle",u.avatar,u.rhp,COALESCE((SELECT json_agg(json_build_object('name',t.name,'slug',t.slug) ORDER BY upt.position ASC) FROM "UserProfileTag" upt JOIN "UserTag" ut ON ut."userId"=u.id AND ut."tagId"=upt."tagId" JOIN "Tag" t ON t.id=ut."tagId" WHERE upt."userId"=u.id LIMIT 3),'[]'::json) AS tags FROM "BattleMatchPlayer" bp JOIN "User" u ON u.id=bp."userId" WHERE bp."matchId"=$1 ORDER BY bp.team,bp.id`, matchId);
+  const players = await prisma.$queryRawUnsafe<any[]>(`SELECT bp.*,u.username,u."displayName",u."profileHandle",u.avatar,u."discordId",u.rhp,COALESCE((SELECT json_agg(json_build_object('name',t.name,'slug',t.slug) ORDER BY upt.position ASC) FROM "UserProfileTag" upt JOIN "UserTag" ut ON ut."userId"=u.id AND ut."tagId"=upt."tagId" JOIN "Tag" t ON t.id=ut."tagId" WHERE upt."userId"=u.id),'[]'::json) AS tags FROM "BattleMatchPlayer" bp JOIN "User" u ON u.id=bp."userId" WHERE bp."matchId"=$1 ORDER BY bp.team,bp.id`, matchId);
+  const normalizedPlayers = players.map((player) => ({ ...player, avatar: getAvatarUrl(player, 256) }));
   const map = match[0].mapId ? await prisma.challengeMap.findUnique({ where: { id: match[0].mapId }, select: { id: true, title: true, artist: true, length: true, mapFileUrl: true, imageUrl: true, rating: true } }) : null;
-  const teamOne = players.filter((player) => player.team === 1).map((player) => player.accuracy).filter((value) => value != null);
-  const teamTwo = players.filter((player) => player.team === 2).map((player) => player.accuracy).filter((value) => value != null);
+  const teamOne = normalizedPlayers.filter((player) => player.team === 1).map((player) => player.accuracy).filter((value) => value != null);
+  const teamTwo = normalizedPlayers.filter((player) => player.team === 2).map((player) => player.accuracy).filter((value) => value != null);
   const teamMode = String(match[0].mode).endsWith(":captains") ? "captains" : "regular";
   const scoreOne = teamScore(teamOne, teamMode); const scoreTwo = teamScore(teamTwo, teamMode);
   const winner = scoreOne == null || scoreTwo == null ? null : scoreOne === scoreTwo ? 0 : scoreOne > scoreTwo ? 1 : 2;
-  return NextResponse.json({ match: match[0], players, map, viewerId: user.id, teamScores: { one: scoreOne, two: scoreTwo, winner } });
+  return NextResponse.json({ match: match[0], players: normalizedPlayers, map, viewerId: user.id, teamScores: { one: scoreOne, two: scoreTwo, winner } });
 }
 
 async function startMatch(matchId: string, rankIndex: number) { const map = await selectBattleMap(rankIndex); await prisma.$executeRawUnsafe(`UPDATE "BattleMatch" SET status='active',"mapId"=$2,"startedAt"=NOW() WHERE id=$1 AND status IN ('queue','invite')`, matchId, map?.id ?? null); }
