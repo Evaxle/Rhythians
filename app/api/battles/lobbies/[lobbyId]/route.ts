@@ -19,7 +19,7 @@ export async function GET(_: Request, { params }: Props) {
 
 export async function PATCH(request: Request, { params }: Props) {
   const user = await getSessionUser(); if (!user) return NextResponse.json({ error: "Authentication required" }, { status: 401 }); const { lobbyId } = await params;
-  const body = await request.json().catch(() => null) as { action?: unknown; mode?: unknown; mapId?: unknown; content?: unknown; userId?: unknown } | null; const action = body?.action;
+  const body = await request.json().catch(() => null) as { action?: unknown; mode?: unknown; teamMode?: unknown; mapId?: unknown; content?: unknown; userId?: unknown } | null; const action = body?.action;
   if (action === "join") {
     const lobby = await prisma.$queryRawUnsafe<any[]>(`SELECT * FROM "BattleLobby" WHERE id=$1 AND status='open'`, lobbyId); if (!lobby[0]) return NextResponse.json({ error: "Lobby not found or closed." }, { status: 404 });
     const count = await prisma.$queryRawUnsafe<any[]>(`SELECT COUNT(*)::int AS count FROM "BattleLobbyMember" WHERE "lobbyId"=$1`, lobbyId); if (count[0].count >= lobby[0].maxPlayers) return NextResponse.json({ error: "Lobby is full." }, { status: 400 });
@@ -32,6 +32,7 @@ export async function PATCH(request: Request, { params }: Props) {
   }
   if (action === "leave") { await prisma.$executeRawUnsafe(`DELETE FROM "BattleLobbyMember" WHERE "lobbyId"=$1 AND "userId"=$2`, lobbyId, user.id); return NextResponse.json({ ok: true }); }
   if (action === "mode") { if (!accessRow.isHost || typeof body?.mode !== "string" || !isBattleMode(body.mode)) return NextResponse.json({ error: "Only the host can change the mode." }, { status: 400 }); await prisma.$executeRawUnsafe(`UPDATE "BattleLobby" SET "mode"=$2,"updatedAt"=NOW() WHERE id=$1`, lobbyId, body.mode); return NextResponse.json({ ok: true }); }
+  if (action === "team-mode") { if (!accessRow.isHost || (body?.teamMode !== "regular" && body?.teamMode !== "captains")) return NextResponse.json({ error: "Only the host can change the team mode." }, { status: 400 }); await prisma.$executeRawUnsafe(`UPDATE "BattleLobby" SET "teamMode"=$2,"updatedAt"=NOW() WHERE id=$1`, lobbyId, body.teamMode); return NextResponse.json({ ok: true }); }
   if (action === "vote") { if (typeof body?.mapId !== "string") return NextResponse.json({ error: "Map required." }, { status: 400 }); const valid = body.mapId === "random" ? true : Boolean((await prisma.$queryRawUnsafe<any[]>(`SELECT id FROM "ChallengeMap" WHERE id=$1 AND status::text IN ('approved','legacy') LIMIT 1`, body.mapId))[0]); if (!valid) return NextResponse.json({ error: "Map not found." }, { status: 404 }); await prisma.$executeRawUnsafe(`INSERT INTO "BattleLobbyMapVote" ("id","lobbyId","userId","mapId") VALUES ($1,$2,$3,$4) ON CONFLICT ("lobbyId","userId") DO UPDATE SET "mapId"=EXCLUDED."mapId","createdAt"=NOW()`, uid(), lobbyId, user.id, body.mapId); return NextResponse.json({ ok: true }); }
   if (action === "message") { if (typeof body?.content !== "string" || !body.content.trim()) return NextResponse.json({ error: "Message required." }, { status: 400 }); await prisma.$executeRawUnsafe(`INSERT INTO "BattleLobbyMessage" ("id","lobbyId","userId","content") VALUES ($1,$2,$3,$4)`, uid(), lobbyId, user.id, body.content.trim().slice(0, 2000)); return NextResponse.json({ ok: true }); }
   if (action === "ready") { await prisma.$executeRawUnsafe(`UPDATE "BattleLobbyMember" SET "isReady"=NOT "isReady" WHERE "lobbyId"=$1 AND "userId"=$2`, lobbyId, user.id); return NextResponse.json({ ok: true }); }
@@ -40,7 +41,7 @@ export async function PATCH(request: Request, { params }: Props) {
     const votes = await prisma.$queryRawUnsafe<any[]>(`SELECT "mapId",COUNT(*)::int AS votes FROM "BattleLobbyMapVote" WHERE "lobbyId"=$1 GROUP BY "mapId" ORDER BY votes DESC,"mapId" LIMIT 1`, lobbyId); let mapId = votes[0]?.mapId ?? null;
     if (!mapId || mapId === "random") { const host = await prisma.user.findUnique({ where: { id: accessRow.hostId }, select: { rhp: true } }); const map = host ? await selectBattleMap(getRankInfo(host.rhp).index) : null; mapId = map?.id ?? null; }
     if (!mapId) return NextResponse.json({ error: "No battle map is available for this lobby." }, { status: 400 });
-    const matchId = uid(); await prisma.$executeRawUnsafe(`INSERT INTO "BattleMatch" ("id","matchType","mode","status","mapId","startedAt") VALUES ($1,$2,$3,'active',$4,NOW())`, matchId, accessRow.matchType, accessRow.mode, mapId);
+    const matchId = uid(); await prisma.$executeRawUnsafe(`INSERT INTO "BattleMatch" ("id","matchType","mode","status","mapId","startedAt") VALUES ($1,$2,$3,'active',$4,NOW())`, matchId, accessRow.matchType, `${accessRow.mode}:${accessRow.teamMode}`, mapId);
     for (let index = 0; index < members.length; index += 1) await prisma.$executeRawUnsafe(`INSERT INTO "BattleMatchPlayer" ("id","matchId","userId","team") VALUES ($1,$2,$3,$4)`, uid(), matchId, members[index].userId, index % 2 === 0 ? 1 : 2);
     await prisma.$executeRawUnsafe(`UPDATE "BattleLobby" SET status='started',"updatedAt"=NOW() WHERE id=$1`, lobbyId); return NextResponse.json({ matchId });
   }
