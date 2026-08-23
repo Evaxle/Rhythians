@@ -26,5 +26,6 @@ export async function POST(request: Request) {
     await tx.$executeRawUnsafe(`INSERT INTO "BattleLobby" ("id","name","hostId","mode","teamMode","matchType") VALUES ($1,$2,$3,$4,$5,$6)`, lobbyId, name, user.id, mode, teamMode, matchType);
     await tx.$executeRawUnsafe(`INSERT INTO "BattleLobbyMember" ("id","lobbyId","userId","isHost") VALUES ($1,$2,$3,true)`, uid(), lobbyId, user.id);
   });
-  return NextResponse.json({ lobbyId }, { status: 201 });
+  const origin = request.headers.get("origin") ?? "https://rhythians.vercel.app";
+  return NextResponse.json({ lobbyId, url: `${origin}/battles/lobby/${lobbyId}` }, { status: 201 });
 }
