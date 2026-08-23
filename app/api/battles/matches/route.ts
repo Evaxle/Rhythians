@@ -59,13 +59,14 @@ export async function POST(request: Request) {
     let recent;
     try { recent = (await fetchRhythiaScores(profile.profileId)).recent; } catch { return NextResponse.json({ error: "Could not retrieve recent Rhythia scores." }, { status: 502 }); }
     const score = findScoreForMap(recent, map.title);
-    if (!score) return NextResponse.json({ error: "No matching recent score was found for this battle map." }, { status: 400 });
-    const accuracy = score.accuracy ?? 0;
+    if (!score) return NextResponse.json({ error: "No matching recent Rhythia score was found for this battle map." }, { status: 400 });
+    const accuracy = Number(score.accuracy);
+    if (!Number.isFinite(accuracy) || accuracy < 0 || accuracy > 100) return NextResponse.json({ error: "The recent Rhythia score did not contain a valid accuracy." }, { status: 400 });
     await prisma.$executeRawUnsafe(`UPDATE "BattleMatchPlayer" SET "accuracy"=$3,"score"=$3,"scoreId"=$4,"checkedAt"=NOW() WHERE "matchId"=$1 AND "userId"=$2`, body.matchId, user.id, accuracy, String(score.id));
     const players = await prisma.$queryRawUnsafe<any[]>(`SELECT * FROM "BattleMatchPlayer" WHERE "matchId"=$1`, body.matchId);
     const allScored = players.length > 0 && players.every((player) => player.accuracy != null);
     if (allScored) await finishMatch(body.matchId, rows[0].matchType, rows[0].mode);
-    return NextResponse.json({ ok: true, accuracy, finished: allScored });
+    return NextResponse.json({ ok: true, finished: allScored });
   }
   if (action === "accept") {
     if (typeof body?.matchId !== "string") return NextResponse.json({ error: "Match required." }, { status: 400 });
@@ -101,7 +102,8 @@ export async function GET(request: Request) {
   const teamTwo = players.filter((player) => player.team === 2).map((player) => player.accuracy).filter((value) => value != null);
   const teamMode = String(match[0].mode).endsWith(":captains") ? "captains" : "regular";
   const scoreOne = teamScore(teamOne, teamMode); const scoreTwo = teamScore(teamTwo, teamMode);
-  return NextResponse.json({ match: match[0], players, map, viewerId: user.id, teamScores: { one: scoreOne, two: scoreTwo, winner: scoreOne == null || scoreTwo == null ? null : scoreOne === scoreTwo ? 0 : scoreOne > scoreTwo ? 1 : 2 } });
+  const winner = scoreOne == null || scoreTwo == null ? null : scoreOne === scoreTwo ? 0 : scoreOne > scoreTwo ? 1 : 2;
+  return NextResponse.json({ match: match[0], players, map, viewerId: user.id, teamScores: { one: scoreOne, two: scoreTwo, winner } });
 }
 
 async function startMatch(matchId: string, rankIndex: number) { const map = await selectBattleMap(rankIndex); await prisma.$executeRawUnsafe(`UPDATE "BattleMatch" SET status='active',"mapId"=$2,"startedAt"=NOW() WHERE id=$1 AND status IN ('queue','invite')`, matchId, map?.id ?? null); }
