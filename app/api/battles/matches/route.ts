@@ -113,12 +113,12 @@ async function finishMatch(matchId: string, matchType: string, modeValue: string
   const winner = scoreOne === scoreTwo ? 0 : scoreOne > scoreTwo ? 1 : 2;
   await prisma.$executeRawUnsafe(`UPDATE "BattleMatch" SET status='finished',"finishedAt"=NOW() WHERE id=$1`, matchId);
   if (matchType !== "ranked" || !winner) return;
+  const winningScore = Math.max(scoreOne, scoreTwo); const losingScore = Math.min(scoreOne, scoreTwo); const loss = rankedLoss(winningScore, losingScore);
   for (const player of players) {
     if (player.team === winner) {
       await prisma.$executeRawUnsafe(`UPDATE "User" SET rhp="rhp"+30,"updatedAt"=NOW() WHERE id=$1`, player.userId);
       await prisma.$executeRawUnsafe(`INSERT INTO "RhpTransaction" ("id","userId","amount","reason","description") VALUES ($1,$2,30,'battle_win',$3)`, uid(), player.userId, `${mode} ranked battle win`);
     } else {
-      const loss = rankedLoss(Math.max(scoreOne, scoreTwo), Math.min(scoreOne, scoreTwo));
       await prisma.$executeRawUnsafe(`UPDATE "User" SET rhp=GREATEST(0,"rhp"-$2),"updatedAt"=NOW() WHERE id=$1`, player.userId, loss);
       await prisma.$executeRawUnsafe(`INSERT INTO "RhpTransaction" ("id","userId","amount","reason","description") VALUES ($1,$2,$3,'battle_loss',$4)`, uid(), player.userId, -loss, `${mode} ranked battle loss`);
     }
