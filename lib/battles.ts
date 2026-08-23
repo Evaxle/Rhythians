@@ -19,6 +19,9 @@ export async function getBattleUser(userId: string) {
 }
 export async function selectBattleMap(rankIndex: number) {
   const rank = getRankInfo(rankIndex * 500);
-  const maps = await prisma.$queryRawUnsafe<any[]>(`SELECT id,title,artist,rating,length,"mapFileUrl","imageUrl" FROM "ChallengeMap" WHERE status::text IN ('approved','legacy') AND rating >= $1 AND rating <= $2 ORDER BY "updatedAt" DESC LIMIT 50`, rank.rangeMin, rank.rangeMax);
+  const useLegacy = Math.random() >= 0.9;
+  const preferredStatus = useLegacy ? "legacy" : "approved";
+  let maps = await prisma.$queryRawUnsafe<any[]>(`SELECT id,title,artist,rating,length,"mapFileUrl","imageUrl" FROM "ChallengeMap" WHERE status::text=$1 AND rating >= $2 AND rating <= $3 ORDER BY RANDOM() LIMIT 100`, preferredStatus, rank.rangeMin, rank.rangeMax);
+  if (!maps.length) maps = await prisma.$queryRawUnsafe<any[]>(`SELECT id,title,artist,rating,length,"mapFileUrl","imageUrl" FROM "ChallengeMap" WHERE status::text IN ('approved','legacy') AND rating >= $1 AND rating <= $2 ORDER BY RANDOM() LIMIT 100`, rank.rangeMin, rank.rangeMax);
   return maps[Math.floor(Math.random() * maps.length)] ?? null;
 }
