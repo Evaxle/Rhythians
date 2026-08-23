@@ -50,10 +50,10 @@ export async function POST(request: Request) {
   }
   if (action === "check-score") {
     if (typeof body?.matchId !== "string") return NextResponse.json({ error: "Match required." }, { status: 400 });
-    const rows = await prisma.$queryRawUnsafe<any[]>(`SELECT bm.*,bp."userId",bm."mapId" FROM "BattleMatch" bm JOIN "BattleMatchPlayer" bp ON bp."matchId"=bm.id AND bp."userId"=$2 WHERE bm.id=$1`, body.matchId, user.id);
+    const rows = await prisma.$queryRawUnsafe<any[]>(`SELECT bm.*,bp."userId" FROM "BattleMatch" bm JOIN "BattleMatchPlayer" bp ON bp."matchId"=bm.id AND bp."userId"=$2 WHERE bm.id=$1`, body.matchId, user.id);
     if (!rows[0] || rows[0].status !== "active") return NextResponse.json({ error: "Active match not found." }, { status: 404 });
     if (!rows[0].mapId) return NextResponse.json({ error: "No battle map selected." }, { status: 400 });
-    const map = await prisma.challengeMap.findUnique({ where: { id: rows[0].mapId }, select: { id: true, title: true } });
+    const map = await prisma.challengeMap.findUnique({ where: { id: rows[0].mapId }, select: { title: true } });
     const profile = await prisma.rhythiaProfile.findUnique({ where: { userId: user.id }, select: { profileId: true } });
     if (!map || !profile) return NextResponse.json({ error: "Link your Rhythia account first." }, { status: 403 });
     let recent;
@@ -71,8 +71,8 @@ export async function POST(request: Request) {
     if (typeof body?.matchId !== "string") return NextResponse.json({ error: "Match required." }, { status: 400 });
     const row = await prisma.$queryRawUnsafe<any[]>(`SELECT * FROM "BattleMatchPlayer" WHERE "matchId"=$1 AND "userId"=$2`, body.matchId, user.id);
     if (!row[0]) return NextResponse.json({ error: "Battle request not found." }, { status: 404 });
-    const match = await prisma.$queryRawUnsafe<any[]>(`SELECT * FROM "BattleMatch" WHERE id=$1`, body.matchId);
-    if (!match[0]) return NextResponse.json({ error: "Match not found." }, { status: 404 });
+    const match = await prisma.$queryRawUnsafe<any[]>(`SELECT * FROM "BattleMatch" WHERE id=$1 AND status='invite'`, body.matchId);
+    if (!match[0]) return NextResponse.json({ error: "Battle request is no longer pending." }, { status: 400 });
     await startMatch(body.matchId, getRankInfo(user.rhp).index);
     return NextResponse.json({ ok: true, matchId: body.matchId });
   }
@@ -86,10 +86,10 @@ export async function GET(request: Request) {
   if (!matchId) return NextResponse.json({ error: "Match required." }, { status: 400 });
   const match = await prisma.$queryRawUnsafe<any[]>(`SELECT * FROM "BattleMatch" WHERE id=$1`, matchId);
   if (!match[0]) return NextResponse.json({ error: "Match not found." }, { status: 404 });
-  const players = await prisma.$queryRawUnsafe<any[]>(`SELECT bp.*,u.username,u."displayName",u."profileHandle",u.avatar,u.rhp FROM "BattleMatchPlayer" bp JOIN "User" u ON u.id=bp."userId" WHERE bp."matchId"=$1 ORDER BY bp.team,bp.id`, matchId);
+  const players = await prisma.$queryRawUnsafe<any[]>(`SELECT bp.*,u.username,u."displayName",u."profileHandle",u.avatar,u.rhp,COALESCE((SELECT json_agg(json_build_object('name',t.name,'slug',t.slug)) FROM "UserTag" ut JOIN "Tag" t ON t.id=ut."tagId" WHERE ut."userId"=u.id),'[]'::json) AS tags FROM "BattleMatchPlayer" bp JOIN "User" u ON u.id=bp."userId" WHERE bp."matchId"=$1 ORDER BY bp.team,bp.id`, matchId);
   let map = null;
   if (match[0].mapId) map = await prisma.challengeMap.findUnique({ where: { id: match[0].mapId }, select: { id: true, title: true, artist: true, length: true, mapFileUrl: true, imageUrl: true, rating: true } });
-  return NextResponse.json({ match: match[0], players, map });
+  return NextResponse.json({ match: match[0], players, map, viewerId: user.id });
 }
 
 async function startMatch(matchId: string, rankIndex: number) { const map = await selectBattleMap(rankIndex); await prisma.$executeRawUnsafe(`UPDATE "BattleMatch" SET status='active',"mapId"=$2,"startedAt"=NOW() WHERE id=$1`, matchId, map?.id ?? null); }
