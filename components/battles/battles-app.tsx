@@ -1,0 +1,50 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { Plus, Search, Swords, Users, Trophy, Crown, Loader2 } from "lucide-react";
+
+const modes = ["1v1", "2v2", "3v3", "15v15"] as const;
+
+export function BattlesApp() {
+  const [tab, setTab] = useState<"lobbies" | "battles">("battles");
+  const [battleTab, setBattleTab] = useState<"casual" | "ranked">("casual");
+  const [mode, setMode] = useState("1v1");
+  const [teamMode, setTeamMode] = useState("regular");
+  const [lobbies, setLobbies] = useState<any[]>([]);
+  const [queueing, setQueueing] = useState(false);
+  const [lobbyName, setLobbyName] = useState("");
+  const [creatingLobby, setCreatingLobby] = useState(false);
+  const [error, setError] = useState("");
+
+  async function loadLobbies() {
+    const response = await fetch("/api/battles/lobbies", { cache: "no-store" });
+    if (response.ok) setLobbies((await response.json()).lobbies ?? []);
+  }
+
+  useEffect(() => { loadLobbies(); }, []);
+
+  async function queue() {
+    setQueueing(true); setError("");
+    const response = await fetch("/api/battles/matches", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "queue", mode, matchType: battleTab, teamMode }) });
+    const data = await response.json();
+    setQueueing(false);
+    if (!response.ok) { setError(data.error ?? "Could not join matchmaking."); return; }
+    window.location.href = `/battles/match/${data.matchId}`;
+  }
+
+  async function createLobby() {
+    if (!lobbyName.trim()) return;
+    setCreatingLobby(true); setError("");
+    const response = await fetch("/api/battles/lobbies", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: lobbyName, mode, matchType: "casual" }) });
+    const data = await response.json();
+    setCreatingLobby(false);
+    if (!response.ok) { setError(data.error ?? "Could not create lobby."); return; }
+    window.location.href = `/battles/lobby/${data.lobbyId}`;
+  }
+
+  return <div className="mx-auto max-w-7xl space-y-6">
+    <section className="overflow-hidden rounded-3xl border border-border bg-surface/95 shadow-glow"><div className="relative p-7"><div className="absolute right-0 top-0 h-48 w-48 rounded-full bg-accent/10 blur-3xl" /><div className="relative flex flex-wrap items-end justify-between gap-5"><div><p className="flex items-center gap-2 text-xs uppercase tracking-[0.24em] text-accent"><Swords size={15} /> Rhythian Battles</p><h1 className="mt-2 text-4xl font-semibold text-white">Compete together.</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-muted">Build a team, find opponents, play a rank-matched battle, and check your score when you finish the selected map.</p></div><div className="flex rounded-2xl border border-border bg-background/60 p-1"><button onClick={() => setTab("lobbies")} className={`rounded-xl px-5 py-2.5 text-sm font-semibold ${tab === "lobbies" ? "bg-accent text-white" : "text-muted hover:text-white"}`}><Users className="mr-2 inline" size={15} />Lobbies</button><button onClick={() => setTab("battles")} className={`rounded-xl px-5 py-2.5 text-sm font-semibold ${tab === "battles" ? "bg-accent text-white" : "text-muted hover:text-white"}`}><Trophy className="mr-2 inline" size={15} />Battles</button></div></div></div></section>
+    {tab === "battles" ? <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow"><div className="flex flex-wrap items-center justify-between gap-4"><div><h2 className="text-xl font-semibold text-white">Battle queue</h2><p className="mt-1 text-sm text-muted">Ranked matches use your exact rank and tier. Casual uses your rank without divisions.</p></div><div className="flex rounded-xl border border-border bg-background/60 p-1"><button onClick={() => setBattleTab("casual")} className={`rounded-lg px-4 py-2 text-sm font-semibold ${battleTab === "casual" ? "bg-white/10 text-white" : "text-muted"}`}>Casual</button><button onClick={() => setBattleTab("ranked")} className={`rounded-lg px-4 py-2 text-sm font-semibold ${battleTab === "ranked" ? "bg-accent text-white" : "text-muted"}`}>Ranked</button></div></div><div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{modes.map((item) => <button key={item} onClick={() => setMode(item)} className={`rounded-2xl border p-5 text-left transition ${mode === item ? "border-accent bg-accent/10 shadow-lg" : "border-border bg-background/40 hover:border-accent/30"}`}><p className="text-2xl font-bold text-white">{item}</p><p className="mt-1 text-xs text-muted">{item === "1v1" ? "Solo duel" : item === "15v15" ? "30-player battle" : `${Number(item[0]) * 2} players`}</p></button>)}</div>{mode !== "1v1" && <div className="mt-5 flex rounded-xl border border-border bg-background/50 p-1"><button onClick={() => setTeamMode("regular")} className={`flex-1 rounded-lg px-4 py-2 text-sm font-semibold ${teamMode === "regular" ? "bg-white/10 text-white" : "text-muted"}`}>Regular · team average</button><button onClick={() => setTeamMode("captains")} className={`flex-1 rounded-lg px-4 py-2 text-sm font-semibold ${teamMode === "captains" ? "bg-accent text-white" : "text-muted"}`}>Captain&apos;s Choice · highest score</button></div>}{error && <p className="mt-4 rounded-xl border border-red-400/20 bg-red-400/10 p-3 text-sm text-red-300">{error}</p>}<button disabled={queueing} onClick={queue} className="mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white hover:bg-accent2 disabled:opacity-50">{queueing ? <Loader2 className="animate-spin" size={16} /> : <Swords size={16} />} Find {battleTab} match</button></section> : <section className="grid gap-6 lg:grid-cols-[1fr_22rem]"><div className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow"><div className="flex flex-wrap items-center justify-between gap-4"><div><h2 className="text-xl font-semibold text-white">Open lobbies</h2><p className="mt-1 text-sm text-muted">Join a party and play casual team battles together.</p></div><button onClick={() => document.getElementById("create-lobby")?.scrollIntoView({ behavior: "smooth" })} className="rounded-full bg-accent px-4 py-2 text-xs font-semibold text-white"><Plus className="mr-1 inline" size={14} />Create lobby</button></div><div className="mt-5 space-y-2">{lobbies.length === 0 ? <div className="rounded-2xl border border-dashed border-border p-10 text-center text-sm text-muted">No open lobbies yet.</div> : lobbies.map((lobby) => <Link href={`/battles/lobby/${lobby.id}`} key={lobby.id} className="flex items-center gap-4 rounded-2xl border border-border bg-background/40 p-4 transition hover:border-accent/30 hover:bg-white/[0.03]"><div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent/10 text-accent"><Users size={19} /></div><div className="min-w-0 flex-1"><p className="truncate font-semibold text-white">{lobby.name}</p><p className="mt-1 text-xs text-muted">{lobby.host} · {lobby.mode} · {lobby.matchType}</p></div><span className="text-xs text-muted">{lobby.playerCount}/{lobby.maxPlayers}</span></Link>)}</div></div><div id="create-lobby" className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow"><p className="text-xs uppercase tracking-[0.2em] text-accent">Party</p><h2 className="mt-1 text-xl font-semibold text-white">Create lobby</h2><div className="mt-5 flex items-center gap-2 rounded-xl border border-border bg-background/50 px-3 py-2"><Search size={16} className="text-muted" /><input value={lobbyName} onChange={(e) => setLobbyName(e.target.value)} placeholder="Party name" className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none" /></div><select value={mode} onChange={(e) => setMode(e.target.value)} className="mt-3 w-full rounded-xl border border-border bg-background/50 px-3 py-3 text-sm text-white outline-none">{modes.map((item) => <option key={item}>{item}</option>)}</select><button disabled={creatingLobby || !lobbyName.trim()} onClick={createLobby} className="mt-3 w-full rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-white disabled:opacity-40">Create lobby</button></div></section>}
+  </div>;
+}
