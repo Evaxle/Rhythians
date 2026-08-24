@@ -1,9 +1,16 @@
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
+import { getSessionUser } from "@/lib/auth";
+import { canAccessRhythiaReview } from "@/lib/admin-access";
 import { RhythiaRequestsManager } from "@/components/admin/rhythia-requests-manager";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminRhythiaRequestsPage() {
+  const user = await getSessionUser();
+  if (!user) redirect("/login");
+  if (!(await canAccessRhythiaReview(user))) redirect("/");
+
   const requests = await prisma.rhythiaProfileRequest.findMany({
     include: {
       user: { select: { id: true, username: true, discriminator: true, profileHandle: true, avatar: true } },
@@ -26,7 +33,6 @@ export default async function AdminRhythiaRequestsPage() {
           </p>
         </div>
       </section>
-
       <RhythiaRequestsManager
         initialRequests={requests.map((request) => ({
           id: request.id,
