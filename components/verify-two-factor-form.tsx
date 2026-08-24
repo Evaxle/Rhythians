@@ -7,6 +7,7 @@ export function VerifyTwoFactorForm() {
   const router = useRouter();
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [resending, setResending] = useState(false);
 
@@ -14,6 +15,7 @@ export function VerifyTwoFactorForm() {
     event.preventDefault();
     setBusy(true);
     setError("");
+    setMessage("");
     try {
       const response = await fetch("/api/auth/mfa/verify", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code }) });
       const data = await response.json().catch(() => ({}));
@@ -30,10 +32,13 @@ export function VerifyTwoFactorForm() {
   async function resend() {
     setResending(true);
     setError("");
+    setMessage("");
     try {
       const response = await fetch("/api/auth/mfa/resend", { method: "POST" });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error ?? "Could not send a new code.");
+      setCode("");
+      setMessage("A new six-digit code was sent. The previous code is no longer valid.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not send a new code.");
     } finally {
@@ -41,5 +46,5 @@ export function VerifyTwoFactorForm() {
     }
   }
 
-  return <div className="space-y-4"><form onSubmit={verify} className="space-y-4"><div><label htmlFor="mfa-code" className="mb-1.5 block text-sm font-medium text-white">Security code</label><input id="mfa-code" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))} required className="w-full rounded-xl border border-border bg-background px-4 py-3 text-center text-2xl tracking-[0.45em] text-white outline-none transition focus:border-accent" /></div>{error && <p className="rounded-xl border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-200">{error}</p>}<button type="submit" disabled={busy || code.length !== 6} className="w-full rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white transition hover:bg-accent/80 disabled:opacity-50">{busy ? "Verifying..." : "Verify and sign in"}</button></form><button type="button" onClick={resend} disabled={resending} className="w-full rounded-full border border-border px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/5 disabled:opacity-50">{resending ? "Sending..." : "Send a new code"}</button></div>;
+  return <div className="space-y-4"><form onSubmit={verify} className="space-y-4"><div><label htmlFor="mfa-code" className="mb-1.5 block text-sm font-medium text-white">Security code</label><input id="mfa-code" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))} required className="w-full rounded-xl border border-border bg-background px-4 py-3 text-center text-2xl tracking-[0.45em] text-white outline-none transition focus:border-accent" /></div>{error && <p className="rounded-xl border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-200">{error}</p>}{message && <p className="rounded-xl border border-green-400/20 bg-green-400/10 px-3 py-2 text-sm text-green-200">{message}</p>}<button type="submit" disabled={busy || code.length !== 6} className="w-full rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white transition hover:bg-accent/80 disabled:opacity-50">{busy ? "Verifying..." : "Verify and sign in"}</button></form><button type="button" onClick={resend} disabled={resending} className="w-full rounded-full border border-border px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/5 disabled:opacity-50">{resending ? "Sending..." : "Send a new code"}</button></div>;
 }
