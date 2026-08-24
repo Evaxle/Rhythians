@@ -18,11 +18,18 @@ export async function POST(request: Request) {
   const challenge = await prisma.emailMfaChallenge.findUnique({ where: { id: challengeId }, include: { user: true } });
   if (!challenge || challenge.usedAt || challenge.expiresAt <= new Date() || !challenge.user.email || !challenge.user.emailVerifiedAt || !challenge.user.emailTwoFactorEnabled) return NextResponse.json({ error: "Your sign-in challenge has expired. Please sign in again." }, { status: 401 });
 
+  const previousHash = challenge.codeHash;
+  const previousExpiry = challenge.expiresAt;
+  const previousAttempts = challenge.attempts;
   const code = createSecurityCode();
-  await prisma.emailMfaChallenge.update({ where: { id: challenge.id }, data: { codeHash: hashSecurityCode(code), expiresAt: new Date(Date.now() + 10 * 60 * 1000), attempts: 0 } });
+  const nextHash = hashSecurityCode(code);
+  const nextExpiry = new Date(Date.now() + 10 * 60 * 1000);
+  await prisma.emailMfaChallenge.update({ where: { id: challenge.id }, data: { codeHash: nextHash, expiresAt: nextExpiry, attempts: 0 } });
+
   try {
-    await sendSecurityCode(challenge.user.email, code, "Your new Rhythians sign-in code", "Your new Rhythians sign-in code");
+    await sendSecurityCode(challenge.user.email, code, "Your new Rhythians sign-in code", "Your new Rhythians sign-in code", 10);
   } catch {
+    await prisma.emailMfaChallenge.update({ where: { id: challenge.id }, data: { codeHash: previousHash, expiresAt: previousExpiry, attempts: previousAttempts } }).catch(() => undefined);
     return NextResponse.json({ error: "We could not send a new code. Please try again later." }, { status: 503 });
   }
   return NextResponse.json({ sent: true });
