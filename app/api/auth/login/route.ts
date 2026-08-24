@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     });
 
     try {
-      await sendSecurityCode(user.email, code, "Your Rhythians sign-in code", "Confirm your Rhythians sign-in");
+      await sendSecurityCode(user.email, code, "Your Rhythians sign-in code", "Confirm your Rhythians sign-in", 10);
     } catch {
       await prisma.emailMfaChallenge.delete({ where: { id: challenge.id } }).catch(() => undefined);
       return NextResponse.json({ error: "We could not send your sign-in code. Please try again later." }, { status: 503 });
