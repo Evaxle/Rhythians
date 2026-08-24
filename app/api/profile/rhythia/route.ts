@@ -17,21 +17,15 @@ export async function POST(request: Request) {
     const alreadyLinked = existing?.profileId === parsed.id;
 
     if (!alreadyLinked && !namesMatch(profile.username, [user.username, user.displayName, user.profileHandle])) {
-      return NextResponse.json(
-        {
-          error: "The name on that Rhythia profile doesn't match your account. You can send a request for an admin to review and approve it.",
-          mismatch: true,
-          candidate: { profileId: profile.profileId, profileUrl: parsed.url, username: profile.username },
-        },
-        { status: 422 }
-      );
+      return NextResponse.json({ error: "The name on that Rhythia profile doesn't match your account. Use the bio verification flow to prove ownership.", mismatch: true, candidate: { profileId: profile.profileId, profileUrl: parsed.url, username: profile.username } }, { status: 422 });
     }
 
+    const { bio: _bio, ...profileData } = profile;
     const saved = await prisma.$transaction(async (tx) => {
       const profileRow = await tx.rhythiaProfile.upsert({
         where: { userId: user.id },
-        create: { userId: user.id, profileUrl: parsed.url, ...profile },
-        update: { profileUrl: parsed.url, ...profile, syncedAt: new Date() },
+        create: { userId: user.id, profileUrl: parsed.url, ...profileData },
+        update: { profileUrl: parsed.url, ...profileData, syncedAt: new Date() },
       });
       await tx.user.update({ where: { id: user.id }, data: { rhythiaVerified: true } });
       return profileRow;
