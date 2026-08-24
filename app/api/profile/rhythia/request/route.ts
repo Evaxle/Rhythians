@@ -28,16 +28,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Your verification code expired. Generate a new code." }, { status: 410 });
     }
     try {
+      const code = String(body?.code ?? "").trim();
+      if (!/^\d{8}$/.test(code) || !matchesCode(code, pending.adminNote)) return NextResponse.json({ error: "The verification code was not found in that profile bio." }, { status: 400 });
       const profile = await fetchRhythiaProfile(pending.profileId);
-      if (!profile.bio || !matchesCode(body?.code === undefined ? "" : String(body.code).trim(), pending.adminNote)) {
-        return NextResponse.json({ error: "The verification code was not found in that profile bio." }, { status: 400 });
-      }
-      if (!profile.bio.includes(String(body?.code ?? "").trim())) return NextResponse.json({ error: "The verification code was not found in that profile bio." }, { status: 400 });
+      if (!profile.bio || !profile.bio.includes(code)) return NextResponse.json({ error: "The verification code was not found in that profile bio." }, { status: 400 });
+      const { bio: _bio, ...profileData } = profile;
       const saved = await prisma.$transaction(async (tx) => {
         const profileRow = await tx.rhythiaProfile.upsert({
           where: { userId: user.id },
-          create: { userId: user.id, profileUrl: pending.profileUrl, ...profile },
-          update: { profileUrl: pending.profileUrl, ...profile, syncedAt: new Date() },
+          create: { userId: user.id, profileUrl: pending.profileUrl, ...profileData },
+          update: { profileUrl: pending.profileUrl, ...profileData, syncedAt: new Date() },
         });
         await tx.user.update({ where: { id: user.id }, data: { rhythiaVerified: true } });
         await tx.rhythiaProfileRequest.delete({ where: { id: pending.id } });
