@@ -6,9 +6,15 @@ import { RANKS } from "@/lib/ranks";
 
 export const dynamic = "force-dynamic";
 
+function pathTargetRating(rankIndex: number) {
+  if (rankIndex === RANKS.length - 1) return 3.9;
+  return Math.max(0, Math.round((RANKS[rankIndex + 1].rangeMin - 0.1) * 100) / 100);
+}
+
 function pathRange(rankIndex: number) {
-  if (rankIndex === RANKS.length - 1) return { gte: 4 };
-  return { gte: RANKS[rankIndex + 1].rangeMin, lte: RANKS[rankIndex + 1].rangeMax };
+  return rankIndex === RANKS.length - 1
+    ? { gte: pathTargetRating(rankIndex) }
+    : { gte: pathTargetRating(rankIndex), lte: RANKS[rankIndex + 1].rangeMax };
 }
 
 export async function POST(request: Request) {
@@ -37,7 +43,7 @@ export async function POST(request: Request) {
       const where = { status: "approved" as const, isAutoImported: true, id: { notIn: reserved }, rating: range };
       const autoCandidates = await tx.challengeMap.findMany({ where, orderBy: [{ rating: "asc" }, { createdAt: "asc" }], take: 100, select: { id: true, title: true, rating: true } });
       const candidates = autoCandidates.length > 0 ? autoCandidates : await tx.challengeMap.findMany({ where: { status: "approved", id: { notIn: reserved }, rating: range }, orderBy: [{ rating: "asc" }, { createdAt: "asc" }], take: 100, select: { id: true, title: true, rating: true } });
-      const target = rankIndex === RANKS.length - 1 ? 4 : RANKS[rankIndex + 1].rangeMin;
+      const target = pathTargetRating(rankIndex);
       const map = candidates.sort((a, b) => Math.abs((a.rating ?? target) - target) - Math.abs((b.rating ?? target) - target))[0];
       if (!map) throw new Error(`No approved map is available for the ${RANKS[rankIndex].name} path slot.`);
 
@@ -45,7 +51,7 @@ export async function POST(request: Request) {
       return { map, previousMapId };
     });
 
-    return NextResponse.json({ ok: true, seasonNumber: season[0].seasonNumber, rankIndex, rankName: RANKS[rankIndex].name, previousMapId: result.previousMapId, map: result.map });
+    return NextResponse.json({ ok: true, seasonNumber: season[0].seasonNumber, rankIndex, rankName: RANKS[rankIndex].name, minimumRating: pathTargetRating(rankIndex), previousMapId: result.previousMapId, map: result.map });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Could not reset the path map." }, { status: 500 });
   }
