@@ -9,6 +9,7 @@ const NEW_TAGS: Array<{ name: string; slug: string }> = [
   { name: "Mapper", slug: "mapper" },
   { name: "Developer", slug: "developer" },
   { name: "Owner", slug: "owner" },
+  { name: "Staff", slug: "staff" },
 ];
 
 const ROLE_ID_TO_TAG_SLUG: Record<string, string> = {
