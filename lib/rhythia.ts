@@ -56,19 +56,14 @@ function buildUrl(baseUrl: string, path: string, body: Record<string, unknown>) 
 async function readApiResponse<T>(response: Response, endpoint: string): Promise<T> {
   const text = await response.text();
   const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
-
   if (!response.ok) {
     const detail = text.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 180);
     throw new Error(`Rhythia API returned ${response.status}${detail ? `: ${detail}` : ""}.`);
   }
-
   if (!contentType.includes("json")) {
-    if (/^\s*<!doctype html/i.test(text) || /<html[\s>]/i.test(text)) {
-      throw new Error(`Rhythia API endpoint ${endpoint} returned an HTML page instead of JSON.`);
-    }
+    if (/^\s*<!doctype html/i.test(text) || /<html[\s>]/i.test(text)) throw new Error(`Rhythia API endpoint ${endpoint} returned an HTML page instead of JSON.`);
     throw new Error(`Rhythia API endpoint ${endpoint} returned a non-JSON response.`);
   }
-
   try {
     const data = JSON.parse(text) as T & { error?: string; message?: string };
     if (data.error) throw new Error(data.error);
@@ -87,29 +82,15 @@ async function requestFromApi<T>(baseUrl: string, path: string, body: Record<str
   try {
     const response = await fetch(endpoint, {
       method: "POST",
-      headers: {
-        accept: "application/json",
-        "content-type": "application/json",
-        "user-agent": "Rhythians/1.0",
-      },
+      headers: { accept: "application/json", "content-type": "application/json", "user-agent": "Rhythians/1.0" },
       body: JSON.stringify({ session: "", ...body }),
       cache: "no-store",
       signal: controller.signal,
     });
-
     if (response.status === 405) {
-      const getResponse = await fetch(buildUrl(baseUrl, path, { session: "", ...body }), {
-        method: "GET",
-        headers: {
-          accept: "application/json",
-          "user-agent": "Rhythians/1.0",
-        },
-        cache: "no-store",
-        signal: controller.signal,
-      });
+      const getResponse = await fetch(buildUrl(baseUrl, path, { session: "", ...body }), { method: "GET", headers: { accept: "application/json", "user-agent": "Rhythians/1.0" }, cache: "no-store", signal: controller.signal });
       return await readApiResponse<T>(getResponse, `${baseUrl}/${path}`);
     }
-
     return await readApiResponse<T>(response, endpoint);
   } finally {
     clearTimeout(timeout);
@@ -119,12 +100,10 @@ async function requestFromApi<T>(baseUrl: string, path: string, body: Record<str
 export async function rhythiaRequest<T>(path: string, body: object): Promise<T> {
   let lastError: unknown = null;
   const requestBody = { ...body } as Record<string, unknown>;
-
   if (path === "getUserScores") {
     delete requestBody.offset;
     delete requestBody.page;
   }
-
   for (const baseUrl of RHYTHIA_API_URLS) {
     try {
       return await requestFromApi<T>(baseUrl, path, requestBody);
@@ -132,12 +111,10 @@ export async function rhythiaRequest<T>(path: string, body: object): Promise<T> 
       lastError = error;
     }
   }
-
   if (lastError instanceof Error) {
     if (lastError.name === "AbortError") throw new Error("Rhythia took too long to respond.");
     throw lastError;
   }
-
   throw new Error("Rhythia could not be reached.");
 }
 
@@ -152,20 +129,19 @@ export function namesMatch(rhythiaUsername: string | null, localNames: (string |
 }
 
 export async function fetchRhythiaProfile(id: number) {
-  const profile = await rhythiaRequest<{ user?: { id: number; username: string | null; flag: string | null; position: number | null; country_position: number | null; skill_points: number | null } }>("getProfile", { id });
+  const profile = await rhythiaRequest<{ user?: { id: number; username: string | null; bio?: string | null; flag: string | null; position: number | null; country_position: number | null; skill_points: number | null } }>("getProfile", { id });
   if (!profile.user || profile.user.id !== id) throw new Error("That Rhythia profile was not found.");
-
   let scores: RhythiaScore[] = [];
   try {
     const scoreData = await rhythiaRequest<{ top?: RhythiaScore[] }>("getUserScores", { id, limit: 10 });
     scores = scoreData.top ?? [];
   } catch {
   }
-
   const rhythmPoints = profile.user.skill_points;
   return {
     profileId: id,
     username: profile.user.username,
+    bio: profile.user.bio ?? null,
     country: profile.user.flag,
     flag: profile.user.flag,
     globalRank: profile.user.position,
