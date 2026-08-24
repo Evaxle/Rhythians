@@ -10,7 +10,13 @@ function addThreeMonths(date: Date) {
 }
 
 function pathTargetRating(rankIndex: number) {
-  return rankIndex === RANKS.length - 1 ? 4 : RANKS[rankIndex + 1].rangeMin;
+  if (rankIndex === RANKS.length - 1) return 3.9;
+  return Math.max(0, Math.round((RANKS[rankIndex + 1].rangeMin - 0.1) * 100) / 100);
+}
+
+function pathRatingRange(rankIndex: number) {
+  if (rankIndex === RANKS.length - 1) return { gte: 3.9 };
+  return { gte: pathTargetRating(rankIndex), lte: RANKS[rankIndex + 1].rangeMax };
 }
 
 function normalizeScoreTitle(value: string | null | undefined) {
@@ -55,7 +61,7 @@ async function ensureSeasonMaps(seasonId: string) {
   for (let rankIndex = 0; rankIndex < RANKS.length; rankIndex += 1) {
     if (byRank.has(rankIndex)) continue;
     const target = pathTargetRating(rankIndex);
-    const range = rankIndex === RANKS.length - 1 ? { gte: 4 } : { gte: RANKS[rankIndex + 1].rangeMin, lte: RANKS[rankIndex + 1].rangeMax };
+    const range = pathRatingRange(rankIndex);
     const candidates = await prisma.challengeMap.findMany({ where: { status: "approved", isAutoImported: true, id: { notIn: [...usedMapIds] }, rating: range }, orderBy: [{ rating: "asc" }, { createdAt: "asc" }], take: 100, select: { id: true, rating: true } });
     const map = candidates.sort((a, b) => Math.abs((a.rating ?? target) - target) - Math.abs((b.rating ?? target) - target))[0];
     if (!map) continue;
