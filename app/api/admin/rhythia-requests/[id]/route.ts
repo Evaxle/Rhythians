@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
-import { canAccessAdmin } from "@/lib/admin-access";
+import { canAccessRhythiaReview } from "@/lib/admin-access";
 import { fetchRhythiaProfile } from "@/lib/rhythia";
 import { checkAndAwardAllChallengeMaps } from "@/lib/maps";
 
@@ -12,7 +12,7 @@ type Props = { params: Promise<{ id: string }> };
 export async function PATCH(request: Request, { params }: Props) {
   const admin = await getSessionUser();
   if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (!(await canAccessAdmin(admin))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!(await canAccessRhythiaReview(admin))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const { id } = await params;
   const body = (await request.json().catch(() => null)) as { action?: unknown; message?: unknown } | null;
   const action = body?.action;
@@ -37,9 +37,7 @@ export async function PATCH(request: Request, { params }: Props) {
     await prisma.notification.create({ data: { userId: requestRecord.userId, type: "moderation", title: "Rhythia profile approved", message: message || "Your Rhythia profile has been approved and linked to your account.", url: `/profile/${requestRecord.user.profileHandle}` } });
     const approvedUser = await prisma.user.findUnique({ where: { id: requestRecord.userId }, select: { scoreImportDone: true } });
     if (!approvedUser?.scoreImportDone) {
-      try {
-        await checkAndAwardAllChallengeMaps(requestRecord.userId);
-      } catch {}
+      try { await checkAndAwardAllChallengeMaps(requestRecord.userId); } catch {}
     }
   } else {
     await prisma.rhythiaProfileRequest.update({ where: { id }, data: { status: "denied", adminNote: message || null, resolvedAt: now, resolvedBy: admin.id } });
