@@ -26,7 +26,7 @@ export async function GET() {
     const members = conversation.members.map((member) => publicUser(member.user));
     const lastMessage = conversation.messages[0] ?? null;
     const name = conversation.type === "group" ? conversation.name || automaticGroupName(conversation.members.map((member) => member.user)) : otherMembers[0]?.username ?? "Chat";
-    return { id: conversation.id, type: conversation.type, name, avatar: conversation.type === "group" ? null : otherMembers[0]?.avatar ?? null, otherUsers: conversation.type === "group" ? members : otherMembers, memberIds: conversation.members.map((member) => member.userId), lastMessage: lastMessage ? { id: lastMessage.id, content: lastMessage.content, senderId: lastMessage.senderId, createdAt: lastMessage.createdAt.toISOString(), isDeleted: lastMessage.isDeleted } : null, unreadCount: unread, updatedAt: conversation.updatedAt.toISOString() };
+    return { id: conversation.id, type: conversation.type, name, avatar: conversation.type === "group" ? null : otherMembers[0]?.avatar ?? null, otherUsers: conversation.type === "group" ? members : otherMembers, memberIds: conversation.members.map((member) => member.userId), createdById: conversation.createdById, memberRoles: Object.fromEntries(conversation.members.map((member) => [member.userId, member.role])), lastMessage: lastMessage ? { id: lastMessage.id, content: lastMessage.content, senderId: lastMessage.senderId, createdAt: lastMessage.createdAt.toISOString(), isDeleted: lastMessage.isDeleted } : null, unreadCount: unread, updatedAt: conversation.updatedAt.toISOString() };
   }));
   return NextResponse.json({ conversations });
 }
@@ -60,6 +60,6 @@ export async function POST(request: Request) {
   if (selectedUsers.length !== memberIds.length) return NextResponse.json({ error: "One or more selected users do not exist." }, { status: 400 });
   const name = suppliedName || automaticGroupName([user, ...selectedUsers]);
   if (name.length > 60) return NextResponse.json({ error: "Group name must be 60 characters or fewer." }, { status: 400 });
-  const conversation = await prisma.conversation.create({ data: { type: "group", name, createdById: user.id, members: { create: [{ userId: user.id, role: "owner" }, ...memberIds.map((memberId) => ({ userId: memberId, role: "member" }))] } } });
+  const conversation = await prisma.conversation.create({ data: { type: "group", name, createdById: user.id, members: { create: [{ userId: user.id, role: "owner" }, ...memberIds.map((memberId) => ({ userId: memberId, role: "member" }))] } });
   return NextResponse.json({ conversationId: conversation.id, name }, { status: 201 });
 }
