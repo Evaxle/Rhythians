@@ -15,9 +15,9 @@ export function HomePathNotice({ regularRank, pathRank }: { regularRank: RankInf
       <p className="text-xs uppercase tracking-[0.24em] text-amber-300">Seasonal Path</p>
       <h2 className="mt-2 text-lg font-semibold text-white">Your seasonal path is below your regular rank</h2>
       <div className="mt-3 flex flex-wrap items-center gap-3 text-sm leading-6 text-amber-100/80">
-        <span className="inline-flex items-center gap-2"><RankIcon rank={regularRank} size={34} />Your regular rank is {regularRank.isExpert ? "Expert" : `${regularRank.name} ${regularRank.tier}`}</span>
+        <span className="inline-flex items-center gap-2"><RankIcon rank={regularRank} size={34} />Your regular rank is {regularRank.isExpert ? "Expert" : regularRank.name}</span>
         <span>but your seasonal path is only</span>
-        {pathRank ? <span className="inline-flex items-center gap-2"><RankIcon rank={pathRank} size={34} />{pathRank.isExpert ? "Expert" : `${pathRank.name} ${pathRank.tier}`}</span> : <span>Unranked</span>}
+        {pathRank ? <span className="inline-flex items-center gap-2"><RankIcon rank={pathRank} size={34} />{pathRank.isExpert ? "Expert" : pathRank.name}</span> : <span>Unranked</span>}
       </div>
       <p className="mt-2 text-sm leading-6 text-amber-100/80">Complete the path maps until you reach your current rank.</p>
       <Link href="/path" className="mt-4 inline-flex rounded-full border border-amber-300/30 bg-amber-300/10 px-4 py-2 text-sm font-semibold text-amber-100 transition hover:bg-amber-300/20">Continue your path</Link>
