@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { supabaseAdmin } from "@/lib/supabase";
 import { getSessionUser } from "@/lib/auth";
 import { canAccessAdmin } from "@/lib/admin-access";
 import { moderateClip } from "@/lib/moderation";
@@ -51,7 +52,7 @@ export async function DELETE(_request: Request, { params }: Props) {
 
   const clip = await prisma.clip.findUnique({
     where: { id },
-    select: { id: true, title: true, status: true, uploaderId: true },
+    select: { id: true, title: true, status: true, uploaderId: true, storagePath: true, thumbnailPath: true },
   });
   if (!clip) return NextResponse.json({ error: "Clip not found." }, { status: 404 });
   if (clip.status === "deleted") {
@@ -76,6 +77,11 @@ export async function DELETE(_request: Request, { params }: Props) {
       },
     },
   });
+
+  if (supabaseAdmin) {
+    const paths = [clip.storagePath, ...(clip.thumbnailPath ? [clip.thumbnailPath] : [])];
+    await supabaseAdmin.storage.from(process.env.STORAGE_BUCKET ?? "media").remove(paths);
+  }
 
   return NextResponse.json({ clip: updated });
 }
