@@ -128,26 +128,46 @@ export function namesMatch(rhythiaUsername: string | null, localNames: (string |
   return localNames.some((name) => normalizeName(name) === target);
 }
 
+function findBio(value: unknown): string | null {
+  if (!value || typeof value !== "object") return null;
+  const record = value as Record<string, unknown>;
+  const directKeys = ["bio", "about", "aboutMe", "about_me", "description"];
+  for (const key of directKeys) {
+    if (typeof record[key] === "string" && record[key].trim()) return record[key];
+  }
+  for (const key of ["user", "profile", "data"]) {
+    const nested = findBio(record[key]);
+    if (nested) return nested;
+  }
+  return null;
+}
+
 export async function fetchRhythiaProfile(id: number) {
-  const profile = await rhythiaRequest<{ user?: { id: number; username: string | null; bio?: string | null; flag: string | null; position: number | null; country_position: number | null; skill_points: number | null } }>("getProfile", { id });
-  if (!profile.user || profile.user.id !== id) throw new Error("That Rhythia profile was not found.");
+  const profile = await rhythiaRequest<Record<string, unknown>>("getProfile", { id });
+  const user = profile.user && typeof profile.user === "object" ? profile.user as Record<string, unknown> : null;
+  const userId = typeof user?.id === "number" ? user.id : null;
+  if (!user || userId !== id) throw new Error("That Rhythia profile was not found.");
   let scores: RhythiaScore[] = [];
   try {
     const scoreData = await rhythiaRequest<{ top?: RhythiaScore[] }>("getUserScores", { id, limit: 10 });
     scores = scoreData.top ?? [];
   } catch {
   }
-  const rhythmPoints = profile.user.skill_points;
+  const username = typeof user.username === "string" ? user.username : null;
+  const flag = typeof user.flag === "string" ? user.flag : null;
+  const globalRank = typeof user.position === "number" ? user.position : null;
+  const countryRank = typeof user.country_position === "number" ? user.country_position : null;
+  const rhythmPoints = typeof user.skill_points === "number" ? user.skill_points : null;
   return {
     profileId: id,
-    username: profile.user.username,
-    bio: profile.user.bio ?? null,
-    country: profile.user.flag,
-    flag: profile.user.flag,
-    globalRank: profile.user.position,
-    countryRank: profile.user.country_position,
+    username,
+    bio: findBio(profile),
+    country: flag,
+    flag,
+    globalRank,
+    countryRank,
     rhythmPoints,
-    title: titleFor(rhythmPoints, profile.user.position),
+    title: titleFor(rhythmPoints, globalRank),
     scores,
   };
 }
