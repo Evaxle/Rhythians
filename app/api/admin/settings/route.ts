@@ -8,6 +8,8 @@ import { supabaseAdmin } from "@/lib/supabase";
 const bucket = () => process.env.STORAGE_BUCKET ?? "media";
 const MAX_SETTINGS_SIZE = 25 * 1024 * 1024;
 const MAX_VIDEO_SIZE = 250 * 1024 * 1024;
+const settingsExtension = (name: string) => /\.(rhm|json)$/i.test(name);
+const videoExtension = (name: string) => /\.(mp4|webm|mov|m4v|mkv|avi|wmv|flv|mpeg|mpg|3gp|ogv|ts|mts|m2ts)$/i.test(name);
 
 async function authorize() {
   const user = await getSessionUser();
@@ -27,7 +29,7 @@ export async function POST(request: Request) {
   const auth = await authorize();
   if (auth.response) return auth.response;
   if (!supabaseAdmin) return NextResponse.json({ error: "Storage service is not configured." }, { status: 500 });
-  const body = await request.json().catch(() => null) as { action?: unknown; id?: unknown; cameraMode?: unknown; userId?: unknown; settingsFileName?: unknown; settingsFileSize?: unknown; settingsContentType?: unknown; videoFileName?: unknown; videoFileSize?: unknown; videoContentType?: unknown; title?: unknown; description?: unknown; settingsPath?: unknown; videoPath?: unknown } | null;
+  const body = await request.json().catch(() => null) as Record<string, unknown> | null;
   if (body?.action === "upload") {
     const settingsFileName = typeof body.settingsFileName === "string" ? body.settingsFileName.trim() : "";
     const videoFileName = typeof body.videoFileName === "string" ? body.videoFileName.trim() : "";
@@ -35,28 +37,44 @@ export async function POST(request: Request) {
     const videoFileSize = Number(body.videoFileSize);
     const settingsContentType = typeof body.settingsContentType === "string" ? body.settingsContentType : "application/octet-stream";
     const videoContentType = typeof body.videoContentType === "string" ? body.videoContentType : "video/mp4";
-    if (!settingsFileName || !Number.isFinite(settingsFileSize) || settingsFileSize <= 0 || settingsFileSize > MAX_SETTINGS_SIZE) return NextResponse.json({ error: "Settings file must be between 1 byte and 25 MB." }, { status: 400 });
-    if (!videoFileName || !Number.isFinite(videoFileSize) || videoFileSize <= 0 || videoFileSize > MAX_VIDEO_SIZE) return NextResponse.json({ error: "Video must be between 1 byte and 250 MB." }, { status: 400 });
+    if (!settingsExtension(settingsFileName)) return NextResponse.json({ error: "Settings file must be an .rhm or .json file." }, { status: 400 });
+    if (!videoExtension(videoFileName)) return NextResponse.json({ error: "Unsupported video file type." }, { status: 400 });
+    if (!Number.isFinite(settingsFileSize) || settingsFileSize <= 0 || settingsFileSize > MAX_SETTINGS_SIZE) return NextResponse.json({ error: "Settings file must be between 1 byte and 25 MB." }, { status: 400 });
+    if (!Number.isFinite(videoFileSize) || videoFileSize <= 0 || videoFileSize > MAX_VIDEO_SIZE) return NextResponse.json({ error: "Video must be between 1 byte and 250 MB." }, { status: 400 });
     const settingsPath = `settings/${randomUUID()}/${settingsFileName.replace(/[^a-zA-Z0-9._-]/g, "-")}`;
     const videoPath = `settings/${randomUUID()}/${videoFileName.replace(/[^a-zA-Z0-9._-]/g, "-")}`;
     const [settingsUpload, videoUpload] = await Promise.all([supabaseAdmin.storage.from(bucket()).createSignedUploadUrl(settingsPath), supabaseAdmin.storage.from(bucket()).createSignedUploadUrl(videoPath)]);
     if (settingsUpload.error || !settingsUpload.data || videoUpload.error || !videoUpload.data) return NextResponse.json({ error: "Could not create upload URLs." }, { status: 500 });
     return NextResponse.json({ settingsUploadUrl: settingsUpload.data.signedUrl, videoUploadUrl: videoUpload.data.signedUrl, settingsPublicUrl: supabaseAdmin.storage.from(bucket()).getPublicUrl(settingsPath).data.publicUrl, videoPublicUrl: supabaseAdmin.storage.from(bucket()).getPublicUrl(videoPath).data.publicUrl, settingsPath, videoPath, settingsContentType, videoContentType });
   }
-  if (body?.action === "create") {
+  if (body?.action === "create" || body?.action === "update") {
+    const id = typeof body.id === "string" ? body.id : "";
     const cameraMode = body.cameraMode === "spin" ? "spin" : body.cameraMode === "lock" ? "lock" : "";
     const userId = typeof body.userId === "string" ? body.userId : "";
     const settingsPath = typeof body.settingsPath === "string" ? body.settingsPath : "";
     const videoPath = typeof body.videoPath === "string" ? body.videoPath : "";
     const settingsFileName = typeof body.settingsFileName === "string" ? body.settingsFileName : "";
-    if (!cameraMode || !userId || !settingsPath || !videoPath || !settingsFileName) return NextResponse.json({ error: "Camera mode, connected user, settings file, and video are required." }, { status: 400 });
+    const title = typeof body.title === "string" ? body.title.trim() || null : null;
+    const description = typeof body.description === "string" ? body.description.trim() || null : null;
+    if (!cameraMode || !userId) return NextResponse.json({ error: "Camera mode and connected user are required." }, { status: 400 });
     const linked = await prisma.rhythiaProfile.findUnique({ where: { userId }, select: { userId: true } });
     if (!linked) return NextResponse.json({ error: "The selected user does not have a connected Rhythia account." }, { status: 400 });
-    const id = randomUUID();
+    if (body.action === "create" && (!settingsPath || !videoPath || !settingsFileName)) return NextResponse.json({ error: "Settings and video files are required." }, { status: 400 });
+    if (body.action === "update") {
+      if (!id) return NextResponse.json({ error: "Settings entry is required." }, { status: 400 });
+      const current = await prisma.$queryRawUnsafe<Array<{ id: string; settingsFileUrl: string; settingsFileName: string; videoUrl: string }>>(`SELECT "id","settingsFileUrl","settingsFileName","videoUrl" FROM "SettingsShowcase" WHERE "id"=$1 LIMIT 1`, id);
+      if (!current[0]) return NextResponse.json({ error: "Settings entry not found." }, { status: 404 });
+      const settingsUrl = settingsPath ? supabaseAdmin.storage.from(bucket()).getPublicUrl(settingsPath).data.publicUrl : current[0].settingsFileUrl;
+      const videoUrl = videoPath ? supabaseAdmin.storage.from(bucket()).getPublicUrl(videoPath).data.publicUrl : current[0].videoUrl;
+      const fileName = settingsFileName || current[0].settingsFileName;
+      await prisma.$executeRawUnsafe(`UPDATE "SettingsShowcase" SET "cameraMode"=$1,"userId"=$2,"settingsFileUrl"=$3,"settingsFileName"=$4,"videoUrl"=$5,"title"=$6,"description"=$7 WHERE "id"=$8`, cameraMode, userId, settingsUrl, fileName, videoUrl, title, description, id);
+      return NextResponse.json({ id });
+    }
+    const newId = randomUUID();
     const settingsUrl = supabaseAdmin.storage.from(bucket()).getPublicUrl(settingsPath).data.publicUrl;
     const videoUrl = supabaseAdmin.storage.from(bucket()).getPublicUrl(videoPath).data.publicUrl;
-    await prisma.$executeRawUnsafe(`INSERT INTO "SettingsShowcase" ("id","cameraMode","userId","settingsFileUrl","settingsFileName","videoUrl","title","description") VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`, id, cameraMode, userId, settingsUrl, settingsFileName, videoUrl, typeof body.title === "string" ? body.title.trim() || null : null, typeof body.description === "string" ? body.description.trim() || null : null);
-    return NextResponse.json({ id }, { status: 201 });
+    await prisma.$executeRawUnsafe(`INSERT INTO "SettingsShowcase" ("id","cameraMode","userId","settingsFileUrl","settingsFileName","videoUrl","title","description") VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`, newId, cameraMode, userId, settingsUrl, settingsFileName, videoUrl, title, description);
+    return NextResponse.json({ id: newId }, { status: 201 });
   }
   if (body?.action === "delete") {
     const id = typeof body.id === "string" ? body.id : "";
