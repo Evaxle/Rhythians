@@ -27,7 +27,7 @@ export async function POST(request: Request) {
   const auth = await authorize();
   if (auth.response) return auth.response;
   if (!supabaseAdmin) return NextResponse.json({ error: "Storage service is not configured." }, { status: 500 });
-  const body = await request.json().catch(() => null) as { action?: unknown; cameraMode?: unknown; userId?: unknown; settingsFileName?: unknown; settingsFileSize?: unknown; settingsContentType?: unknown; videoFileName?: unknown; videoFileSize?: unknown; videoContentType?: unknown; title?: unknown; description?: unknown; settingsPath?: unknown; videoPath?: unknown } | null;
+  const body = await request.json().catch(() => null) as { action?: unknown; id?: unknown; cameraMode?: unknown; userId?: unknown; settingsFileName?: unknown; settingsFileSize?: unknown; settingsContentType?: unknown; videoFileName?: unknown; videoFileSize?: unknown; videoContentType?: unknown; title?: unknown; description?: unknown; settingsPath?: unknown; videoPath?: unknown } | null;
   if (body?.action === "upload") {
     const settingsFileName = typeof body.settingsFileName === "string" ? body.settingsFileName.trim() : "";
     const videoFileName = typeof body.videoFileName === "string" ? body.videoFileName.trim() : "";
