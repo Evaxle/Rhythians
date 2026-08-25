@@ -9,7 +9,7 @@ import { UnreadIndicator } from "@/components/messages/unread-indicator";
 import { version } from "@/package.json";
 
 const links = [
-  ["/", "Home"], ["/daily", "Daily"], ["/path", "Path"], ["/maps", "Maps"], ["/categories?tab=challenge", "Challenge"], ["/battles", "Battles"], ["/online", "Online"], ["/wiki", "Wiki"], ["/settings", "Player Settings"], ["/community-settings", "Community Settings"], ["/leaderboards", "Leaderboards"], ["/clips", "Clips"], ["/rules", "Rules"], ["/community", "Community"]
+  ["/", "Home"], ["/daily", "Daily"], ["/path", "Path"], ["/maps", "Maps"], ["/categories?tab=challenge", "Challenge"], ["/battles", "Battles"], ["/online", "Online"], ["/wiki", "Wiki"], ["/community-settings", "Community Settings"], ["/leaderboards", "Leaderboards"], ["/clips", "Clips"], ["/rules", "Rules"], ["/community", "Community"]
 ] as const;
 
 export async function SiteHeader() {
