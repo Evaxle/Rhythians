@@ -18,7 +18,8 @@ export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
   const user = await getSessionUser();
-  if (!user) redirect("/login");
+  if (!user) return <div className="mx-auto w-full max-w-6xl space-y-8"><section className="rounded-[2rem] border border-border bg-surface/95 p-8 shadow-glow sm:p-10"><p className="text-sm uppercase tracking-[0.3em] text-accent">Settings</p><h1 className="mt-3 text-3xl font-semibold text-white">Player settings</h1><p className="mt-3 max-w-2xl text-sm leading-7 text-muted">Browse the settings, ranks, downloads, and gameplay showcases published by the Rhythians team.</p></section><SettingsShowcase /></div>;
+
   const fullUser = await prisma.user.findUnique({ where: { id: user.id }, include: { userTags: { include: { tag: true } }, rhythiaProfile: true } });
   if (!fullUser) redirect("/login");
   const token = process.env.DISCORD_BOT_TOKEN;
