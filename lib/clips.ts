@@ -1,20 +1,38 @@
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { supabaseAdmin } from "@/lib/supabase";
 
+const getCachedVideoUrl = unstable_cache(
+  async (path: string) => {
+    if (!supabaseAdmin) return null;
+    const { data, error } = await supabaseAdmin.storage
+      .from(process.env.STORAGE_BUCKET ?? "media")
+      .createSignedUrl(path, 900);
+    return error || !data ? null : data.signedUrl;
+  },
+  ["rhythians-video-url"],
+  { revalidate: 600 }
+);
+
+const getCachedThumbnailUrl = unstable_cache(
+  async (path: string) => {
+    if (!supabaseAdmin) return null;
+    const { data, error } = await supabaseAdmin.storage
+      .from(process.env.STORAGE_BUCKET ?? "media")
+      .createSignedUrl(path, 900);
+    return error || !data ? null : data.signedUrl;
+  },
+  ["rhythians-thumbnail-url"],
+  { revalidate: 600 }
+);
+
 export async function getVideoUrl(path: string) {
-  if (!supabaseAdmin) return null;
-  const { data, error } = await supabaseAdmin.storage
-    .from(process.env.STORAGE_BUCKET ?? "media")
-    .createSignedUrl(path, 300);
-  return error || !data ? null : data.signedUrl;
+  return getCachedVideoUrl(path);
 }
 
 export async function getThumbnailUrl(path: string | null) {
-  if (!path || !supabaseAdmin) return null;
-  const { data, error } = await supabaseAdmin.storage
-    .from(process.env.STORAGE_BUCKET ?? "media")
-    .createSignedUrl(path, 300);
-  return error || !data ? null : data.signedUrl;
+  if (!path) return null;
+  return getCachedThumbnailUrl(path);
 }
 
 export async function getPendingClips() {
