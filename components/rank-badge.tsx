@@ -1,4 +1,5 @@
-import { RANKS, type RankInfo } from "@/lib/ranks";
+import { RANKS, getRankInfo, type RankInfo } from "@/lib/ranks";
+import { RankIcon } from "@/components/rank-icon";
 
 export function RankBadge({
   rank,
@@ -12,8 +13,7 @@ export function RankBadge({
   showTier?: boolean;
 }) {
   const sizeClass = size === "lg" ? "px-4 py-1.5 text-base gap-2" : size === "sm" ? "px-2 py-0.5 text-[11px] gap-1" : "px-3 py-1 text-sm gap-1.5";
-  const dotClass = size === "lg" ? "h-3 w-3" : size === "sm" ? "h-2 w-2" : "h-2.5 w-2.5";
-
+  const iconSize = size === "lg" ? 34 : size === "sm" ? 22 : 28;
   const label = rank.isExpert ? "Expert" : `${rank.name} ${rank.tier}`;
   const sub = rank.isExpert && globalRank != null ? ` #${globalRank.toLocaleString()}` : "";
 
@@ -23,7 +23,7 @@ export function RankBadge({
       style={{ color: rank.color, borderColor: `${rank.color}55`, backgroundColor: `${rank.color}1a` }}
       title={`${label}${sub} · ${rank.minRhp.toLocaleString()} RHP`}
     >
-      <span className={`rounded-full ${dotClass}`} style={{ backgroundColor: rank.color }} />
+      <RankIcon rank={rank} size={iconSize} />
       <span>
         {label}
         {sub}
@@ -39,12 +39,14 @@ export function RankBadge({
 
 export function RankRow({ rankIndex, className }: { rankIndex: number; className?: string }) {
   const rank = RANKS[rankIndex] ?? RANKS[RANKS.length - 1];
+  const rankInfo = getRankInfo(rank.minRhp);
+
   return (
     <span
       className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-semibold ${className ?? ""}`}
       style={{ color: rank.color, borderColor: `${rank.color}55`, backgroundColor: `${rank.color}1a` }}
     >
-      <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: rank.color }} />
+      <RankIcon rank={rankInfo} size={28} />
       {rank.name}
     </span>
   );
