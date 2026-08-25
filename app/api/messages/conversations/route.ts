@@ -13,7 +13,7 @@ function automaticGroupName(users: Array<{ username: string; displayName: string
 export async function GET() {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
-  const memberships = await prisma.conversationMember.findMany({ where: { userId: user.id, conversation: { NOT: { name: { startsWith: "battle:" } } } }, include: { conversation: { include: { members: { include: { user: { select: PUBLIC_USER_FIELDS } } }, messages: { orderBy: { createdAt: "desc" }, take: 1 } } } }, orderBy: { conversation: { updatedAt: "desc" } });
+  const memberships = await prisma.conversationMember.findMany({ where: { userId: user.id, conversation: { NOT: { name: { startsWith: "battle:" } } } }, include: { conversation: { include: { members: { include: { user: { select: PUBLIC_USER_FIELDS } } }, messages: { orderBy: { createdAt: "desc" }, take: 1 } } } }, orderBy: { conversation: { updatedAt: "desc" } } });
   const conversations = await Promise.all(memberships.map(async (membership) => {
     const { conversation } = membership;
     const unread = await prisma.message.count({ where: { conversationId: conversation.id, senderId: { not: user.id }, isDeleted: false, createdAt: { gt: membership.lastReadAt ?? new Date(0) } } });
@@ -55,6 +55,6 @@ export async function POST(request: Request) {
   if (selectedUsers.length !== memberIds.length) return NextResponse.json({ error: "One or more selected users do not exist." }, { status: 400 });
   const name = suppliedName || automaticGroupName([user, ...selectedUsers]);
   if (name.length > 60) return NextResponse.json({ error: "Group name must be 60 characters or fewer." }, { status: 400 });
-  const conversation = await prisma.conversation.create({ data: { type: "group", name, createdById: user.id, members: { create: [{ userId: user.id, role: "owner" }, ...memberIds.map((memberId) => ({ userId: memberId, role: "member" }))] } } });
+  const conversation = await prisma.conversation.create({ data: { type: "group", name, createdById: user.id, members: { create: [{ userId: user.id, role: "owner" }, ...memberIds.map((memberId) => ({ userId: memberId, role: "member" }))] } });
   return NextResponse.json({ conversationId: conversation.id, name }, { status: 201 });
 }
