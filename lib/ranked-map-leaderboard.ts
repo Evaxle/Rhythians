@@ -3,39 +3,31 @@ import { getRankInfo, RANKS } from "@/lib/ranks";
 
 export type RankedMapLeaderboardRow = { position: number; userId: string; username: string; displayName: string | null; profileHandle: string; avatar: string | null; accuracy: number | null; points: number; scoreId: number | null; rankInfo: ReturnType<typeof getRankInfo> };
 export type RankedMapLeaderboard = { mapId: string; title: string; artist: string | null; description: string | null; mapFileUrl: string; imageUrl: string | null; rating: number; rankIndex: number; rankName: string; rankColor: string; rangeMin: number; rangeMax: number; mapperName: string | null; noteCount: number | null; length: number | null; sourceBeatmapId: number | null; sourceUrl: string | null; rows: RankedMapLeaderboardRow[]; isRanked?: boolean };
-
 type ScoreWrite = { rating: number; accuracy: number | null; passed: boolean; points: number; scoreId: number | null; speed: number | null; rankIndex: number };
 type StoredScore = { id: string; points: number; accuracy: number | null; passed: boolean; scoreId: number | null };
 
 async function loadMap(mapId: string) {
-  const direct = await prisma.challengeMap.findUnique({ where: { id: mapId }, select: { id: true, title: true, artist: true, description: true, mapFileUrl: true, imageUrl: true, rating: true, requestedRating: true, mapperName: true, noteCount: true, length: true, sourceBeatmapId: true, sourceUrl: true, status: true, isAutoImported: true } });
+  const select = { id: true, title: true, artist: true, description: true, mapFileUrl: true, imageUrl: true, rating: true, requestedRating: true, mapperName: true, noteCount: true, length: true, sourceBeatmapId: true, sourceUrl: true, status: true, isAutoImported: true, reviewerNote: true } as const;
+  const direct = await prisma.challengeMap.findUnique({ where: { id: mapId }, select });
   if (direct) return direct;
-  if (/^\d+$/.test(mapId)) return prisma.challengeMap.findFirst({ where: { sourceBeatmapId: Number(mapId) }, select: { id: true, title: true, artist: true, description: true, mapFileUrl: true, imageUrl: true, rating: true, requestedRating: true, mapperName: true, noteCount: true, length: true, sourceBeatmapId: true, sourceUrl: true, status: true, isAutoImported: true }, orderBy: { createdAt: "desc" } });
+  if (/^\d+$/.test(mapId)) return prisma.challengeMap.findFirst({ where: { sourceBeatmapId: Number(mapId) }, select, orderBy: { createdAt: "desc" } });
   return null;
 }
 
 export async function getRankedMapDetail(mapId: string): Promise<RankedMapLeaderboard | null> {
   const map = await loadMap(mapId);
-  if (!map || !map.mapFileUrl) return null;
-  const isRanked = map.status === "approved";
-  if (!isRanked || !map.rating) return null;
-  const rating = map.rating ?? map.requestedRating;
+  if (!map || !map.mapFileUrl || map.status !== "approved" || map.rating == null || map.reviewerNote === "rhythia-unranked") return null;
+  const rating = map.rating;
   const rankIndex = RANKS.findIndex((rank) => rating >= rank.rangeMin && rating <= rank.rangeMax);
   const rank = RANKS[rankIndex === -1 ? RANKS.length - 1 : rankIndex];
-  return { mapId: map.id, title: map.title, artist: map.artist, description: map.description, mapFileUrl: map.mapFileUrl, imageUrl: map.imageUrl, rating, rankIndex: rank.index, rankName: rank.name, rankColor: rank.color, rangeMin: rank.rangeMin, rangeMax: rank.rangeMax, mapperName: map.mapperName, noteCount: map.noteCount, length: map.length, sourceBeatmapId: map.sourceBeatmapId, sourceUrl: map.sourceUrl, rows: [], isRanked };
+  return { mapId: map.id, title: map.title, artist: map.artist, description: map.description, mapFileUrl: map.mapFileUrl, imageUrl: map.imageUrl, rating, rankIndex: rank.index, rankName: rank.name, rankColor: rank.color, rangeMin: rank.rangeMin, rangeMax: rank.rangeMax, mapperName: map.mapperName, noteCount: map.noteCount, length: map.length, sourceBeatmapId: map.sourceBeatmapId, sourceUrl: map.sourceUrl, rows: [], isRanked: true };
 }
 
 export async function upsertRankedMapScore(mapId: string, userId: string, score: ScoreWrite) {
   const detail = await getRankedMapDetail(mapId);
-  if (!detail || detail.rankIndex !== score.rankIndex) {
-    await prisma.$executeRaw`DELETE FROM "RankedMapScore" WHERE "challengeMapId" = ${mapId} AND "userId" = ${userId}`;
-    return false;
-  }
+  if (!detail || detail.rankIndex !== score.rankIndex) { await prisma.$executeRaw`DELETE FROM "RankedMapScore" WHERE "challengeMapId" = ${mapId} AND "userId" = ${userId}`; return false; }
   const currentRank = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } });
-  if (!currentRank || getRankInfo(currentRank.rhp).index !== detail.rankIndex) {
-    await prisma.$executeRaw`DELETE FROM "RankedMapScore" WHERE "challengeMapId" = ${mapId} AND "userId" = ${userId}`;
-    return false;
-  }
+  if (!currentRank || getRankInfo(currentRank.rhp).index !== detail.rankIndex) { await prisma.$executeRaw`DELETE FROM "RankedMapScore" WHERE "challengeMapId" = ${mapId} AND "userId" = ${userId}`; return false; }
   const existing = await prisma.$queryRaw<StoredScore[]>`SELECT "id", "points", "accuracy", "passed", "scoreId" FROM "RankedMapScore" WHERE "challengeMapId" = ${mapId} AND "userId" = ${userId} LIMIT 1`;
   const current = existing[0];
   const shouldReplace = !current || score.passed !== current.passed ? score.passed : score.points > current.points || (score.points === current.points && (score.accuracy ?? -1) > (current.accuracy ?? -1));
