@@ -7,18 +7,13 @@ import { getAvatarUrl } from "@/lib/avatar";
 
 const PUBLIC_USER_FIELDS = { id: true, discordId: true, username: true, discriminator: true, avatar: true, displayName: true, profileHandle: true } as const;
 
-function publicUser(user: { id: string; discordId: string | null; username: string; discriminator: string | null; avatar: string | null; displayName: string | null; profileHandle: string }) {
-  return { ...user, avatar: getAvatarUrl(user, 128) };
-}
-
-function automaticGroupName(users: Array<{ username: string; displayName: string | null }>) {
-  return users.map((user) => user.displayName?.trim() || user.username).filter(Boolean).slice(0, 12).join(", ") || "Group Chat";
-}
+function publicUser(user: { id: string; discordId: string | null; username: string; discriminator: string | null; avatar: string | null; displayName: string | null; profileHandle: string }) { return { ...user, avatar: getAvatarUrl(user, 128) }; }
+function automaticGroupName(users: Array<{ username: string; displayName: string | null }>) { return users.map((user) => user.displayName?.trim() || user.username).filter(Boolean).slice(0, 12).join(", ") || "Group Chat"; }
 
 export async function GET() {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
-  const memberships = await prisma.conversationMember.findMany({ where: { userId: user.id }, include: { conversation: { include: { members: { include: { user: { select: PUBLIC_USER_FIELDS } } }, messages: { orderBy: { createdAt: "desc" }, take: 1 } } } }, orderBy: { conversation: { updatedAt: "desc" } } });
+  const memberships = await prisma.conversationMember.findMany({ where: { userId: user.id, conversation: { NOT: { name: { startsWith: "battle:" } } } }, include: { conversation: { include: { members: { include: { user: { select: PUBLIC_USER_FIELDS } } }, messages: { orderBy: { createdAt: "desc" }, take: 1 } } } }, orderBy: { conversation: { updatedAt: "desc" } });
   const conversations = await Promise.all(memberships.map(async (membership) => {
     const { conversation } = membership;
     const unread = await prisma.message.count({ where: { conversationId: conversation.id, senderId: { not: user.id }, isDeleted: false, createdAt: { gt: membership.lastReadAt ?? new Date(0) } } });
