@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Download, ExternalLink, Trophy } from "lucide-react";
 import { RANKS, rhpGainForMap, type RankInfo } from "@/lib/ranks";
+import { RankIcon } from "@/components/rank-icon";
 import type { RankedMapLeaderboard } from "@/lib/ranked-map-leaderboard";
 
 type Props = {
@@ -57,7 +58,10 @@ export function MapDetail({ map, userRank, currentUserId }: Props) {
         <div className="p-6 sm:p-8">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <p className="text-sm uppercase tracking-[0.2em]" style={{ color: data.rankColor }}>{data.rankName}</p>
+              <div className="flex items-center gap-3">
+                <RankIcon rank={{ index: data.rankIndex, name: data.rankName, tier: 1, isExpert: data.rankIndex >= RANKS.length - 1, minRhp: data.rankIndex * 500, maxRhp: data.rankIndex < RANKS.length - 1 ? data.rankIndex * 500 + 500 : null, tierStart: data.rankIndex * 500, tierEnd: data.rankIndex * 500 + 100, nextTierStart: data.rankIndex * 500 + 100, nextRankStart: data.rankIndex < RANKS.length - 1 ? (data.rankIndex + 1) * 500 : null, color: data.rankColor, progressToNextTier: 0, rangeMin: data.rangeMin, rangeMax: data.rangeMax }} size={44} />
+                <p className="text-sm uppercase tracking-[0.2em]" style={{ color: data.rankColor }}>{data.rankName}</p>
+              </div>
               <h1 className="mt-2 text-3xl font-semibold text-white sm:text-4xl">{data.title}</h1>
               <p className="mt-2 text-sm text-muted">{data.artist ?? "Unknown artist"} · Mapped by {data.mapperName ?? "Unknown"}</p>
             </div>
@@ -95,7 +99,10 @@ export function MapDetail({ map, userRank, currentUserId }: Props) {
 
         <div className="mt-5 flex flex-wrap gap-2">
           <button type="button" onClick={() => setSelectedRank(-1)} className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${selectedRank === -1 ? "border-accent/50 bg-accent/15 text-white" : "border-border bg-white/5 text-muted hover:text-white"}`}>All ranks</button>
-          {RANKS.map((rank, index) => <button key={rank.name} type="button" onClick={() => setSelectedRank(index)} className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${selectedRank === index ? "text-white" : "text-muted hover:text-white"}`} style={selectedRank === index ? { borderColor: `${rank.color}88`, backgroundColor: `${rank.color}22`, color: rank.color } : { borderColor: "var(--border, #2a2a3a)" }}>{rank.name}</button>)}
+          {RANKS.map((rank, index) => {
+            const rankInfo = { index, name: rank.name, tier: 1, isExpert: index === RANKS.length - 1, minRhp: rank.minRhp, maxRhp: index < RANKS.length - 1 ? rank.minRhp + 500 : null, tierStart: rank.minRhp, tierEnd: rank.minRhp + 100, nextTierStart: rank.minRhp + 100, nextRankStart: index < RANKS.length - 1 ? rank.minRhp + 500 : null, color: rank.color, progressToNextTier: 0, rangeMin: rank.rangeMin, rangeMax: rank.rangeMax } satisfies RankInfo;
+            return <button key={rank.name} type="button" onClick={() => setSelectedRank(index)} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${selectedRank === index ? "text-white" : "text-muted hover:text-white"}`} style={selectedRank === index ? { borderColor: `${rank.color}88`, backgroundColor: `${rank.color}22`, color: rank.color } : { borderColor: "var(--border, #2a2a3a)" }}><RankIcon rank={rankInfo} size={24} />{rank.name}</button>;
+          })}
         </div>
 
         {selectedRank >= 0 && <p className="mt-4 text-xs text-muted">Showing {rankLabel(selectedRank)} users, determined from their current RHP.</p>}
@@ -106,7 +113,7 @@ export function MapDetail({ map, userRank, currentUserId }: Props) {
             return <div key={row.userId} className={`grid grid-cols-[2.5rem_minmax(0,1fr)_6rem_5rem] items-center gap-3 border-b border-border px-4 py-3 last:border-0 ${current ? "bg-accent/10" : "bg-background/60"}`}>
               <span className="text-sm font-bold text-muted">{row.position}</span>
               <div className="flex min-w-0 items-center gap-3">
-                {row.avatar ? <img src={row.avatar} alt="" className="h-9 w-9 shrink-0 rounded-full border border-border" /> : <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-xs font-bold" style={{ color: row.rankInfo.color, borderColor: `${row.rankInfo.color}55`, backgroundColor: `${row.rankInfo.color}18` }}>{row.rankInfo.isExpert ? "#" : row.rankInfo.tier}</span>}
+                {row.avatar ? <img src={row.avatar} alt="" className="h-9 w-9 shrink-0 rounded-full border border-border" /> : <RankIcon rank={row.rankInfo} size={38} />}
                 <div className="min-w-0"><Link href={`/profile/${row.profileHandle}`} className={`truncate text-sm font-semibold hover:text-accent ${current ? "text-accent" : "text-white"}`}>{row.displayName ?? row.username}{current ? " (you)" : ""}</Link><p className="text-xs text-muted">{row.rankInfo.isExpert ? "Expert" : `${row.rankInfo.name} ${row.rankInfo.tier}`}</p></div>
               </div>
               <span className="text-right text-sm text-muted">{row.accuracy != null ? `${row.accuracy.toFixed(2)}%` : "—"}</span>
