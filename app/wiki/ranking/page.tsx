@@ -1,4 +1,5 @@
-import { RANKS, RANK_TIERS, TIER_SPAN } from "@/lib/ranks";
+import { RANKS, RANK_TIERS, TIER_SPAN, getRankInfo } from "@/lib/ranks";
+import { RankIcon } from "@/components/rank-icon";
 
 const ACCURACY_TIERS = [
   { min: 100, label: "100% of weighted RHP", note: "Perfect clear" },
@@ -31,36 +32,37 @@ export default function AboutRankingPage() {
         </p>
 
         <div className="mt-6 overflow-hidden rounded-2xl border border-border">
-          <div className="grid grid-cols-1 gap-px bg-border sm:grid-cols-4">
-            {RANKS.map((rank) => (
-              <div key={rank.name} className="bg-surface p-4">
-                <p className="flex items-center gap-2 text-sm font-semibold" style={{ color: rank.color }}>
-                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: rank.color }} />
-                  {rank.name}
-                </p>
-                <p className="mt-2 text-xs text-muted">
-                  {rank.minRhp.toLocaleString()}{rank.index === RANKS.length - 1 ? "+" : ` – ${(rank.minRhp + 500).toLocaleString()}`} RHP
-                </p>
-                <p className="mt-1 text-xs text-muted">
-                  Map rating {rank.rangeMin.toFixed(2)} – {rank.rangeMax.toFixed(2)}
-                </p>
-                <p className="mt-2 text-[11px] text-muted">
-                  {rank.index === RANKS.length - 1 ? "Global rank position" : `${RANK_TIERS} tiers × ${TIER_SPAN} RHP each`}
-                </p>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 gap-px bg-border sm:grid-cols-2 lg:grid-cols-3">
+            {RANKS.map((rank) => {
+              const tierIcons = rank.index < RANKS.length - 1 ? [1, 2, 3, 4, 5].map((tier) => <RankIcon key={tier} rank={getRankInfo(rank.minRhp + (tier - 1) * TIER_SPAN)} size={42} />) : [<RankIcon key="expert" rank={getRankInfo(rank.minRhp)} size={58} />];
+              return (
+                <div key={rank.name} className="bg-surface p-5">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1">{tierIcons}</div>
+                  </div>
+                  <p className="mt-3 text-sm font-semibold" style={{ color: rank.color }}>{rank.name}</p>
+                  <p className="mt-2 text-xs text-muted">
+                    {rank.minRhp.toLocaleString()}{rank.index === RANKS.length - 1 ? "+" : ` – ${(rank.minRhp + 500).toLocaleString()}`} RHP
+                  </p>
+                  <p className="mt-1 text-xs text-muted">Map rating {rank.rangeMin.toFixed(2)} – {rank.rangeMax.toFixed(2)}</p>
+                  <p className="mt-2 text-[11px] text-muted">
+                    {rank.index === RANKS.length - 1 ? "Global rank position" : `${RANK_TIERS} tiers × ${TIER_SPAN} RHP each`}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
 
         <div className="mt-6 rounded-2xl border border-border bg-background/70 p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-accent">Example tiers</p>
-          <ul className="mt-3 space-y-2 text-sm leading-6 text-muted">
-            <li>Copper 1 = 0 – 100 RHP</li>
-            <li>Copper 5 = 401 – 500 RHP</li>
-            <li>Bronze 1 = 500 – 600 RHP</li>
-            <li>Master 5 = 3900 – 4000 RHP</li>
-            <li>Expert = 4000+ RHP and displays global leaderboard position</li>
-          </ul>
+          <div className="mt-4 space-y-3 text-sm text-muted">
+            {[0, 1, 2, 3, 4].map((tier) => {
+              const rank = getRankInfo(tier * TIER_SPAN);
+              return <div key={tier} className="flex items-center gap-3"><RankIcon rank={rank} size={34} /><span>{rank.name} {rank.tier} = {rank.tierStart.toLocaleString()} – {(rank.tierEnd - 1).toLocaleString()} RHP</span></div>;
+            })}
+            <div className="flex items-center gap-3"><RankIcon rank={getRankInfo(4000)} size={44} /><span>Expert = 4000+ RHP and displays global leaderboard position</span></div>
+          </div>
         </div>
       </section>
 
@@ -74,7 +76,7 @@ export default function AboutRankingPage() {
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {RANKS.map((rank) => (
             <div key={rank.name} className="rounded-2xl border border-border bg-background/70 p-4">
-              <p className="text-sm font-semibold" style={{ color: rank.color }}>{rank.name}</p>
+              <div className="flex items-center gap-3"><RankIcon rank={getRankInfo(rank.minRhp)} size={36} /><p className="text-sm font-semibold" style={{ color: rank.color }}>{rank.name}</p></div>
               <p className="mt-2 text-sm text-muted">{rank.rangeMin.toFixed(2)} – {rank.rangeMax.toFixed(2)} rating</p>
             </div>
           ))}
