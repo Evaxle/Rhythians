@@ -5,6 +5,7 @@ import { getSessionUser } from "@/lib/auth";
 import { getOrCreateDailyMap, formatDailyDate, rhpForMap } from "@/lib/daily";
 import { getUserDailyStatusAcrossRankChange } from "@/lib/daily-compat";
 import { getRankInfo, fairRatingFromStars } from "@/lib/ranks";
+import { RankIcon } from "@/components/rank-icon";
 
 export async function HomeDailySection() {
   const user = await getSessionUser();
@@ -51,7 +52,7 @@ export async function HomeDailySection() {
     <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 text-sm uppercase tracking-[0.24em] text-accent"><CalendarDays size={18} /> Daily map</div>
-        {userRow && <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-semibold text-accent">{userRow.rhp.toLocaleString()} RHP</span>}
+        {userRow && <span className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-semibold text-accent"><RankIcon rank={rankInfo} size={26} />{rankInfo.isExpert ? "Expert" : `${rankInfo.name} ${rankInfo.tier}`} · {userRow.rhp.toLocaleString()} RHP</span>}
       </div>
       <p className="mt-3 text-sm text-muted">{formatDailyDate(daily.date)}</p>
 
