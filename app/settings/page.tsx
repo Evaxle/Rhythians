@@ -12,6 +12,7 @@ import { OnboardingForm } from "@/components/onboarding-form";
 import { CursorSettings } from "@/components/cursor-settings";
 import { CheckAllScoresButton } from "@/components/check-all-scores-button";
 import { AccountSecurity } from "@/components/account-security";
+import { SettingsShowcase } from "@/components/settings-showcase";
 
 export const dynamic = "force-dynamic";
 
@@ -32,7 +33,8 @@ export default async function SettingsPage() {
   const selectedOptionIds = await getSelectedOptionIds(prisma, onboardingData, userTagSlugs);
 
   return <div className="space-y-8">
-    <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow"><p className="text-sm uppercase tracking-[0.3em] text-accent">Settings</p><h1 className="mt-3 text-3xl font-semibold text-white">Account</h1><p className="mt-3 text-sm leading-7 text-muted">Manage your profile picture, roles, Discord connection, and account preferences.</p></section>
+    <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow"><p className="text-sm uppercase tracking-[0.3em] text-accent">Settings</p><h1 className="mt-3 text-3xl font-semibold text-white">Account &amp; player settings</h1><p className="mt-3 text-sm leading-7 text-muted">Manage your account and browse the settings showcases published by the Rhythians team.</p></section>
+    <SettingsShowcase />
     {!fullUser.discordId && <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow"><p className="text-sm uppercase tracking-[0.3em] text-accent">Security</p><h2 className="mt-2 text-2xl font-semibold text-white">Email two-factor authentication</h2><p className="mt-2 text-sm leading-7 text-muted">Email 2FA adds a second verification step after your password. Your email address must be verified before it can be used for sign-in protection.</p><div className="mt-6 border-t border-border pt-6"><AccountSecurity email={fullUser.email} emailVerifiedAt={fullUser.emailVerifiedAt} emailTwoFactorEnabled={fullUser.emailTwoFactorEnabled} /></div></section>}
     <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow"><p className="text-sm uppercase tracking-[0.3em] text-accent">Profile</p><h2 className="mt-2 text-2xl font-semibold text-white">Profile picture</h2><div className="mt-6"><AvatarUploader avatarUrl={avatarUrl} username={fullUser.username} /></div></section>
     {fullUser.rhythiaProfile && <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow"><p className="text-sm uppercase tracking-[0.3em] text-accent">Rhythia scores</p><h2 className="mt-2 text-2xl font-semibold text-white">Import your old scores</h2><p className="mt-2 text-sm leading-7 text-muted">Your past Rhythia scores are imported automatically when you link your account. Only maps inside your current rank&apos;s rating range award RHP. If you&apos;ve played more ranked maps since then, run the scan again to claim the RHP for any new completions.</p><div className="mt-6 border-t border-border pt-6"><CheckAllScoresButton /></div></section>}
