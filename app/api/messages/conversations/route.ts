@@ -55,6 +55,6 @@ export async function POST(request: Request) {
   if (selectedUsers.length !== memberIds.length) return NextResponse.json({ error: "One or more selected users do not exist." }, { status: 400 });
   const name = suppliedName || automaticGroupName([user, ...selectedUsers]);
   if (name.length > 60) return NextResponse.json({ error: "Group name must be 60 characters or fewer." }, { status: 400 });
-  const conversation = await prisma.conversation.create({ data: { type: "group", name, createdById: user.id, members: { create: [{ userId: user.id, role: "owner" }, ...memberIds.map((memberId) => ({ userId: memberId, role: "member" }))] } });
+  const conversation = await prisma.conversation.create({ data: { type: "group", name, createdById: user.id, members: { create: [{ userId: user.id, role: "owner" }, ...memberIds.map((memberId) => ({ userId: memberId, role: "member" }))] } } });
   return NextResponse.json({ conversationId: conversation.id, name }, { status: 201 });
 }
