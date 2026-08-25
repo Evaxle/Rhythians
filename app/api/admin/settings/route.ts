@@ -8,7 +8,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 const bucket = () => process.env.STORAGE_BUCKET ?? "media";
 const MAX_SETTINGS_SIZE = 25 * 1024 * 1024;
 const MAX_VIDEO_SIZE = 250 * 1024 * 1024;
-const settingsExtension = (name: string) => /\.(rhm|json)$/i.test(name);
+const settingsExtension = (name: string) => /\.rhs$/i.test(name);
 const videoExtension = (name: string) => /\.(mp4|webm|mov|m4v|mkv|avi|wmv|flv|mpeg|mpg|3gp|ogv|ts|mts|m2ts)$/i.test(name);
 
 async function authorize() {
@@ -37,8 +37,8 @@ export async function POST(request: Request) {
     const videoFileSize = Number(body.videoFileSize);
     const settingsContentType = typeof body.settingsContentType === "string" ? body.settingsContentType : "application/octet-stream";
     const videoContentType = typeof body.videoContentType === "string" ? body.videoContentType : "video/mp4";
-    if (!settingsExtension(settingsFileName)) return NextResponse.json({ error: "Settings file must be an .rhm or .json file." }, { status: 400 });
-    if (!videoExtension(videoFileName)) return NextResponse.json({ error: "Unsupported video file type." }, { status: 400 });
+    if (!settingsExtension(settingsFileName)) return NextResponse.json({ error: "Settings file must be an .rhs file." }, { status: 400 });
+    if (!videoExtension(videoFileName)) return NextResponse.json({ error: "Unsupported video file type. Supported video formats include MP4, WebM, MOV, M4V, MKV, AVI, WMV, FLV, MPEG, MPG, 3GP, OGV, TS, MTS, and M2TS." }, { status: 400 });
     if (!Number.isFinite(settingsFileSize) || settingsFileSize <= 0 || settingsFileSize > MAX_SETTINGS_SIZE) return NextResponse.json({ error: "Settings file must be between 1 byte and 25 MB." }, { status: 400 });
     if (!Number.isFinite(videoFileSize) || videoFileSize <= 0 || videoFileSize > MAX_VIDEO_SIZE) return NextResponse.json({ error: "Video must be between 1 byte and 250 MB." }, { status: 400 });
     const settingsPath = `settings/${randomUUID()}/${settingsFileName.replace(/[^a-zA-Z0-9._-]/g, "-")}`;
