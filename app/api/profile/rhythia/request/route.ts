@@ -14,6 +14,12 @@ function matchesCode(value: string, storedHash: string) {
   return actual.length === expected.length && timingSafeEqual(actual, expected);
 }
 
+function bioContainsVerificationCode(bio: string, storedHash: string) {
+  const normalized = bio.replace(/[\u200B-\u200D\uFEFF\s]+/g, "");
+  const candidates = normalized.match(/\d{8}/g) ?? [];
+  return candidates.some((candidate) => matchesCode(candidate, storedHash));
+}
+
 export async function POST(request: Request) {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "You must be signed in." }, { status: 401 });
@@ -28,10 +34,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Your verification code expired. Generate a new code." }, { status: 410 });
     }
     try {
-      const code = String(body?.code ?? "").trim();
-      if (!/^\d{8}$/.test(code) || !matchesCode(code, pending.adminNote)) return NextResponse.json({ error: "The verification code was not found in that profile bio." }, { status: 400 });
       const profile = await fetchRhythiaProfile(pending.profileId);
-      if (!profile.bio || !profile.bio.includes(code)) return NextResponse.json({ error: "The verification code was not found in that profile bio." }, { status: 400 });
+      if (!profile.bio || !bioContainsVerificationCode(profile.bio, pending.adminNote)) return NextResponse.json({ error: "The verification code was not found in that profile bio." }, { status: 400 });
       const { bio: _bio, ...profileData } = profile;
       const saved = await prisma.$transaction(async (tx) => {
         const profileRow = await tx.rhythiaProfile.upsert({
