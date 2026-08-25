@@ -197,11 +197,13 @@ export async function POST(request: Request) {
   try {
     if (challengeCategory === "main_challenge") {
       const map = await submitChallengeMap({ id: mapId, title: resolvedTitle, artist: resolvedArtist, description: resolvedDescription, mapFileUrl: resolvedMapFile, imageUrl: resolvedImage, requestedRating: 0, mapperName: resolvedMapper, noteCount: resolvedNotes, length: resolvedLength, submittedById: user.id, sourceBeatmapId, sourceUrl, isAutoImported: false });
-      await setMapSubmissionMetadata(map.id, submissionType);
+      await setMapSubmissionMetadata(map.id, "challenge", "main", requestedLevel);
       await prisma.moderationAction.create({ data: { actorId: user.id, action: "challenge_map_submitted", targetType: "map_submission", targetId: map.id, metadata: { title: map.title, submissionType, challengeCategory, requestedLevel, sourceUrl, sourceBeatmapId } } });
       return NextResponse.json({ mapId: map.id, status: map.status, challengeCategory, requestedLevel });
     }
-    const map = await prisma.categoryMap.create({ data: { id: mapId, category: challengeCategory as "jumps" | "stream" | "tech" | "off_grid", level: requestedLevel, title: resolvedTitle, artist: resolvedArtist, description: resolvedDescription, mapFileUrl: resolvedMapFile, imageUrl: resolvedImage, mapperName: resolvedMapper, noteCount: resolvedNotes, length: resolvedLength, submittedById: user.id, sourceBeatmapId, sourceUrl } });
+    const placement = challengeCategory as "jumps" | "stream" | "tech" | "off_grid";
+    const map = await prisma.categoryMap.create({ data: { id: mapId, category: placement, level: requestedLevel, title: resolvedTitle, artist: resolvedArtist, description: resolvedDescription, mapFileUrl: resolvedMapFile, imageUrl: resolvedImage, mapperName: resolvedMapper, noteCount: resolvedNotes, length: resolvedLength, submittedById: user.id, sourceBeatmapId, sourceUrl } });
+    await setMapSubmissionMetadata(map.id, "challenge", placement, requestedLevel);
     await prisma.moderationAction.create({ data: { actorId: user.id, action: "category_map_submitted", targetType: "category_map_submission", targetId: map.id, metadata: { title: map.title, submissionType, challengeCategory, requestedLevel, sourceUrl, sourceBeatmapId } } });
     return NextResponse.json({ mapId: map.id, status: map.status, challengeCategory, requestedLevel });
   } catch (error: any) {
