@@ -12,14 +12,12 @@ import { OnboardingForm } from "@/components/onboarding-form";
 import { CursorSettings } from "@/components/cursor-settings";
 import { CheckAllScoresButton } from "@/components/check-all-scores-button";
 import { AccountSecurity } from "@/components/account-security";
-import { SettingsShowcase } from "@/components/settings-showcase";
 
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
   const user = await getSessionUser();
-  if (!user) return <div className="mx-auto w-full max-w-6xl space-y-8"><section className="rounded-[2rem] border border-border bg-surface/95 p-8 shadow-glow sm:p-10"><p className="text-sm uppercase tracking-[0.3em] text-accent">Settings</p><h1 className="mt-3 text-3xl font-semibold text-white">Player settings</h1><p className="mt-3 max-w-2xl text-sm leading-7 text-muted">Browse the settings, ranks, downloads, and gameplay showcases published by the Rhythians team.</p></section><SettingsShowcase /></div>;
-
+  if (!user) redirect("/login");
   const fullUser = await prisma.user.findUnique({ where: { id: user.id }, include: { userTags: { include: { tag: true } }, rhythiaProfile: true } });
   if (!fullUser) redirect("/login");
   const token = process.env.DISCORD_BOT_TOKEN;
@@ -34,8 +32,7 @@ export default async function SettingsPage() {
   const selectedOptionIds = await getSelectedOptionIds(prisma, onboardingData, userTagSlugs);
 
   return <div className="space-y-8">
-    <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow"><p className="text-sm uppercase tracking-[0.3em] text-accent">Settings</p><h1 className="mt-3 text-3xl font-semibold text-white">Account &amp; player settings</h1><p className="mt-3 text-sm leading-7 text-muted">Manage your account and browse the settings showcases published by the Rhythians team.</p></section>
-    <SettingsShowcase />
+    <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow"><p className="text-sm uppercase tracking-[0.3em] text-accent">Player settings</p><h1 className="mt-3 text-3xl font-semibold text-white">Account settings</h1><p className="mt-3 text-sm leading-7 text-muted">Manage your account, profile, Rhythia connection, Discord roles, and personal customization.</p><div className="mt-6"><Link href="/community-settings" className="inline-flex rounded-full border border-border bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition hover:border-accent/40 hover:bg-accent/10">Browse community settings →</Link></div></section>
     {!fullUser.discordId && <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow"><p className="text-sm uppercase tracking-[0.3em] text-accent">Security</p><h2 className="mt-2 text-2xl font-semibold text-white">Email two-factor authentication</h2><p className="mt-2 text-sm leading-7 text-muted">Email 2FA adds a second verification step after your password. Your email address must be verified before it can be used for sign-in protection.</p><div className="mt-6 border-t border-border pt-6"><AccountSecurity email={fullUser.email} emailVerifiedAt={fullUser.emailVerifiedAt} emailTwoFactorEnabled={fullUser.emailTwoFactorEnabled} /></div></section>}
     <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow"><p className="text-sm uppercase tracking-[0.3em] text-accent">Profile</p><h2 className="mt-2 text-2xl font-semibold text-white">Profile picture</h2><div className="mt-6"><AvatarUploader avatarUrl={avatarUrl} username={fullUser.username} /></div></section>
     {fullUser.rhythiaProfile && <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow"><p className="text-sm uppercase tracking-[0.3em] text-accent">Rhythia scores</p><h2 className="mt-2 text-2xl font-semibold text-white">Import your old scores</h2><p className="mt-2 text-sm leading-7 text-muted">Your past Rhythia scores are imported automatically when you link your account. Only maps inside your current rank&apos;s rating range award RHP. If you&apos;ve played more ranked maps since then, run the scan again to claim the RHP for any new completions.</p><div className="mt-6 border-t border-border pt-6"><CheckAllScoresButton /></div></section>}
