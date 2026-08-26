@@ -8,22 +8,39 @@ import { isBattleMode, playerCount, selectBattleMap, teamScore, rankedLoss } fro
 
 function uid() { return crypto.randomUUID(); }
 
-async function selectCasualMap(lowestRank: number, highestRank: number, mode: string, manualMapId?: string | null) {
+async function chooseCasualMap(matchId: string, mode: string, manualMapId?: string | null) {
+  const players = await prisma.$queryRawUnsafe<Array<{ rhp: number }>>(`SELECT u.rhp FROM "BattleMatchPlayer" bp JOIN "User" u ON u.id=bp."userId" WHERE bp."matchId"=$1`, matchId);
+  const ranks = players.map((player) => getRankInfo(player.rhp).index);
+  const lowest = ranks.length ? Math.min(...ranks) : 0;
+  const highest = ranks.length ? Math.max(...ranks) : lowest;
   if (mode === "manual") {
     if (!manualMapId) throw new Error("A map is required for manual selection.");
     const map = await prisma.challengeMap.findFirst({ where: { id: manualMapId, status: { in: ["approved", "legacy"] } }, select: { id: true } });
     if (!map) throw new Error("The selected map is unavailable.");
-    return map;
+    return map.id;
   }
-  const rankIndex = mode === "highest" ? highestRank : mode === "middle" ? Math.floor((lowestRank + highestRank) / 2) : lowestRank;
-  return selectBattleMap(rankIndex);
+  const rankIndex = mode === "highest" ? highest : mode === "middle" ? Math.floor((lowest + highest) / 2) : lowest;
+  const map = await selectBattleMap(rankIndex);
+  return map.id;
+}
+
+async function prepareCasualMatch(matchId: string, mode = "lowest") {
+  const mapId = await chooseCasualMap(matchId, mode);
+  await prisma.$executeRawUnsafe(`UPDATE "BattleMatch" SET status='map_select',"casualMapMode"=$2,"mapId"=$3 WHERE id=$1 AND status IN ('queue','invite')`, matchId, mode, mapId);
+}
+
+async function allPlayersLiked(matchId: string) {
+  const players = await prisma.$queryRawUnsafe<Array<{ userId: string }>>(`SELECT "userId" FROM "BattleMatchPlayer" WHERE "matchId"=$1`, matchId);
+  const likes = await prisma.$queryRawUnsafe<Array<{ userId: string }>>(`SELECT "userId" FROM "BattleMatchMapLike" WHERE "matchId"=$1`, matchId);
+  return players.length > 0 && players.every((player) => likes.some((like) => like.userId === player.userId));
 }
 
 export async function POST(request: Request) {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
-  const body = await request.json().catch(() => null) as { action?: unknown; mode?: unknown; matchType?: unknown; teamMode?: unknown; opponentId?: unknown; matchId?: unknown; casualMapMode?: unknown; mapId?: unknown } | null;
+  const body = await request.json().catch(() => null) as { action?: unknown; mode?: unknown; matchType?: unknown; teamMode?: unknown; opponentId?: unknown; matchId?: unknown } | null;
   const action = body?.action;
+
   if (action === "queue") {
     const mode = typeof body?.mode === "string" ? body.mode : "1v1";
     const matchType = body?.matchType === "ranked" ? "ranked" : "casual";
@@ -37,15 +54,19 @@ export async function POST(request: Request) {
       const compatible = members.length > 0 && members.every((member) => { const memberRank = getRankInfo(member.rhp); return matchType === "ranked" ? memberRank.index === rank.index && memberRank.tier === rank.tier : memberRank.index === rank.index; });
       if (!compatible) continue;
       await prisma.$executeRawUnsafe(`INSERT INTO "BattleMatchPlayer" ("id","matchId","userId","team") VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`, uid(), candidate.id, user.id, candidate.players % 2 === 0 ? 1 : 2);
-      const total = await prisma.$queryRawUnsafe<any[]>(`SELECT COUNT(*)::int AS count FROM "BattleMatchPlayer" WHERE "matchId"=$1`, candidate.id);
-      if (total[0].count >= count) await startMatch(candidate.id, rank.index);
-      return NextResponse.json({ matchId: candidate.id, status: total[0].count >= count ? "active" : "queue" });
+      const total = await prisma.$queryRawUnsafe<Array<{ count: number }>>(`SELECT COUNT(*)::int AS count FROM "BattleMatchPlayer" WHERE "matchId"=$1`, candidate.id);
+      if (total[0].count >= count) {
+        if (matchType === "casual") await prepareCasualMatch(candidate.id, "lowest");
+        else await startRankedMatch(candidate.id, rank.index);
+      }
+      return NextResponse.json({ matchId: candidate.id, status: total[0].count >= count ? matchType === "casual" ? "map_select" : "active" : "queue" });
     }
     const matchId = uid();
-    await prisma.$executeRawUnsafe(`INSERT INTO "BattleMatch" ("id","matchType","mode","status") VALUES ($1,$2,$3,'queue')`, matchId, matchType, `${mode}:${teamMode}`);
+    await prisma.$executeRawUnsafe(`INSERT INTO "BattleMatch" ("id","matchType","mode","status","casualMapMode") VALUES ($1,$2,$3,'queue','lowest')`, matchId, matchType, `${mode}:${teamMode}`);
     await prisma.$executeRawUnsafe(`INSERT INTO "BattleMatchPlayer" ("id","matchId","userId","team") VALUES ($1,$2,$3,1)`, uid(), matchId, user.id);
     return NextResponse.json({ matchId, status: "queue" }, { status: 201 });
   }
+
   if (action === "invite") {
     if (typeof body?.opponentId !== "string" || body.opponentId === user.id) return NextResponse.json({ error: "A different opponent is required." }, { status: 400 });
     const opponent = await prisma.user.findUnique({ where: { id: body.opponentId }, select: { id: true, rhp: true } });
@@ -54,17 +75,48 @@ export async function POST(request: Request) {
     const matchType = body?.matchType === "ranked" ? "ranked" : "casual";
     if (mode !== "1v1") return NextResponse.json({ error: "Direct challenges are only available for 1v1." }, { status: 400 });
     if (matchType === "ranked") { const a = getRankInfo(user.rhp); const b = getRankInfo(opponent.rhp); if (a.index !== b.index || a.tier !== b.tier) return NextResponse.json({ error: "Not matching ranks." }, { status: 400 }); }
-    const casualMapMode = matchType === "casual" && ["lowest", "middle", "highest", "manual"].includes(String(body?.casualMapMode)) ? String(body?.casualMapMode) : "lowest";
-    const manualMapId = matchType === "casual" && typeof body?.mapId === "string" ? body.mapId : null;
-    if (casualMapMode === "manual" && !manualMapId) return NextResponse.json({ error: "Select a map for manual selection." }, { status: 400 });
-    if (casualMapMode === "manual") { const selected = await prisma.challengeMap.findFirst({ where: { id: manualMapId!, status: { in: ["approved", "legacy"] } }, select: { id: true } }); if (!selected) return NextResponse.json({ error: "Selected map is unavailable." }, { status: 400 }); }
     const matchId = uid();
-    await prisma.$executeRawUnsafe(`INSERT INTO "BattleMatch" ("id","matchType","mode","status","casualMapMode") VALUES ($1,$2,$3,'invite',$4)`, matchId, matchType, mode, casualMapMode);
-    if (manualMapId) await prisma.$executeRawUnsafe(`UPDATE "BattleMatch" SET "mapId"=$2 WHERE id=$1`, matchId, manualMapId);
+    await prisma.$executeRawUnsafe(`INSERT INTO "BattleMatch" ("id","matchType","mode","status","casualMapMode") VALUES ($1,$2,$3,'invite','lowest')`, matchId, matchType, mode);
     await prisma.$executeRawUnsafe(`INSERT INTO "BattleMatchPlayer" ("id","matchId","userId","team") VALUES ($1,$2,$3,1),($4,$5,$6,2)`, uid(), matchId, user.id, uid(), matchId, opponent.id);
     await prisma.notification.create({ data: { userId: opponent.id, type: "announcement", title: "Battle request", message: `${user.displayName ?? user.username} invited you to a ${matchType} ${mode} battle.`, url: `/battles/match/${matchId}` } });
-    return NextResponse.json({ matchId, status: "invite", casualMapMode });
+    return NextResponse.json({ matchId, status: "invite" });
   }
+
+  if (action === "accept") {
+    if (typeof body?.matchId !== "string") return NextResponse.json({ error: "Match required." }, { status: 400 });
+    const row = await prisma.$queryRawUnsafe<any[]>(`SELECT * FROM "BattleMatchPlayer" WHERE "matchId"=$1 AND "userId"=$2 AND team=2`, body.matchId, user.id);
+    if (!row[0]) return NextResponse.json({ error: "Battle request not found." }, { status: 404 });
+    const match = await prisma.$queryRawUnsafe<any[]>(`SELECT * FROM "BattleMatch" WHERE id=$1 AND status='invite'`, body.matchId);
+    if (!match[0]) return NextResponse.json({ error: "Battle request is no longer pending." }, { status: 400 });
+    const creator = await prisma.$queryRawUnsafe<any[]>(`SELECT u.rhp FROM "BattleMatchPlayer" bp JOIN "User" u ON u.id=bp."userId" WHERE bp."matchId"=$1 AND bp.team=1`, body.matchId);
+    if (!creator[0]) return NextResponse.json({ error: "Battle creator not found." }, { status: 404 });
+    if (match[0].matchType === "ranked") { const a = getRankInfo(creator[0].rhp); const b = getRankInfo(user.rhp); if (a.index !== b.index || a.tier !== b.tier) return NextResponse.json({ error: "Not matching ranks." }, { status: 400 }); await startRankedMatch(body.matchId, a.index); return NextResponse.json({ ok: true, matchId: body.matchId, status: "active" }); }
+    await prepareCasualMatch(body.matchId, "lowest");
+    return NextResponse.json({ ok: true, matchId: body.matchId, status: "map_select" });
+  }
+
+  if (action === "like-map") {
+    if (typeof body?.matchId !== "string") return NextResponse.json({ error: "Match required." }, { status: 400 });
+    const match = await prisma.$queryRawUnsafe<any[]>(`SELECT id,status,"matchType","mapId" FROM "BattleMatch" WHERE id=$1`, body.matchId);
+    if (!match[0] || match[0].matchType !== "casual") return NextResponse.json({ error: "Casual match not found." }, { status: 404 });
+    if (match[0].status !== "map_select" || !match[0].mapId) return NextResponse.json({ error: "A battle map has not been selected yet." }, { status: 400 });
+    const member = await prisma.$queryRawUnsafe<any[]>(`SELECT 1 FROM "BattleMatchPlayer" WHERE "matchId"=$1 AND "userId"=$2`, body.matchId, user.id);
+    if (!member[0]) return NextResponse.json({ error: "You are not in this battle." }, { status: 403 });
+    await prisma.$executeRawUnsafe(`INSERT INTO "BattleMatchMapLike" ("id","matchId","userId","mapId") VALUES ($1,$2,$3,$4) ON CONFLICT ("matchId","userId") DO UPDATE SET "mapId"=EXCLUDED."mapId","createdAt"=NOW()`, uid(), body.matchId, user.id, match[0].mapId);
+    return NextResponse.json({ ok: true, liked: true, readyToStart: await allPlayersLiked(body.matchId) });
+  }
+
+  if (action === "start") {
+    if (typeof body?.matchId !== "string") return NextResponse.json({ error: "Match required." }, { status: 400 });
+    const match = await prisma.$queryRawUnsafe<any[]>(`SELECT id,status,"matchType","mapId" FROM "BattleMatch" WHERE id=$1`, body.matchId);
+    if (!match[0] || match[0].matchType !== "casual" || match[0].status !== "map_select") return NextResponse.json({ error: "This battle is not ready to start." }, { status: 400 });
+    const member = await prisma.$queryRawUnsafe<any[]>(`SELECT 1 FROM "BattleMatchPlayer" WHERE "matchId"=$1 AND "userId"=$2`, body.matchId, user.id);
+    if (!member[0]) return NextResponse.json({ error: "You are not in this battle." }, { status: 403 });
+    if (!match[0].mapId || !(await allPlayersLiked(body.matchId))) return NextResponse.json({ error: "Both players must like the selected map first." }, { status: 400 });
+    await prisma.$executeRawUnsafe(`UPDATE "BattleMatch" SET status='active',"startedAt"=NOW() WHERE id=$1 AND status='map_select'`, body.matchId);
+    return NextResponse.json({ ok: true, status: "active" });
+  }
+
   if (action === "check-score") {
     if (typeof body?.matchId !== "string") return NextResponse.json({ error: "Match required." }, { status: 400 });
     const rows = await prisma.$queryRawUnsafe<any[]>(`SELECT bm.*,bp."userId" FROM "BattleMatch" bm JOIN "BattleMatchPlayer" bp ON bp."matchId"=bm.id AND bp."userId"=$2 WHERE bm.id=$1`, body.matchId, user.id);
@@ -84,21 +136,7 @@ export async function POST(request: Request) {
     if (allScored) await finishMatch(body.matchId, rows[0].matchType, rows[0].mode);
     return NextResponse.json({ ok: true, finished: allScored });
   }
-  if (action === "accept") {
-    if (typeof body?.matchId !== "string") return NextResponse.json({ error: "Match required." }, { status: 400 });
-    const row = await prisma.$queryRawUnsafe<any[]>(`SELECT * FROM "BattleMatchPlayer" WHERE "matchId"=$1 AND "userId"=$2 AND team=2`, body.matchId, user.id);
-    if (!row[0]) return NextResponse.json({ error: "Battle request not found." }, { status: 404 });
-    const match = await prisma.$queryRawUnsafe<any[]>(`SELECT * FROM "BattleMatch" WHERE id=$1 AND status='invite'`, body.matchId);
-    if (!match[0]) return NextResponse.json({ error: "Battle request is no longer pending." }, { status: 400 });
-    const creator = await prisma.$queryRawUnsafe<any[]>(`SELECT u.rhp FROM "BattleMatchPlayer" bp JOIN "User" u ON u.id=bp."userId" WHERE bp."matchId"=$1 AND bp.team=1`, body.matchId);
-    if (!creator[0]) return NextResponse.json({ error: "Battle creator not found." }, { status: 404 });
-    if (match[0].matchType === "ranked") { const a = getRankInfo(creator[0].rhp); const b = getRankInfo(user.rhp); if (a.index !== b.index || a.tier !== b.tier) return NextResponse.json({ error: "Not matching ranks." }, { status: 400 }); }
-    const creatorRank = getRankInfo(creator[0].rhp).index;
-    const opponentRank = getRankInfo(user.rhp).index;
-    const mapRankIndex = match[0].matchType === "casual" ? Math.min(creatorRank, opponentRank) : creatorRank;
-    await startMatch(body.matchId, mapRankIndex, match[0].matchType === "casual" ? match[0].casualMapMode : "lowest");
-    return NextResponse.json({ ok: true, matchId: body.matchId, status: "active" });
-  }
+
   return NextResponse.json({ error: "Unknown action." }, { status: 400 });
 }
 
@@ -117,25 +155,41 @@ export async function GET(request: Request) {
   const players = await prisma.$queryRawUnsafe<any[]>(`SELECT bp.*,u.username,u."displayName",u."profileHandle",u.avatar,u."discordId",u.rhp,COALESCE((SELECT json_agg(json_build_object('name',t.name,'slug',t.slug) ORDER BY upt.position ASC) FROM "UserProfileTag" upt JOIN "UserTag" ut ON ut."userId"=u.id AND ut."tagId"=upt."tagId" JOIN "Tag" t ON t.id=ut."tagId" WHERE upt."userId"=u.id LIMIT 3),'[]'::json) AS tags FROM "BattleMatchPlayer" bp JOIN "User" u ON u.id=bp."userId" WHERE bp."matchId"=$1 ORDER BY bp.team,bp.id`, matchId);
   const normalizedPlayers = players.map((player) => ({ ...player, avatar: getAvatarUrl({ avatar: player.avatar, discordId: player.discordId }, 256) }));
   const map = match[0].mapId ? await prisma.challengeMap.findUnique({ where: { id: match[0].mapId }, select: { id: true, title: true, artist: true, length: true, mapFileUrl: true, imageUrl: true, rating: true } }) : null;
+  const likes = await prisma.$queryRawUnsafe<Array<{ userId: string }>>(`SELECT "userId" FROM "BattleMatchMapLike" WHERE "matchId"=$1`, matchId);
   const teamOne = normalizedPlayers.filter((player) => player.team === 1).map((player) => player.accuracy).filter((value) => value != null);
   const teamTwo = normalizedPlayers.filter((player) => player.team === 2).map((player) => player.accuracy).filter((value) => value != null);
   const teamMode = String(match[0].mode).endsWith(":captains") ? "captains" : "regular";
   const scoreOne = teamScore(teamOne, teamMode); const scoreTwo = teamScore(teamTwo, teamMode);
   const winner = scoreOne == null || scoreTwo == null ? null : scoreOne === scoreTwo ? 0 : scoreOne > scoreTwo ? 1 : 2;
-  return NextResponse.json({ match: match[0], players: normalizedPlayers, map, viewerId: user.id, teamScores: { one: scoreOne, two: scoreTwo, winner } });
+  return NextResponse.json({ match: match[0], players: normalizedPlayers, map, viewerId: user.id, mapLikes: likes.length, likedByViewer: likes.some((like) => like.userId === user.id), teamScores: { one: scoreOne, two: scoreTwo, winner } });
 }
 
-async function startMatch(matchId: string, rankIndex: number, casualMapMode = "lowest") {
+async function startRankedMatch(matchId: string, rankIndex: number) {
   const players = await prisma.$queryRawUnsafe<Array<{ rhp: number }>>(`SELECT u.rhp FROM "BattleMatchPlayer" bp JOIN "User" u ON u.id=bp."userId" WHERE bp."matchId"=$1`, matchId);
-  const rankIndexes = players.map((player) => getRankInfo(player.rhp).index);
-  const lowest = rankIndexes.length ? Math.min(...rankIndexes) : rankIndex;
-  const highest = rankIndexes.length ? Math.max(...rankIndexes) : rankIndex;
-  const current = await prisma.$queryRawUnsafe<Array<{ mapId: string | null }>>(`SELECT "mapId" FROM "BattleMatch" WHERE id=$1`, matchId);
-  let map = current[0]?.mapId ? { id: current[0].mapId } : null;
-  if (!map) map = casualMapMode === "manual" ? null : await selectCasualMap(lowest, highest, casualMapMode);
-  if (!map) return;
+  const ranks = players.map((player) => getRankInfo(player.rhp).index);
+  const lowest = ranks.length ? Math.min(...ranks) : rankIndex;
+  const map = await selectBattleMap(lowest);
   await prisma.$executeRawUnsafe(`UPDATE "BattleMatch" SET status='active',"mapId"=$2,"startedAt"=NOW() WHERE id=$1 AND status IN ('queue','invite')`, matchId, map.id);
 }
 
 async function finishMatch(matchId: string, matchType: string, modeValue: string) {
-  const players = await prisma.$queryRawUnsafe<any[]>(`SELECT * FROM "BattleMatchPlayer" WHERE "matchId"=$1`); const mode = modeValue.includes(":") ? modeValue.split(":")[0] : modeValue; const teamMode = matchType === "ranked" ? "regular" : modeValue.endsWith(":captains") ? "captains" : "regular"; const scoreOne = teamScore(players.filter((p) => p.team === 1).map((p) => p.accuracy), teamMode); const scoreTwo = teamScore(players.filter((p) => p.team === 2).map((p) => p.accuracy), teamMode); if (scoreOne == null || scoreTwo == null) return; const winner = scoreOne === scoreTwo ? 0 : scoreOne > scoreTwo ? 1 : 2; await prisma.$executeRawUnsafe(`UPDATE "BattleMatch" SET status='finished',"finishedAt"=NOW() WHERE id=$1`, matchId); if (matchType !== "ranked" || !winner) return; const winningScore = Math.max(scoreOne, scoreTwo); const losingScore = Math.min(scoreOne, scoreTwo); const loss = rankedLoss(winningScore, losingScore); for (const player of players) { if (player.team === winner) { await prisma.$executeRawUnsafe(`UPDATE "User" SET rhp="rhp"+30,"updatedAt"=NOW() WHERE id=$1`, player.userId); await prisma.$executeRawUnsafe(`INSERT INTO "RhpTransaction" ("id","userId","amount","reason","description") VALUES ($1,$2,30,'battle_win',$3)`, uid(), player.userId, `${mode} ranked battle win`); } else { await prisma.$executeRawUnsafe(`UPDATE "User" SET rhp=GREATEST(0,"rhp"-$2),"updatedAt"=NOW() WHERE id=$1`, player.userId, loss); await prisma.$executeRawUnsafe(`INSERT INTO "RhpTransaction" ("id","userId","amount","reason","description") VALUES ($1,$2,$3,'battle_loss',$4)`, uid(), player.userId, -loss, `${mode} ranked battle loss`); } } }
+  const players = await prisma.$queryRawUnsafe<any[]>(`SELECT * FROM "BattleMatchPlayer" WHERE "matchId"=$1`);
+  const mode = modeValue.includes(":") ? modeValue.split(":")[0] : modeValue;
+  const teamMode = matchType === "ranked" ? "regular" : modeValue.endsWith(":captains") ? "captains" : "regular";
+  const scoreOne = teamScore(players.filter((p) => p.team === 1).map((p) => p.accuracy), teamMode);
+  const scoreTwo = teamScore(players.filter((p) => p.team === 2).map((p) => p.accuracy), teamMode);
+  if (scoreOne == null || scoreTwo == null) return;
+  const winner = scoreOne === scoreTwo ? 0 : scoreOne > scoreTwo ? 1 : 2;
+  await prisma.$executeRawUnsafe(`UPDATE "BattleMatch" SET status='finished',"finishedAt"=NOW() WHERE id=$1`, matchId);
+  if (matchType !== "ranked" || !winner) return;
+  const loss = rankedLoss(Math.max(scoreOne, scoreTwo), Math.min(scoreOne, scoreTwo));
+  for (const player of players) {
+    if (player.team === winner) {
+      await prisma.$executeRawUnsafe(`UPDATE "User" SET rhp="rhp"+30,"updatedAt"=NOW() WHERE id=$1`, player.userId);
+      await prisma.$executeRawUnsafe(`INSERT INTO "RhpTransaction" ("id","userId","amount","reason","description") VALUES ($1,$2,30,'battle_win',$3)`, uid(), player.userId, `${mode} ranked battle win`);
+    } else {
+      await prisma.$executeRawUnsafe(`UPDATE "User" SET rhp=GREATEST(0,"rhp"-$2),"updatedAt"=NOW() WHERE id=$1`, player.userId, loss);
+      await prisma.$executeRawUnsafe(`INSERT INTO "RhpTransaction" ("id","userId","amount","reason","description") VALUES ($1,$2,$3,'battle_loss',$4)`, uid(), player.userId, -loss, `${mode} ranked battle loss`);
+    }
+  }
+}
