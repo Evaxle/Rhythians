@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
+import { getRankInfo } from "@/lib/ranks";
+import { selectBattleMap } from "@/lib/battles";
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ matchId: string }> }) {
   const user = await getSessionUser();
@@ -30,6 +32,3 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ma
   await prisma.$executeRawUnsafe(`DELETE FROM "BattleMatchMapLike" WHERE "matchId"=$1`, matchId);
   return NextResponse.json({ ok: true, mode, mapId: map.id });
 }
-
-import { getRankInfo } from "@/lib/ranks";
-import { selectBattleMap } from "@/lib/battles";
