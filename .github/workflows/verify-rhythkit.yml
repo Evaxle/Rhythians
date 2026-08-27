@@ -21,4 +21,4 @@ jobs:
       - run: npm install
       - run: npx prisma generate
       - run: npm run typecheck
-      - run: npm run test:rhythkit-map-file
+      - run: npx tsx scripts/test-rhythkit-map-file.mjs
