@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getRankIndex } from "@/lib/rhythkit";
-import { getMapRankMeta, getRhythKitInstallation, isMapAllowed, isRankedMap, mapLengthSeconds, safeLimit, safeMapRating } from "@/lib/rhythkit-api";
+import { getMapRankMeta, getRhythKitInstallation, isRankedMap, mapLengthSeconds, safeLimit, safeMapRating } from "@/lib/rhythkit-api";
 
 export const runtime = "nodejs";
 
@@ -9,11 +8,9 @@ export async function GET(request: Request) {
   const installation = await getRhythKitInstallation(request);
   if (!installation) return NextResponse.json({ ok: false, error: "Unauthorized." }, { status: 401 });
   const users = await prisma.$queryRawUnsafe<Array<{ rhp: number }>>(`SELECT "rhp" FROM "User" WHERE "id" = $1 LIMIT 1`, installation.userId);
-  const user = users[0];
-  if (!user) return NextResponse.json({ ok: false, error: "Unauthorized." }, { status: 401 });
-  const rankIndex = getRankIndex(user.rhp);
+  if (!users[0]) return NextResponse.json({ ok: false, error: "Unauthorized." }, { status: 401 });
   const url = new URL(request.url);
-  const limit = safeLimit(url.searchParams.get("limit"), 100, 500);
+  const limit = safeLimit(url.searchParams.get("limit"), 500, 500);
   const rows = await prisma.$queryRawUnsafe<Array<{
     id: string;
     title: string;
@@ -51,33 +48,31 @@ export async function GET(request: Request) {
     LIMIT $2
   `, installation.userId, limit);
 
-  const maps = rows
-    .filter((map) => isMapAllowed(map.rating, map.reviewerNote, map.status, rankIndex))
-    .map((map) => {
-      const ranked = isRankedMap(map.rating, map.reviewerNote, map.status);
-      const rating = safeMapRating(map.rating);
-      const rankMeta = getMapRankMeta(rating);
-      return {
-        id: map.id,
-        title: map.title,
-        artist: map.artist ?? "Unknown Artist",
-        mapper: map.mapper ?? map.submitter ?? "Unknown",
-        curatedBy: map.mapper ?? map.submitter ?? "Unknown",
-        length: mapLengthSeconds(map.length),
-        noteCount: Math.max(0, Math.floor(map.noteCount ?? 0)),
-        notes: Math.max(0, Math.floor(map.noteCount ?? 0)),
-        rating,
-        isRanked: ranked,
-        isLegacy: map.status === "legacy",
-        rankName: ranked ? rankMeta.name : map.status === "legacy" ? "Legacy" : "Unranked",
-        rankColor: ranked ? rankMeta.color : map.status === "legacy" ? "#94a3b8" : "#64748b",
-        hasScore: map.hasScore,
-        completion: {
-          passed: map.passed === true,
-          points: Math.trunc(map.completionPoints ?? 0),
-        },
-      };
-    });
+  const maps = rows.map((map) => {
+    const ranked = isRankedMap(map.rating, map.reviewerNote, map.status);
+    const rating = safeMapRating(map.rating);
+    const rankMeta = getMapRankMeta(rating);
+    return {
+      id: map.id,
+      title: map.title,
+      artist: map.artist ?? "Unknown Artist",
+      mapper: map.mapper ?? map.submitter ?? "Unknown",
+      curatedBy: map.mapper ?? map.submitter ?? "Unknown",
+      length: mapLengthSeconds(map.length),
+      noteCount: Math.max(0, Math.floor(map.noteCount ?? 0)),
+      notes: Math.max(0, Math.floor(map.noteCount ?? 0)),
+      rating,
+      isRanked: ranked,
+      isLegacy: map.status === "legacy",
+      rankName: ranked ? rankMeta.name : map.status === "legacy" ? "Legacy" : "Unranked",
+      rankColor: ranked ? rankMeta.color : map.status === "legacy" ? "#94a3b8" : "#64748b",
+      hasScore: map.hasScore,
+      completion: {
+        passed: map.passed === true,
+        points: Math.trunc(map.completionPoints ?? 0),
+      },
+    };
+  });
 
   return NextResponse.json({ ok: true, maps });
 }
