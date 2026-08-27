@@ -5,17 +5,20 @@ on:
     branches:
       - main
       - feat/rhythkit-recent-scores
+      - feat/rhythkit-api-contract-20260827
   pull_request:
 
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - run: npm install
       - run: npx prisma generate
       - run: npm run typecheck
-      - run: npm run test:rhythkit-map-file
+      - run: npx tsx scripts/test-rhythkit-map-file.mjs

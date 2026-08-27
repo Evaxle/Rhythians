@@ -1,34 +1,36 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { hashToken } from "@/lib/rhythkit";
+import { getRankIndex } from "@/lib/rhythkit";
+import { getRhythKitInstallation, isMapAllowed, isRankedMap } from "@/lib/rhythkit-api";
 import { normalizeRhythiaSourceId } from "@/lib/rhythia-map-sync";
 
 export const runtime = "nodejs";
 
 export async function GET(request: Request, { params }: { params: Promise<{ mapId: string }> }) {
-  const auth = request.headers.get("authorization") ?? "";
-  const token = auth.startsWith("Bearer ") ? auth.slice(7).trim() : "";
-  if (!token) return NextResponse.json({ error: "Authorization required." }, { status: 401 });
-
-  const installations = await prisma.$queryRawUnsafe<Array<{ id: string; revokedAt: Date | null }>>(`SELECT "installationId" AS id, "revokedAt" FROM "RhythKitInstallation" WHERE "tokenHash" = $1 LIMIT 1`, hashToken(token));
-  if (!installations[0] || installations[0].revokedAt) return NextResponse.json({ error: "Invalid RhythKit installation." }, { status: 401 });
-
+  const installation = await getRhythKitInstallation(request);
+  if (!installation) return NextResponse.json({ ok: false, error: "Unauthorized." }, { status: 401 });
   const { mapId } = await params;
   const numericMapId = /^\d+$/.test(mapId) ? Number(mapId) : null;
   const sourceMapId = numericMapId == null ? null : normalizeRhythiaSourceId(numericMapId);
   const maps = sourceMapId == null
-    ? await prisma.$queryRawUnsafe<Array<{ id: string; title: string; rating: number | null; length: number | null; status: string; sourceBeatmapId: number | null }>>(`SELECT "id", "title", "rating", "length", "status", "sourceBeatmapId" FROM "ChallengeMap" WHERE "id" = $1 LIMIT 1`, mapId)
-    : await prisma.$queryRawUnsafe<Array<{ id: string; title: string; rating: number | null; length: number | null; status: string; sourceBeatmapId: number | null }>>(`SELECT "id", "title", "rating", "length", "status", "sourceBeatmapId" FROM "ChallengeMap" WHERE "sourceBeatmapId" = $1 LIMIT 1`, sourceMapId);
+    ? await prisma.$queryRawUnsafe<Array<{ id: string; title: string; rating: number | null; length: number | null; status: string; sourceBeatmapId: number | null; reviewerNote: string | null }>>(`SELECT "id", "title", "rating", "length", "status", "sourceBeatmapId", "reviewerNote" FROM "ChallengeMap" WHERE "id" = $1 LIMIT 1`, mapId)
+    : await prisma.$queryRawUnsafe<Array<{ id: string; title: string; rating: number | null; length: number | null; status: string; sourceBeatmapId: number | null; reviewerNote: string | null }>>(`SELECT "id", "title", "rating", "length", "status", "sourceBeatmapId", "reviewerNote" FROM "ChallengeMap" WHERE "sourceBeatmapId" = $1 LIMIT 1`, sourceMapId);
   const map = maps[0];
-  if (!map || map.status !== "approved" || map.rating == null) return NextResponse.json({ error: "Map is not an approved Rhythians ranked map." }, { status: 404 });
-
+  if (!map || (map.status !== "approved" && map.status !== "legacy")) return NextResponse.json({ ok: false, error: "Map not found." }, { status: 404 });
+  const users = await prisma.$queryRawUnsafe<Array<{ rhp: number }>>(`SELECT "rhp" FROM "User" WHERE "id" = $1 LIMIT 1`, installation.userId);
+  const user = users[0];
+  if (!user) return NextResponse.json({ ok: false, error: "Unauthorized." }, { status: 401 });
+  if (!isMapAllowed(map.rating, map.reviewerNote, map.status, getRankIndex(user.rhp))) return NextResponse.json({ ok: false, error: "Map is outside your current rank range." }, { status: 403 });
   return NextResponse.json({
+    ok: true,
     id: map.id,
     rhythiaMapId: numericMapId?.toString() ?? map.sourceBeatmapId?.toString() ?? mapId,
     title: map.title,
-    rating: map.rating,
-    length: map.length,
+    rating: map.rating ?? 0,
+    length: map.length == null ? 0 : Math.max(0, Math.round(map.length / 1000)),
     eligible: true,
-    downloadUrl: `/api/maps/download?id=${encodeURIComponent(map.id)}`
+    isRanked: isRankedMap(map.rating, map.reviewerNote, map.status),
+    isLegacy: map.status === "legacy",
+    downloadUrl: `/api/rhythkit/maps/${encodeURIComponent(map.id)}/download`,
   });
 }
