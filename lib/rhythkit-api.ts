@@ -43,7 +43,7 @@ export function isRankedMap(rating: number | null, reviewerNote: string | null, 
 export function isMapAllowed(rating: number | null, reviewerNote: string | null, status: string, rankIndex: number) {
   if (status === "legacy") return true;
   if (!isRankedMap(rating, reviewerNote, status)) return true;
-  return isMapInRankRange(rating, rankIndex);
+  return rating != null && isMapInRankRange(rating, rankIndex);
 }
 
 export function mapLengthSeconds(length: number | null) {
