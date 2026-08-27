@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - feat/rhythkit-recent-scores
+      - feat/rhythkit-api-contract-20260827
   pull_request:
 
 jobs:
