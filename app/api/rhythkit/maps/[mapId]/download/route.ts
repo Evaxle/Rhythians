@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getRankIndex } from "@/lib/rhythkit";
-import { getRhythKitInstallation, isMapAllowed, isRankedMap } from "@/lib/rhythkit-api";
+import { getRhythKitInstallation } from "@/lib/rhythkit-api";
 import { embedRhythiansId } from "@/lib/rhythkit-map-file";
 import { resolveRhythKitMapSource } from "@/lib/rhythkit-map-download";
 
@@ -15,17 +14,16 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   const installation = await getRhythKitInstallation(request);
   if (!installation) return NextResponse.json({ ok: false, error: "Unauthorized." }, { status: 401 });
   const { id } = await params;
-  const rows = await prisma.$queryRawUnsafe<Array<{ id: string; title: string; mapFileUrl: string; rating: number | null; status: string; reviewerNote: string | null; length: number | null }>>(
-    `SELECT "id", "title", "mapFileUrl", "rating", "status", "reviewerNote", "length" FROM "ChallengeMap" WHERE "id" = $1 LIMIT 1`,
+  const rows = await prisma.$queryRawUnsafe<Array<{ id: string; title: string; mapFileUrl: string; rating: number | null; status: string; reviewerNote: string | null; length: number | null; isAutoImported: boolean }>>(
+    `SELECT "id", "title", "mapFileUrl", "rating", "status", "reviewerNote", "length", "isAutoImported" FROM "ChallengeMap" WHERE "id" = $1 LIMIT 1`,
     id
   );
   const map = rows[0];
-  if (!map || (map.status !== "approved" && map.status !== "legacy")) return NextResponse.json({ ok: false, error: "Map not found." }, { status: 404 });
+  const downloadable = map && (map.status === "approved" || map.status === "legacy" || (map.status === "pending" && map.isAutoImported));
+  if (!downloadable) return NextResponse.json({ ok: false, error: "Map not found." }, { status: 404 });
   const users = await prisma.$queryRawUnsafe<Array<{ rhp: number }>>(`SELECT "rhp" FROM "User" WHERE "id" = $1 LIMIT 1`, installation.userId);
   const user = users[0];
   if (!user) return NextResponse.json({ ok: false, error: "Unauthorized." }, { status: 401 });
-  if (!isMapAllowed(map.rating, map.reviewerNote, map.status, getRankIndex(user.rhp))) return NextResponse.json({ ok: false, error: "Map is outside your current rank range." }, { status: 403 });
-  if (isRankedMap(map.rating, map.reviewerNote, map.status) && (map.rating == null || map.rating < 0 || map.rating > 9.99)) return NextResponse.json({ ok: false, error: "Map rating is invalid." }, { status: 422 });
 
   let source: Awaited<ReturnType<typeof resolveRhythKitMapSource>>;
   try {
@@ -42,11 +40,16 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   }
   if (!response.ok) return NextResponse.json({ ok: false, error: `Map file is unavailable (${response.status}).` }, { status: 404 });
 
+  const original = new Uint8Array(await response.arrayBuffer());
   let data: Uint8Array;
   try {
-    data = embedRhythiansId(new Uint8Array(await response.arrayBuffer()), source.extension, map.id);
+    data = embedRhythiansId(original, source.extension, map.id);
   } catch {
-    return NextResponse.json({ ok: false, error: "The map file is not a valid Rhythia map." }, { status: 422 });
+    // Any member can download any map; if the Rhythians id can't be embedded
+    // (unknown format, legacy archive file), serve the original file instead
+    // of rejecting the download. RHP eligibility is decided when scores are
+    // submitted, not here.
+    data = original;
   }
 
   const body = new ArrayBuffer(data.byteLength);

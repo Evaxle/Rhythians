@@ -10,7 +10,9 @@ export async function GET(request: Request) {
   const users = await prisma.$queryRawUnsafe<Array<{ rhp: number }>>(`SELECT "rhp" FROM "User" WHERE "id" = $1 LIMIT 1`, installation.userId);
   if (!users[0]) return NextResponse.json({ ok: false, error: "Unauthorized." }, { status: 401 });
   const url = new URL(request.url);
-  const limit = safeLimit(url.searchParams.get("limit"), 500, 500);
+  const limit = safeLimit(url.searchParams.get("limit"), 500, 5000);
+  const rawOffset = Number(url.searchParams.get("offset"));
+  const offset = Number.isFinite(rawOffset) ? Math.max(0, Math.min(100000, Math.floor(rawOffset))) : 0;
   const rows = await prisma.$queryRawUnsafe<Array<{
     id: string;
     title: string;
@@ -43,10 +45,10 @@ export async function GET(request: Request) {
     FROM "ChallengeMap" cm
     LEFT JOIN "User" u ON u."id" = cm."submittedById"
     LEFT JOIN "ChallengeMapCompletion" c ON c."challengeMapId" = cm."id" AND c."userId" = $1
-    WHERE cm."status" IN ('approved', 'legacy')
-    ORDER BY cm."rating" ASC NULLS LAST, cm."createdAt" DESC
-    LIMIT $2
-  `, installation.userId, limit);
+    WHERE cm."status" IN ('approved', 'legacy') OR (cm."status" = 'pending' AND cm."isAutoImported" = true)
+    ORDER BY cm."rating" ASC NULLS LAST, cm."createdAt" DESC, cm."id" ASC
+    LIMIT $2 OFFSET $3
+  `, installation.userId, limit, offset);
 
   const maps = rows.map((map) => {
     const ranked = isRankedMap(map.rating, map.reviewerNote, map.status);
