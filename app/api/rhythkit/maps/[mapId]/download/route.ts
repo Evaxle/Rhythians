@@ -10,10 +10,10 @@ function safeFileName(value: string) {
   return value.replace(/[\\/:*?"<>|]+/g, "_").replace(/\s+/g, " ").trim().slice(0, 120) || "map";
 }
 
-export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ mapId: string }> }) {
   const installation = await getRhythKitInstallation(request);
   if (!installation) return NextResponse.json({ ok: false, error: "Unauthorized." }, { status: 401 });
-  const { id } = await params;
+  const { mapId: id } = await params;
   const rows = await prisma.$queryRawUnsafe<Array<{ id: string; title: string; mapFileUrl: string; rating: number | null; status: string; reviewerNote: string | null; length: number | null; isAutoImported: boolean }>>(
     `SELECT "id", "title", "mapFileUrl", "rating", "status", "reviewerNote", "length", "isAutoImported" FROM "ChallengeMap" WHERE "id" = $1 LIMIT 1`,
     id
