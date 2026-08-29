@@ -3,15 +3,18 @@ import { getAvatarUrl } from "@/lib/avatar";
 import { UserTagsManager } from "@/components/user-tags-manager";
 import { AdminUserSearch } from "@/components/admin-user-search";
 import { AdminUserProfileControls } from "@/components/admin-user-profile-controls";
+import { AdminRankManager } from "@/components/admin-rank-manager";
 import { ResetRatingSystem } from "@/components/admin/reset-rating-system";
 import { AdminCheckUserScores } from "@/components/admin/check-user-scores";
 import { AdminDiscordStatusCheck } from "@/components/admin/discord-status-check";
+import { getRankInfo } from "@/lib/ranks";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminUsersPage() {
   const users = await prisma.user.findMany({ orderBy: { createdAt: "desc" }, include: { userTags: { include: { tag: true } } } });
   const allTags = await prisma.tag.findMany({ orderBy: { name: "asc" } });
+  const rankPlayers = users.map((user) => ({ id: user.id, username: user.username, displayName: user.displayName, profileHandle: user.profileHandle, rhp: user.rhp, rankIndex: getRankInfo(user.rhp).index }));
 
   return (
     <div className="space-y-8">
@@ -25,6 +28,7 @@ export default async function AdminUsersPage() {
       <AdminCheckUserScores />
       <AdminUserSearch />
       <ResetRatingSystem />
+      <AdminRankManager players={rankPlayers} />
 
       <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
         <p className="text-sm uppercase tracking-[0.3em] text-accent">All users</p>
