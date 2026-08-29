@@ -7,6 +7,7 @@ import { TailwindIndicator } from "@/components/tailwind-indicator";
 import { CursorFX } from "@/components/cursor-fx";
 import { WarningPopups } from "@/components/warning-popups";
 import { AccountSecurityNotice } from "@/components/account-security-notice";
+import { RankSync } from "@/components/rank-sync";
 import { getSessionUser } from "@/lib/auth";
 import { getRankInfo } from "@/lib/ranks";
 
@@ -47,6 +48,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Script src="/_vercel/speed-insights/script.js" strategy="afterInteractive" />
         <div className="min-h-screen text-white" style={{ background: `radial-gradient(circle at 50% -10%, ${rankColor}18, transparent 36%), radial-gradient(circle at 0% 35%, ${rankColor}0b, transparent 28%), linear-gradient(180deg, ${rankColor}06 0%, transparent 45%), var(--page-bg)` }}>
           <AccountSecurityNotice />
+          {user && <RankSync initialRhp={user.rhp} initialUpdatedAt={user.updatedAt.toISOString()} />}
           <SiteHeader />
           <main className="mx-auto max-w-7xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
             {children}
