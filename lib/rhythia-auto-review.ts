@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { syncRhythiaMaps, type SyncedRhythiaMap } from "@/lib/rhythia-map-sync";
+import { syncRhythiaMaps } from "@/lib/rhythia-map-sync";
 
 type RhythiaMapStatus = "RANKED" | "UNRANKED" | "LEGACY";
 const UNRANKED_MARKER = "rhythia-unranked";
