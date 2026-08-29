@@ -22,6 +22,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   const placement = body?.challengePlacement as ChallengePlacement | null | undefined;
   const level = body?.challengeLevel == null ? null : Number(body.challengeLevel);
   try {
+    const mapRecord = await prisma.challengeMap.findUnique({ where: { id }, select: { isAutoImported: true } });
+    if (!mapRecord) return NextResponse.json({ error: "Map not found." }, { status: 404 });
+    if (mapRecord.isAutoImported) return NextResponse.json({ error: "Rhythia auto-imported maps are reviewed automatically." }, { status: 400 });
     const metadata = await getMapSubmissionMetadata(id);
     if (!metadata) return NextResponse.json({ error: "Map submission type is missing." }, { status: 400 });
     if (status === "approved" && metadata.submissionType === "challenge") {
