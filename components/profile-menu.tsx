@@ -17,8 +17,13 @@ const CLOSE_DELAY_MS = 250;
 
 export function ProfileMenu({ user }: { user: ProfileMenuUser }) {
   const [open, setOpen] = useState(false);
+  const [avatarFailed, setAvatarFailed] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    setAvatarFailed(false);
+  }, [user.avatar, user.discordId]);
 
   useEffect(() => {
     return () => {
@@ -36,13 +41,16 @@ export function ProfileMenu({ user }: { user: ProfileMenuUser }) {
     closeTimerRef.current = setTimeout(() => setOpen(false), CLOSE_DELAY_MS);
   }
 
-  const avatarUrl = user.avatar
-    ? user.avatar.startsWith("http")
-      ? user.avatar
+  const avatarHash = user.avatar;
+  const avatarExtension = avatarHash?.startsWith("a_") ? "gif" : "png";
+  const avatarUrl = avatarHash
+    ? avatarHash.startsWith("http")
+      ? avatarHash
       : user.discordId
-        ? `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png?size=64`
+        ? `https://cdn.discordapp.com/avatars/${user.discordId}/${avatarHash}.${avatarExtension}?size=128`
         : null
     : null;
+  const showAvatar = Boolean(avatarUrl) && !avatarFailed;
 
   return (
     <div
@@ -57,11 +65,15 @@ export function ProfileMenu({ user }: { user: ProfileMenuUser }) {
         aria-expanded={open}
         className="flex cursor-pointer items-center gap-2 rounded-full border border-border bg-white/5 px-2 py-1.5 text-sm text-white transition hover:border-accent/40"
       >
-        {avatarUrl ? (
+        {showAvatar ? (
           <img
-            src={avatarUrl}
+            src={avatarUrl!}
             alt={`${user.username}'s avatar`}
-            className="h-8 w-8 rounded-full"
+            className="h-8 w-8 rounded-full object-cover"
+            width={32}
+            height={32}
+            decoding="async"
+            onError={() => setAvatarFailed(true)}
           />
         ) : (
           <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-xs font-bold text-white">
@@ -83,30 +95,14 @@ export function ProfileMenu({ user }: { user: ProfileMenuUser }) {
               <Trophy size={12} /> {user.rhp.toLocaleString()} RHP
             </p>
           </div>
-          <Link href={`/profile/${user.profileHandle}`} className="mt-1 block rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">
-            View profile
-          </Link>
-          <Link href="/daily" className="block rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">
-            Daily map
-          </Link>
-          <Link href="/maps" className="block rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">
-            Ranked maps
-          </Link>
-          <Link href="/leaderboards" className="block rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">
-            Leaderboards
-          </Link>
-          <Link href="/messages" className="block rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">
-            Messages
-          </Link>
-          <Link href="/notifications" className="block rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">
-            Notifications
-          </Link>
-          <Link href="/settings" className="block rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">
-            Settings
-          </Link>
-          <a href="/api/auth/logout" className="block rounded-xl px-3 py-2 text-sm text-red-300 transition hover:bg-red-500/10 hover:text-red-200">
-            Log out
-          </a>
+          <Link href={`/profile/${user.profileHandle}`} className="mt-1 block rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">View profile</Link>
+          <Link href="/daily" className="block rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">Daily map</Link>
+          <Link href="/maps" className="block rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">Ranked maps</Link>
+          <Link href="/leaderboards" className="block rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">Leaderboards</Link>
+          <Link href="/messages" className="block rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">Messages</Link>
+          <Link href="/notifications" className="block rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">Notifications</Link>
+          <Link href="/settings" className="block rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">Settings</Link>
+          <a href="/api/auth/logout" className="block rounded-xl px-3 py-2 text-sm text-red-300 transition hover:bg-red-500/10 hover:text-red-200">Log out</a>
         </div>
       )}
     </div>
