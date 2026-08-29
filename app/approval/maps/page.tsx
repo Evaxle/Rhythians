@@ -3,6 +3,8 @@ import { getPendingChallengeMaps } from "@/lib/maps";
 import { getMapSubmissionMetadataMap } from "@/lib/map-submission-metadata";
 import { getSessionUser } from "@/lib/auth";
 import { canReviewMaps } from "@/lib/map-review";
+import { syncAndAutoReviewRhythiaMaps } from "@/lib/rhythia-auto-review";
+import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -10,7 +12,13 @@ export const dynamic = "force-dynamic";
 export default async function ApprovalMapsPage() {
   const user = await getSessionUser();
   if (!user || !(await canReviewMaps(user))) redirect("/approval");
-  const maps = await getPendingChallengeMaps();
+
+  const autoImportedPending = await prisma.challengeMap.count({ where: { status: "pending", isAutoImported: true } });
+  if (autoImportedPending > 0) {
+    try { await syncAndAutoReviewRhythiaMaps(); } catch {}
+  }
+
+  const maps = (await getPendingChallengeMaps()).filter((map) => !map.isAutoImported);
   const metadata = await getMapSubmissionMetadataMap(maps.map((map) => map.id));
   const pending = maps.map((map) => {
     const meta = metadata.get(map.id);
