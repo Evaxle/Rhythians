@@ -52,8 +52,8 @@ async function finalizeExpiredSeasons() {
 async function ensureSeasonMaps(seasonId: string) {
   const existing = await prisma.$queryRawUnsafe<Array<{ id: string; rankIndex: number; challengeMapId: string }>>('SELECT "id", "rankIndex", "challengeMapId" FROM "SeasonalPathMap" WHERE "seasonId" = $1 ORDER BY "rankIndex" ASC', seasonId);
   const validExisting = await Promise.all(existing.map(async (entry) => {
-    const map = await prisma.challengeMap.findUnique({ where: { id: entry.challengeMapId }, select: { id: true, status: true, isAutoImported: true } });
-    return map?.status === "approved" && map.isAutoImported ? entry : null;
+    const map = await prisma.challengeMap.findUnique({ where: { id: entry.challengeMapId }, select: { id: true, status: true } });
+    return map?.status === "approved" ? entry : null;
   }));
   const byRank = new Map(validExisting.filter((entry): entry is NonNullable<typeof entry> => Boolean(entry)).map((entry) => [entry.rankIndex, entry]));
   for (const entry of existing) if (!byRank.has(entry.rankIndex)) await prisma.$executeRawUnsafe('DELETE FROM "SeasonalPathMap" WHERE "id" = $1', entry.id);
