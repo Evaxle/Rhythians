@@ -24,10 +24,10 @@ export async function POST(request: Request) {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "You must be signed in." }, { status: 401 });
   const body = await request.json().catch(() => null);
-  const action = body?.action === "check" ? "check" : "start";
+  const action = body?.action === "check" || body?.action === "manual" ? body.action : "start";
 
   if (action === "check") {
-    const pending = await prisma.rhythiaProfileRequest.findFirst({ where: { userId: user.id, status: "pending" }, orderBy: { createdAt: "desc" } });
+    const pending = await prisma.rhythiaProfileRequest.findFirst({ where: { userId: user.id, status: "pending", resolvedAt: { not: null } }, orderBy: { createdAt: "desc" } });
     if (!pending) return NextResponse.json({ error: "Start verification first." }, { status: 400 });
     if (!pending.adminNote || !pending.resolvedAt || pending.resolvedAt.getTime() <= Date.now()) {
       await prisma.rhythiaProfileRequest.delete({ where: { id: pending.id } });
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     }
     try {
       const profile = await fetchRhythiaProfile(pending.profileId);
-      if (!profile.bio || !bioContainsVerificationCode(profile.bio, pending.adminNote)) return NextResponse.json({ error: "The verification code was not found in that profile bio." }, { status: 400 });
+      if (!profile.bio || !bioContainsVerificationCode(profile.bio, pending.adminNote)) return NextResponse.json({ error: "The verification code was not found in that profile bio.", manualReviewAvailable: true }, { status: 400 });
       const { bio: _bio, ...profileData } = profile;
       const saved = await prisma.$transaction(async (tx) => {
         const profileRow = await tx.rhythiaProfile.upsert({
@@ -64,6 +64,22 @@ export async function POST(request: Request) {
     if (activeForProfile && activeForProfile.userId !== user.id) return NextResponse.json({ error: "That Rhythia profile is already linked to another account." }, { status: 409 });
 
     await prisma.rhythiaProfileRequest.deleteMany({ where: { userId: user.id, status: "pending" } });
+
+    if (action === "manual") {
+      const reason = typeof body?.reason === "string" ? body.reason.trim().slice(0, 1000) : "The automatic Rhythia bio verification could not be completed.";
+      const created = await prisma.rhythiaProfileRequest.create({
+        data: {
+          userId: user.id,
+          profileId: profile.profileId,
+          profileUrl: parsed.url,
+          rhythiaUsername: profile.username ?? "Unknown",
+          claimedUsername: user.username,
+          adminNote: reason,
+        },
+      });
+      return NextResponse.json({ submitted: true, requestId: created.id, message: "Your Rhythia verification request was sent for manual review." });
+    }
+
     const code = String(randomInt(10000000, 100000000));
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
     await prisma.rhythiaProfileRequest.create({
