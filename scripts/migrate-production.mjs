@@ -17,6 +17,9 @@ if (process.env.VERCEL === "1") {
   }
 }
 
+const prismaEnv = { ...process.env, DATABASE_URL: databaseUrl };
+const npx = process.platform === "win32" ? "npx.cmd" : "npx";
+
 const client = new Client({ connectionString: databaseUrl });
 await client.connect();
 
@@ -29,9 +32,21 @@ try {
       .sort();
 
     for (const migration of migrations) {
-      execFileSync(process.platform === "win32" ? "npx.cmd" : "npx", ["prisma", "migrate", "resolve", "--applied", migration], {
+      execFileSync(npx, ["prisma", "migrate", "resolve", "--applied", migration], {
         stdio: "inherit",
-        env: { ...process.env, DATABASE_URL: databaseUrl },
+        env: prismaEnv,
+      });
+    }
+  } else {
+    const { rows: failedMigrations } = await client.query(
+      'SELECT DISTINCT migration_name FROM "_prisma_migrations" WHERE finished_at IS NULL AND rolled_back_at IS NULL ORDER BY migration_name'
+    );
+
+    for (const { migration_name } of failedMigrations) {
+      console.warn(`Recovering failed Prisma migration: ${migration_name}`);
+      execFileSync(npx, ["prisma", "migrate", "resolve", "--rolled-back", migration_name], {
+        stdio: "inherit",
+        env: prismaEnv,
       });
     }
   }
@@ -39,7 +54,7 @@ try {
   await client.end();
 }
 
-execFileSync(process.platform === "win32" ? "npx.cmd" : "npx", ["prisma", "migrate", "deploy"], {
+execFileSync(npx, ["prisma", "migrate", "deploy"], {
   stdio: "inherit",
-  env: { ...process.env, DATABASE_URL: databaseUrl },
+  env: prismaEnv,
 });
