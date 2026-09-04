@@ -71,4 +71,26 @@ const normalized = source
   .replace(/\n{3,}/g, "\n\n")
   .trim() + "\n";
 
-if (normalized !== source) fs.writeFileSync(path, normalized);
+const primaryKeys = new Map();
+for (const match of normalized.matchAll(/model\s+(\w+)\s*\{([\s\S]*?)\n\}/g)) {
+  const id = match[2].match(/^\s*id\s+(\w+)/m);
+  if (id) primaryKeys.set(match[1], id[1]);
+}
+
+const repaired = normalized.replace(/model\s+(\w+)\s*\{([\s\S]*?)\n\}/g, (match, name, body) => {
+  const declared = new Set([...body.matchAll(/^\s*(\w+)\s+[A-Za-z_]\w*(?:\[\])?\??/gm)].map((entry) => entry[1]));
+  const missing = new Set();
+  for (const relation of body.matchAll(/^\s*(\w+)\s+(\w+)\??\s+@relation\(([^)]*)\)/gm)) {
+    const fields = relation[3].match(/fields:\s*\[([^\]]+)\]/)?.[1];
+    if (!fields) continue;
+    const scalarType = primaryKeys.get(relation[2]) ?? "String";
+    for (const field of fields.split(",").map((value) => value.trim()).filter(Boolean)) {
+      if (!declared.has(field)) missing.add(`${field} ${scalarType}`);
+    }
+  }
+  if (!missing.size) return match;
+  return `model ${name} {\n${[...missing].map((field) => `  ${field}`).join("\n")}\n${body.trim()}\n}`;
+});
+
+const finalSchema = repaired.trim() + "\n";
+if (finalSchema !== source) fs.writeFileSync(path, finalSchema);
