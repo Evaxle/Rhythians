@@ -5,7 +5,7 @@ import { MODE_RULES, type ModeKey, type ModePoints } from "@/lib/rhythia-mode-ru
 
 export { MODE_RULES } from "@/lib/rhythia-mode-rules";
 export type { ModeKey, ModePoints } from "@/lib/rhythia-mode-rules";
-export type EditablePointSystem = "rhp" | ModeKey;
+export type EditablePointSystem = "rhp" | "rpl" | "rps" | "rpv";
 export type RhythiaModeScoreRow = { id: string; mapKey: string; mapTitle: string; scoreId: number; cameraMode: ModeKey; points: number; accuracy: number | null; awardedSp: number | null };
 type ScorePayload = { id: number; beatmapTitle?: string | null; beatmapId?: number | null; mapId?: number | null; beatmapHash?: string | null; passed?: boolean | null; misses?: number | null; beatmapNotes?: number | null; accuracy?: number | null; speed?: number | null; awarded_sp?: number | null; created_at?: string | null; cameraMode?: string | null; gameMode?: string | null; mode?: string | null; spin?: boolean | null; vr?: boolean | null; isVr?: boolean | null; mods?: string | null };
 type ScoreBucket = { name: "lastDay" | "top" | "vrTop" | "vrRecent"; scores: ScorePayload[] };
