@@ -28,6 +28,7 @@ body {
   background:
     radial-gradient(circle at 15% -10%, rgba(124, 143, 240, 0.16), transparent 34%),
     radial-gradient(circle at 85% 0%, rgba(85, 214, 160, 0.08), transparent 28%),
+    radial-gradient(circle at 50% 90%, rgba(167, 139, 250, 0.07), transparent 30%),
     linear-gradient(180deg, #080b14 0%, #070a12 52%, #060810 100%);
   color: var(--page-text);
 }
@@ -76,7 +77,7 @@ button:active:not(:disabled) {
 }
 
 a {
-  transition: color 0.16s ease, opacity 0.16s ease, border-color 0.16s ease, background-color 0.16s ease;
+  transition: color 0.16s ease, opacity 0.16s ease, border-color 0.16s ease, background-color 0.16s ease, transform 0.18s ease, box-shadow 0.18s ease;
 }
 
 input,
@@ -112,7 +113,7 @@ table {
 }
 
 tbody tr {
-  transition: background-color 0.16s ease;
+  transition: background-color 0.16s ease, transform 0.16s ease;
 }
 
 tbody tr:hover {
@@ -124,9 +125,15 @@ hr {
 }
 
 @layer components {
+  .ui-page {
+    width: 100%;
+    max-width: 1500px;
+    margin-inline: auto;
+  }
+
   .ui-card {
     border: 1px solid var(--page-border);
-    background: linear-gradient(145deg, rgba(20, 27, 45, 0.9), rgba(12, 17, 29, 0.9));
+    background: linear-gradient(145deg, rgba(20, 27, 45, 0.92), rgba(12, 17, 29, 0.92));
     box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.025);
     backdrop-filter: blur(18px);
   }
@@ -143,6 +150,43 @@ hr {
 
   .ui-section-title {
     letter-spacing: -0.025em;
+  }
+
+  .ui-kicker {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+  }
+
+  .ui-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    padding: 0.7rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .ui-glow {
+    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.22), 0 0 50px rgba(124, 143, 240, 0.07);
+  }
+
+  .ui-sheen {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ui-sheen::after {
+    content: "";
+    position: absolute;
+    inset: -40% -20%;
+    background: linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0.04) 50%, transparent 65%);
+    transform: translateX(-60%);
+    animation: ui-sheen 4.8s ease-in-out infinite;
+    pointer-events: none;
   }
 }
 
@@ -174,6 +218,15 @@ hr {
 
 .animate-modal-in {
   animation: modal-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes ui-sheen {
+  0%, 65% {
+    transform: translateX(-60%);
+  }
+  100% {
+    transform: translateX(60%);
+  }
 }
 
 :root {
