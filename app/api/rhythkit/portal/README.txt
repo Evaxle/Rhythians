@@ -1,0 +1,1 @@
+Authenticated native client API for Rhythians portal pages, profiles, search, direct messages, global chat, clips, daily, path, challenge, online users and leaderboards.
