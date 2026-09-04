@@ -19,11 +19,18 @@ if (process.env.VERCEL === "1") {
 
 const prismaEnv = { ...process.env, DATABASE_URL: databaseUrl };
 const npx = process.platform === "win32" ? "npx.cmd" : "npx";
+const battleMigration = "20260904000000_add_battle_reconnect_voting";
+const migrationLock = "rhythians:prisma:migrations";
 
 const client = new Client({ connectionString: databaseUrl });
 await client.connect();
 
+let lockHeld = false;
+
 try {
+  await client.query("SELECT pg_advisory_lock(hashtext($1))", [migrationLock]);
+  lockHeld = true;
+
   const { rows } = await client.query("select to_regclass('public._prisma_migrations') as table_name");
   if (!rows[0]?.table_name) {
     const migrations = readdirSync("prisma/migrations", { withFileTypes: true })
@@ -43,18 +50,77 @@ try {
     );
 
     for (const { migration_name } of failedMigrations) {
-      console.warn(`Recovering failed Prisma migration: ${migration_name}`);
-      execFileSync(npx, ["prisma", "migrate", "resolve", "--rolled-back", migration_name], {
-        stdio: "inherit",
-        env: prismaEnv,
-      });
+      if (migration_name !== battleMigration) {
+        throw new Error(`Unresolved Prisma migration: ${migration_name}`);
+      }
+
+      const { rows: schemaRows } = await client.query(`
+        SELECT
+          to_regclass('public."RbpSeason"') IS NOT NULL AS has_rbp_season,
+          to_regclass('public."RbpMatchAward"') IS NOT NULL AS has_rbp_match_award,
+          to_regclass('public."BattleMatchMapOption"') IS NOT NULL AS has_map_options,
+          to_regclass('public."BattleMatchMapVote"') IS NOT NULL AS has_map_votes,
+          EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='BattleMatch' AND column_name='responseDeadlineAt') AS has_response_deadline,
+          EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='BattleMatchPlayer' AND column_name='scoreSubmittedAt') AS has_score_submitted,
+          EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='BattleMatchPlayer' AND column_name='lastSeenAt') AS has_last_seen,
+          EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='BattleMatchPlayer' AND column_name='disconnectedAt') AS has_disconnected,
+          EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='BattleMatchPlayer' AND column_name='reconnectUntilAt') AS has_reconnect_until
+      `);
+
+      const schema = schemaRows[0];
+      const complete = Object.values(schema).every(Boolean);
+
+      if (complete) {
+        console.warn(`Resolving completed Prisma migration as applied: ${migration_name}`);
+        execFileSync(npx, ["prisma", "migrate", "resolve", "--applied", migration_name], {
+          stdio: "inherit",
+          env: prismaEnv,
+        });
+      } else {
+        console.warn(`Resolving incomplete Prisma migration for re-application: ${migration_name}`);
+        execFileSync(npx, ["prisma", "migrate", "resolve", "--rolled-back", migration_name], {
+          stdio: "inherit",
+          env: prismaEnv,
+        });
+      }
     }
   }
+
+  execFileSync(npx, ["prisma", "migrate", "deploy"], {
+    stdio: "inherit",
+    env: prismaEnv,
+  });
+
+  const { rows: finalState } = await client.query(`
+    SELECT
+      COUNT(*) FILTER (WHERE finished_at IS NULL AND rolled_back_at IS NULL) AS failed_count,
+      COUNT(*) FILTER (WHERE migration_name = $1 AND finished_at IS NOT NULL AND rolled_back_at IS NULL) AS battle_applied_count
+    FROM "_prisma_migrations"
+  `, [battleMigration]);
+
+  if (Number(finalState[0].failed_count) !== 0) {
+    throw new Error(`Prisma migration verification failed: ${finalState[0].failed_count} migration(s) remain unresolved`);
+  }
+
+  const { rows: requiredObjects } = await client.query(`
+    SELECT
+      to_regclass('public."RbpSeason"') IS NOT NULL AS has_rbp_season,
+      to_regclass('public."RbpMatchAward"') IS NOT NULL AS has_rbp_match_award,
+      to_regclass('public."BattleMatchMapOption"') IS NOT NULL AS has_map_options,
+      to_regclass('public."BattleMatchMapVote"') IS NOT NULL AS has_map_votes,
+      EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='BattleMatch' AND column_name='responseDeadlineAt') AS has_response_deadline,
+      EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='BattleMatchPlayer' AND column_name='scoreSubmittedAt') AS has_score_submitted,
+      EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='BattleMatchPlayer' AND column_name='lastSeenAt') AS has_last_seen,
+      EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='BattleMatchPlayer' AND column_name='disconnectedAt') AS has_disconnected,
+      EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='BattleMatchPlayer' AND column_name='reconnectUntilAt') AS has_reconnect_until,
+      EXISTS (SELECT 1 FROM pg_indexes WHERE schemaname='public' AND indexname='BattleMatch_responseDeadlineAt_idx') AS has_response_index,
+      EXISTS (SELECT 1 FROM pg_indexes WHERE schemaname='public' AND indexname='BattleMatchPlayer_reconnectUntilAt_idx') AS has_reconnect_index
+  `);
+
+  if (!Object.values(requiredObjects[0]).every(Boolean)) {
+    throw new Error("Prisma migration verification failed: battle/RBP schema objects are incomplete");
+  }
 } finally {
+  if (lockHeld) await client.query("SELECT pg_advisory_unlock(hashtext($1))", [migrationLock]);
   await client.end();
 }
-
-execFileSync(npx, ["prisma", "migrate", "deploy"], {
-  stdio: "inherit",
-  env: prismaEnv,
-});
