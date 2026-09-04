@@ -1,15 +1,10 @@
 import { prisma } from "@/lib/db";
 import { rhythiaRequest } from "@/lib/rhythia";
 import { accuracyFromMisses, accuracyMultiplier, RANKS, type RankInfo, getRankInfo } from "@/lib/ranks";
+import { MODE_RULES, type ModeKey, type ModePoints } from "@/lib/rhythia-mode-rules";
 
-export const MODE_RULES = {
-  lock: { key: "lock", label: "Lock", short: "RPL", maxPoints: 25, tierSpan: 100 },
-  spin: { key: "spin", label: "Spin", short: "RPS", maxPoints: 30, tierSpan: 90 },
-  vr: { key: "vr", label: "VR", short: "RPV", maxPoints: 23, tierSpan: 92 },
-} as const;
-
-export type ModeKey = keyof typeof MODE_RULES;
-export type ModePoints = { lock: number; spin: number; vr: number };
+export { MODE_RULES } from "@/lib/rhythia-mode-rules";
+export type { ModeKey, ModePoints } from "@/lib/rhythia-mode-rules";
 export type EditablePointSystem = "rhp" | ModeKey;
 export type RhythiaModeScoreRow = { id: string; mapKey: string; mapTitle: string; scoreId: number; cameraMode: ModeKey; points: number; accuracy: number | null; awardedSp: number | null };
 type ScorePayload = { id: number; beatmapTitle?: string | null; beatmapId?: number | null; mapId?: number | null; beatmapHash?: string | null; passed?: boolean | null; misses?: number | null; beatmapNotes?: number | null; accuracy?: number | null; speed?: number | null; awarded_sp?: number | null; created_at?: string | null; cameraMode?: string | null; gameMode?: string | null; mode?: string | null; spin?: boolean | null; vr?: boolean | null; isVr?: boolean | null; mods?: string | null };
