@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { RankIcon } from "@/components/rank-icon";
-import { MODE_RULES, type ModeKey } from "@/lib/rhythia-mode-points";
+import { MODE_RULES, type ModeKey } from "@/lib/rhythia-mode-rules";
 import type { RankInfo } from "@/lib/ranks";
 
 type Row = { position: number; userId: string; username: string; displayName: string | null; profileHandle: string; avatar: string | null; points: number; rankInfo: RankInfo };
