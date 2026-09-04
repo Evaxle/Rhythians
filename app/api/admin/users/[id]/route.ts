@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { canAccessAdmin } from "@/lib/admin-access";
+import { prisma } from "@/lib/db";
 import { resetUserRankedStatus } from "@/lib/maps-legacy";
+import { setUserPointOverride, syncUserModeScores } from "@/lib/rhythia-mode-points";
 
 export const dynamic = "force-dynamic";
 
@@ -17,11 +18,13 @@ export async function PATCH(request: Request, { params }: Props) {
   const target = await prisma.user.findUnique({ where: { id }, select: { id: true, profileHandle: true } });
   if (!target) return NextResponse.json({ error: "User not found." }, { status: 404 });
   if (body?.resetRanked === true) {
+    await prisma.$executeRawUnsafe('DELETE FROM "UserPointOverride" WHERE "userId"=$1', id);
+    await prisma.$executeRawUnsafe('DELETE FROM "RhythiaModeScore" WHERE "userId"=$1', id);
     await resetUserRankedStatus(id);
     await prisma.moderationAction.create({ data: { actorId: admin.id, action: "ranked_status_reset", targetType: "user", targetId: id, metadata: { reset: true } } });
     return NextResponse.json({ ok: true, reset: true });
   }
-  const data: { displayName?: string; bio?: string; website?: string; profileHandle?: string; rhp?: number } = {};
+  const data: { displayName?: string; bio?: string; website?: string; profileHandle?: string } = {};
   if (typeof body?.displayName === "string") {
     const displayName = body.displayName.trim().slice(0, 60);
     if (!displayName) return NextResponse.json({ error: "Display name cannot be empty." }, { status: 400 });
@@ -38,13 +41,16 @@ export async function PATCH(request: Request, { params }: Props) {
     }
     data.profileHandle = profileHandle;
   }
-  if (body?.rhp !== undefined) {
+  const rhpProvided = body?.rhp !== undefined;
+  if (rhpProvided) {
     const rhp = Number(body.rhp);
-    if (!Number.isFinite(rhp) || rhp < 0 || rhp > 100000) return NextResponse.json({ error: "RHP must be a number between 0 and 100000." }, { status: 400 });
-    data.rhp = Math.round(rhp);
+    if (!Number.isFinite(rhp) || rhp < 0 || rhp > 1000000) return NextResponse.json({ error: "RHP must be a number between 0 and 1000000." }, { status: 400 });
+    await setUserPointOverride(id, "rhp", Math.round(rhp));
   }
-  if (Object.keys(data).length === 0) return NextResponse.json({ error: "Nothing to update." }, { status: 400 });
-  const updated = await prisma.user.update({ where: { id }, data, select: { id: true, displayName: true, bio: true, website: true, profileHandle: true, rhp: true } });
-  await prisma.moderationAction.create({ data: { actorId: admin.id, action: "user_edited", targetType: "user", targetId: id, metadata: data } });
+  if (Object.keys(data).length === 0 && !rhpProvided) return NextResponse.json({ error: "Nothing to update." }, { status: 400 });
+  if (Object.keys(data).length) await prisma.user.update({ where: { id }, data });
+  const synced = await syncUserModeScores(id);
+  await prisma.moderationAction.create({ data: { actorId: admin.id, action: rhpProvided ? "user_profile_rhp_edited" : "user_edited", targetType: "user", targetId: id, metadata: { ...data, rhp: rhpProvided ? synced.rhp : undefined } } });
+  const updated = await prisma.user.findUnique({ where: { id }, select: { id: true, displayName: true, bio: true, website: true, profileHandle: true, rhp: true } });
   return NextResponse.json({ user: updated });
 }
