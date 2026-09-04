@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Check, CircleCheck, Lock, Play, Sparkles } from "lucide-react";
+import { Check, CircleCheck, Download, Lock, Play, Sparkles, ArrowRight } from "lucide-react";
 import { getSessionUser } from "@/lib/auth";
 import { getSeasonalPath } from "@/lib/seasonal-path";
 import { CheckRecentScoreButton } from "@/components/path/check-recent-score-button";
@@ -15,51 +15,50 @@ function formatLength(length: number | null | undefined) {
   return `${Math.floor(totalSeconds / 60)}:${String(totalSeconds % 60).padStart(2, "0")}`;
 }
 
+function PathCard({ rank, completed, current, locked, user }: { rank: Awaited<ReturnType<typeof getSeasonalPath>>["ranks"][number]; completed: boolean; current: boolean; locked: boolean; user: Awaited<ReturnType<typeof getSessionUser>> }) {
+  const map = rank.map;
+  const lengthLabel = formatLength(map?.map?.length);
+  return <article className={`relative min-w-[290px] flex-1 rounded-[2rem] border p-5 transition duration-300 sm:min-w-[330px] ${locked ? "border-white/10 bg-black/20 opacity-45 grayscale" : completed ? "border-emerald-400/30 bg-[linear-gradient(145deg,rgba(52,211,153,0.12),rgba(10,18,19,0.92))] shadow-[0_20px_70px_rgba(16,185,129,0.08)]" : current ? "border-white/20 bg-[linear-gradient(145deg,rgba(124,143,240,0.14),rgba(20,27,45,0.96))] shadow-[0_24px_80px_rgba(124,143,240,0.12)]" : "border-white/10 bg-background/45"}`} style={!locked && current ? { borderColor: `${rank.color}88`, boxShadow: `0 24px 80px ${rank.color}18` } : undefined}>
+    <div className="flex items-start justify-between gap-4">
+      <div className="flex items-center gap-3"><div className="flex h-12 w-12 items-center justify-center rounded-2xl border" style={{ borderColor: locked ? "rgba(255,255,255,.1)" : completed ? "rgba(52,211,153,.45)" : `${rank.color}66`, background: completed ? "rgba(52,211,153,.10)" : locked ? "rgba(255,255,255,.04)" : `${rank.color}16`, color: completed ? "#34d399" : locked ? "#8d99b5" : rank.color }}>{completed ? <Check size={22} /> : locked ? <Lock size={21} /> : rank.index + 1}</div><div><p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted">{current ? "Current rank" : completed ? "Completed" : "Next rank"}</p><h2 className="mt-1 text-xl font-semibold text-white">{rank.name}</h2></div></div>{current && <span className="rounded-full border border-accent/25 bg-accent/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-accent">You are here</span>}</div>
+
+    {map?.map ? <div className="mt-5 rounded-2xl border border-white/10 bg-black/15 p-4">
+      <div><p className="truncate text-base font-semibold text-white">{map.map.title}</p>{map.map.artist && <p className="mt-1 truncate text-sm text-muted">{map.map.artist}</p>}<div className="mt-2 flex flex-wrap gap-2 text-[11px] text-muted"><span>{map.map.rating?.toFixed(2)} rating</span>{lengthLabel && <span>{lengthLabel}</span>}{map.map.mapperName && <span>Mapped by {map.map.mapperName}</span>}{map.ranked ? <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/25 bg-emerald-400/10 px-2 py-1 font-semibold text-emerald-300"><CircleCheck size={12} /> Ranked</span> : <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">Rank status unavailable</span>}</div></div>
+      {current && user && !locked && !map.completed && <CheckRecentScoreButton rankIndex={rank.index} completed={false} />}
+      {current && map.map.mapFileUrl && !locked && !map.completed && <a href={map.map.mapFileUrl} target="_blank" rel="noreferrer" className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-accent px-4 py-3 text-sm font-bold text-white transition hover:bg-accent2"><Play size={15} /> Play map</a>}
+      {completed && <div className="mt-3 flex items-center gap-2 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-3 py-2.5 text-sm font-semibold text-emerald-300"><Check size={15} /> Passed</div>}
+      {current && user && !locked && <div className="mt-3"><ReportButton targetType="challenge_map" targetId={map.map.id} targetLabel="this path map" reasons={["Path map needs to be reset", "Map is not ranked", "Broken or misleading content", "Other"]} /></div>}
+      {locked && <div className="mt-3 flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm font-semibold text-muted"><Lock size={15} /> Reach this rank to unlock</div>}
+    </div> : <div className="mt-5 rounded-2xl border border-dashed border-white/10 bg-black/10 p-5 text-sm text-muted">{locked ? "This rank is locked until you progress through the path." : "No approved ranked map is currently available for this path rank."}</div>}
+  </article>;
+}
+
 export default async function PathPage() {
   const user = await getSessionUser();
   const path = await getSeasonalPath(user?.id);
   const activePathIndex = Math.min(Math.max(path.completedRank + 1, 0), path.ranks.length - 1);
-  const activeRank = path.ranks[activePathIndex];
-  const themeColor = activeRank?.color ?? "#7289da";
+  const current = path.ranks[activePathIndex];
+  const previous = activePathIndex > 0 ? path.ranks[activePathIndex - 1] : null;
+  const next = activePathIndex < path.ranks.length - 1 ? path.ranks[activePathIndex + 1] : null;
+  const themeColor = current?.color ?? "#7289da";
 
-  return <div className="relative min-h-[calc(100vh-5rem)] overflow-hidden rounded-[2rem]" style={{ background: `radial-gradient(circle at 50% 0%, ${themeColor}24, transparent 48%), linear-gradient(180deg, ${themeColor}10 0%, transparent 45%)` }}>
-    <div className="relative mx-auto max-w-4xl space-y-8 px-2 py-4">
-      <section className="rounded-3xl border border-border bg-surface/95 p-8 text-center shadow-glow" style={{ borderColor: `${themeColor}55`, boxShadow: `0 20px 70px ${themeColor}14` }}>
-        <p className="text-sm uppercase tracking-[0.3em]" style={{ color: themeColor }}>Seasonal progression</p>
-        <h1 className="mt-3 text-4xl font-semibold text-white">Seasonal Rhythian Path</h1>
-        <p className="mt-3 text-sm leading-7 text-muted">Complete one ranked map at a time to progress through this season's path. Each completed rank earns its seasonal rank at the end of the season.</p>
-        <div className="mx-auto mt-5 max-w-2xl rounded-2xl border border-accent/25 bg-accent/10 p-4 text-left text-sm leading-6 text-muted"><p className="font-semibold text-white">How path completion works</p><p className="mt-1">You must <span className="font-semibold text-white">repass the path map</span> for your current path rank. An older pass already on your Rhythia profile does not count. The pass must appear in your <span className="font-semibold text-white">recent scores</span> and must have <span className="font-semibold text-white">normal speed (1.0x)</span> with no speed modification. Top/older scores and modified-speed passes cannot complete a path rank.</p></div>
-        <div className="mt-6 inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold" style={{ borderColor: `${themeColor}55`, backgroundColor: `${themeColor}14`, color: themeColor }}><Sparkles size={16} /> Season {path.season.seasonNumber}</div>
-        <p className="mt-3 text-xs text-muted">{path.season.startsAt.toLocaleDateString()} – {path.season.endsAt.toLocaleDateString()}</p>
-        <SeasonCountdown endsAt={path.season.endsAt.toISOString()} />
-        {user && <p className="mt-4 text-sm text-muted">Your regular rank allows you to play through <span className="font-semibold text-white">{path.ranks[path.maxPlayableRank]?.name}</span> on the path.</p>}
+  return <div className="ui-page relative overflow-hidden rounded-[2rem] px-0 py-1" style={{ background: `radial-gradient(circle at 50% 0%, ${themeColor}20, transparent 38%), radial-gradient(circle at 8% 60%, ${themeColor}0d, transparent 28%), linear-gradient(180deg, ${themeColor}09 0%, transparent 52%, rgba(6,8,16,.15) 100%)` }}>
+    <div className="relative space-y-6 px-1 py-2 sm:px-2">
+      <section className="rounded-[2rem] border border-white/10 bg-black/10 p-6 sm:p-7">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"><div><p className="ui-kicker" style={{ color: themeColor }}>Seasonal progression</p><h1 className="mt-2 text-4xl font-semibold tracking-[-0.04em] text-white">Seasonal Rhythian Path</h1><p className="mt-2 max-w-3xl text-sm leading-6 text-muted">A battle-pass style progression through the season. Complete the map in the center to unlock the next rank.</p></div><div className="flex flex-wrap items-center gap-3"><div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3"><p className="ui-kicker text-muted">Season</p><p className="mt-1 text-sm font-semibold text-white">{path.season.seasonNumber}</p></div><SeasonCountdown endsAt={path.season.endsAt.toISOString()} /></div></div>
+        {user && <div className="mt-5 rounded-2xl border border-accent/20 bg-accent/[0.06] p-4 text-sm text-muted"><span className="font-semibold text-white">Current progression:</span> {path.completedRank < 0 ? "Start with Copper." : path.completedRank >= path.ranks.length - 1 ? "You have completed the full seasonal path." : `Completed through ${path.ranks[path.completedRank].name}. Your next target is ${current.name}.`}</div>}
       </section>
 
-      <section className="relative space-y-4">
-        {path.ranks.map((rank) => {
-          const map = rank.map;
-          const targetName = rank.index === path.ranks.length - 1 ? "4.00 rating" : path.ranks[rank.index + 1].name;
-          const aboveRegularRank = Boolean(user) && rank.index > path.maxPlayableRank;
-          const locked = !map || !map.unlocked;
-          const ranked = map?.ranked === true;
-          const lengthLabel = formatLength(map?.map?.length);
-          return <div key={rank.name} className={`relative rounded-3xl border p-6 transition ${locked ? "border-border bg-background/40 opacity-45 grayscale" : map?.completed ? "border-emerald-400/30 bg-emerald-400/[0.06] shadow-glow" : "border-border bg-surface/95 shadow-glow"}`} style={!locked && !map?.completed ? { borderColor: `${rank.color}55`, boxShadow: `0 18px 55px ${rank.color}0d` } : undefined}>
-            <div className="flex items-start gap-5">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border text-lg font-bold" style={{ borderColor: map?.completed ? "#34d399" : rank.color, color: map?.completed ? "#34d399" : rank.color, backgroundColor: map?.completed ? "rgba(52,211,153,0.10)" : `${rank.color}18` }}>{map?.completed ? <Check size={25} /> : locked ? <Lock size={22} /> : rank.index + 1}</div>
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-3"><h2 className="text-2xl font-semibold" style={{ color: locked ? undefined : map?.completed ? "#34d399" : rank.color }}>{rank.name}</h2>{map?.completed && <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 text-xs font-semibold text-emerald-300">Completed</span>}{!map?.completed && !locked && <span className="rounded-full border border-accent/30 bg-accent/10 px-2.5 py-1 text-xs font-semibold text-accent">Next path map</span>}{aboveRegularRank && <span className="rounded-full border border-border bg-white/5 px-2.5 py-1 text-xs font-semibold text-muted">Requires {rank.name} rank</span>}</div>
-                <p className="mt-1 text-sm text-muted">Complete a {targetName} map to earn the {rank.name} seasonal rank.</p>
-                {map?.map ? <div className="mt-5 rounded-2xl border border-border bg-background/70 p-4">
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div className="min-w-0"><p className="truncate text-lg font-semibold text-white">{map.map.title}</p>{map.map.artist && <p className="mt-1 text-sm text-muted">{map.map.artist}</p>}<div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted"><span>{map.map.rating?.toFixed(2)} rating</span>{lengthLabel && <span>{lengthLabel}</span>}{map.map.mapperName && <span>Mapped by {map.map.mapperName}</span>}{ranked ? <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 font-semibold text-emerald-300"><CircleCheck size={14} /> Ranked map verified</span> : <span className="inline-flex items-center gap-1.5 rounded-full border border-red-400/30 bg-red-400/10 px-2.5 py-1 font-semibold text-red-300"><CircleCheck size={14} /> Ranked status could not be verified</span>}</div></div>{map.map.mapFileUrl && !locked && !map.completed && <a href={map.map.mapFileUrl} target="_blank" rel="noreferrer" className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent2"><Play size={15} /> Play map</a>}{map.completed && <span className="inline-flex shrink-0 items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-sm font-semibold text-emerald-300"><Check size={15} /> Passed</span>}</div>
-                  {user && !locked && !map.completed && <CheckRecentScoreButton rankIndex={rank.index} completed={false} />}<div className="mt-4"><ReportButton targetType="challenge_map" targetId={map.map.id} targetLabel="this path map" reasons={["Path map needs to be reset", "Map is not ranked", "Broken or misleading content", "Other"]} /></div>
-                </div> : <div className="mt-5 rounded-2xl border border-dashed border-border p-4 text-sm text-muted">No approved ranked map is currently available for this path rank.</div>}
-              </div>
-            </div>
-          </div>;
-        })}
+      <section className="rounded-[2rem] border border-white/10 bg-black/10 p-4 sm:p-6">
+        <div className="mb-5 flex items-center justify-between gap-4"><div><p className="ui-kicker text-muted">Battle pass</p><h2 className="mt-1 text-xl font-semibold text-white">Your path</h2></div><p className="hidden text-xs text-muted sm:block">Previous · Current · Next</p></div>
+        <div className="flex items-center overflow-x-auto px-1 pb-3 pt-2 [scrollbar-width:thin]">
+          {previous ? <><PathCard rank={previous} completed={Boolean(previous.map?.completed)} current={false} locked={false} user={user} /><div className="mx-2 hidden h-1 min-w-10 bg-gradient-to-r from-emerald-400/70 to-accent/70 sm:block" /><div className="my-auto h-1 min-w-8 bg-gradient-to-r from-emerald-400/70 to-accent/60 sm:hidden" /></> : <div className="hidden min-w-8 sm:block" />}
+          <PathCard rank={current} completed={Boolean(current.map?.completed)} current={true} locked={!current.map?.unlocked} user={user} />
+          {next ? <><div className="my-auto h-1 min-w-8 bg-white/10 sm:hidden" /><div className="mx-2 hidden h-1 min-w-10 bg-gradient-to-r from-accent/60 to-white/10 sm:block" /><PathCard rank={next} completed={false} current={false} locked={!next.map?.unlocked || next.index > path.maxPlayableRank} user={user} /></> : <div className="hidden min-w-8 sm:block" />}
+        </div>
       </section>
 
-      {user && <section className="rounded-3xl border border-border bg-surface/95 p-6 text-sm text-muted shadow-glow" style={{ borderColor: `${themeColor}55` }}><p className="font-semibold text-white">Your path progress</p><p className="mt-2">{path.completedRank < 0 ? "No path maps completed yet. Start with Copper." : path.completedRank >= path.ranks.length - 1 ? "You have completed the full seasonal path." : `You have completed through ${path.ranks[path.completedRank].name}. Your next map is ${path.ranks[path.completedRank + 1].name}.`}</p><Link href={`/profile/${user.profileHandle}`} className="mt-4 inline-flex rounded-full border border-border bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:border-accent/40">View profile</Link></section>}
+      <section className="overflow-x-auto rounded-[2rem] border border-white/10 bg-black/10 p-4"><div className="flex min-w-max items-center gap-0 px-2">{path.ranks.map((rank, index) => { const done = index <= path.completedRank; const active = index === activePathIndex; return <div key={rank.name} className="flex items-center"><div className={`flex h-9 w-9 items-center justify-center rounded-xl border text-xs font-bold transition ${done ? "border-emerald-400/35 bg-emerald-400/10 text-emerald-300" : active ? "border-accent/45 bg-accent/10 text-accent" : "border-white/10 bg-white/5 text-muted"}`} style={active ? { borderColor: `${rank.color}88`, backgroundColor: `${rank.color}18`, color: rank.color } : undefined}>{done ? <Check size={14} /> : index + 1}</div>{index < path.ranks.length - 1 && <div className={`h-1 w-10 ${index < path.completedRank ? "bg-emerald-400/60" : index === path.completedRank ? "bg-gradient-to-r from-emerald-400/60 to-accent/70" : "bg-white/10"}`} />}</div>; })}</div></section>
     </div>
     {user && <SeasonRewardPopups />}
   </div>;
