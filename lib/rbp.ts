@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { RANKS, getRankInfo } from "@/lib/ranks";
 import { getSeasonalPath } from "@/lib/seasonal-path";
 import { teamScore } from "@/lib/battles";
+import type { Prisma } from "@/generated/prisma/client";
 
 export const RBP_MAX_WIN = 30;
 export const RBP_MAX_LOSS = 20;
@@ -64,7 +65,7 @@ export function rbpDeltaFromAccuracyDifference(winnerAccuracy: number, loserAccu
   return { win: 26 + bucket, loss: 16 + bucket, difference };
 }
 
-async function insertResult(tx: any, input: { seasonId: string; matchId: string; userId: string; opponentUserId: string | null; result: string; delta: number; accuracy: number | null; opponentAccuracy: number | null; reason: string | null }) {
+async function insertResult(tx: Prisma.TransactionClient, input: { seasonId: string; matchId: string; userId: string; opponentUserId: string | null; result: string; delta: number; accuracy: number | null; opponentAccuracy: number | null; reason: string | null }) {
   return tx.$queryRawUnsafe<Array<{ id: string }>>('INSERT INTO "RbpMatchResult" ("id","seasonId","matchId","userId","opponentUserId","result","delta","accuracy","opponentAccuracy","reason") VALUES (gen_random_uuid(),$1,$2,$3,$4,$5,$6,$7,$8,$9) ON CONFLICT ("seasonId","matchId","userId") DO NOTHING RETURNING "id"', input.seasonId, input.matchId, input.userId, input.opponentUserId, input.result, input.delta, input.accuracy, input.opponentAccuracy, input.reason);
 }
 
