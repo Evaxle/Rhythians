@@ -8,7 +8,7 @@ import { ChallengeLevelLeaderboard, type ChallengeLevelRow } from "@/components/
 import { RANKS, type RankInfo } from "@/lib/ranks";
 import { RankIcon } from "@/components/rank-icon";
 import { ModeLeaderboard } from "@/components/daily/mode-leaderboard";
-import type { ModeKey } from "@/lib/rhythia-mode-points";
+import type { ModeKey } from "@/lib/rhythia-mode-rules";
 
 type Section = "global" | "my-rank" | ModeKey;
 type ModeLeaderboards = Record<ModeKey, any[]>;
