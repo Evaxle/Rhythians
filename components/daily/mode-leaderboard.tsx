@@ -1,0 +1,14 @@
+"use client";
+
+import Link from "next/link";
+import { RankIcon } from "@/components/rank-icon";
+import { MODE_RULES, type ModeKey } from "@/lib/rhythia-mode-points";
+import type { RankInfo } from "@/lib/ranks";
+
+type Row = { position: number; userId: string; username: string; displayName: string | null; profileHandle: string; avatar: string | null; points: number; rankInfo: RankInfo };
+
+export function ModeLeaderboard({ mode, rows, currentUserId }: { mode: ModeKey; rows: Row[]; currentUserId: string | null }) {
+  const rule = MODE_RULES[mode];
+  const previewRank = rows[0]?.rankInfo;
+  return <section className="space-y-5"><div><p className="text-sm uppercase tracking-[0.24em] text-accent">{rule.label} leaderboard</p><h2 className="mt-1 flex items-center gap-3 text-2xl font-semibold text-white">{previewRank && <RankIcon rank={previewRank} size={40} />}{rule.short} rankings</h2><p className="mt-2 text-sm text-muted">Players are ranked only by {rule.short} earned from {rule.label} scores. One score per map per mode is counted.</p></div><div className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-black/10"><div className="hidden grid-cols-[3rem_minmax(0,1fr)_10rem_8rem] gap-3 border-b border-white/10 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-muted sm:grid"><span>#</span><span>Player</span><span className="text-right">Rank</span><span className="text-right">{rule.short}</span></div>{rows.length === 0 ? <p className="p-10 text-sm text-muted">No {rule.label} scores have been synchronized yet.</p> : rows.map((row) => { const isCurrentUser = row.userId === currentUserId; const label = row.rankInfo.isExpert ? "Expert" : `${row.rankInfo.name} ${row.rankInfo.tier}`; return <div key={row.userId} className={`grid grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-3 border-b border-white/10 px-4 py-4 last:border-0 sm:grid-cols-[3rem_minmax(0,1fr)_10rem_8rem] sm:px-5 ${isCurrentUser ? "bg-accent/[0.08]" : "hover:bg-white/[0.025]"}`} style={{ borderLeft: `3px solid ${isCurrentUser ? row.rankInfo.color : "transparent"}` }}><span className="text-sm font-bold tabular-nums text-muted">{row.position}</span><div className="flex min-w-0 items-center gap-3"><RankIcon rank={row.rankInfo} size={40} /><div className="min-w-0"><Link href={`/profile/${row.profileHandle}`} className={`truncate text-sm font-semibold hover:text-accent ${isCurrentUser ? "text-accent" : "text-white"}`}>{row.displayName ?? row.username}{isCurrentUser ? " (you)" : ""}</Link><p className="truncate text-xs text-muted">{label} · mode points</p></div></div><span className="hidden text-right text-sm font-semibold sm:block" style={{ color: row.rankInfo.color }}>{label}</span><span className="text-right text-sm font-bold text-white">{row.points.toLocaleString()} <span className="text-[10px] font-medium text-muted">{rule.short}</span></span></div>; })}</div></section>;
+}

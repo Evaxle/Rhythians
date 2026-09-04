@@ -41,12 +41,16 @@ const SEASON_RANK_COLORS: Record<string, string> = {
 
 function tagColor(slug: string) {
   if (TAG_COLORS[slug]) return TAG_COLORS[slug];
-  const match = slug.match(/^season-\d+-(copper|bronze|silver|gold|platinum|emerald|diamond|master|expert)$/);
+  const match = slug.match(/^season-\d+(?:-battles)?-(copper|bronze|silver|gold|platinum|emerald|diamond|master|expert)$/);
   return match ? SEASON_RANK_COLORS[match[1]] : "bg-white/5 text-muted border-border";
 }
 
 export function UserTags({ tags, size = "sm" }: UserTagsProps) {
-  const visibleTags = tags.filter(({ tag }) => tag.slug !== "rhythian-coach").slice(0, 3);
+  const filtered = tags.filter(({ tag }) => tag.slug !== "rhythian-coach");
+  const battleSeason = filtered.filter(({ tag }) => /^season-\d+-battles-/.test(tag.slug));
+  const otherSeason = filtered.filter(({ tag }) => /^season-\d+-/.test(tag.slug) && !/^season-\d+-battles-/.test(tag.slug));
+  const regular = filtered.filter(({ tag }) => !/^season-\d+-/.test(tag.slug));
+  const visibleTags = [...regular.slice(0, 3), ...battleSeason, ...otherSeason].slice(0, 12);
   if (visibleTags.length === 0) return null;
 
   const sizeClasses = {

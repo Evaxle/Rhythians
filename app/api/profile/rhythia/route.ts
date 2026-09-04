@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { fetchRhythiaProfile, namesMatch, parseRhythiaUrl } from "@/lib/rhythia";
-import { checkAndAwardAllChallengeMaps } from "@/lib/maps";
+import { syncUserModeScores } from "@/lib/rhythia-mode-points";
 
 export async function POST(request: Request) {
   const user = await getSessionUser();
@@ -15,29 +15,14 @@ export async function POST(request: Request) {
     const profile = await fetchRhythiaProfile(parsed.id);
     const existing = await prisma.rhythiaProfile.findUnique({ where: { userId: user.id } });
     const alreadyLinked = existing?.profileId === parsed.id;
-
-    if (!alreadyLinked && !namesMatch(profile.username, [user.username, user.displayName, user.profileHandle])) {
-      return NextResponse.json({ error: "The name on that Rhythia profile doesn't match your account. Use the bio verification flow to prove ownership.", mismatch: true, candidate: { profileId: profile.profileId, profileUrl: parsed.url, username: profile.username } }, { status: 422 });
-    }
-
+    if (!alreadyLinked && !namesMatch(profile.username, [user.username, user.displayName, user.profileHandle])) return NextResponse.json({ error: "The name on that Rhythia profile doesn't match your account. Use the bio verification flow to prove ownership.", mismatch: true, candidate: { profileId: profile.profileId, profileUrl: parsed.url, username: profile.username } }, { status: 422 });
     const { bio: _bio, ...profileData } = profile;
     const saved = await prisma.$transaction(async (tx) => {
-      const profileRow = await tx.rhythiaProfile.upsert({
-        where: { userId: user.id },
-        create: { userId: user.id, profileUrl: parsed.url, ...profileData },
-        update: { profileUrl: parsed.url, ...profileData, syncedAt: new Date() },
-      });
+      const profileRow = await tx.rhythiaProfile.upsert({ where: { userId: user.id }, create: { userId: user.id, profileUrl: parsed.url, ...profileData }, update: { profileUrl: parsed.url, ...profileData, syncedAt: new Date() } });
       await tx.user.update({ where: { id: user.id }, data: { rhythiaVerified: true } });
       return profileRow;
     });
-
-    if (!user.scoreImportDone) {
-      try {
-        await checkAndAwardAllChallengeMaps(user.id);
-      } catch {
-      }
-    }
-
+    try { await syncUserModeScores(user.id); } catch {}
     return NextResponse.json({ profile: saved });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to load that Rhythia profile." }, { status: 502 });
