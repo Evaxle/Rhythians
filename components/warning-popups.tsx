@@ -49,7 +49,7 @@ export function WarningPopups() {
   if (warnings.length === 0) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-[99990] flex w-[22rem] max-w-[calc(100vw-2rem)] flex-col gap-3">
+    <div className="warning-popups fixed bottom-4 right-4 z-[99990] flex w-[22rem] max-w-[calc(100vw-2rem)] flex-col gap-3">
       {warnings.map((warning) => (
         <div
           key={warning.id}
