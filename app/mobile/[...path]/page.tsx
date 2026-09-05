@@ -120,7 +120,7 @@ export default async function MobileCatchAll({ params }: { params: Promise<{ pat
       settings: AdminSettings,
       "featured-clips": AdminFeaturedClips,
     };
-    if (path.length === 2 && adminPages[path[1]]) return <MobilePage><adminPages[path[1]] /></MobilePage>;
+    if (path.length === 2 && adminPages[path[1]]) { const AdminPage = adminPages[path[1]]; return <MobilePage><AdminPage /></MobilePage>; }
     if (path.length === 3 && path[1] === "clips" && path[2] === "manage") return <MobilePage><AdminManageClips /></MobilePage>;
     notFound();
   }
