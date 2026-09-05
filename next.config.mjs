@@ -1,3 +1,5 @@
+const mobileOrigin = process.env.RHYTHIANS_MOBILE_ORIGIN?.replace(/\/$/, "");
+
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -11,6 +13,7 @@ const nextConfig = {
     ],
     unoptimized: false,
   },
+  rewrites: async () => mobileOrigin ? [{ source: "/mobile", destination: `${mobileOrigin}/mobile` }, { source: "/mobile/:path*", destination: `${mobileOrigin}/mobile/:path*` }] : [],
   headers: async () => {
     return [
       {
