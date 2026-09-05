@@ -96,7 +96,7 @@ export async function syncUserModeScores(userId: string) {
   if (!profile || !user) return { rpl: 0, rps: 0, rpv: 0, rhp: 0, rows: [] as RhythiaModeScoreRow[], foundModes: { lock: 0, spin: 0, vr: 0 }, added: 0, rankIndex: 0 };
   const baseRhpForRank = overrides.get("rhp") ?? user.rhp;
   const rankInfo = getRankInfo(baseRhpForRank);
-  const maps = await prisma.challengeMap.findMany({ where: { status: "approved", rating: { not: null, gte: rankInfo.rangeMin, lte: rankInfo.rangeMax }, OR: [{ reviewerNote: null }, { reviewerNote: { not: UNRANKED_MARKER } }] }, select: { id: true, title: true, sourceBeatmapId: true } });
+  const maps = await prisma.challengeMap.findMany({ where: { status: { in: ["approved", "legacy"] }, rating: { not: null, gte: rankInfo.rangeMin, lte: rankInfo.rangeMax }, OR: [{ reviewerNote: null }, { reviewerNote: { not: UNRANKED_MARKER } }] }, select: { id: true, title: true, sourceBeatmapId: true } });
   const [scores, transactions] = await Promise.all([
     fetchModeScores(profile.profileId),
     prisma.rhpTransaction.aggregate({ where: { userId, reason: { notIn: ["challenge_map", "challenge_map_fail", "ranked_map", "battle_win", "battle_loss"] } }, _sum: { amount: true } }),

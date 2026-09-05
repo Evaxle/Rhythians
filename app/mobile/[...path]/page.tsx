@@ -30,6 +30,7 @@ import Terms from "@/app/terms/mobile";
 import Verify2FA from "@/app/verify-2fa/mobile";
 import ClipReviewers from "@/app/clip-reviewers/mobile";
 import Profile from "@/app/profile/[username]/mobile";
+import RankedMap from "@/app/maps/[id]/page";
 
 const routes: Record<string, any> = {
   daily: Daily,
@@ -66,6 +67,7 @@ export default async function MobileCatchAll({ params }: { params: Promise<{ pat
   const { path = [] } = await params;
   if (path.length === 0) return <MobilePage><Home /></MobilePage>;
   if (path[0] === "profile" && path[1]) return <MobilePage><Profile params={Promise.resolve({ username: path[1] })} /></MobilePage>;
+  if (path[0] === "maps" && path[1]) return <MobilePage><RankedMap params={Promise.resolve({ id: path[1] })} /></MobilePage>;
   const Page = routes[path[0]];
   if (!Page || path.length > 1) notFound();
   return <MobilePage><Page /></MobilePage>;
