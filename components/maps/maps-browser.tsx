@@ -5,7 +5,8 @@ import Link from "next/link";
 import { LockKeyhole, RotateCw, Glasses } from "lucide-react";
 import type { RankInfo } from "@/lib/ranks";
 import { isMapInRankRange, RANKS, getRankInfo } from "@/lib/ranks";
-import { modeRankInfo, type ModeKey, type ModePoints } from "@/lib/rhythia-mode-points";
+import { modeRankInfo } from "@/lib/rhythia-mode-rank";
+import type { ModeKey, ModePoints } from "@/lib/rhythia-mode-rules";
 import { RankIcon } from "@/components/rank-icon";
 
 const PAGE_SIZE = 40;
