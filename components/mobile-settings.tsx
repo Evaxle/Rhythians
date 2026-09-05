@@ -50,7 +50,7 @@ export function MobileSettings() {
 
         <div className="grid gap-3 sm:grid-cols-2">
           <button type="button" onClick={() => update({ navSide: "left" })} className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition ${prefs.navSide === "left" ? "border-accent/50 bg-accent/10" : "border-border bg-white/5"}`}>
-            <PanelLeft size={19} className="shrink-0 text-accent" /><span><strong className="block text-sm text-white">Left navigation</strong><span className="text-xs text-muted">Best for left-handed? Choose this edge for the sidebar.</span></span>
+            <PanelLeft size={19} className="shrink-0 text-accent" /><span><strong className="block text-sm text-white">Left navigation</strong><span className="text-xs text-muted">Keep the sidebar on the left edge of the screen.</span></span>
           </button>
           <button type="button" onClick={() => update({ navSide: "right" })} className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition ${prefs.navSide === "right" ? "border-accent/50 bg-accent/10" : "border-border bg-white/5"}`}>
             <PanelRight size={19} className="shrink-0 text-accent" /><span><strong className="block text-sm text-white">Right navigation</strong><span className="text-xs text-muted">Move the sidebar to the opposite edge.</span></span>
