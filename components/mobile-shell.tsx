@@ -1,46 +1,43 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Home, CalendarDays, Route, Map, Swords, Radio, BookOpen, Trophy, Scissors, Shield, Settings, Search, UserRound, UsersRound, MessageCircle, Bell, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const items = [
-  ["/", "Home", Home],
-  ["/daily", "Daily", CalendarDays],
-  ["/path", "Path", Route],
-  ["/maps", "Maps", Map],
-  ["/battles", "Battles", Swords],
-  ["/online", "Online", Radio],
-  ["/wiki", "Wiki", BookOpen],
-  ["/leaderboards", "Ranks", Trophy],
-  ["/clips", "Clips", Scissors],
-  ["/rules", "Rules", Shield],
-  ["/community-settings", "Community", UsersRound],
-  ["/messages", "Friends", MessageCircle],
-  ["/notifications", "Alerts", Bell],
-  ["/settings", "Settings", Settings],
+  ["/", "Home", Home], ["/daily", "Daily", CalendarDays], ["/path", "Path", Route], ["/maps", "Maps", Map], ["/battles", "Battles", Swords], ["/online", "Online", Radio], ["/wiki", "Wiki", BookOpen], ["/leaderboards", "Ranks", Trophy], ["/clips", "Clips", Scissors], ["/rules", "Rules", Shield], ["/community-settings", "Community", UsersRound], ["/messages", "Friends", MessageCircle], ["/notifications", "Alerts", Bell], ["/settings", "Settings", Settings],
 ] as const;
 
 export function MobileShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleClick = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const target = event.target instanceof Element ? event.target.closest("a") : null;
+      if (!target) return;
+      const href = target.getAttribute("href");
+      if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:")) return;
+      const url = new URL(href, window.location.origin);
+      if (url.origin !== window.location.origin || url.pathname.startsWith("/mobile") || url.pathname.startsWith("/api") || url.pathname.startsWith("/_next")) return;
+      event.preventDefault();
+      router.push(`/mobile${url.pathname}${url.search}${url.hash}`);
+    };
+    document.addEventListener("click", handleClick, true);
+    return () => document.removeEventListener("click", handleClick, true);
+  }, [router]);
 
   return (
     <div className="mobile-app fixed inset-0 z-[60] flex min-h-[100dvh] w-screen overflow-hidden bg-[#060914] text-white">
       <aside className="mobile-app-nav flex h-full w-[72px] shrink-0 flex-col border-r border-white/10 bg-[#080c18]/96 py-3 shadow-2xl backdrop-blur-2xl sm:w-[82px]">
-        <Link href="/mobile" aria-label="Rhythians home" className="mx-auto mb-3 grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-2xl bg-gradient-to-br from-accent to-indigo-400 shadow-lg ring-1 ring-white/10">
-          <img src="/favicon.ico" alt="Rhythians" className="h-full w-full object-cover" />
-        </Link>
+        <Link href="/mobile" aria-label="Rhythians home" className="mx-auto mb-3 grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-2xl bg-gradient-to-br from-accent to-indigo-400 shadow-lg ring-1 ring-white/10"><img src="/favicon.ico" alt="Rhythians" className="h-full w-full object-cover" /></Link>
         <nav className="mobile-nav-scroll flex min-h-0 flex-1 flex-col items-center gap-1 overflow-y-auto px-1.5">
           {items.map(([href, label, Icon]) => {
             const active = href === "/" ? pathname === "/mobile" : pathname === `/mobile${href}` || pathname.startsWith(`/mobile${href}/`);
-            return (
-              <Link key={href} href={`/mobile${href === "/" ? "" : href}`} aria-label={label} className={`group flex w-full flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[9px] font-semibold transition ${active ? "bg-accent/20 text-white ring-1 ring-accent/30" : "text-muted hover:bg-white/[0.06] hover:text-white"}`}>
-                <Icon size={18} strokeWidth={active ? 2.4 : 1.9} />
-                <span className="max-w-full truncate">{label}</span>
-              </Link>
-            );
+            return <Link key={href} href={`/mobile${href === "/" ? "" : href}`} aria-label={label} className={`group flex w-full flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[9px] font-semibold transition ${active ? "bg-accent/20 text-white ring-1 ring-accent/30" : "text-muted hover:bg-white/[0.06] hover:text-white"}`}><Icon size={18} strokeWidth={active ? 2.4 : 1.9} /><span className="max-w-full truncate">{label}</span></Link>;
           })}
         </nav>
         <div className="mt-2 flex flex-col items-center gap-1 border-t border-white/10 pt-2">
@@ -53,10 +50,7 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
       <section className="mobile-app-main min-w-0 flex-1 overflow-y-auto overscroll-contain">
         <div className="mobile-app-topbar sticky top-0 z-30 flex min-h-14 items-center justify-between border-b border-white/10 bg-[#080c18]/90 px-3 backdrop-blur-xl sm:px-4">
           <div className="min-w-0 pl-1"><p className="truncate text-sm font-bold text-white">Rhythians</p><p className="text-[10px] text-muted">Mobile</p></div>
-          <div className="flex items-center gap-1.5">
-            <Link href="/mobile/search" className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-muted"><Search size={16} /></Link>
-            <Link href="/mobile/settings" className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-muted"><UserRound size={16} /></Link>
-          </div>
+          <div className="flex items-center gap-1.5"><Link href="/mobile/search" className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-muted"><Search size={16} /></Link><Link href="/mobile/settings" className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-muted"><UserRound size={16} /></Link></div>
         </div>
         <main className="mobile-page mx-auto w-full max-w-2xl px-3 pb-8 pt-3 sm:px-4 sm:pt-4">{children}</main>
       </section>
