@@ -64,11 +64,14 @@ export function MobileShell({ children, canReview, canAdmin, user }: MobileShell
         <div className="mobile-app-topbar sticky top-0 z-30 flex min-h-14 shrink-0 items-center justify-between border-b border-white/10 bg-[#080c18]/90 px-3 backdrop-blur-xl sm:px-4">
           <div className="min-w-0 pl-1"><p className="truncate text-sm font-bold text-white">Rhythians</p><p className="text-[10px] text-muted">Mobile</p></div>
           <div className="flex min-w-0 items-center gap-1.5">
-            <Link href="/mobile/search" className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-muted"><Search size={16} /></Link>
-            {user ? <Link href={`/mobile/profile/${user.profileHandle}`} aria-label="Open profile" className="flex min-w-0 max-w-[48vw] items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-2 py-1">
-              {user.avatar && user.discordId ? <img src={user.avatar.startsWith("http") ? user.avatar : `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.${user.avatar.startsWith("a_") ? "gif" : "png"}?size=64`} alt="" className="h-7 w-7 shrink-0 rounded-full object-cover" /> : <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-accent text-[10px] font-bold">{user.username.slice(0, 1).toUpperCase()}</span>}
-              <span className="min-w-0 truncate text-xs font-semibold text-white">{user.displayName ?? user.username}</span>
-            </Link> : <Link href="/mobile/settings" aria-label="Account" className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-muted"><UserRound size={16} /></Link>} className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-muted"><Search size={16} /></Link><Link href="/mobile/settings" className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-muted"><UserRound size={16} /></Link></div>
+            <Link href="/mobile/search" aria-label="Search" className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-muted"><Search size={16} /></Link>
+            {user ? (
+              <Link href={`/mobile/profile/${user.profileHandle}`} aria-label="Open profile" className="flex min-w-0 max-w-[48vw] items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-2 py-1">
+                {user.avatar && user.discordId ? <img src={user.avatar.startsWith("http") ? user.avatar : `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.${user.avatar.startsWith("a_") ? "gif" : "png"}?size=64`} alt="" className="h-7 w-7 shrink-0 rounded-full object-cover" /> : <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-accent text-[10px] font-bold">{user.username.slice(0, 1).toUpperCase()}</span>}
+                <span className="min-w-0 truncate text-xs font-semibold text-white">{user.displayName ?? user.username}</span>
+              </Link>
+            ) : <Link href="/mobile/settings" aria-label="Account" className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-muted"><UserRound size={16} /></Link>}
+          </div>
         </div>
         <main className="mobile-page mx-auto w-full max-w-2xl min-w-0 overflow-x-hidden px-3 pb-8 pt-3 sm:px-4 sm:pt-4">{children}</main>
       </section>
