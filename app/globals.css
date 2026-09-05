@@ -129,7 +129,7 @@ html,body { width:100%; min-width:0; overflow-x:hidden; }
 }
 
 @media (max-width:420px) {
-  .mobile-app-main { width:calc(100vw - 66px); }
+  .mobile-app-main { width:auto; }
   .mobile-page { padding-left:8px!important; padding-right:8px!important; }
   .mobile-page-content { font-size:.9rem; }
   .mobile-page :where([class~="grid-cols-2"],[class~="sm:grid-cols-2"],[class~="md:grid-cols-2"],[class~="lg:grid-cols-2"],[class~="xl:grid-cols-2"]) { gap:8px!important; }
@@ -139,7 +139,7 @@ html,body { width:100%; min-width:0; overflow-x:hidden; }
 }
 
 @media (max-width:359px) {
-  .mobile-app-main { width:calc(100vw - 62px); }
+  .mobile-app-main { width:auto; }
   .mobile-page { padding-left:7px!important; padding-right:7px!important; }
   .mobile-page-content :where([class~="grid-cols-2"],[class~="sm:grid-cols-2"],[class~="md:grid-cols-2"],[class~="lg:grid-cols-2"],[class~="xl:grid-cols-2"]) { grid-template-columns:minmax(0,1fr)!important; }
 }
@@ -152,7 +152,7 @@ html,body { width:100%; min-width:0; overflow-x:hidden; }
 .mobile-app,
 .mobile-app * { min-width: 0; }
 .mobile-app-main { overscroll-behavior-x: none; overflow-x: hidden; }
-.mobile-app-topbar { position: sticky; top: 0; }
+.mobile-app-topbar { position: fixed; }
 .mobile-page-content { width: 100%; max-width: 100%; overflow-x: clip; }
 .mobile-page-content > * { max-width: 100%; }
 .mobile-page-content :where([style*="width:"],[style*="min-width:"]) { max-width: 100%; }
@@ -162,7 +162,7 @@ html,body { width:100%; min-width:0; overflow-x:hidden; }
 
 @media (max-width:699px) {
   .mobile-app-nav { width: clamp(60px, 18vw, 72px); }
-  .mobile-app-main { width: calc(100vw - clamp(60px, 18vw, 72px)); flex: 1 1 auto; }
+  .mobile-app-main { width: auto; flex: none; }
   .mobile-app-topbar { min-height: 56px; padding-top: max(8px, env(safe-area-inset-top)); }
   .mobile-page { width: 100%; max-width: 100%; overflow-x: clip; }
   .mobile-page-content { width: 100%; max-width: 100%; overflow-x: clip; }
@@ -175,4 +175,14 @@ html,body { width:100%; min-width:0; overflow-x:hidden; }
 @media (max-width:420px) {
   .mobile-app-topbar { min-height: 52px; }
   .warning-popups { left: calc(clamp(60px, 18vw, 72px) + 6px); right: 6px; }
+}
+
+/* Final mobile viewport geometry: fixed chrome, one scrollable content region. */
+@media (max-width:699px) {
+  .mobile-app-nav { width: clamp(60px, 18vw, 72px); }
+  .mobile-app-main { left: clamp(60px, 18vw, 72px); width: auto; right: 0; }
+  .mobile-app-topbar { left: clamp(60px, 18vw, 72px); width: auto; right: 0; height: 56px; min-height: 56px; }
+}
+@media (max-width:420px) {
+  .mobile-app-topbar { height: 52px; min-height: 52px; }
 }
