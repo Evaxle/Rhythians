@@ -248,3 +248,32 @@ html,body { width:100%; min-width:0; overflow-x:hidden; }
   .mobile-app-topbar { height: calc(52px + env(safe-area-inset-top)); min-height: calc(52px + env(safe-area-inset-top)); }
   .mobile-page { padding-top: calc(62px + env(safe-area-inset-top)) !important; }
 }
+
+/* Mobile viewport is intentionally static: no body, shell, sidebar, or content scrolling. */
+@media (max-width:699px) {
+  html:has(.mobile-app), body:has(.mobile-app) {
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    height: 100% !important;
+    max-height: 100dvh !important;
+  }
+  .mobile-app {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+  }
+  .mobile-app-nav,
+  .mobile-nav-scroll,
+  .mobile-app-main,
+  .mobile-page {
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+  }
+  .mobile-app-main {
+    position: absolute !important;
+  }
+}
