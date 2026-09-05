@@ -42,7 +42,7 @@ export function MobileRedirect() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (window.location.pathname.startsWith("/mobile")) return;
+    if (window.location.pathname === "/mobile" || window.location.pathname.startsWith("/mobile/")) return;
     if (!isMobileDevice()) return;
     readConfirmation().then((value) => {
       if (value === true) window.location.assign(`/mobile${window.location.pathname}${window.location.search}${window.location.hash}`);
@@ -59,9 +59,8 @@ export function MobileRedirect() {
       if (mobile) window.location.assign(`/mobile${window.location.pathname}${window.location.search}${window.location.hash}`);
       else setOpen(false);
     } catch {
-      setOpen(false);
-    } finally {
-      setBusy(false);
+      if (mobile) window.location.assign(`/mobile${window.location.pathname}${window.location.search}${window.location.hash}`);
+      else setOpen(false);
     }
   };
 
