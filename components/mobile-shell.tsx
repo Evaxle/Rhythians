@@ -86,7 +86,7 @@ export function MobileShell({ children, canReview, canAdmin, user }: MobileShell
           <Link href="/mobile/settings" aria-label="Account" className="grid h-10 w-10 place-items-center rounded-xl text-muted hover:bg-white/[0.06] hover:text-white"><UserRound size={18} /></Link>
         </div>
       </aside>
-      <section className={`mobile-app-main absolute inset-y-0 min-w-0 overflow-x-hidden overflow-y-auto overscroll-contain ${prefs.navSide === "right" ? "left-0 right-[72px] sm:right-[82px]" : "left-[72px] right-0 sm:left-[82px]"}`}>
+      <section className={`mobile-app-main absolute inset-y-0 min-w-0 overflow-hidden ${prefs.navSide === "right" ? "left-0 right-[72px] sm:right-[82px]" : "left-[72px] right-0 sm:left-[82px]"}`}>
         <div className={`mobile-app-topbar fixed top-0 z-30 flex min-h-14 h-14 shrink-0 items-center justify-between border-b border-white/10 bg-[#080c18]/90 px-3 backdrop-blur-xl sm:px-4 ${prefs.navSide === "right" ? "left-0 right-[72px] sm:right-[82px]" : "left-[72px] right-0 sm:left-[82px]"}`}>
           <div className="min-w-0 pl-1"><p className="truncate text-sm font-bold text-white">Rhythians</p><p className="text-[10px] text-muted">Mobile</p></div>
           <div className="flex min-w-0 items-center gap-1.5">
