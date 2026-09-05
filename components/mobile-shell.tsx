@@ -2,16 +2,29 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, CalendarDays, Route, Map, Swords, Radio, BookOpen, Trophy, Scissors, Shield, Settings, Search, UserRound, UsersRound, MessageCircle, Bell, Menu, X, Smartphone } from "lucide-react";
+import { Home, CalendarDays, Route, Map, Swords, Radio, BookOpen, Trophy, Scissors, Shield, ShieldCheck, Settings, Search, UserRound, UsersRound, MessageCircle, Bell, Menu, X, Smartphone } from "lucide-react";
 import { useEffect, useState } from "react";
 
-const items = [
+const baseItems = [
   ["/", "Home", Home], ["/daily", "Daily", CalendarDays], ["/path", "Path", Route], ["/maps", "Maps", Map], ["/battles", "Battles", Swords], ["/online", "Online", Radio], ["/wiki", "Wiki", BookOpen], ["/leaderboards", "Ranks", Trophy], ["/clips", "Clips", Scissors], ["/rules", "Rules", Shield], ["/community-settings", "Community", UsersRound], ["/messages", "Friends", MessageCircle], ["/notifications", "Alerts", Bell], ["/settings", "Settings", Settings], ["/get-mobile", "Mobile", Smartphone],
 ] as const;
 
-export function MobileShell({ children }: { children: React.ReactNode }) {
+type MobileShellProps = {
+  children: React.ReactNode;
+  canReview: boolean;
+  canAdmin: boolean;
+  user: { username: string; displayName: string | null; profileHandle: string; avatar: string | null; discordId: string | null } | null;
+};
+
+export function MobileShell({ children, canReview, canAdmin, user }: MobileShellProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const items = [
+    ...baseItems.slice(0, 13),
+    ...(canReview ? [["/approval", "Review", ShieldCheck] as const] : []),
+    ...(canAdmin ? [["/admin", "Admin", Shield] as const] : []),
+    ...baseItems.slice(13),
+  ];
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -47,12 +60,17 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
           <button type="button" aria-label="Open mobile navigation" onClick={() => setMenuOpen(true)} className="grid h-10 w-10 place-items-center rounded-xl text-muted hover:bg-white/[0.06] hover:text-white sm:hidden"><Menu size={18} /></button>
         </div>
       </aside>
-      <section className="mobile-app-main min-w-0 flex-1 overflow-y-auto overscroll-contain">
-        <div className="mobile-app-topbar sticky top-0 z-30 flex min-h-14 items-center justify-between border-b border-white/10 bg-[#080c18]/90 px-3 backdrop-blur-xl sm:px-4">
+      <section className="mobile-app-main min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain">
+        <div className="mobile-app-topbar sticky top-0 z-30 flex min-h-14 shrink-0 items-center justify-between border-b border-white/10 bg-[#080c18]/90 px-3 backdrop-blur-xl sm:px-4">
           <div className="min-w-0 pl-1"><p className="truncate text-sm font-bold text-white">Rhythians</p><p className="text-[10px] text-muted">Mobile</p></div>
-          <div className="flex items-center gap-1.5"><Link href="/mobile/search" className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-muted"><Search size={16} /></Link><Link href="/mobile/settings" className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-muted"><UserRound size={16} /></Link></div>
+          <div className="flex min-w-0 items-center gap-1.5">
+            <Link href="/mobile/search" className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-muted"><Search size={16} /></Link>
+            {user ? <Link href={`/mobile/profile/${user.profileHandle}`} aria-label="Open profile" className="flex min-w-0 max-w-[48vw] items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-2 py-1">
+              {user.avatar && user.discordId ? <img src={user.avatar.startsWith("http") ? user.avatar : `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.${user.avatar.startsWith("a_") ? "gif" : "png"}?size=64`} alt="" className="h-7 w-7 shrink-0 rounded-full object-cover" /> : <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-accent text-[10px] font-bold">{user.username.slice(0, 1).toUpperCase()}</span>}
+              <span className="min-w-0 truncate text-xs font-semibold text-white">{user.displayName ?? user.username}</span>
+            </Link> : <Link href="/mobile/settings" aria-label="Account" className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-muted"><UserRound size={16} /></Link>} className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-muted"><Search size={16} /></Link><Link href="/mobile/settings" className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-muted"><UserRound size={16} /></Link></div>
         </div>
-        <main className="mobile-page mx-auto w-full max-w-2xl px-3 pb-8 pt-3 sm:px-4 sm:pt-4">{children}</main>
+        <main className="mobile-page mx-auto w-full max-w-2xl min-w-0 overflow-x-hidden px-3 pb-8 pt-3 sm:px-4 sm:pt-4">{children}</main>
       </section>
       {menuOpen && <div className="fixed inset-0 z-[80] bg-black/70 backdrop-blur-sm sm:hidden" onClick={() => setMenuOpen(false)}><div className="absolute left-0 top-0 flex h-full w-64 flex-col border-r border-white/10 bg-[#080c18] p-3 shadow-2xl" onClick={(event) => event.stopPropagation()}><div className="flex items-center justify-between pb-3"><span className="font-bold">Rhythians</span><button type="button" onClick={() => setMenuOpen(false)} className="grid h-9 w-9 place-items-center rounded-xl bg-white/[0.06]"><X size={17} /></button></div>{items.map(([href, label, Icon]) => <Link key={href} href={`/mobile${href === "/" ? "" : href}`} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-muted hover:bg-white/[0.06] hover:text-white"><Icon size={18} />{label}</Link>)}</div></div>}
     </div>
