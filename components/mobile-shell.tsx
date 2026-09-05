@@ -57,7 +57,7 @@ export function MobileShell({ children, canReview, canAdmin, user }: MobileShell
   }, [router]);
 
   return (
-    <div className={`mobile-app fixed inset-0 z-[60] h-[100dvh] w-screen overflow-hidden bg-[#060914] text-white ${prefs.navSide === "right" ? "mobile-nav-right" : "mobile-nav-left"} ${prefs.compactNav ? "mobile-nav-compact" : ""} ${prefs.reduceMotion ? "mobile-reduced-motion" : ""}`}> z-[60] h-[100dvh] w-screen overflow-hidden bg-[#060914] text-white">
+    <div className={`mobile-app fixed inset-0 z-[60] h-[100dvh] w-screen overflow-hidden bg-[#060914] text-white ${prefs.navSide === "right" ? "mobile-nav-right" : "mobile-nav-left"} ${prefs.compactNav ? "mobile-nav-compact" : ""} ${prefs.reduceMotion ? "mobile-reduced-motion" : ""}`}>
       <aside className={`mobile-app-nav fixed inset-y-0 z-40 flex h-[100dvh] w-[72px] shrink-0 flex-col border-white/10 bg-[#080c18]/96 py-3 shadow-2xl backdrop-blur-2xl sm:w-[82px] ${prefs.navSide === "right" ? "right-0 border-l" : "left-0 border-r"}`}>
         <Link href="/mobile" aria-label="Rhythians home" className="mx-auto mb-3 grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-2xl bg-gradient-to-br from-accent to-indigo-400 shadow-lg ring-1 ring-white/10"><img src="/favicon.ico" alt="Rhythians" className="h-full w-full object-cover" /></Link>
         <nav className="mobile-nav-scroll flex min-h-0 flex-1 flex-col items-center gap-1 overflow-y-auto px-1.5">
