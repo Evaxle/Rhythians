@@ -17,8 +17,6 @@ import Settings from "@/app/settings/mobile";
 import Search from "@/app/search/mobile";
 import Login from "@/app/login/mobile";
 import Register from "@/app/register/mobile";
-import Rhythia from "@/app/rhythia/mobile";
-import RhythKit from "@/app/rhythkit/mobile";
 import Challenge from "@/app/challenge/mobile";
 import Categories from "@/app/categories/mobile";
 import Admin from "@/app/admin/mobile";
@@ -33,7 +31,36 @@ import Verify2FA from "@/app/verify-2fa/mobile";
 import ClipReviewers from "@/app/clip-reviewers/mobile";
 import Profile from "@/app/profile/[username]/mobile";
 
-const routes: Record<string, any> = { daily: Daily, path: Path, maps: Maps, battles: Battles, online: Online, wiki: Wiki, leaderboards: Leaderboards, clips: Clips, rules: Rules, "community-settings": CommunitySettings, messages: Messages, notifications: Notifications, settings: Settings, search: Search, login: Login, register: Register, rhythia: Rhythia, rhythkit: RhythKit, challenge: Challenge, categories: Categories, admin: Admin, approval: Approval, coach: Coach, announcements: Announcements, completion: Completion, onboarding: Onboarding, "setup-tags": SetupTags, terms: Terms, "verify-2fa": Verify2FA, "clip-reviewers": ClipReviewers };
+const routes: Record<string, any> = {
+  daily: Daily,
+  path: Path,
+  maps: Maps,
+  battles: Battles,
+  online: Online,
+  wiki: Wiki,
+  leaderboards: Leaderboards,
+  clips: Clips,
+  rules: Rules,
+  "community-settings": CommunitySettings,
+  messages: Messages,
+  notifications: Notifications,
+  settings: Settings,
+  search: Search,
+  login: Login,
+  register: Register,
+  challenge: Challenge,
+  categories: Categories,
+  admin: Admin,
+  approval: Approval,
+  coach: Coach,
+  announcements: Announcements,
+  completion: Completion,
+  onboarding: Onboarding,
+  "setup-tags": SetupTags,
+  terms: Terms,
+  "verify-2fa": Verify2FA,
+  "clip-reviewers": ClipReviewers,
+};
 
 export default async function MobileCatchAll({ params }: { params: Promise<{ path?: string[] }> }) {
   const { path = [] } = await params;
