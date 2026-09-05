@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { RankInfo } from "@/lib/ranks";
 import { isMapInRankRange, RANKS, getRankInfo } from "@/lib/ranks";
+import { modeRankInfo } from "@/lib/rhythia-mode-points";
 import { RankIcon } from "@/components/rank-icon";
 import type { ModeScoreMap } from "@/components/maps/maps-sort-controls-persisted";
 
