@@ -102,6 +102,9 @@ export function AdminUserSearch() {
   const [title, setTitle] = useState("");
   const [titleColor, setTitleColor] = useState("#a78bfa");
   const [rhpInput, setRhpInput] = useState("");
+  const [modePoints, setModePoints] = useState({ rpl: "", rps: "", rpv: "" });
+  const [modePointsOpen, setModePointsOpen] = useState(false);
+  const [modePointsLoading, setModePointsLoading] = useState(false);
   const [resetting, setResetting] = useState(false);
 
   async function search() {
@@ -195,6 +198,53 @@ export function AdminUserSearch() {
       await search();
     } catch (titleError) {
       setError(titleError instanceof Error ? titleError.message : "Could not save profile title.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function loadModePoints() {
+    if (!user || modePointsOpen) {
+      setModePointsOpen((current) => !current);
+      return;
+    }
+    setModePointsLoading(true);
+    setError("");
+    try {
+      const response = await fetch(`/api/admin/users/${encodeURIComponent(user.id)}/levels`, { cache: "no-store" });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? "Could not load mode points.");
+      setModePoints({ rpl: String(data.points?.rpl ?? 0), rps: String(data.points?.rps ?? 0), rpv: String(data.points?.rpv ?? 0) });
+      setModePointsOpen(true);
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : "Could not load mode points.");
+    } finally {
+      setModePointsLoading(false);
+    }
+  }
+
+  async function saveModePoints() {
+    if (!user) return;
+    const values = { rpl: Number(modePoints.rpl), rps: Number(modePoints.rps), rpv: Number(modePoints.rpv) };
+    if (Object.values(values).some((value) => !Number.isFinite(value) || value < 0)) {
+      setError("Enter valid RPL, RPS, and RPV values (0 or more).");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    try {
+      const response = await fetch(`/api/admin/users/${encodeURIComponent(user.id)}/levels`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ points: values }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? "Could not update mode points.");
+      setModePoints({ rpl: String(data.points?.rpl ?? values.rpl), rps: String(data.points?.rps ?? values.rps), rpv: String(data.points?.rpv ?? values.rpv) });
+      setModePointsOpen(false);
+      await search();
+    } catch (pointError) {
+      setError(pointError instanceof Error ? pointError.message : "Could not update mode points.");
     } finally {
       setBusy(false);
     }
@@ -368,11 +418,16 @@ export function AdminUserSearch() {
                   );
                 })()}
                 <div className="mt-2 border-t border-border pt-3">
-                  <p className="text-xs text-muted">Set RHP directly</p>
+                  <p className="text-xs text-muted">Edit RHP</p>
                   <div className="mt-2 flex gap-2">
                     <input value={rhpInput} onChange={(e) => setRhpInput(e.target.value)} type="number" min={0} placeholder={String(user.ranked.rhp)} className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-white outline-none focus:border-accent" />
                     <button onClick={saveRhp} disabled={busy || rhpInput === ""} className="shrink-0 rounded-xl bg-accent px-4 py-2 text-xs font-semibold text-white transition hover:bg-accent2 disabled:opacity-50">{busy ? "Saving…" : "Save"}</button>
                   </div>
+                  <button onClick={() => void loadModePoints()} disabled={busy || modePointsLoading} className="mt-2 rounded-xl border border-border bg-white/5 px-4 py-2 text-xs font-semibold text-white transition hover:border-accent/40 disabled:opacity-50">{modePointsLoading ? "Loading…" : modePointsOpen ? "Hide RPL / RPS / RPV" : "Edit RPL / RPS / RPV"}</button>
+                  {modePointsOpen && <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                    {([["rpl", "RPL · Lock"], ["rps", "RPS · Spin"], ["rpv", "RPV · VR"]] as const).map(([key, label]) => <label key={key} className="block"><span className="mb-1 block text-xs text-muted">{label}</span><input type="number" min={0} max={1000000} value={modePoints[key]} onChange={(event) => setModePoints((current) => ({ ...current, [key]: event.target.value }))} className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-white outline-none focus:border-accent" /></label>)}
+                    <button onClick={() => void saveModePoints()} disabled={busy} className="sm:col-span-3 rounded-xl bg-accent px-4 py-2 text-xs font-semibold text-white transition hover:bg-accent2 disabled:opacity-50">{busy ? "Saving…" : "Save RPL / RPS / RPV"}</button>
+                  </div>}
                 </div>
                 <button onClick={resetRanked} disabled={resetting || busy} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-red-400/40 bg-red-400/10 px-4 py-2 text-xs font-semibold text-red-200 transition hover:bg-red-400/20 disabled:opacity-50"><RotateCcw size={13} /> {resetting ? "Resetting…" : "Reset ranked status to zero"}</button>
               </div>
