@@ -266,14 +266,26 @@ html,body { width:100%; min-width:0; overflow-x:hidden; }
     overflow: hidden !important;
     overscroll-behavior: none !important;
   }
-  .mobile-app-nav,
-  .mobile-nav-scroll,
-  .mobile-app-main,
-  .mobile-page {
-    overflow: hidden !important;
-    overscroll-behavior: none !important;
-  }
-  .mobile-app-main {
-    position: absolute !important;
-  }
+  .mobile-app-nav { overflow: hidden !important; overscroll-behavior: none !important; }
+  .mobile-nav-scroll { overflow-y: auto !important; overflow-x: hidden !important; overscroll-behavior: contain !important; }
+  .mobile-app-main { position: absolute !important; overflow-y: auto !important; overflow-x: hidden !important; overscroll-behavior: contain !important; -webkit-overflow-scrolling: touch; }
+  .mobile-page { overflow: visible !important; overscroll-behavior: auto !important; }
+}
+
+@media (max-width:699px) {
+  .mobile-page-content { width: 100%; min-width: 0; }
+  .mobile-page-content > * { min-width: 0; max-width: 100%; }
+  .mobile-page-content .ui-page { width: 100%; max-width: 100%; padding-left: .25rem; padding-right: .25rem; }
+  .mobile-page-content .ui-card,
+  .mobile-page-content section,
+  .mobile-page-content aside { max-width: 100%; min-width: 0; }
+  .mobile-page-content .grid { grid-template-columns: minmax(0,1fr) !important; }
+  .mobile-page-content :where(h1) { font-size: clamp(1.65rem,7vw,2.15rem); line-height: 1.08; }
+  .mobile-page-content :where(h2) { font-size: clamp(1.2rem,5vw,1.55rem); line-height: 1.15; }
+  .mobile-page-content :where(h3) { font-size: 1.05rem; line-height: 1.2; }
+  .mobile-page-content :where(button,[role="button"],.ui-button) { min-height: 44px; max-width: 100%; }
+  .mobile-page-content :where(input,select,textarea) { min-height: 44px; max-width: 100%; min-width: 0; font-size: 16px; }
+  .mobile-page-content :where(img,video,iframe) { max-width: 100%; }
+  .mobile-page-content :where(.rounded-[2rem],.rounded-3xl) { border-radius: 1.25rem; }
+  .mobile-page-content :where(.p-10,.p-8,.p-7,.p-6,.sm\:p-6,.sm\:p-7,.sm\:p-8) { padding: 1rem; }
 }
