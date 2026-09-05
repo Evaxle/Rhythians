@@ -57,8 +57,8 @@ export function MobileShell({ children, canReview, canAdmin, user }: MobileShell
   }, [router]);
 
   return (
-    <div className={`mobile-app fixed inset-0 ${prefs.navSide === "right" ? "mobile-nav-right" : "mobile-nav-left"} ${prefs.compactNav ? "mobile-nav-compact" : ""} ${prefs.reduceMotion ? "mobile-reduced-motion" : ""}`}> z-[60] h-[100dvh] w-screen overflow-hidden bg-[#060914] text-white">
-      <aside className="mobile-app-nav fixed inset-y-0 left-0 z-40 flex h-[100dvh] w-[72px] shrink-0 flex-col border-r border-white/10 bg-[#080c18]/96 py-3 shadow-2xl backdrop-blur-2xl sm:w-[82px]">
+    <div className={`mobile-app fixed inset-0 z-[60] h-[100dvh] w-screen overflow-hidden bg-[#060914] text-white ${prefs.navSide === "right" ? "mobile-nav-right" : "mobile-nav-left"} ${prefs.compactNav ? "mobile-nav-compact" : ""} ${prefs.reduceMotion ? "mobile-reduced-motion" : ""}`}> z-[60] h-[100dvh] w-screen overflow-hidden bg-[#060914] text-white">
+      <aside className={`mobile-app-nav fixed inset-y-0 z-40 flex h-[100dvh] w-[72px] shrink-0 flex-col border-white/10 bg-[#080c18]/96 py-3 shadow-2xl backdrop-blur-2xl sm:w-[82px] ${prefs.navSide === "right" ? "right-0 border-l" : "left-0 border-r"}`}>
         <Link href="/mobile" aria-label="Rhythians home" className="mx-auto mb-3 grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-2xl bg-gradient-to-br from-accent to-indigo-400 shadow-lg ring-1 ring-white/10"><img src="/favicon.ico" alt="Rhythians" className="h-full w-full object-cover" /></Link>
         <nav className="mobile-nav-scroll flex min-h-0 flex-1 flex-col items-center gap-1 overflow-y-auto px-1.5">
           {items.map(([href, label, Icon]) => {
@@ -72,8 +72,8 @@ export function MobileShell({ children, canReview, canAdmin, user }: MobileShell
           <button type="button" aria-label="Open mobile navigation" onClick={() => setMenuOpen(true)} className="grid h-10 w-10 place-items-center rounded-xl text-muted hover:bg-white/[0.06] hover:text-white sm:hidden"><Menu size={18} /></button>
         </div>
       </aside>
-      <section className="mobile-app-main absolute inset-y-0 left-[72px] right-0 min-w-0 overflow-x-hidden overflow-y-auto overscroll-contain sm:left-[82px]">
-        <div className="mobile-app-topbar fixed left-[72px] right-0 top-0 z-30 flex min-h-14 h-14 shrink-0 sm:left-[82px] items-center justify-between border-b border-white/10 bg-[#080c18]/90 px-3 backdrop-blur-xl sm:px-4">
+      <section className={`mobile-app-main absolute inset-y-0 min-w-0 overflow-x-hidden overflow-y-auto overscroll-contain ${prefs.navSide === "right" ? "left-0 right-[72px] sm:right-[82px]" : "left-[72px] right-0 sm:left-[82px]"}`}>
+        <div className={`mobile-app-topbar fixed top-0 z-30 flex min-h-14 h-14 shrink-0 items-center justify-between border-b border-white/10 bg-[#080c18]/90 px-3 backdrop-blur-xl sm:px-4 ${prefs.navSide === "right" ? "left-0 right-[72px] sm:right-[82px]" : "left-[72px] right-0 sm:left-[82px]"}`}>
           <div className="min-w-0 pl-1"><p className="truncate text-sm font-bold text-white">Rhythians</p><p className="text-[10px] text-muted">Mobile</p></div>
           <div className="flex min-w-0 items-center gap-1.5">
             <Link href="/mobile/search" aria-label="Search" className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-muted"><Search size={16} /></Link>
