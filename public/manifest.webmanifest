@@ -1,0 +1,15 @@
+{
+  "name": "Rhythians Mobile",
+  "short_name": "Rhythians",
+  "description": "The Rhythians mobile web app.",
+  "start_url": "/mobile",
+  "scope": "/mobile/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "orientation": "portrait",
+  "background_color": "#060914",
+  "theme_color": "#0b0f19",
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "any", "type": "image/x-icon", "purpose": "any maskable" }
+  ]
+}
