@@ -103,6 +103,7 @@ export async function rhythiaRequest<T>(path: string, body: object): Promise<T> 
   if (path === "getUserScores") {
     delete requestBody.offset;
     delete requestBody.page;
+    delete requestBody.limit;
   }
   for (const baseUrl of RHYTHIA_API_URLS) {
     try {
