@@ -186,3 +186,65 @@ html,body { width:100%; min-width:0; overflow-x:hidden; }
 @media (max-width:420px) {
   .mobile-app-topbar { height: 52px; min-height: 52px; }
 }
+
+/* Mobile final layout: the sidebar and top bar are viewport chrome, never part of the scroll flow. */
+.mobile-app { contain: layout paint; }
+.mobile-app-main { overscroll-behavior: contain; }
+.mobile-app.mobile-reduced-motion *, .mobile-app.mobile-reduced-motion *::before, .mobile-app.mobile-reduced-motion *::after {
+  animation-duration: .01ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-duration: .01ms !important;
+}
+.mobile-app.mobile-nav-compact .mobile-nav-item { gap: 2px; padding-top: 5px; padding-bottom: 5px; }
+.mobile-app.mobile-nav-compact .mobile-nav-item svg { width: 17px; height: 17px; }
+.mobile-app.mobile-nav-compact .mobile-nav-item span { font-size: 8px; line-height: 1; }
+
+@media (max-width:699px) {
+  .mobile-app { padding: 0; }
+  .mobile-app-main { top: 0; bottom: 0; }
+  .mobile-app-topbar {
+    height: calc(56px + env(safe-area-inset-top));
+    min-height: calc(56px + env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
+  }
+  .mobile-page { padding-top: calc(68px + env(safe-area-inset-top)) !important; }
+  .mobile-page-content,
+  .mobile-page-content > * { min-width: 0; max-width: 100%; }
+  .mobile-page-content :where(.fixed, .absolute) { max-width: 100%; }
+  .mobile-page-content :where([role="dialog"], dialog) { max-width: 100vw; }
+  .mobile-page-content :where(.overflow-hidden) { min-width: 0; }
+  /* Any modal rendered inside the mobile shell is constrained to the usable area beside the nav. */
+  .mobile-app .fixed.inset-0,
+  .mobile-app [role="dialog"].fixed {
+    top: 0 !important;
+    bottom: 0 !important;
+    left: clamp(60px, 18vw, 72px) !important;
+    right: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+    overflow: hidden;
+    padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom)) !important;
+  }
+  .mobile-app.mobile-nav-right .fixed.inset-0,
+  .mobile-app.mobile-nav-right [role="dialog"].fixed {
+    left: 0 !important;
+    right: clamp(60px, 18vw, 72px) !important;
+  }
+  .mobile-app .fixed.inset-0 > :where(div, section, form, article),
+  .mobile-app [role="dialog"].fixed > :where(div, section, form, article) {
+    width: min(100%, 430px) !important;
+    max-width: 430px !important;
+    max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 16px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin-inline: auto;
+  }
+  .mobile-app .fixed.inset-0 > :where(div, section, form, article) :where(img, video, iframe) { max-width: 100%; height: auto; }
+  .mobile-app :where([class*="w-screen"]) { width: 100% !important; max-width: 100% !important; }
+  .mobile-app :where([class*="min-w-"]) { min-width: 0 !important; }
+}
+@media (max-width:420px) {
+  .mobile-app-topbar { height: calc(52px + env(safe-area-inset-top)); min-height: calc(52px + env(safe-area-inset-top)); }
+  .mobile-page { padding-top: calc(62px + env(safe-area-inset-top)) !important; }
+}
