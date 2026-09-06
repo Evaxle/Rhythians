@@ -108,17 +108,26 @@ try {
       to_regclass('public."RbpMatchAward"') IS NOT NULL AS has_rbp_match_award,
       to_regclass('public."BattleMatchMapOption"') IS NOT NULL AS has_map_options,
       to_regclass('public."BattleMatchMapVote"') IS NOT NULL AS has_map_votes,
+      to_regclass('public."Tournament"') IS NOT NULL AS has_tournament,
+      to_regclass('public."TournamentSignup"') IS NOT NULL AS has_tournament_signup,
+      to_regclass('public."TournamentMapPool"') IS NOT NULL AS has_tournament_map_pool,
+      to_regclass('public."TournamentTeam"') IS NOT NULL AS has_tournament_team,
+      to_regclass('public."TournamentTeamMember"') IS NOT NULL AS has_tournament_team_member,
+      to_regclass('public."TournamentMatch"') IS NOT NULL AS has_tournament_match,
       EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='BattleMatch' AND column_name='responseDeadlineAt') AS has_response_deadline,
       EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='BattleMatchPlayer' AND column_name='scoreSubmittedAt') AS has_score_submitted,
       EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='BattleMatchPlayer' AND column_name='lastSeenAt') AS has_last_seen,
       EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='BattleMatchPlayer' AND column_name='disconnectedAt') AS has_disconnected,
       EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='BattleMatchPlayer' AND column_name='reconnectUntilAt') AS has_reconnect_until,
       EXISTS (SELECT 1 FROM pg_indexes WHERE schemaname='public' AND indexname='BattleMatch_responseDeadlineAt_idx') AS has_response_index,
-      EXISTS (SELECT 1 FROM pg_indexes WHERE schemaname='public' AND indexname='BattleMatchPlayer_reconnectUntilAt_idx') AS has_reconnect_index
+      EXISTS (SELECT 1 FROM pg_indexes WHERE schemaname='public' AND indexname='BattleMatchPlayer_reconnectUntilAt_idx') AS has_reconnect_index,
+      EXISTS (SELECT 1 FROM pg_indexes WHERE schemaname='public' AND indexname='Tournament_status_scheduledAt_idx') AS has_tournament_status_index,
+      EXISTS (SELECT 1 FROM pg_indexes WHERE schemaname='public' AND indexname='TournamentSignup_tournament_split_status_idx') AS has_tournament_signup_index,
+      EXISTS (SELECT 1 FROM pg_indexes WHERE schemaname='public' AND indexname='TournamentMatch_tournament_status_idx') AS has_tournament_match_index
   `);
 
   if (!Object.values(requiredObjects[0]).every(Boolean)) {
-    throw new Error("Prisma migration verification failed: battle/RBP schema objects are incomplete");
+    throw new Error("Prisma migration verification failed: battle/RBP/tournament schema objects are incomplete");
   }
 } finally {
   if (lockHeld) await client.query("SELECT pg_advisory_unlock(hashtext($1))", [migrationLock]);
