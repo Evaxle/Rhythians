@@ -18,6 +18,7 @@ import Search from "@/app/search/mobile";
 import Login from "@/app/login/mobile";
 import Register from "@/app/register/mobile";
 import Challenge from "@/app/challenge/mobile";
+import ChallengeClips from "@/app/challenge/clips/page";
 import Categories from "@/app/categories/mobile";
 import Admin from "@/app/admin/mobile";
 import Approval from "@/app/approval/mobile";
@@ -49,77 +50,23 @@ import AdminReports from "@/app/admin/reports/page";
 import AdminDiscord from "@/app/admin/discord/page";
 import AdminSettings from "@/app/admin/settings/page";
 
-const routes: Record<string, any> = {
-  daily: Daily,
-  path: Path,
-  maps: Maps,
-  battles: Battles,
-  online: Online,
-  wiki: Wiki,
-  leaderboards: Leaderboards,
-  clips: Clips,
-  rules: Rules,
-  "community-settings": CommunitySettings,
-  messages: Messages,
-  notifications: Notifications,
-  settings: Settings,
-  search: Search,
-  login: Login,
-  register: Register,
-  challenge: Challenge,
-  categories: Categories,
-  admin: Admin,
-  "admin-dashboard": AdminDashboard,
-  "admin-announcements": AdminAnnouncements,
-  "admin-clips": AdminClips,
-  "admin-completion-clips": AdminCompletionClips,
-  "admin-manage-clips": AdminManageClips,
-  "admin-featured-clips": AdminFeaturedClips,
-  "admin-maps": AdminMaps,
-  "admin-categories": AdminCategories,
-  "admin-challenge": AdminChallenge,
-  "admin-users": AdminUsers,
-  "admin-rhythia-requests": AdminRhythiaRequests,
-  "admin-rhythian-path": AdminRhythianPath,
-  "admin-alerts": AdminAlerts,
-  "admin-reports": AdminReports,
-  "admin-discord": AdminDiscord,
-  "admin-settings": AdminSettings,
-  approval: Approval,
-  coach: Coach,
-  announcements: Announcements,
-  completion: Completion,
-  onboarding: Onboarding,
-  "setup-tags": SetupTags,
-  terms: Terms,
-  "verify-2fa": Verify2FA,
-  "clip-reviewers": ClipReviewers,
-};
+const routes: Record<string, any> = { daily: Daily, path: Path, maps: Maps, battles: Battles, online: Online, wiki: Wiki, leaderboards: Leaderboards, clips: Clips, rules: Rules, "community-settings": CommunitySettings, messages: Messages, notifications: Notifications, settings: Settings, search: Search, login: Login, register: Register, challenge: Challenge, categories: Categories, admin: Admin, "admin-dashboard": AdminDashboard, "admin-announcements": AdminAnnouncements, "admin-clips": AdminClips, "admin-completion-clips": AdminCompletionClips, "admin-manage-clips": AdminManageClips, "admin-featured-clips": AdminFeaturedClips, "admin-maps": AdminMaps, "admin-categories": AdminCategories, "admin-challenge": AdminChallenge, "admin-users": AdminUsers, "admin-rhythia-requests": AdminRhythiaRequests, "admin-rhythian-path": AdminRhythianPath, "admin-alerts": AdminAlerts, "admin-reports": AdminReports, "admin-discord": AdminDiscord, "admin-settings": AdminSettings, approval: Approval, coach: Coach, announcements: Announcements, completion: Completion, onboarding: Onboarding, "setup-tags": SetupTags, terms: Terms, "verify-2fa": Verify2FA, "clip-reviewers": ClipReviewers };
 
-export default async function MobileCatchAll({ params }: { params: Promise<{ path?: string[] }> }) {
+export default async function MobileCatchAll({ params, searchParams }: { params: Promise<{ path?: string[] }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const { path = [] } = await params;
   if (path.length === 0) return <MobilePage><Home /></MobilePage>;
   if (path[0] === "profile" && path[1]) return <MobilePage><Profile params={Promise.resolve({ username: path[1] })} /></MobilePage>;
   if (path[0] === "maps" && path[1]) return <MobilePage><RankedMap params={Promise.resolve({ id: path[1] })} /></MobilePage>;
+  if (path[0] === "challenge" && path[1] === "clips" && path.length === 2) {
+    const query = await searchParams;
+    const normalized = { kind: typeof query.kind === "string" ? query.kind : undefined, category: typeof query.category === "string" ? query.category : undefined, level: typeof query.level === "string" ? query.level : undefined };
+    return <MobilePage><ChallengeClips searchParams={Promise.resolve(normalized)} /></MobilePage>;
+  }
   if (path[0] === "admin") {
     if (path.length === 1) return <MobilePage><AdminDashboard /></MobilePage>;
     if (path.length === 2 && path[1] === "announcements") return <MobilePage><AdminAnnouncements /></MobilePage>;
     if (path.length === 3 && path[1] === "announcements" && path[2] === "new") return <MobilePage><AdminAnnouncementNew /></MobilePage>;
-    const adminPages: Record<string, any> = {
-      clips: AdminClips,
-      "completion-clips": AdminCompletionClips,
-      maps: AdminMaps,
-      categories: AdminCategories,
-      challenge: AdminChallenge,
-      users: AdminUsers,
-      "rhythia-requests": AdminRhythiaRequests,
-      "rhythian-path": AdminRhythianPath,
-      alerts: AdminAlerts,
-      reports: AdminReports,
-      discord: AdminDiscord,
-      settings: AdminSettings,
-      "featured-clips": AdminFeaturedClips,
-    };
+    const adminPages: Record<string, any> = { clips: AdminClips, "completion-clips": AdminCompletionClips, maps: AdminMaps, categories: AdminCategories, challenge: AdminChallenge, users: AdminUsers, "rhythia-requests": AdminRhythiaRequests, "rhythian-path": AdminRhythianPath, alerts: AdminAlerts, reports: AdminReports, discord: AdminDiscord, settings: AdminSettings, "featured-clips": AdminFeaturedClips };
     if (path.length === 2 && adminPages[path[1]]) { const AdminPage = adminPages[path[1]]; return <MobilePage><AdminPage /></MobilePage>; }
     if (path.length === 3 && path[1] === "clips" && path[2] === "manage") return <MobilePage><AdminManageClips /></MobilePage>;
     notFound();

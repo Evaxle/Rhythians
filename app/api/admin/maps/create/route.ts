@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { getSessionUser } from "@/lib/auth";
 import { canAccessAdmin } from "@/lib/admin-access";
 import { prisma } from "@/lib/db";
-import { ensureChallengeLevelTable } from "@/lib/challenge";
+import { ensureChallengeLevelTable, ensureChallengeVisibilityTable } from "@/lib/challenge";
 import { ensureCompletionClipTables } from "@/lib/completion-clips";
 import { rhpGainForMap, rankIndexForRating, roundRating } from "@/lib/ranks";
 
@@ -27,8 +27,8 @@ export async function POST(request: Request) {
   const category = typeof body?.category === "string" ? body.category : null;
   const categoryLevel = body?.categoryLevel == null || body.categoryLevel === "" ? null : Number(body.categoryLevel);
   const challengeLevel = body?.challengeLevel == null || body.challengeLevel === "" ? null : Number(body.challengeLevel);
+  const challengeVisible = typeof body?.challengeVisible === "boolean" ? body.challengeVisible : true;
   const rhpOverride = body?.rhpOverride == null || body.rhpOverride === "" ? null : Number(body.rhpOverride);
-
   if (!title) return NextResponse.json({ error: "Title is required." }, { status: 400 });
   if (!mapFileUrl) return NextResponse.json({ error: "Map file upload is required." }, { status: 400 });
   if (!Number.isFinite(requestedRating) || requestedRating < 0 || requestedRating > 9.99) return NextResponse.json({ error: "Rating must be between 0 and 9.99." }, { status: 400 });
@@ -38,17 +38,19 @@ export async function POST(request: Request) {
   if (category && !["jumps", "stream", "tech", "off_grid", "vibro"].includes(category)) return NextResponse.json({ error: "Invalid category." }, { status: 400 });
   if (category && (!Number.isInteger(categoryLevel) || categoryLevel! < 1 || categoryLevel! > 10)) return NextResponse.json({ error: "Category level must be between 1 and 10." }, { status: 400 });
   if (challengeLevel != null && (!Number.isInteger(challengeLevel) || challengeLevel < 1 || challengeLevel > 10)) return NextResponse.json({ error: "Challenge level must be between 1 and 10." }, { status: 400 });
-
   const rating = roundRating(requestedRating);
   const calculatedRhp = rhpGainForMap(rating, 100, null, rankIndexForRating(rating), length != null ? length / 1000 : null);
-
   try {
-    await ensureRhpOverrideColumn();
+    await Promise.all([ensureRhpOverrideColumn(), ensureChallengeVisibilityTable()]);
     const map = await prisma.challengeMap.create({ data: { title, artist, mapperName, mapFileUrl, requestedRating: rating, rating, noteCount, length, submittedById: admin.id, status: "approved", reviewedById: admin.id, reviewedAt: new Date(), isAutoImported: false } });
-    await prisma.$executeRawUnsafe('UPDATE "ChallengeMap" SET "rhpOverride" = $1 WHERE "id" = $2', rhpOverride, map.id);
-    if (challengeLevel != null) { await ensureChallengeLevelTable(); await prisma.$executeRawUnsafe(`INSERT INTO "ChallengeMapLevel" ("id", "challengeMapId", "level", "createdAt", "updatedAt") VALUES ($1, $2, $3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) ON CONFLICT ("challengeMapId") DO UPDATE SET "level" = EXCLUDED."level", "updatedAt" = CURRENT_TIMESTAMP`, randomUUID(), map.id, challengeLevel); }
+    await prisma.$executeRawUnsafe('UPDATE "ChallengeMap" SET "rhpOverride"=$1 WHERE "id"=$2', rhpOverride, map.id);
+    await prisma.$executeRawUnsafe(`INSERT INTO "ChallengeMapVisibility" ("challengeMapId","visible","updatedAt") VALUES ($1,$2,CURRENT_TIMESTAMP) ON CONFLICT ("challengeMapId") DO UPDATE SET "visible"=EXCLUDED."visible","updatedAt"=CURRENT_TIMESTAMP`, map.id, challengeVisible);
+    if (challengeLevel != null) { await ensureChallengeLevelTable(); await prisma.$executeRawUnsafe(`INSERT INTO "ChallengeMapLevel" ("id","challengeMapId","level","createdAt","updatedAt") VALUES ($1,$2,$3,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) ON CONFLICT ("challengeMapId") DO UPDATE SET "level"=EXCLUDED."level","updatedAt"=CURRENT_TIMESTAMP`, randomUUID(), map.id, challengeLevel); }
     if (category && categoryLevel != null) await prisma.$executeRawUnsafe(`INSERT INTO "CategoryMap" ("id","category","level","title","artist","mapFileUrl","mapperName","noteCount","length","submittedById","status","reviewedById","reviewedAt","createdAt","updatedAt") VALUES ($1,$2::"CategoryType",$3,$4,$5,$6,$7,$8,$9,$10,'approved',$10,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)`, randomUUID(), category, categoryLevel, title, artist, mapFileUrl, mapperName, noteCount, length, admin.id);
-    await prisma.moderationAction.create({ data: { actorId: admin.id, action: "admin_map_created", targetType: "challenge_map", targetId: map.id, metadata: { rating, calculatedRhp, rhpOverride, category, categoryLevel, challengeLevel } } });
-    return NextResponse.json({ map, calculatedRhp, rhpOverride }, { status: 201 });
-  } catch (error) { if ((error as { code?: string })?.code === "P2002") return NextResponse.json({ error: "A map with that source ID already exists." }, { status: 409 }); return NextResponse.json({ error: error instanceof Error ? error.message : "Could not create the map." }, { status: 500 }); }
+    await prisma.moderationAction.create({ data: { actorId: admin.id, action: "admin_map_created", targetType: "challenge_map", targetId: map.id, metadata: { rating, calculatedRhp, rhpOverride, category, categoryLevel, challengeLevel, challengeVisible } } });
+    return NextResponse.json({ map, calculatedRhp, rhpOverride, challengeVisible }, { status: 201 });
+  } catch (error) {
+    if ((error as { code?: string })?.code === "P2002") return NextResponse.json({ error: "A map with that source ID already exists." }, { status: 409 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Could not create the map." }, { status: 500 });
+  }
 }

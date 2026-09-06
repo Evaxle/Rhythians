@@ -15,9 +15,20 @@ export async function ensureChallengeLevelTable() {
   await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "ChallengeMapLevel_level_idx" ON "ChallengeMapLevel"("level")');
 }
 
+export async function ensureChallengeVisibilityTable() {
+  await prisma.$executeRawUnsafe(`CREATE TABLE IF NOT EXISTS "ChallengeMapVisibility" ("challengeMapId" TEXT NOT NULL, "visible" BOOLEAN NOT NULL DEFAULT true, "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, CONSTRAINT "ChallengeMapVisibility_pkey" PRIMARY KEY ("challengeMapId"), CONSTRAINT "ChallengeMapVisibility_challengeMapId_fkey" FOREIGN KEY ("challengeMapId") REFERENCES "ChallengeMap"("id") ON DELETE CASCADE)`);
+}
+
 async function getAssignedLevels() {
   await ensureChallengeLevelTable();
   return prisma.$queryRawUnsafe<Array<{ challengeMapId: string; level: number }>>('SELECT "challengeMapId", "level" FROM "ChallengeMapLevel" WHERE "level" BETWEEN 1 AND 10');
+}
+
+async function getVisibleMapIds(ids: string[]) {
+  if (ids.length === 0) return new Set<string>();
+  await ensureChallengeVisibilityTable();
+  const rows = await prisma.$queryRawUnsafe<Array<{ id: string }>>(`SELECT m."id" FROM "ChallengeMap" m LEFT JOIN "ChallengeMapVisibility" v ON v."challengeMapId" = m."id" WHERE m."id" = ANY($1::text[]) AND COALESCE(v."visible", true) = true`, ids);
+  return new Set(rows.map((row) => row.id));
 }
 
 export async function getUserChallengeLevel(userId: string): Promise<number> {
@@ -38,7 +49,8 @@ export async function getChallengeMapsWithCompletions(userId: string) {
   const assignments = await getAssignedLevels();
   if (assignments.length === 0) return [];
   const assignmentMap = new Map(assignments.map((assignment) => [assignment.challengeMapId, assignment.level]));
-  const maps = await prisma.challengeMap.findMany({ where: { id: { in: [...assignmentMap.keys()] }, status: "approved", rating: { not: null }, isAutoImported: false }, orderBy: [{ rating: "asc" }, { createdAt: "asc" }], include: { completions: { where: { userId }, select: { passed: true, accuracy: true } } } });
+  const visibleIds = await getVisibleMapIds([...assignmentMap.keys()]);
+  const maps = await prisma.challengeMap.findMany({ where: { id: { in: [...visibleIds] }, status: "approved", rating: { not: null }, isAutoImported: false }, orderBy: [{ rating: "asc" }, { createdAt: "asc" }], include: { completions: { where: { userId }, select: { passed: true, accuracy: true } } } });
   return maps.map((map) => ({ id: map.id, title: map.title, artist: map.artist, description: map.description, mapFileUrl: map.mapFileUrl, imageUrl: map.imageUrl, rating: map.rating as number, mapperName: map.mapperName, noteCount: map.noteCount, length: map.length, level: assignmentMap.get(map.id) ?? 1, completion: map.completions[0] ?? null }));
 }
 
@@ -49,6 +61,8 @@ export async function checkAndAwardChallengeLevelMap(userId: string, challengeMa
   const assignment = await prisma.$queryRawUnsafe<Array<{ level: number }>>('SELECT "level" FROM "ChallengeMapLevel" WHERE "challengeMapId" = $1 LIMIT 1', challengeMapId);
   const level = assignment[0]?.level;
   if (!level || level < 1 || level > MAX_CHALLENGE_LEVEL) return { status: "not_available" as const };
+  const visibleIds = await getVisibleMapIds([challengeMapId]);
+  if (!visibleIds.has(challengeMapId)) return { status: "not_available" as const };
   const map = await prisma.challengeMap.findUnique({ where: { id: challengeMapId } });
   if (!map || map.isAutoImported || map.status !== "approved") return { status: "not_available" as const };
   const currentLevel = await getUserChallengeLevel(userId);
@@ -63,6 +77,24 @@ export async function checkAndAwardChallengeLevelMap(userId: string, challengeMa
   await prisma.challengeMapCompletion.upsert({ where: { challengeMapId_userId: { challengeMapId, userId } }, create: { challengeMapId, userId, rating: map.rating ?? 0, accuracy, passed: true, points: 0, scoreId: hit.id }, update: { accuracy, passed: true, points: 0, scoreId: hit.id } });
   const newLevel = await getUserChallengeLevel(userId);
   return { status: level === currentLevel + 1 && newLevel > currentLevel ? "level_up" as const : "passed" as const, level: newLevel, mapLevel: level, points: 0, earnsRhp: false };
+}
+
+export async function checkChallengeLevel(userId: string, level: number) {
+  if (!Number.isInteger(level) || level < 1 || level > 6) throw new Error("Automatic level checking is only available for Levels 1-6.");
+  const currentLevel = await getUserChallengeLevel(userId);
+  if (level > currentLevel + 1) throw new Error(`Level ${level} is locked.`);
+  const maps = await getChallengeMapsWithCompletions(userId);
+  const targets = maps.filter((map) => map.level === level);
+  let passed = 0;
+  let already = 0;
+  let notBeat = 0;
+  for (const map of targets) {
+    const result = await checkAndAwardChallengeLevelMap(userId, map.id);
+    if (result.status === "passed" || result.status === "level_up") passed += 1;
+    else if (result.status === "already") already += 1;
+    else if (result.status === "not_beat") notBeat += 1;
+  }
+  return { checked: targets.length, passed, already, notBeat, level: await getUserChallengeLevel(userId) };
 }
 
 export type ChallengeLeaderboardRow = { position: number; userId: string; username: string; displayName: string | null; profileHandle: string; avatarUrl: string | null; level: number; completions: number };
