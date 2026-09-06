@@ -1,5 +1,6 @@
 :root {
-  --mobile-nav-width: clamp(62px, 18vw, 76px);
+  --mobile-nav-width: clamp(60px, 16vw, 68px);
+  --mobile-topbar-height: 54px;
 }
 
 .ui-card,
@@ -43,13 +44,27 @@
 }
 
 @media (max-width: 699px) {
-  .mobile-app { --mobile-nav-width: clamp(62px,18vw,76px); }
-  .mobile-app-main { width: auto!important; }
-  .mobile-page { padding-top: .75rem!important; }
+  .mobile-app {
+    --mobile-nav-width: clamp(60px,16vw,68px);
+    --mobile-topbar-height: 54px;
+    width: 100vw!important;
+    height: 100dvh!important;
+    max-width: 100vw!important;
+    max-height: 100dvh!important;
+    padding: 0!important;
+    overscroll-behavior: none;
+  }
+  .mobile-app-topbar { width: 100vw!important; }
+  .mobile-app-nav { height: auto!important; max-height: none!important; }
+  .mobile-app-main { width: auto!important; min-height: 0!important; height: auto!important; }
+  .mobile-nav-scroll { padding-bottom: .25rem; }
+  .mobile-nav-item { min-height: 45px; }
+  .mobile-nav-compact .mobile-nav-item { min-height: 39px; padding-top: .3rem!important; padding-bottom: .3rem!important; }
+  .mobile-page { padding-top: .625rem!important; }
   .mobile-app :where([role="dialog"], .mobile-dialog, .modal-panel) {
     width: min(calc(100% - 16px), 680px)!important;
     max-width: calc(100% - 16px)!important;
-    max-height: calc(100dvh - 56px - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 24px)!important;
+    max-height: calc(100dvh - var(--mobile-topbar-height) - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 20px)!important;
     overflow-y: auto!important;
     overscroll-behavior: contain;
   }
@@ -59,10 +74,7 @@
     width: auto!important;
     max-width: none!important;
   }
-  .mobile-nav-left .mobile-app-main :where(.fixed.inset-0) {
-    left: 0!important;
-    right: 0!important;
-  }
+  .mobile-nav-left .mobile-app-main :where(.fixed.inset-0),
   .mobile-nav-right .mobile-app-main :where(.fixed.inset-0) {
     left: 0!important;
     right: 0!important;
@@ -72,6 +84,15 @@
     max-height: calc(100% - 16px)!important;
     overflow-y: auto!important;
   }
+}
+
+@media (max-width: 420px) {
+  .mobile-app {
+    --mobile-nav-width: 60px;
+    --mobile-topbar-height: 52px;
+  }
+  .mobile-nav-item { min-height: 42px; font-size: 8px!important; }
+  .mobile-nav-item svg { width: 16px; height: 16px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
