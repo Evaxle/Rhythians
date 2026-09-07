@@ -3,6 +3,7 @@ import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { postponeDueTournaments } from "@/lib/tournament-schedule";
 import { forfeitTournamentMatchRuntime, getTournamentRuntimeState, heartbeatTournament, submitTournamentScoreRuntime } from "@/lib/tournament-runtime";
+import { publicTournamentState } from "@/lib/tournament-public-state";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -18,7 +19,7 @@ export async function GET(_request: Request, { params }: Props) {
   if (user && state.currentMatch?.battleMatchId) {
     viewerScore = (await prisma.$queryRawUnsafe<any[]>(`SELECT accuracy,"scoreSubmittedAt" FROM "BattleMatchPlayer" WHERE "matchId"=$1 AND "userId"=$2`, state.currentMatch.battleMatchId, user.id))[0] ?? null;
   }
-  return NextResponse.json({ ...state, viewerScore });
+  return NextResponse.json({ ...publicTournamentState(state), viewerScore });
 }
 
 export async function POST(request: Request, { params }: Props) {
