@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { postponeDueTournaments } from "@/lib/tournament-schedule";
 import { forfeitTournamentMatch, getTournamentPublicState, submitTournamentScore } from "@/lib/tournaments";
 
 type Props = { params: Promise<{ id: string }> };
@@ -10,6 +11,7 @@ export const dynamic = "force-dynamic";
 export async function GET(_request: Request, { params }: Props) {
   const { id } = await params;
   const user = await getSessionUser();
+  await postponeDueTournaments(id);
   const state = await getTournamentPublicState(id, user?.id ?? null);
   if (!state) return NextResponse.json({ error: "Tournament not found." }, { status: 404 });
   let viewerScore = null;
