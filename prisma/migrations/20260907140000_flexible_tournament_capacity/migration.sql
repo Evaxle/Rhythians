@@ -1,0 +1,2 @@
+ALTER TABLE "Tournament" DROP CONSTRAINT IF EXISTS "Tournament_target_players_check";
+ALTER TABLE "Tournament" ADD CONSTRAINT "Tournament_target_players_check" CHECK ("targetPlayersPerSplit" IS NULL OR "targetPlayersPerSplit" BETWEEN 2 AND 512);
