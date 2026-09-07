@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Loader2, Swords, UserRound } from "lucide-react";
+import { Loader2, Swords } from "lucide-react";
 import { getRankInfo, rankLabel } from "@/lib/ranks";
+import { UserAvatar } from "@/components/user-avatar";
 
 function Avatar({ player }: { player: any }) {
-  if (player?.avatar) return <img src={player.avatar} alt={player.username} className="h-20 w-20 rounded-full border border-white/10 object-cover" />;
-  return <div className="flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white"><UserRound size={30} /></div>;
+  return <UserAvatar src={player?.avatar} username={player?.username ?? "?"} displayName={player?.displayName} className="h-20 w-20 rounded-full border border-white/10 object-cover" fallbackClassName="h-20 w-20 rounded-full border border-white/10 bg-white/5 text-2xl font-black text-white" />;
 }
 
 export function BattleFinding({ matchId }: { matchId: string }) {
