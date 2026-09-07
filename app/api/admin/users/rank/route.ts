@@ -4,8 +4,7 @@ import { getSessionUser } from "@/lib/auth";
 import { canAccessAdmin } from "@/lib/admin-access";
 import { RANKS, getRankInfo } from "@/lib/ranks";
 import { setUserPointOverride } from "@/lib/rhythia-mode-points";
-import { getCachedModePoints } from "@/lib/profile-points";
-import { rebuildRhythiaScorePoints } from "@/lib/rhythia-full-score-import";
+import { getCachedModePoints, syncHalfRhythiaRp } from "@/lib/profile-points";
 
 export const dynamic = "force-dynamic";
 
@@ -43,19 +42,20 @@ export async function PATCH(request: Request) {
   const users = await prisma.user.findMany({ where: { id: { in: userIds } }, select: { id: true, username: true, profileHandle: true, rhp: true, rhythiaProfile: { select: { profileId: true } } } });
   if (users.length !== userIds.length) return NextResponse.json({ error: "One or more selected players could not be found." }, { status: 404 });
 
-  if (action === "rebuild-rp" || action === "use-rp") {
+  if (action === "rebuild-rp" || action === "use-rp" || action === "sync-rp") {
     let changed = 0;
     let skipped = 0;
     const failures: string[] = [];
-    const results: Array<{ userId: string; rpl: number; rps: number; rpv: number; rhp: number; passedScores: number; uniqueScoredMaps: number }> = [];
+    const results: Array<{ userId: string; rpl: number; rps: number; rpv: number; rhp: number }> = [];
     for (const user of users) {
       if (!user.rhythiaProfile?.profileId) { skipped++; continue; }
       try {
-        const result = await rebuildRhythiaScorePoints(user.id);
-        results.push({ userId: user.id, ...result });
+        const result = await syncHalfRhythiaRp(user.id);
+        const values = { userId: user.id, rpl: result.points.lock, rps: result.points.spin, rpv: result.points.vr, rhp: result.rhp };
+        results.push(values);
         changed++;
-        await prisma.moderationAction.create({ data: { actorId: admin.id, action: "rhythia_scores_rebuilt", targetType: "user", targetId: user.id, metadata: { ...result, bulk: users.length > 1 } } });
-      } catch (error) { failures.push(`${user.username}: ${error instanceof Error ? error.message : "Rhythia scores could not be rebuilt."}`); }
+        await prisma.moderationAction.create({ data: { actorId: admin.id, action: "rhythia_half_rp_synced", targetType: "user", targetId: user.id, metadata: { ...values, divisor: 2, bulk: users.length > 1 } } });
+      } catch (error) { failures.push(`${user.username}: ${error instanceof Error ? error.message : "Rhythia RP could not be synced."}`); }
     }
     if (changed === 0 && failures.length) return NextResponse.json({ error: `No players were updated. ${failures.slice(0, 3).join(" ")}` }, { status: 502 });
     return NextResponse.json({ ok: true, changed, skipped, failed: failures.length, failures: failures.slice(0, 10), results });
