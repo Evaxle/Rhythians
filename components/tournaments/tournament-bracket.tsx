@@ -23,7 +23,7 @@ function MatchCard({ match, mode }: { match: any; mode?: string }) {
   const teamMode = mode === "2v2" || mode === "3v3";
   return (
     <div className="min-w-[250px] rounded-2xl border border-white/10 bg-black/15 p-3">
-      <div className="mb-2 flex items-center justify-between gap-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted"><span>Round {match.round}</span><span>{String(match.status).replaceAll("_", " ")}</span></div>
+      <div className="mb-2 flex items-center justify-between gap-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted"><span>Round {match.round}</span><span>{String(match.status).replace(/_/g, " ")}</span></div>
       <TeamPanel team={match.team1} winner={match.winnerTeamId === match.team1Id} score={match.team1Score} showCaptainScore={teamMode && match.status === "completed"} />
       <div className="py-1 text-center text-[10px] font-black text-muted">VS</div>
       <TeamPanel team={match.team2} winner={match.winnerTeamId === match.team2Id} score={match.team2Score} showCaptainScore={teamMode && match.status === "completed"} />
