@@ -1,13 +1,28 @@
 import "@/lib/tournament-cap-overrides";
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
+import { prisma } from "@/lib/db";
+import { fetchRhythiaProfile } from "@/lib/rhythia";
 import { postponeDueTournaments } from "@/lib/tournament-schedule";
 import { prepareTournamentCapacityForSignup } from "@/lib/tournament-cap-overrides";
-import { parseTournamentSplit, requestTournamentSplit, splitForRhp, withdrawTournamentSignup } from "@/lib/tournaments";
-import { getTournamentsRuntimeHome, registerForTournamentRuntime } from "@/lib/tournament-runtime";
+import { parseTournamentSplit, requestTournamentSplit, splitForRhp, withdrawTournamentSignup, type TournamentSplit } from "@/lib/tournaments";
+import { getTournamentRuntimeState, getTournamentsRuntimeHome, registerForTournamentRuntime } from "@/lib/tournament-runtime";
 import { publicTournamentHome, publicTournamentState } from "@/lib/tournament-public-state";
 
 export const dynamic = "force-dynamic";
+
+async function tournamentSplitForUser(userId: string, fallbackRhp: number): Promise<TournamentSplit> {
+  const linked = await prisma.rhythiaProfile.findUnique({ where: { userId }, select: { profileId: true, globalRank: true } });
+  if (!linked) return splitForRhp(fallbackRhp);
+  let globalRank = linked.globalRank;
+  try {
+    const profile = await fetchRhythiaProfile(linked.profileId);
+    globalRank = profile.globalRank;
+    await prisma.rhythiaProfile.update({ where: { userId }, data: { globalRank: profile.globalRank, countryRank: profile.countryRank, rhythmPoints: profile.rhythmPoints, username: profile.username, country: profile.country, flag: profile.flag, title: profile.title, syncedAt: new Date() } });
+  } catch {}
+  if (typeof globalRank === "number" && Number.isFinite(globalRank) && globalRank > 0) return globalRank <= 500 ? "higher" : "lower";
+  return splitForRhp(fallbackRhp);
+}
 
 export async function GET() {
   const user = await getSessionUser();
@@ -15,7 +30,7 @@ export async function GET() {
   const home = await getTournamentsRuntimeHome(user?.id ?? null);
   if (user && home.scheduled) {
     const signupSplit = home.scheduled.viewerSignup?.status !== "withdrawn" ? home.scheduled.viewerSignup?.split : null;
-    (home.scheduled as any).viewerSplit = signupSplit === "lower" || signupSplit === "higher" ? signupSplit : splitForRhp(Number(user.rhp ?? 0));
+    (home.scheduled as any).viewerSplit = signupSplit === "lower" || signupSplit === "higher" ? signupSplit : await tournamentSplitForUser(user.id, Number(user.rhp ?? 0));
   }
   return NextResponse.json(publicTournamentHome(home));
 }
@@ -27,13 +42,19 @@ export async function POST(request: Request) {
   if (!body || typeof body.tournamentId !== "string") return NextResponse.json({ error: "Tournament required." }, { status: 400 });
   try {
     if (body.action === "signup") {
-      await prepareTournamentCapacityForSignup(body.tournamentId, splitForRhp(Number(user.rhp ?? 0)));
-      const state = await registerForTournamentRuntime(body.tournamentId, {
+      const split = await tournamentSplitForUser(user.id, Number(user.rhp ?? 0));
+      await prepareTournamentCapacityForSignup(body.tournamentId, split);
+      await registerForTournamentRuntime(body.tournamentId, {
         id: user.id,
         streamOptIn: body.streamOptIn === true,
         streamPlatform: body.streamPlatform,
         streamIdentity: body.streamIdentity,
       });
+      await prisma.$executeRawUnsafe(
+        `UPDATE "TournamentSignup" SET split=$3,"requestedSplit"=NULL,"splitRequestStatus"='none',"updatedAt"=CURRENT_TIMESTAMP WHERE "tournamentId"=$1 AND "userId"=$2 AND status NOT IN ('withdrawn','kicked')`,
+        body.tournamentId, user.id, split,
+      );
+      const state = await getTournamentRuntimeState(body.tournamentId, user.id);
       return NextResponse.json({ ok: true, state: publicTournamentState(state) });
     }
     if (body.action === "withdraw") {
