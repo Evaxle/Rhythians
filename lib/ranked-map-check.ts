@@ -3,6 +3,8 @@ import { fetchAllRhythiaScores, type RhythiaScoreEntry } from "@/lib/daily";
 import { accuracyFromMisses, getRankInfo, isMapInRankRange, rankIndexForRating, rhpGainForMap } from "@/lib/ranks";
 import { upsertRankedMapScore } from "@/lib/ranked-map-leaderboard";
 
+const UNRANKED_MARKER = "rhythia-unranked";
+
 function normalizeTitle(value: string | null | undefined) { return (value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
 function bestScoresByTitle(scores: RhythiaScoreEntry[]) { const best = new Map<string, RhythiaScoreEntry>(); for (const score of scores) { if (!score.passed) continue; const title = normalizeTitle(score.beatmapTitle); if (!title) continue; const existing = best.get(title); if (!existing || (score.awarded_sp ?? 0) > (existing.awarded_sp ?? 0)) best.set(title, score); } return best; }
 async function alreadyAwarded(userId: string, mapId: string) { return Boolean(await prisma.rhpTransaction.findFirst({ where: { userId, reason: "ranked_map", description: { startsWith: `Completed ranked map [${mapId}]:` } }, select: { id: true } })); }
@@ -11,8 +13,8 @@ function scoreDetails(map: { rating: number; length: number | null; legacy: bool
 export async function checkRankedMap(userId: string, mapId: string) {
   const [profile, user] = await Promise.all([prisma.rhythiaProfile.findUnique({ where: { userId }, select: { profileId: true } }), prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } })]);
   if (!profile || !user) return { status: "not_available" as const, points: 0 };
-  const map = await prisma.challengeMap.findUnique({ where: { id: mapId }, select: { id: true, title: true, rating: true, length: true, status: true } });
-  if (!map || !["approved", "legacy"].includes(map.status) || map.rating == null) return { status: "not_available" as const, points: 0 };
+  const map = await prisma.challengeMap.findUnique({ where: { id: mapId }, select: { id: true, title: true, rating: true, length: true, status: true, reviewerNote: true } });
+  if (!map || !["approved", "legacy"].includes(map.status) || map.rating == null || (map.status === "approved" && map.reviewerNote === UNRANKED_MARKER)) return { status: "not_available" as const, points: 0 };
   const legacy = map.status === "legacy";
   const rankInfo = getRankInfo(user.rhp);
   const awardRankIndex = legacy ? rankIndexForRating(map.rating) : rankInfo.index;
@@ -31,31 +33,65 @@ export async function checkRankedMap(userId: string, mapId: string) {
 }
 
 export async function checkAllRankedMaps(userId: string) {
-  const profile = await prisma.rhythiaProfile.findUnique({ where: { userId }, select: { profileId: true } });
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } });
-  if (!profile || !user) return { checked: 0, foundScores: 0, alreadyCompleted: 0, newlyCompleted: 0, totalPoints: 0 };
+  const [profile, user] = await Promise.all([
+    prisma.rhythiaProfile.findUnique({ where: { userId }, select: { profileId: true } }),
+    prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } }),
+  ]);
+  if (!profile || !user) return { checked: 0, foundScores: 0, alreadyCompleted: 0, newlyCompleted: 0, totalPoints: 0, rankIndex: null };
+
   const rankInfo = getRankInfo(user.rhp);
-  const maps = await prisma.challengeMap.findMany({ where: { status: { in: ["approved", "legacy"] }, rating: { not: null } }, select: { id: true, title: true, rating: true, length: true, status: true } });
+  const maps = await prisma.challengeMap.findMany({
+    where: {
+      OR: [
+        { status: "legacy", rating: { not: null } },
+        {
+          status: "approved",
+          rating: { not: null, gte: rankInfo.rangeMin, lte: rankInfo.rangeMax },
+          OR: [{ reviewerNote: null }, { reviewerNote: { not: UNRANKED_MARKER } }],
+        },
+      ],
+    },
+    select: { id: true, title: true, rating: true, length: true, status: true },
+  });
+
   let scores: RhythiaScoreEntry[];
-  try { scores = await fetchAllRhythiaScores(profile.profileId); } catch { return { checked: maps.length, foundScores: 0, alreadyCompleted: 0, newlyCompleted: 0, totalPoints: 0, rankIndex: rankInfo.index }; }
+  try {
+    scores = await fetchAllRhythiaScores(profile.profileId);
+  } catch {
+    return { checked: maps.length, foundScores: 0, alreadyCompleted: 0, newlyCompleted: 0, totalPoints: 0, rankIndex: rankInfo.index };
+  }
+
   const bestScores = bestScoresByTitle(scores);
-  let foundScores = 0, alreadyCompleted = 0, newlyCompleted = 0, totalPoints = 0;
+  let foundScores = 0;
+  let alreadyCompleted = 0;
+  let newlyCompleted = 0;
+  let totalPoints = 0;
+
   for (const map of maps) {
     if (map.rating == null) continue;
     const legacy = map.status === "legacy";
     const awardRankIndex = legacy ? rankIndexForRating(map.rating) : rankInfo.index;
-    if (!legacy && !isMapInRankRange(map.rating, rankInfo.index)) continue;
     const score = bestScores.get(normalizeTitle(map.title));
     if (!score) continue;
+
     foundScores += 1;
     const { accuracy, points } = scoreDetails({ rating: map.rating, length: map.length, legacy }, score, awardRankIndex);
     await upsertRankedMapScore(map.id, userId, { rating: map.rating, accuracy, passed: true, points, scoreId: score.id ?? null, speed: score.speed ?? null, rankIndex: awardRankIndex });
-    if (await alreadyAwarded(userId, map.id)) { alreadyCompleted += 1; continue; }
+
+    if (await alreadyAwarded(userId, map.id)) {
+      alreadyCompleted += 1;
+      continue;
+    }
+
     const currentUser = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } });
     if (!currentUser) continue;
-    await prisma.$transaction([prisma.user.update({ where: { id: userId }, data: { rhp: currentUser.rhp + points } }), prisma.rhpTransaction.create({ data: { userId, amount: points, reason: "ranked_map", description: `Completed ranked map [${map.id}]: ${map.title} (${map.rating.toFixed(2)})` } })]);
+    await prisma.$transaction([
+      prisma.user.update({ where: { id: userId }, data: { rhp: currentUser.rhp + points } }),
+      prisma.rhpTransaction.create({ data: { userId, amount: points, reason: "ranked_map", description: `Completed ranked map [${map.id}]: ${map.title} (${map.rating.toFixed(2)})` } }),
+    ]);
     newlyCompleted += 1;
     totalPoints += points;
   }
+
   return { checked: maps.length, foundScores, alreadyCompleted, newlyCompleted, totalPoints, rankIndex: rankInfo.index };
 }
