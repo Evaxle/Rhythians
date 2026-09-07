@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
+import { postponeDueTournaments } from "@/lib/tournament-schedule";
 import { getTournamentsHome, parseTournamentSplit, registerForTournament, requestTournamentSplit, withdrawTournamentSignup } from "@/lib/tournaments";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   const user = await getSessionUser();
+  await postponeDueTournaments();
   return NextResponse.json(await getTournamentsHome(user?.id ?? null));
 }
 
