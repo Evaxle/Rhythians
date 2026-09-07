@@ -61,17 +61,17 @@ export async function SiteHeader({ user }: { user: SessionUser | null }) {
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-[#080b14]/82 shadow-[0_10px_40px_rgba(0,0,0,0.18)] backdrop-blur-2xl">
-      <div className="mx-auto flex max-w-[1700px] items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-5 lg:px-7 2xl:px-9">
+      <div className="site-header-inner mx-auto flex max-w-[1700px] items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-5 lg:px-7 2xl:px-9">
         <Link href="/" prefetch className="group flex shrink-0 items-center gap-2.5 rounded-2xl px-1.5 py-1.5 sm:gap-3">
           <span className="relative grid h-10 w-10 place-items-center overflow-hidden rounded-2xl bg-gradient-to-br from-accent to-indigo-400 shadow-[0_8px_30px_rgba(124,143,240,0.25)] ring-1 ring-white/10 sm:h-11 sm:w-11">
             <img src="/favicon.ico" alt="Rhythians" className="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
           </span>
-          <span className="hidden text-[15px] font-bold tracking-tight text-white sm:block sm:text-base">Rhythians</span>
-          <span className="hidden rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-muted xl:inline">Beta</span>
-          <span className="hidden text-[10px] font-medium text-muted 2xl:inline">v{version}</span>
+          <span className="site-brand-text hidden text-[15px] font-bold tracking-tight text-white sm:block sm:text-base">Rhythians</span>
+          <span className="site-brand-meta hidden rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-muted xl:inline">Beta</span>
+          <span className="site-brand-meta hidden text-[10px] font-medium text-muted 2xl:inline">v{version}</span>
         </Link>
 
-        <nav className="hidden min-w-0 flex-1 items-center justify-center gap-1 xl:flex" aria-label="Primary navigation">
+        <nav className="site-desktop-nav hidden min-w-0 flex-1 items-center justify-center gap-1 xl:flex" aria-label="Primary navigation">
           {allLinks.map(({ href, label, icon: Icon, elevated }) => (
             <Link
               key={href}
@@ -91,14 +91,14 @@ export async function SiteHeader({ user }: { user: SessionUser | null }) {
           ))}
         </nav>
 
-        <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
-          <details className="relative xl:hidden">
+        <div className="site-header-actions ml-auto flex min-w-0 shrink-0 items-center gap-1.5 sm:gap-2">
+          <details className="site-mobile-nav relative xl:hidden">
             <summary className="flex h-10 cursor-pointer list-none items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm text-muted hover:border-white/20 hover:bg-white/[0.07] hover:text-white [&::-webkit-details-marker]:hidden" aria-label="Open navigation menu">
               <Menu size={17} />
-              <span className="hidden sm:inline">Menu</span>
-              <ChevronDown size={14} className="hidden sm:inline" />
+              <span className="site-mobile-menu-label hidden sm:inline">Menu</span>
+              <ChevronDown size={14} className="site-mobile-menu-label hidden sm:inline" />
             </summary>
-            <nav className="absolute right-0 mt-2 grid w-72 gap-1 rounded-2xl border border-white/10 bg-[#101629]/95 p-2 shadow-2xl backdrop-blur-2xl" aria-label="Mobile navigation">
+            <nav className="site-mobile-menu-panel absolute right-0 mt-2 grid w-72 gap-1 rounded-2xl border border-white/10 bg-[#101629]/95 p-2 shadow-2xl backdrop-blur-2xl" aria-label="Mobile navigation">
               {allLinks.map(({ href, label, icon: Icon, elevated }) => (
                 <Link key={href} href={href} prefetch className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition hover:bg-white/[0.06] hover:text-white ${elevated ? "text-accent" : "text-muted"}`}>
                   <Icon size={17} className="shrink-0" />
@@ -110,7 +110,7 @@ export async function SiteHeader({ user }: { user: SessionUser | null }) {
           </details>
           <Link href="/search" prefetch aria-label="Search" className="inline-flex h-10 shrink-0 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm text-muted hover:border-white/20 hover:bg-white/[0.07] hover:text-white sm:px-3.5">
             <Search size={16} />
-            <span className="hidden lg:inline">Search</span>
+            <span className="site-search-label hidden lg:inline">Search</span>
           </Link>
           {user && <NotificationsBell />}
           {user ? (
@@ -118,7 +118,7 @@ export async function SiteHeader({ user }: { user: SessionUser | null }) {
           ) : (
             <Link href="/login" prefetch className="inline-flex h-10 shrink-0 items-center gap-2 rounded-xl bg-accent px-3.5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(124,143,240,0.2)] hover:bg-accent2 sm:px-4">
               <MessageCircle size={16} />
-              <span className="hidden sm:inline">Login</span>
+              <span className="site-login-label hidden sm:inline">Login</span>
             </Link>
           )}
         </div>
