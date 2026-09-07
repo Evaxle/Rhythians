@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Sparkles, MessageCircle, Video, Link2, Lock, Trophy, Users } from "lucide-react";
+import { ArrowRight, CalendarDays, Sparkles, MessageCircle, Video, Link2, Lock, Trophy, Users } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { getOnlineUserCount } from "@/lib/rhythia-status";
@@ -14,18 +14,27 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 async function getStats() {
-  const [members, clips, maps, online] = await Promise.allSettled([
+  const [members, maps, online] = await Promise.allSettled([
     prisma.user.count(),
-    prisma.clip.count({ where: { status: "approved" } }),
     prisma.challengeMap.count({ where: { status: "approved", isAutoImported: false } }),
     getOnlineUserCount(),
   ]);
   return {
     members: members.status === "fulfilled" ? members.value : 0,
     maps: maps.status === "fulfilled" ? maps.value : 0,
-    clips: clips.status === "fulfilled" ? clips.value : 0,
     online: online.status === "fulfilled" ? online.value : 0,
   };
+}
+
+async function getNextScheduledTournament() {
+  try {
+    const rows = await prisma.$queryRawUnsafe<Array<{ id: string; name: string; mode: string; scheduledAt: Date }>>(
+      `SELECT id,name,mode,"scheduledAt" FROM "Tournament" WHERE status='scheduled' AND "publishedAt" IS NOT NULL ORDER BY "scheduledAt" ASC LIMIT 1`,
+    );
+    return rows[0] ?? null;
+  } catch {
+    return null;
+  }
 }
 
 async function getFeaturedClips() {
@@ -73,14 +82,18 @@ function AnnouncementsSection({ announcements }: { announcements: Awaited<Return
 }
 
 export default async function HomePage() {
-  const stats = await getStats();
-  const featuredClips = await getFeaturedClips();
-  const announcements = await getLatestAnnouncements();
-  const user = await getSessionUser();
+  const [stats, featuredClips, announcements, nextTournament, user] = await Promise.all([
+    getStats(),
+    getFeaturedClips(),
+    getLatestAnnouncements(),
+    getNextScheduledTournament(),
+    getSessionUser(),
+  ]);
   const linkedProfile = user ? await prisma.rhythiaProfile.findUnique({ where: { userId: user.id }, select: { id: true } }).catch(() => null) : null;
   const pathRank = user ? await getUserPathRank(user.id).catch(() => -1) : -1;
   const regularRank = user ? getRankInfo(user.rhp) : null;
   const pathRankInfo = pathRank >= 0 ? getRankInfo(pathRank * 500) : null;
+  const tournamentDate = nextTournament ? new Date(nextTournament.scheduledAt) : null;
 
   return (
     <div className="ui-page space-y-7 sm:space-y-8">
@@ -107,7 +120,7 @@ export default async function HomePage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="ui-sheen rounded-3xl border border-white/10 bg-white/[0.045] p-5"><p className="ui-kicker text-muted">Members</p><p className="mt-3 text-3xl font-semibold text-white">{stats.members.toLocaleString()}</p><p className="mt-1 text-xs text-muted">Community accounts</p></div>
             <div className="ui-sheen rounded-3xl border border-violet-400/15 bg-violet-400/[0.045] p-5"><p className="ui-kicker text-muted">Maps</p><p className="mt-3 text-3xl font-semibold text-white">{stats.maps.toLocaleString()}</p><p className="mt-1 text-xs text-violet-300">Approved community maps</p></div>
-            <div className="ui-sheen rounded-3xl border border-sky-400/15 bg-sky-400/[0.045] p-5"><p className="ui-kicker text-muted">Clips</p><p className="mt-3 text-3xl font-semibold text-white">{stats.clips.toLocaleString()}</p><p className="mt-1 text-xs text-sky-300">Approved community clips</p></div>
+            <Link href="/tournaments" className="ui-sheen group rounded-3xl border border-sky-400/15 bg-sky-400/[0.045] p-5 transition hover:-translate-y-0.5 hover:border-sky-300/30"><p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-muted"><CalendarDays size={14} className="text-sky-300" /> Next tournament</p><p className="mt-3 line-clamp-2 text-xl font-semibold leading-tight text-white transition group-hover:text-sky-100">{nextTournament?.name ?? "No tournament scheduled"}</p>{tournamentDate ? <><p className="mt-2 text-sm font-semibold text-sky-200">{tournamentDate.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</p><p className="mt-1 text-xs text-muted">{tournamentDate.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })} · {nextTournament?.mode}</p></> : <p className="mt-2 text-xs text-sky-300">Check back for the next signup window.</p>}</Link>
             <div className="ui-sheen rounded-3xl border border-emerald-400/15 bg-emerald-400/[0.045] p-5"><p className="ui-kicker text-muted">Live</p><p className="mt-3 text-3xl font-semibold text-white">{stats.online.toLocaleString()}</p><p className="mt-1 text-xs text-emerald-300">Rhythia presence</p></div>
           </div>
         </div>
