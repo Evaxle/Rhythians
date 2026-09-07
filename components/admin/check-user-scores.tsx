@@ -32,8 +32,8 @@ export function AdminCheckUserScores() {
   }
 
   async function check(payload: Record<string, unknown>) {
-    if (payload.userId && !window.confirm(`Check all eligible ranked scores for ${user?.displayName ?? user?.username}?`)) return;
-    if (payload.all && !window.confirm("Check ranked scores for EVERY linked user? This can make many Rhythia API requests and award newly discovered RHP.")) return;
+    if (payload.userId && !window.confirm(`Check all ranked and legacy map passes for ${user?.displayName ?? user?.username}?`)) return;
+    if (payload.all && !window.confirm("Check ranked and legacy map passes for every user with a linked Rhythia profile? Unlinked users will be reported as skipped.")) return;
     setBusy(true);
     setError("");
     setMessage("");
@@ -41,8 +41,12 @@ export function AdminCheckUserScores() {
       const response = await fetch("/api/admin/users/check-scores", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Score check failed.");
-      if (data.mode === "all") setMessage(`Checked ${data.users} users and ${data.checked} map entries; awarded ${data.awarded} RHP.`);
-      else setMessage(`Checked ${data.checked} map entries for ${data.user?.displayName ?? data.user?.username ?? "user"}; awarded ${data.awarded} RHP.`);
+      if (data.mode === "all") {
+        const failureText = data.failedUsers > 0 ? ` ${data.failedUsers} linked user${data.failedUsers === 1 ? "" : "s"} failed and can be retried.` : "";
+        setMessage(`Scanned ${data.usersChecked} of ${data.totalUsers} total users (${data.linkedUsers} linked, ${data.skippedUnlinked} unlinked skipped). Checked ${data.mapsChecked} ranked/legacy map entries, found ${data.foundScores} passes, recorded ${data.newlyCompleted} new completions, and awarded ${data.awardedPoints} RHP.${failureText}`);
+      } else {
+        setMessage(`Checked ${data.mapsChecked} ranked/legacy map entries for ${data.user?.displayName ?? data.user?.username ?? "user"}; found ${data.foundScores} passes, recorded ${data.newlyCompleted} new completions, and awarded ${data.awardedPoints} RHP.`);
+      }
     } catch (checkError) {
       setError(checkError instanceof Error ? checkError.message : "Score check failed.");
     } finally {
@@ -54,7 +58,7 @@ export function AdminCheckUserScores() {
     <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
       <p className="text-sm uppercase tracking-[0.3em] text-accent">Ranked score tools</p>
       <h2 className="mt-2 text-xl font-semibold text-white">Recheck completed maps</h2>
-      <p className="mt-2 max-w-3xl text-sm leading-7 text-muted">Search for one user and scan only maps in that user&apos;s current rank range. The scan never awards RHP for maps outside the user&apos;s rank. After a rank-up, it starts a new pass using the user&apos;s new rank so newly unlocked maps can be discovered without mixing rank ranges.</p>
+      <p className="mt-2 max-w-3xl text-sm leading-7 text-muted">Scan each linked Rhythia account for passed ranked maps in that player&apos;s current rank range plus legacy maps. The all-users scan attempts every linked account, reports unlinked users separately, and continues even if one Rhythia profile fails.</p>
       <div className="mt-5 flex flex-col gap-3 lg:flex-row">
         <input value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") void search(); }} placeholder="Search username, handle, Discord ID, or email" className="min-w-0 flex-1 rounded-2xl border border-border bg-background px-4 py-3 text-sm text-white outline-none focus:border-accent" />
         <button type="button" onClick={() => void search()} disabled={busy || query.trim().length < 2} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:border-accent/40 disabled:opacity-50"><Search size={16} /> Find user</button>
