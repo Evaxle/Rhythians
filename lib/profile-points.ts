@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { fetchRhythiaModeRp } from "@/lib/rhythia";
+import { fetchReliableRhythiaModeRp } from "@/lib/rhythia-mode-rp";
 import { getUserPointOverrides, setUserPointOverride, type ModePoints } from "@/lib/rhythia-mode-points";
 
 export type ReliableModePoints = { points: ModePoints; rhp: number; source: "fresh" | "cached"; syncedAt: Date | null; warning: string | null };
@@ -20,7 +20,7 @@ export async function getCachedModePoints(userId: string): Promise<ReliableModeP
 export async function syncHalfRhythiaRp(userId: string): Promise<ReliableModePoints> {
   const profile = await prisma.rhythiaProfile.findUnique({ where: { userId }, select: { profileId: true } });
   if (!profile) return getCachedModePoints(userId);
-  const source = await fetchRhythiaModeRp(profile.profileId);
+  const source = await fetchReliableRhythiaModeRp(profile.profileId);
   const points: ModePoints = {
     lock: Math.round(source.lock / 2),
     spin: Math.round(source.spin / 2),
