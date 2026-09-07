@@ -142,6 +142,36 @@ function findBio(value: unknown): string | null {
   return null;
 }
 
+function numericField(record: Record<string, unknown>, keys: string[]) {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === "number" && Number.isFinite(value) && value >= 0) return value;
+    if (typeof value === "string" && value.trim() && Number.isFinite(Number(value)) && Number(value) >= 0) return Number(value);
+  }
+  return null;
+}
+
+function findModeRp(value: unknown): { lock: number; spin: number; vr: number } | null {
+  if (!value || typeof value !== "object") return null;
+  const record = value as Record<string, unknown>;
+  const lock = numericField(record, ["lock_rp", "lockRp", "lockRP", "lock_skill_points", "lockSkillPoints", "skill_points_lock", "skillPointsLock", "rp_lock", "rpLock"]);
+  const spin = numericField(record, ["spin_rp", "spinRp", "spinRP", "spin_skill_points", "spinSkillPoints", "skill_points_spin", "skillPointsSpin", "rp_spin", "rpSpin"]);
+  const vr = numericField(record, ["vr_rp", "vrRp", "vrRP", "vr_skill_points", "vrSkillPoints", "skill_points_vr", "skillPointsVr", "rp_vr", "rpVr"]);
+  if (lock != null && spin != null && vr != null) return { lock, spin, vr };
+  for (const key of ["user", "profile", "data", "stats", "ranked", "ranking", "rp", "skillPoints", "skill_points"]) {
+    const nested = findModeRp(record[key]);
+    if (nested) return nested;
+  }
+  return null;
+}
+
+export async function fetchRhythiaModeRp(id: number) {
+  const profile = await rhythiaRequest<Record<string, unknown>>("getProfile", { id });
+  const modeRp = findModeRp(profile);
+  if (!modeRp) throw new Error("Rhythia did not return separate Lock, Spin, and VR RP for this profile.");
+  return modeRp;
+}
+
 export async function fetchRhythiaProfile(id: number) {
   const profile = await rhythiaRequest<Record<string, unknown>>("getProfile", { id });
   const user = profile.user && typeof profile.user === "object" ? profile.user as Record<string, unknown> : null;
