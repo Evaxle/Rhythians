@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { canAccessAdmin } from "@/lib/admin-access";
 import {
+  TOURNAMENT_CAPS,
   addTournamentMap,
   buildTournamentBrackets,
   cancelTournament,
   createTournament,
   forceTournamentWinner,
-  getTournamentAdminState,
   moveTournamentSeed,
   parseTournamentMode,
   parseTournamentSplit,
@@ -15,10 +15,10 @@ import {
   resolveSplitRequest,
   setSignupPriority,
   setSignupSplit,
-  startTournament,
   swapTournamentMembers,
   updateTournament,
 } from "@/lib/tournaments";
+import { getTournamentRuntimeAdminState, startTournamentRuntime, updateTournamentRuntimeSettings } from "@/lib/tournament-runtime";
 
 export const dynamic = "force-dynamic";
 
@@ -29,11 +29,16 @@ async function authorize() {
   return { user } as const;
 }
 
+function integer(value: unknown) {
+  const number = Number(value);
+  return Number.isInteger(number) ? number : undefined;
+}
+
 export async function GET(request: Request) {
   const auth = await authorize();
   if ("response" in auth) return auth.response;
   const id = new URL(request.url).searchParams.get("id");
-  return NextResponse.json(await getTournamentAdminState(id));
+  return NextResponse.json(await getTournamentRuntimeAdminState(id));
 }
 
 export async function POST(request: Request) {
@@ -47,8 +52,14 @@ export async function POST(request: Request) {
       const scheduledAt = typeof body.scheduledAt === "string" ? new Date(body.scheduledAt) : new Date(NaN);
       if (!mode || typeof body.name !== "string") throw new Error("Name, date, and tournament mode are required.");
       const id = await createTournament({ name: body.name, mode, scheduledAt, createdById: auth.user.id });
-      return NextResponse.json({ ok: true, id, state: await getTournamentAdminState(id) }, { status: 201 });
+      await updateTournamentRuntimeSettings(id, {
+        targetPlayersPerSplit: integer(body.targetPlayersPerSplit) ?? TOURNAMENT_CAPS[mode][2],
+        matchDurationSeconds: integer(body.matchDurationSeconds) ?? 600,
+        intermissionSeconds: integer(body.intermissionSeconds) ?? 300,
+      });
+      return NextResponse.json({ ok: true, id, state: await getTournamentRuntimeAdminState(id) }, { status: 201 });
     }
+
     const tournamentId = typeof body.tournamentId === "string" ? body.tournamentId : null;
     if (!tournamentId) throw new Error("Tournament required.");
 
@@ -56,12 +67,23 @@ export async function POST(request: Request) {
       const mode = body.mode == null ? undefined : parseTournamentMode(body.mode) ?? undefined;
       const scheduledAt = typeof body.scheduledAt === "string" && body.scheduledAt ? new Date(body.scheduledAt) : undefined;
       await updateTournament(tournamentId, { name: typeof body.name === "string" ? body.name : undefined, mode, scheduledAt });
+      await updateTournamentRuntimeSettings(tournamentId, {
+        targetPlayersPerSplit: integer(body.targetPlayersPerSplit),
+        matchDurationSeconds: integer(body.matchDurationSeconds),
+        intermissionSeconds: integer(body.intermissionSeconds),
+      });
+    } else if (body.action === "runtime-settings") {
+      await updateTournamentRuntimeSettings(tournamentId, {
+        targetPlayersPerSplit: integer(body.targetPlayersPerSplit),
+        matchDurationSeconds: integer(body.matchDurationSeconds),
+        intermissionSeconds: integer(body.intermissionSeconds),
+      });
     } else if (body.action === "cancel") {
       await cancelTournament(tournamentId);
     } else if (body.action === "build") {
       await buildTournamentBrackets(tournamentId);
     } else if (body.action === "start") {
-      await startTournament(tournamentId);
+      await startTournamentRuntime(tournamentId);
     } else if (body.action === "set-split") {
       const split = parseTournamentSplit(body.split);
       if (!split || typeof body.userId !== "string") throw new Error("User and split are required.");
@@ -92,7 +114,7 @@ export async function POST(request: Request) {
     } else {
       throw new Error("Unknown action.");
     }
-    return NextResponse.json({ ok: true, state: await getTournamentAdminState(tournamentId) });
+    return NextResponse.json({ ok: true, state: await getTournamentRuntimeAdminState(tournamentId) });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Tournament admin action failed." }, { status: 400 });
   }
