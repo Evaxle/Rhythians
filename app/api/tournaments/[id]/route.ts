@@ -31,10 +31,10 @@ async function requireFreshNoModPass(tournamentId: string, userId: string) {
   if (!map || !profile) throw new Error("A linked Rhythia account is required for tournament scoring.");
   let recent;
   try { recent = (await fetchRhythiaScores(profile.profileId)).recent; } catch { throw new Error("Could not retrieve recent Rhythia scores."); }
+  const score = findScoreForMap(recent, map.title);
+  const createdAt = score?.created_at ? new Date(score.created_at).getTime() : NaN;
   const startMs = new Date(match.startedAt).getTime() - 5000;
-  const eligible = recent.filter((score) => score.passed === true && score.speed === 1 && Boolean(score.created_at) && new Date(score.created_at as string).getTime() >= startMs);
-  const score = findScoreForMap(eligible, map.title);
-  if (!score) throw new Error("No fresh No Mod pass was found for this tournament map. Play the revealed map after the match starts with No Mod (1.00x), then check your score again.");
+  if (!score || score.passed !== true || score.speed !== 1 || !Number.isFinite(createdAt) || createdAt < startMs) throw new Error("Your newest pass for this tournament map must be a fresh No Mod (1.00x) pass played after the match starts. Play the map again with No Mod, then check your score.");
 }
 
 export async function POST(request: Request, { params }: Props) {
