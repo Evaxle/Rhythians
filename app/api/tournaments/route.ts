@@ -1,12 +1,19 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
-import { getTournamentsHome, parseTournamentSplit, registerForTournament, requestTournamentSplit, withdrawTournamentSignup } from "@/lib/tournaments";
+import { postponeDueTournaments } from "@/lib/tournament-schedule";
+import { getTournamentsHome, parseTournamentSplit, registerForTournament, requestTournamentSplit, splitForRhp, withdrawTournamentSignup } from "@/lib/tournaments";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   const user = await getSessionUser();
-  return NextResponse.json(await getTournamentsHome(user?.id ?? null));
+  await postponeDueTournaments();
+  const home = await getTournamentsHome(user?.id ?? null);
+  if (user && home.scheduled) {
+    const signupSplit = home.scheduled.viewerSignup?.status !== "withdrawn" ? home.scheduled.viewerSignup?.split : null;
+    (home.scheduled as any).viewerSplit = signupSplit === "lower" || signupSplit === "higher" ? signupSplit : splitForRhp(Number(user.rhp ?? 0));
+  }
+  return NextResponse.json(home);
 }
 
 export async function POST(request: Request) {
