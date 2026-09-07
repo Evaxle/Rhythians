@@ -3,12 +3,19 @@ import { prisma } from "@/lib/db";
 import { fetchRhythiaScores, findScoreForMap } from "@/lib/daily";
 import { getRankInfo, rankLabel } from "@/lib/ranks";
 import { rankTierValue, teamScore } from "@/lib/battles";
+import { isRankedMap } from "@/lib/rhythkit-api";
 
 export type TournamentMode = "1v1" | "2v2" | "3v3";
 export type TournamentSplit = "lower" | "higher";
+export type TournamentStreamPlatform = "steam" | "nightly";
+export type TournamentStreamIdentity = "discord" | "rhythia";
 
 export const TOURNAMENT_MODES: TournamentMode[] = ["1v1", "2v2", "3v3"];
 export const TOURNAMENT_SPLITS: TournamentSplit[] = ["lower", "higher"];
+export const TOURNAMENT_SPLIT_RANKS: Record<TournamentSplit, string[]> = {
+  lower: ["Copper", "Bronze", "Silver", "Gold", "Platinum", "Diamond"],
+  higher: ["Emerald", "Master", "Expert"],
+};
 export const TOURNAMENT_CAPS: Record<TournamentMode, [number, number, number]> = {
   "1v1": [4, 8, 16],
   "2v2": [8, 16, 32],
@@ -26,13 +33,21 @@ function asSplit(value: unknown): TournamentSplit | null {
   return typeof value === "string" && TOURNAMENT_SPLITS.includes(value as TournamentSplit) ? value as TournamentSplit : null;
 }
 
+function asStreamPlatform(value: unknown): TournamentStreamPlatform | null {
+  return value === "steam" || value === "nightly" ? value : null;
+}
+
+function asStreamIdentity(value: unknown): TournamentStreamIdentity | null {
+  return value === "discord" || value === "rhythia" ? value : null;
+}
+
 export function tournamentTeamSize(mode: TournamentMode) {
   return Number(mode.split("v")[0]);
 }
 
 export function splitForRhp(rhp: number): TournamentSplit {
   const name = getRankInfo(rhp).name;
-  return name === "Emerald" || name === "Master" || name === "Expert" ? "higher" : "lower";
+  return TOURNAMENT_SPLIT_RANKS.higher.includes(name) ? "higher" : "lower";
 }
 
 export function tournamentCapState(mode: TournamentMode, count: number) {
@@ -87,20 +102,50 @@ async function loadMatches(tournamentId: string, teams?: any[]) {
     `SELECT tm.*,m.title AS "mapTitle",m.artist AS "mapArtist",m.length AS "mapLength",m.rating AS "mapRating",m."mapFileUrl",m."imageUrl" FROM "TournamentMatch" tm LEFT JOIN "ChallengeMap" m ON m.id=tm."mapId" WHERE tm."tournamentId"=$1 ORDER BY tm.split,tm.round,tm.position`,
     tournamentId,
   );
+  const battleIds = rows.map((row) => row.battleMatchId).filter(Boolean);
+  const scoreRows = battleIds.length ? await prisma.$queryRawUnsafe<any[]>(
+    `SELECT bp."matchId",bp."userId",bp.team,bp.accuracy,bp."scoreSubmittedAt" FROM "BattleMatchPlayer" bp WHERE bp."matchId"=ANY($1::text[])`,
+    battleIds,
+  ) : [];
+  const decorateTeam = (team: any, battleMatchId: string | null) => team ? {
+    ...team,
+    members: (team.members ?? []).map((member: any) => {
+      const score = battleMatchId ? scoreRows.find((row) => row.matchId === battleMatchId && row.userId === member.userId) : null;
+      return { ...member, accuracy: score?.accuracy == null ? null : Number(score.accuracy), scoreSubmittedAt: score?.scoreSubmittedAt ?? null };
+    }),
+  } : null;
   return rows.map((row) => ({
     ...row,
-    team1: resolvedTeams.find((team) => team.id === row.team1Id) ?? null,
-    team2: resolvedTeams.find((team) => team.id === row.team2Id) ?? null,
-    winner: resolvedTeams.find((team) => team.id === row.winnerTeamId) ?? null,
+    team1: decorateTeam(resolvedTeams.find((team) => team.id === row.team1Id) ?? null, row.battleMatchId),
+    team2: decorateTeam(resolvedTeams.find((team) => team.id === row.team2Id) ?? null, row.battleMatchId),
+    winner: decorateTeam(resolvedTeams.find((team) => team.id === row.winnerTeamId) ?? null, row.battleMatchId),
     map: row.mapId ? { id: row.mapId, title: row.mapTitle, artist: row.mapArtist, length: row.mapLength, rating: row.mapRating, mapFileUrl: row.mapFileUrl, imageUrl: row.imageUrl } : null,
   }));
 }
 
 async function loadMapPool(tournamentId: string) {
   return prisma.$queryRawUnsafe<any[]>(
-    `SELECT p.id,p.split,p."mapId",p."createdAt",m.title,m.artist,m.rating,m.length,m.status,m."mapFileUrl",m."imageUrl" FROM "TournamentMapPool" p JOIN "ChallengeMap" m ON m.id=p."mapId" WHERE p."tournamentId"=$1 ORDER BY p.split,m.title`,
+    `SELECT p.id,p.split,p."mapId",p."createdAt",m.title,m.artist,m.rating,m.length,m.status,m."mapFileUrl",m."imageUrl" FROM "TournamentMapPool" p JOIN "ChallengeMap" m ON m.id=p."mapId" WHERE p."tournamentId"=$1 AND m.status::text='approved' AND m.rating IS NOT NULL AND m."reviewerNote" IS DISTINCT FROM 'rhythia-unranked' ORDER BY p.split,m.title`,
     tournamentId,
   );
+}
+
+async function viewerEligibility(userId: string | null) {
+  if (!userId) return null;
+  const row = (await prisma.$queryRawUnsafe<any[]>(
+    `SELECT u.id,u."discordId",u."inGuild",u."rhythiaVerified",rp.username AS "rhythiaUsername",rp."profileId" AS "rhythiaProfileId" FROM "User" u LEFT JOIN "RhythiaProfile" rp ON rp."userId"=u.id WHERE u.id=$1`,
+    userId,
+  ))[0];
+  if (!row) return null;
+  const verifiedRhythia = Boolean(row.rhythiaVerified && row.rhythiaProfileId);
+  return {
+    canSignUp: verifiedRhythia,
+    rhythiaVerified: verifiedRhythia,
+    rhythiaUsername: row.rhythiaUsername ?? null,
+    discordLinked: Boolean(row.discordId),
+    discordId: row.discordId ?? null,
+    discordInGuild: Boolean(row.discordId && row.inGuild),
+  };
 }
 
 function sideFor(round: number, rounds: number, position: number) {
@@ -134,7 +179,7 @@ async function reseedRoundOne(tournamentId: string, split: TournamentSplit) {
   const teams = await prisma.$queryRawUnsafe<any[]>(`SELECT id FROM "TournamentTeam" WHERE "tournamentId"=$1 AND split=$2 ORDER BY seed`, tournamentId, split);
   for (let position = 0; position < teams.length / 2; position += 1) {
     await prisma.$executeRawUnsafe(
-      `UPDATE "TournamentMatch" SET "team1Id"=$4,"team2Id"=$5,"winnerTeamId"=NULL,status='waiting',"countdownEndsAt"=NULL,"battleMatchId"=NULL,"mapId"=NULL,"matchDeadlineAt"=NULL,"startedAt"=NULL,"finishedAt"=NULL,"updatedAt"=CURRENT_TIMESTAMP WHERE "tournamentId"=$1 AND split=$2 AND round=1 AND position=$3`,
+      `UPDATE "TournamentMatch" SET "team1Id"=$4,"team2Id"=$5,"winnerTeamId"=NULL,"team1Score"=NULL,"team2Score"=NULL,status='waiting',"countdownEndsAt"=NULL,"battleMatchId"=NULL,"mapId"=NULL,"matchDeadlineAt"=NULL,"startedAt"=NULL,"finishedAt"=NULL,"updatedAt"=CURRENT_TIMESTAMP WHERE "tournamentId"=$1 AND split=$2 AND round=1 AND position=$3`,
       tournamentId,
       split,
       position,
@@ -143,7 +188,7 @@ async function reseedRoundOne(tournamentId: string, split: TournamentSplit) {
     );
   }
   await prisma.$executeRawUnsafe(
-    `UPDATE "TournamentMatch" SET "team1Id"=NULL,"team2Id"=NULL,"winnerTeamId"=NULL,status='waiting',"countdownEndsAt"=NULL,"battleMatchId"=NULL,"mapId"=NULL,"matchDeadlineAt"=NULL,"startedAt"=NULL,"finishedAt"=NULL,"updatedAt"=CURRENT_TIMESTAMP WHERE "tournamentId"=$1 AND split=$2 AND round>1`,
+    `UPDATE "TournamentMatch" SET "team1Id"=NULL,"team2Id"=NULL,"winnerTeamId"=NULL,"team1Score"=NULL,"team2Score"=NULL,status='waiting',"countdownEndsAt"=NULL,"battleMatchId"=NULL,"mapId"=NULL,"matchDeadlineAt"=NULL,"startedAt"=NULL,"finishedAt"=NULL,"updatedAt"=CURRENT_TIMESTAMP WHERE "tournamentId"=$1 AND split=$2 AND round>1`,
     tournamentId,
     split,
   );
@@ -218,20 +263,60 @@ export async function buildTournamentBrackets(tournamentId: string) {
   return getTournamentPublicState(tournamentId, null);
 }
 
+export async function getTournamentPreflight(tournamentId: string) {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const tournament = await tournamentRow(tournamentId);
+  if (!tournament) return { ready: false, errors: ["Tournament not found."], warnings };
+  if (tournament.status !== "scheduled") errors.push("Only a scheduled tournament can be started.");
+  const mode = asMode(tournament.mode);
+  if (!mode) return { ready: false, errors: [...errors, "Tournament mode is invalid."], warnings };
+  const teamSize = tournamentTeamSize(mode);
+  const activeOther = Number((await prisma.$queryRawUnsafe<Array<{ count: number }>>(`SELECT COUNT(*)::int AS count FROM "Tournament" WHERE status='active' AND id<>$1`, tournamentId))[0]?.count ?? 0);
+  if (activeOther) errors.push("Another tournament is already active. Finish it before starting this one.");
+  const pendingRequests = Number((await prisma.$queryRawUnsafe<Array<{ count: number }>>(`SELECT COUNT(*)::int AS count FROM "TournamentSignup" WHERE "tournamentId"=$1 AND "splitRequestStatus"='pending' AND status<>'withdrawn'`, tournamentId))[0]?.count ?? 0);
+  if (pendingRequests) errors.push(`${pendingRequests} split change request${pendingRequests === 1 ? " is" : "s are"} still pending.`);
+  const unverified = await prisma.$queryRawUnsafe<any[]>(
+    `SELECT u.username FROM "TournamentSignup" s JOIN "User" u ON u.id=s."userId" LEFT JOIN "RhythiaProfile" rp ON rp."userId"=u.id WHERE s."tournamentId"=$1 AND s.status<>'withdrawn' AND (u."rhythiaVerified"=FALSE OR rp."profileId" IS NULL) LIMIT 10`,
+    tournamentId,
+  );
+  if (unverified.length) errors.push(`Every entrant must have a verified linked Rhythia account. Fix: ${unverified.map((row) => row.username).join(", ")}.`);
+  const counts = await splitCounts(tournamentId);
+  for (const split of TOURNAMENT_SPLITS) {
+    const label = split === "lower" ? "Lower" : "Higher";
+    const cap = tournamentCapState(mode, counts[split]);
+    if (!cap.canStart) errors.push(`${label} split has not reached its ${cap.minimum}-player minimum.`);
+    if (cap.atRisk) warnings.push(`${label} has ${cap.count} signups but only ${cap.secured} are secured; remaining entrants will be waitlisted unless the split reaches ${cap.next}.`);
+    const invalidMaps = Number((await prisma.$queryRawUnsafe<Array<{ count: number }>>(
+      `SELECT COUNT(*)::int AS count FROM "TournamentMapPool" p JOIN "ChallengeMap" m ON m.id=p."mapId" WHERE p."tournamentId"=$1 AND p.split=$2 AND NOT (m.status::text='approved' AND m.rating IS NOT NULL AND m."reviewerNote" IS DISTINCT FROM 'rhythia-unranked')`,
+      tournamentId,
+      split,
+    ))[0]?.count ?? 0);
+    const rankedMaps = Number((await prisma.$queryRawUnsafe<Array<{ count: number }>>(
+      `SELECT COUNT(*)::int AS count FROM "TournamentMapPool" p JOIN "ChallengeMap" m ON m.id=p."mapId" WHERE p."tournamentId"=$1 AND p.split=$2 AND m.status::text='approved' AND m.rating IS NOT NULL AND m."reviewerNote" IS DISTINCT FROM 'rhythia-unranked'`,
+      tournamentId,
+      split,
+    ))[0]?.count ?? 0);
+    if (!rankedMaps) errors.push(`${label} split needs at least one ranked map.`);
+    if (invalidMaps) errors.push(`${label} map pool contains ${invalidMaps} unranked map${invalidMaps === 1 ? "" : "s"}. Remove them before starting.`);
+    const accepted = Number((await prisma.$queryRawUnsafe<Array<{ count: number }>>(`SELECT COUNT(*)::int AS count FROM "TournamentSignup" WHERE "tournamentId"=$1 AND split=$2 AND status='accepted'`, tournamentId, split))[0]?.count ?? 0);
+    const teamCount = Number((await prisma.$queryRawUnsafe<Array<{ count: number }>>(`SELECT COUNT(*)::int AS count FROM "TournamentTeam" WHERE "tournamentId"=$1 AND split=$2`, tournamentId, split))[0]?.count ?? 0);
+    const memberCount = Number((await prisma.$queryRawUnsafe<Array<{ count: number }>>(`SELECT COUNT(*)::int AS count FROM "TournamentTeamMember" tm JOIN "TournamentTeam" t ON t.id=tm."teamId" WHERE tm."tournamentId"=$1 AND t.split=$2`, tournamentId, split))[0]?.count ?? 0);
+    const matchCount = Number((await prisma.$queryRawUnsafe<Array<{ count: number }>>(`SELECT COUNT(*)::int AS count FROM "TournamentMatch" WHERE "tournamentId"=$1 AND split=$2`, tournamentId, split))[0]?.count ?? 0);
+    if (teamCount === 0 || matchCount === 0) errors.push(`${label} bracket has not been generated.`);
+    if (teamCount > 0 && (teamCount & (teamCount - 1)) !== 0) errors.push(`${label} bracket team count must be a power of two.`);
+    if (accepted !== cap.secured) errors.push(`${label} accepted-player count does not match the secured cap. Rebuild the bracket.`);
+    if (teamCount && memberCount !== teamCount * teamSize) errors.push(`${label} has an incomplete team. Rebuild or fix player placement.`);
+    if (memberCount !== accepted) errors.push(`${label} bracket does not contain every accepted player exactly once.`);
+  }
+  return { ready: errors.length === 0, errors, warnings };
+}
+
 export async function startTournament(tournamentId: string) {
   const tournament = await tournamentRow(tournamentId);
   if (!tournament) throw new Error("Tournament not found.");
-  if (tournament.status !== "scheduled") throw new Error("Only a scheduled tournament can start.");
-  const mode = asMode(tournament.mode);
-  if (!mode) throw new Error("Tournament mode is invalid.");
-  const counts = await splitCounts(tournamentId);
-  for (const split of TOURNAMENT_SPLITS) {
-    if (!tournamentCapState(mode, counts[split]).canStart) throw new Error(`${split === "lower" ? "Lower" : "Higher"} split has not reached its minimum player cap.`);
-    const poolCount = Number((await prisma.$queryRawUnsafe<Array<{ count: number }>>(`SELECT COUNT(*)::int AS count FROM "TournamentMapPool" WHERE "tournamentId"=$1 AND split=$2`, tournamentId, split))[0]?.count ?? 0);
-    if (!poolCount) throw new Error(`${split === "lower" ? "Lower" : "Higher"} split needs at least one map in its map pool.`);
-  }
-
-  await buildTournamentBrackets(tournamentId);
+  const preflight = await getTournamentPreflight(tournamentId);
+  if (!preflight.ready) throw new Error(preflight.errors[0] ?? "Tournament preflight failed.");
   const accepted = await prisma.$queryRawUnsafe<Array<{ userId: string }>>(`SELECT "userId" FROM "TournamentSignup" WHERE "tournamentId"=$1 AND status='accepted'`, tournamentId);
   if (!accepted.length) throw new Error("No players were accepted into this tournament.");
   const activeConflicts = await prisma.$queryRawUnsafe<any[]>(
@@ -242,6 +327,8 @@ export async function startTournament(tournamentId: string) {
 
   const countdown = new Date(Date.now() + COUNTDOWN_MS);
   await prisma.$transaction(async (tx) => {
+    const activeOther = Number((await tx.$queryRawUnsafe<Array<{ count: number }>>(`SELECT COUNT(*)::int AS count FROM "Tournament" WHERE status='active' AND id<>$1`, tournamentId))[0]?.count ?? 0);
+    if (activeOther) throw new Error("Another tournament is already active.");
     const changed = await tx.$executeRawUnsafe(`UPDATE "Tournament" SET status='active',"startedAt"=CURRENT_TIMESTAMP,"completedAt"=NULL,"updatedAt"=CURRENT_TIMESTAMP WHERE id=$1 AND status='scheduled'`, tournamentId);
     if (!changed) throw new Error("Tournament could not be started.");
     await tx.$executeRawUnsafe(`UPDATE "TournamentMatch" SET status='countdown',"countdownEndsAt"=$2,"updatedAt"=CURRENT_TIMESTAMP WHERE "tournamentId"=$1 AND round=1 AND "team1Id" IS NOT NULL AND "team2Id" IS NOT NULL`, tournamentId, countdown);
@@ -268,7 +355,7 @@ async function activateTournamentMatch(matchId: string) {
   const mode = asMode(tournament.mode);
   if (!mode) throw new Error("Tournament mode is invalid.");
   const maps = await prisma.$queryRawUnsafe<any[]>(
-    `SELECT m.id,m.length FROM "TournamentMapPool" p JOIN "ChallengeMap" m ON m.id=p."mapId" WHERE p."tournamentId"=$1 AND p.split=$2 AND m.status::text IN ('approved','legacy') ORDER BY RANDOM() LIMIT 1`,
+    `SELECT m.id,m.length FROM "TournamentMapPool" p JOIN "ChallengeMap" m ON m.id=p."mapId" WHERE p."tournamentId"=$1 AND p.split=$2 AND m.status::text='approved' AND m.rating IS NOT NULL AND m."reviewerNote" IS DISTINCT FROM 'rhythia-unranked' ORDER BY RANDOM() LIMIT 1`,
     tournament.id,
     claimed.split,
   );
@@ -303,7 +390,7 @@ async function activateTournamentMatch(matchId: string) {
     for (const member of teamOne) await tx.$executeRawUnsafe(`INSERT INTO "BattleMatchPlayer" (id,"matchId","userId",team,"lastSeenAt") VALUES ($1,$2,$3,1,CURRENT_TIMESTAMP)`, uid(), battleMatchId, member.userId);
     for (const member of teamTwo) await tx.$executeRawUnsafe(`INSERT INTO "BattleMatchPlayer" (id,"matchId","userId",team,"lastSeenAt") VALUES ($1,$2,$3,2,CURRENT_TIMESTAMP)`, uid(), battleMatchId, member.userId);
     await tx.$executeRawUnsafe(
-      `UPDATE "TournamentMatch" SET status='active',"battleMatchId"=$2,"mapId"=$3,"matchDeadlineAt"=$4,"startedAt"=CURRENT_TIMESTAMP,"updatedAt"=CURRENT_TIMESTAMP WHERE id=$1 AND status='activating'`,
+      `UPDATE "TournamentMatch" SET status='active',"battleMatchId"=$2,"mapId"=$3,"matchDeadlineAt"=$4,"startedAt"=CURRENT_TIMESTAMP,"team1Score"=NULL,"team2Score"=NULL,"updatedAt"=CURRENT_TIMESTAMP WHERE id=$1 AND status='activating'`,
       matchId,
       battleMatchId,
       map.id,
@@ -312,11 +399,13 @@ async function activateTournamentMatch(matchId: string) {
   });
 }
 
-async function advanceTournamentWinner(match: any, winnerTeamId: string) {
+async function advanceTournamentWinner(match: any, winnerTeamId: string, scores?: { one: number | null; two: number | null }) {
   const updated = (await prisma.$queryRawUnsafe<any[]>(
-    `UPDATE "TournamentMatch" SET status='completed',"winnerTeamId"=$2,"finishedAt"=CURRENT_TIMESTAMP,"updatedAt"=CURRENT_TIMESTAMP WHERE id=$1 AND status IN ('active','needs_admin','activating') RETURNING *`,
+    `UPDATE "TournamentMatch" SET status='completed',"winnerTeamId"=$2,"team1Score"=COALESCE($3,"team1Score"),"team2Score"=COALESCE($4,"team2Score"),"finishedAt"=CURRENT_TIMESTAMP,"updatedAt"=CURRENT_TIMESTAMP WHERE id=$1 AND status IN ('active','needs_admin','activating') RETURNING *`,
     match.id,
     winnerTeamId,
+    scores?.one ?? null,
+    scores?.two ?? null,
   ))[0];
   if (!updated) return;
   const finals = await prisma.$queryRawUnsafe<any[]>(`SELECT id,split,status,"winnerTeamId" FROM "TournamentMatch" WHERE "tournamentId"=$1 AND side='final'`, match.tournamentId);
@@ -336,19 +425,26 @@ async function advanceTournamentWinner(match: any, winnerTeamId: string) {
   }
 }
 
+async function battleScores(battleMatchId: string) {
+  const battle = (await prisma.$queryRawUnsafe<any[]>(`SELECT mode FROM "BattleMatch" WHERE id=$1`, battleMatchId))[0];
+  if (!battle) return { one: null, two: null, players: [] as any[] };
+  const players = await prisma.$queryRawUnsafe<any[]>(`SELECT team,accuracy FROM "BattleMatchPlayer" WHERE "matchId"=$1`, battleMatchId);
+  const captains = String(battle.mode).endsWith(":captains");
+  const one = teamScore(players.filter((player) => Number(player.team) === 1).map((player) => player.accuracy == null ? null : Number(player.accuracy)), captains ? "captains" : "regular");
+  const two = teamScore(players.filter((player) => Number(player.team) === 2).map((player) => player.accuracy == null ? null : Number(player.accuracy)), captains ? "captains" : "regular");
+  return { one, two, players };
+}
+
 export async function resolveTournamentBattle(battleMatchId: string, forcedWinnerBattleTeam: 1 | 2 | null = null) {
   const match = (await prisma.$queryRawUnsafe<any[]>(`SELECT * FROM "TournamentMatch" WHERE "battleMatchId"=$1`, battleMatchId))[0];
   if (!match || match.status === "completed") return;
-  const battle = (await prisma.$queryRawUnsafe<any[]>(`SELECT status,mode FROM "BattleMatch" WHERE id=$1`, battleMatchId))[0];
-  if (!battle) return;
-  const players = await prisma.$queryRawUnsafe<any[]>(`SELECT team,accuracy FROM "BattleMatchPlayer" WHERE "matchId"=$1`, battleMatchId);
+  const scores = await battleScores(battleMatchId);
   let winnerBattleTeam = forcedWinnerBattleTeam;
   if (!winnerBattleTeam) {
-    const captains = String(battle.mode).endsWith(":captains");
-    const one = teamScore(players.filter((player) => Number(player.team) === 1).map((player) => player.accuracy == null ? null : Number(player.accuracy)), captains ? "captains" : "regular");
-    const two = teamScore(players.filter((player) => Number(player.team) === 2).map((player) => player.accuracy == null ? null : Number(player.accuracy)), captains ? "captains" : "regular");
+    const one = scores.one;
+    const two = scores.two;
     if (one == null && two == null || one != null && two != null && one === two) {
-      await prisma.$executeRawUnsafe(`UPDATE "TournamentMatch" SET status='needs_admin',"updatedAt"=CURRENT_TIMESTAMP WHERE id=$1 AND status<>'completed'`, match.id);
+      await prisma.$executeRawUnsafe(`UPDATE "TournamentMatch" SET status='needs_admin',"team1Score"=$2,"team2Score"=$3,"updatedAt"=CURRENT_TIMESTAMP WHERE id=$1 AND status<>'completed'`, match.id, one, two);
       return;
     }
     winnerBattleTeam = one == null ? 2 : two == null ? 1 : one > two ? 1 : 2;
@@ -358,7 +454,7 @@ export async function resolveTournamentBattle(battleMatchId: string, forcedWinne
     await prisma.$executeRawUnsafe(`UPDATE "TournamentMatch" SET status='needs_admin',"updatedAt"=CURRENT_TIMESTAMP WHERE id=$1`, match.id);
     return;
   }
-  await advanceTournamentWinner(match, winnerTeamId);
+  await advanceTournamentWinner(match, winnerTeamId, scores);
 }
 
 async function resolveExpiredTournamentMatches(tournamentId: string) {
@@ -441,35 +537,53 @@ export async function forfeitTournamentMatch(tournamentId: string, userId: strin
   return { ok: true };
 }
 
-export async function registerForTournament(tournamentId: string, user: { id: string; rhp: number }) {
+export async function registerForTournament(tournamentId: string, input: { id: string; streamOptIn?: boolean; streamPlatform?: unknown; streamIdentity?: unknown }) {
   const tournament = await tournamentRow(tournamentId);
   if (!tournament || tournament.status !== "scheduled") throw new Error("Tournament registration is closed.");
   const mode = asMode(tournament.mode);
   if (!mode) throw new Error("Tournament mode is invalid.");
-  const profile = await prisma.rhythiaProfile.findUnique({ where: { userId: user.id }, select: { id: true } });
-  if (!profile) throw new Error("Link your Rhythia account before signing up for a tournament.");
-  const rank = getRankInfo(Number(user.rhp));
-  const split = splitForRhp(Number(user.rhp));
-  const count = Number((await prisma.$queryRawUnsafe<Array<{ count: number }>>(`SELECT COUNT(*)::int AS count FROM "TournamentSignup" WHERE "tournamentId"=$1 AND split=$2 AND status<>'withdrawn'`, tournamentId, split))[0]?.count ?? 0);
+  const account = (await prisma.$queryRawUnsafe<any[]>(
+    `SELECT u.id,u.rhp,u."discordId",u."inGuild",u."rhythiaVerified",rp.username AS "rhythiaUsername",rp."profileId" AS "rhythiaProfileId" FROM "User" u LEFT JOIN "RhythiaProfile" rp ON rp."userId"=u.id WHERE u.id=$1`,
+    input.id,
+  ))[0];
+  if (!account || !account.rhythiaVerified || !account.rhythiaProfileId) throw new Error("A verified linked Rhythia account is required before you can sign up for a tournament.");
+  const streamOptIn = Boolean(input.streamOptIn);
+  const streamPlatform = streamOptIn ? asStreamPlatform(input.streamPlatform) : null;
+  const streamIdentity = streamOptIn ? asStreamIdentity(input.streamIdentity) : null;
+  if (streamOptIn && (!streamPlatform || !streamIdentity)) throw new Error("Choose a Rhythia version and livestream identity, or turn livestream opt-in off.");
+  if (streamPlatform === "nightly") {
+    if (streamIdentity !== "discord") throw new Error("Nightly livestream players must use Discord identity.");
+    if (!account.discordId) throw new Error("Connect your Discord account before choosing Nightly livestream coverage.");
+    if (!account.inGuild) throw new Error("Your connected Discord account must currently be in the Rhythians Discord server for Nightly livestream coverage.");
+  }
+  if (streamPlatform === "steam" && streamIdentity === "discord" && !account.discordId) throw new Error("Connect your Discord account or select your verified Rhythia account for Steam livestream coverage.");
+  if (streamPlatform === "steam" && streamIdentity === "rhythia" && (!account.rhythiaVerified || !account.rhythiaProfileId)) throw new Error("A verified linked Rhythia account is required for this Steam livestream option.");
+  const rhp = Number(account.rhp);
+  const rank = getRankInfo(rhp);
+  const split = splitForRhp(rhp);
+  const count = Number((await prisma.$queryRawUnsafe<Array<{ count: number }>>(`SELECT COUNT(*)::int AS count FROM "TournamentSignup" WHERE "tournamentId"=$1 AND split=$2 AND "userId"<>$3 AND status<>'withdrawn'`, tournamentId, split, input.id))[0]?.count ?? 0);
   if (tournamentCapState(mode, count).full) throw new Error(`${split === "lower" ? "Lower" : "Higher"} split is full.`);
   await prisma.$executeRawUnsafe(
-    `INSERT INTO "TournamentSignup" (id,"tournamentId","userId",split,"rankName","rankIndex","rankTier","rhpSnapshot",status,"signedUpAt","updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'registered',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) ON CONFLICT ("tournamentId","userId") DO UPDATE SET split=EXCLUDED.split,"rankName"=EXCLUDED."rankName","rankIndex"=EXCLUDED."rankIndex","rankTier"=EXCLUDED."rankTier","rhpSnapshot"=EXCLUDED."rhpSnapshot",status='registered',"requestedSplit"=NULL,"splitRequestStatus"='none',"signedUpAt"=CURRENT_TIMESTAMP,"updatedAt"=CURRENT_TIMESTAMP`,
+    `INSERT INTO "TournamentSignup" (id,"tournamentId","userId",split,"rankName","rankIndex","rankTier","rhpSnapshot",status,"streamOptIn","streamPlatform","streamIdentity","signedUpAt","updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'registered',$9,$10,$11,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) ON CONFLICT ("tournamentId","userId") DO UPDATE SET split=EXCLUDED.split,"rankName"=EXCLUDED."rankName","rankIndex"=EXCLUDED."rankIndex","rankTier"=EXCLUDED."rankTier","rhpSnapshot"=EXCLUDED."rhpSnapshot",status='registered',"streamOptIn"=EXCLUDED."streamOptIn","streamPlatform"=EXCLUDED."streamPlatform","streamIdentity"=EXCLUDED."streamIdentity","requestedSplit"=NULL,"splitRequestStatus"='none',"signedUpAt"=CURRENT_TIMESTAMP,"updatedAt"=CURRENT_TIMESTAMP`,
     uid(),
     tournamentId,
-    user.id,
+    input.id,
     split,
     rank.name,
     rank.index,
     rank.tier,
-    Number(user.rhp),
+    rhp,
+    streamOptIn,
+    streamPlatform,
+    streamIdentity,
   );
-  return getTournamentPublicState(tournamentId, user.id);
+  return getTournamentPublicState(tournamentId, input.id);
 }
 
 export async function withdrawTournamentSignup(tournamentId: string, userId: string) {
   const tournament = await tournamentRow(tournamentId);
   if (!tournament || tournament.status !== "scheduled") throw new Error("You can only withdraw before the tournament starts.");
-  await prisma.$executeRawUnsafe(`UPDATE "TournamentSignup" SET status='withdrawn',"requestedSplit"=NULL,"splitRequestStatus"='none',"updatedAt"=CURRENT_TIMESTAMP WHERE "tournamentId"=$1 AND "userId"=$2`, tournamentId, userId);
+  await prisma.$executeRawUnsafe(`UPDATE "TournamentSignup" SET status='withdrawn',"requestedSplit"=NULL,"splitRequestStatus"='none',"streamOptIn"=FALSE,"streamPlatform"=NULL,"streamIdentity"=NULL,"updatedAt"=CURRENT_TIMESTAMP WHERE "tournamentId"=$1 AND "userId"=$2`, tournamentId, userId);
 }
 
 export async function requestTournamentSplit(tournamentId: string, userId: string, requested: TournamentSplit) {
@@ -491,6 +605,7 @@ export async function getTournamentPublicState(tournamentId: string, viewerId: s
   const teams = await loadTeams(tournamentId);
   const matches = await loadMatches(tournamentId, teams);
   const mapPool = await loadMapPool(tournamentId);
+  const eligibility = await viewerEligibility(viewerId);
   const viewerSignup = viewerId ? (await prisma.$queryRawUnsafe<any[]>(`SELECT * FROM "TournamentSignup" WHERE "tournamentId"=$1 AND "userId"=$2`, tournamentId, viewerId))[0] ?? null : null;
   const viewerTeam = viewerId ? teams.find((team) => team.members.some((member: any) => member.userId === viewerId)) ?? null : null;
   const viewerMatches = viewerTeam ? matches.filter((match) => match.team1Id === viewerTeam.id || match.team2Id === viewerTeam.id) : [];
@@ -508,6 +623,8 @@ export async function getTournamentPublicState(tournamentId: string, viewerId: s
       lower: tournamentCapState(mode, counts.lower),
       higher: tournamentCapState(mode, counts.higher),
     },
+    splitRanks: TOURNAMENT_SPLIT_RANKS,
+    viewerEligibility: eligibility,
     viewerSignup,
     viewerTeam,
     viewerEliminated: Boolean(loss),
@@ -583,8 +700,8 @@ export async function setSignupPriority(tournamentId: string, userId: string, pr
 export async function addTournamentMap(tournamentId: string, split: TournamentSplit, mapId: string) {
   const tournament = await tournamentRow(tournamentId);
   if (!tournament || tournament.status !== "scheduled") throw new Error("Map pools can only be edited before the tournament starts.");
-  const map = await prisma.challengeMap.findUnique({ where: { id: mapId }, select: { id: true, status: true } });
-  if (!map || !["approved", "legacy"].includes(String(map.status))) throw new Error("Only approved or legacy maps can be added to tournament pools.");
+  const map = await prisma.challengeMap.findUnique({ where: { id: mapId }, select: { id: true, status: true, rating: true, reviewerNote: true } });
+  if (!map || !isRankedMap(map.rating, map.reviewerNote, String(map.status))) throw new Error("Only ranked, approved maps can be added to tournament pools.");
   await prisma.$executeRawUnsafe(`INSERT INTO "TournamentMapPool" (id,"tournamentId",split,"mapId") VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`, uid(), tournamentId, split, mapId);
 }
 
@@ -625,14 +742,19 @@ export async function swapTournamentMembers(tournamentId: string, firstUserId: s
   });
   await refreshTeamAverage(first.teamId);
   await refreshTeamAverage(second.teamId);
+  await reseedRoundOne(tournamentId, rows[0].split as TournamentSplit);
 }
 
 export async function forceTournamentWinner(tournamentMatchId: string, winnerTeamId: string) {
   const match = (await prisma.$queryRawUnsafe<any[]>(`SELECT * FROM "TournamentMatch" WHERE id=$1`, tournamentMatchId))[0];
   if (!match || ![match.team1Id, match.team2Id].includes(winnerTeamId)) throw new Error("Winner must be one of the teams in this match.");
   if (match.status === "completed") return;
-  if (match.battleMatchId) await prisma.$executeRawUnsafe(`UPDATE "BattleMatch" SET status='finished',"finishedAt"=COALESCE("finishedAt",CURRENT_TIMESTAMP) WHERE id=$1`, match.battleMatchId);
-  await advanceTournamentWinner(match, winnerTeamId);
+  let scores: { one: number | null; two: number | null } | undefined;
+  if (match.battleMatchId) {
+    await prisma.$executeRawUnsafe(`UPDATE "BattleMatch" SET status='finished',"finishedAt"=COALESCE("finishedAt",CURRENT_TIMESTAMP) WHERE id=$1`, match.battleMatchId);
+    scores = await battleScores(match.battleMatchId);
+  }
+  await advanceTournamentWinner(match, winnerTeamId, scores);
 }
 
 export async function getTournamentAdminState(tournamentId?: string | null) {
@@ -641,10 +763,12 @@ export async function getTournamentAdminState(tournamentId?: string | null) {
   if (!selectedId) return { tournaments, selected: null };
   const selected = await getTournamentPublicState(selectedId, null);
   const signups = await prisma.$queryRawUnsafe<any[]>(
-    `SELECT s.*,u.username,u."displayName",u."profileHandle",u.rhp AS "currentRhp" FROM "TournamentSignup" s JOIN "User" u ON u.id=s."userId" WHERE s."tournamentId"=$1 ORDER BY s.split,s.priority DESC,s."signedUpAt" ASC`,
+    `SELECT s.*,u.username,u."displayName",u."profileHandle",u.rhp AS "currentRhp",u."discordId",u."inGuild",u."rhythiaVerified",rp.username AS "rhythiaUsername" FROM "TournamentSignup" s JOIN "User" u ON u.id=s."userId" LEFT JOIN "RhythiaProfile" rp ON rp."userId"=u.id WHERE s."tournamentId"=$1 ORDER BY s.split,s.priority DESC,s."signedUpAt" ASC`,
     selectedId,
   );
-  return { tournaments, selected: selected ? { ...selected, signups } : null };
+  const streamSignups = signups.filter((signup) => signup.streamOptIn && signup.status !== "withdrawn");
+  const preflight = selected?.tournament?.status === "scheduled" ? await getTournamentPreflight(selectedId) : null;
+  return { tournaments, selected: selected ? { ...selected, signups, streamSignups, preflight } : null };
 }
 
 export function tournamentRankSnapshot(rhp: number) {
@@ -652,4 +776,4 @@ export function tournamentRankSnapshot(rhp: number) {
   return { ...rank, label: rankLabel(rank), split: splitForRhp(rhp) };
 }
 
-export { asMode as parseTournamentMode, asSplit as parseTournamentSplit };
+export { asMode as parseTournamentMode, asSplit as parseTournamentSplit, asStreamPlatform as parseTournamentStreamPlatform, asStreamIdentity as parseTournamentStreamIdentity };
