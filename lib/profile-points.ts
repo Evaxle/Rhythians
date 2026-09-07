@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { getUserPointOverrides, syncUserModeScores, type ModePoints } from "@/lib/rhythia-mode-points";
+import { getUserPointOverrides, type ModePoints } from "@/lib/rhythia-mode-points";
 
 export type ReliableModePoints = { points: ModePoints; rhp: number; source: "fresh" | "cached"; syncedAt: Date | null; warning: string | null };
 
@@ -14,15 +14,6 @@ export async function getCachedModePoints(userId: string): Promise<ReliableModeP
   return { points: { lock: overrides.get("rpl") ?? raw.lock, spin: overrides.get("rps") ?? raw.spin, vr: overrides.get("rpv") ?? raw.vr }, rhp: overrides.get("rhp") ?? user?.rhp ?? 0, source: "cached", syncedAt: user?.lastRhythiaRpCheckAt ?? null, warning: null };
 }
 
-export async function getReliableModePoints(userId: string, options: { forceRefresh?: boolean; maxAgeMs?: number } = {}): Promise<ReliableModePoints> {
-  const cached = await getCachedModePoints(userId);
-  if (!options.forceRefresh) return cached;
-  const profile = await prisma.rhythiaProfile.findUnique({ where: { userId }, select: { profileId: true } });
-  if (!profile) return cached;
-  try {
-    const fresh = await syncUserModeScores(userId);
-    return { points: { lock: fresh.rpl, spin: fresh.rps, vr: fresh.rpv }, rhp: fresh.rhp, source: "fresh", syncedAt: new Date(), warning: null };
-  } catch (error) {
-    return { ...cached, warning: error instanceof Error ? error.message : "Rhythia score sync failed; showing the last saved values." };
-  }
+export async function getReliableModePoints(userId: string, _options: { forceRefresh?: boolean; maxAgeMs?: number } = {}): Promise<ReliableModePoints> {
+  return getCachedModePoints(userId);
 }
