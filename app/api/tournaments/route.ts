@@ -12,11 +12,16 @@ export async function GET() {
 export async function POST(request: Request) {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
-  const body = await request.json().catch(() => null) as { action?: unknown; tournamentId?: unknown; split?: unknown } | null;
+  const body = await request.json().catch(() => null) as { action?: unknown; tournamentId?: unknown; split?: unknown; streamOptIn?: unknown; streamPlatform?: unknown; streamIdentity?: unknown } | null;
   if (!body || typeof body.tournamentId !== "string") return NextResponse.json({ error: "Tournament required." }, { status: 400 });
   try {
     if (body.action === "signup") {
-      const state = await registerForTournament(body.tournamentId, { id: user.id, rhp: Number(user.rhp) });
+      const state = await registerForTournament(body.tournamentId, {
+        id: user.id,
+        streamOptIn: body.streamOptIn === true,
+        streamPlatform: body.streamPlatform,
+        streamIdentity: body.streamIdentity,
+      });
       return NextResponse.json({ ok: true, state });
     }
     if (body.action === "withdraw") {
