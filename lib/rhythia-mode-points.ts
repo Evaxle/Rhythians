@@ -73,7 +73,7 @@ async function fetchModeScores(profileId: number) {
 function scoreAccuracy(score: ScorePayload) { return score.accuracy ?? accuracyFromMisses(score.beatmapNotes ?? null, score.misses ?? null); }
 
 async function getOverrides(userId: string) {
-  const rows = await prisma.$queryRawUnsafe<Array<{ system: EditablePointSystem; points: number }>>('SELECT "system","points" FROM "UserPointOverride" WHERE "userId"=$1');
+  const rows = await prisma.$queryRawUnsafe<Array<{ system: EditablePointSystem; points: number }>>('SELECT "system","points" FROM "UserPointOverride" WHERE "userId"=$1', userId);
   return new Map(rows.map((row) => [row.system, Number(row.points)]));
 }
 
