@@ -1,4 +1,5 @@
 import "./globals.css";
+import "./mobile.css";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
