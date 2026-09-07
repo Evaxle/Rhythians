@@ -77,7 +77,7 @@ function timeUntil(value: string | null | undefined) {
   const days = Math.floor(ms / DAY_MS);
   const hours = Math.floor((ms % DAY_MS) / (60 * 60 * 1000));
   if (days > 0) return `${days}d ${hours}h remaining`;
-  const mins = Math.floor((ms % (60 * 60 * 1000)) / 60000;
+  const mins = Math.floor((ms % (60 * 60 * 1000)) / 60000);
   return `${hours > 0 ? `${hours}h ` : ""}${mins}m remaining`;
 }
 
