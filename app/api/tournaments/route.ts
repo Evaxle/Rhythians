@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { postponeDueTournaments } from "@/lib/tournament-schedule";
-import { getTournamentsHome, parseTournamentSplit, registerForTournament, requestTournamentSplit, splitForRhp, withdrawTournamentSignup } from "@/lib/tournaments";
+import { parseTournamentSplit, requestTournamentSplit, splitForRhp, withdrawTournamentSignup } from "@/lib/tournaments";
+import { getTournamentsRuntimeHome, registerForTournamentRuntime } from "@/lib/tournament-runtime";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   const user = await getSessionUser();
   await postponeDueTournaments();
-  const home = await getTournamentsHome(user?.id ?? null);
+  const home = await getTournamentsRuntimeHome(user?.id ?? null);
   if (user && home.scheduled) {
     const signupSplit = home.scheduled.viewerSignup?.status !== "withdrawn" ? home.scheduled.viewerSignup?.split : null;
     (home.scheduled as any).viewerSplit = signupSplit === "lower" || signupSplit === "higher" ? signupSplit : splitForRhp(Number(user.rhp ?? 0));
@@ -23,7 +24,7 @@ export async function POST(request: Request) {
   if (!body || typeof body.tournamentId !== "string") return NextResponse.json({ error: "Tournament required." }, { status: 400 });
   try {
     if (body.action === "signup") {
-      const state = await registerForTournament(body.tournamentId, {
+      const state = await registerForTournamentRuntime(body.tournamentId, {
         id: user.id,
         streamOptIn: body.streamOptIn === true,
         streamPlatform: body.streamPlatform,
