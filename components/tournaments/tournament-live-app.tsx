@@ -84,8 +84,8 @@ export function TournamentLiveApp({ tournamentId }: { tournamentId: string }) {
       </section> : viewerAccepted && data.viewerEliminated ? <section className="rounded-[2rem] border border-white/10 bg-surface/95 p-8 text-center"><Trophy className="mx-auto text-muted" size={28} /><h2 className="mt-3 text-2xl font-bold text-white">Your tournament run is complete</h2><p className="mt-2 text-sm text-muted">You can keep this page open to watch both brackets finish.</p></section> : viewerAccepted && data.tournament.status === "completed" ? null : <section className="rounded-[2rem] border border-white/10 bg-surface/95 p-7 text-center"><p className="text-sm text-muted">You are viewing the live public bracket.</p></section>}
 
       {message && <p className="rounded-2xl border border-accent/20 bg-accent/[0.06] p-4 text-sm text-white">{message}</p>}
-      <TournamentBracket matches={data.matches} split="lower" />
-      <TournamentBracket matches={data.matches} split="higher" />
+      <TournamentBracket matches={data.matches} split="lower" mode={data.mode} />
+      <TournamentBracket matches={data.matches} split="higher" mode={data.mode} />
 
       {confirmForfeit && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-5 backdrop-blur-sm"><div className="w-full max-w-md rounded-3xl border border-white/10 bg-[#101629] p-7 shadow-2xl"><h2 className="text-xl font-bold text-white">Forfeit this tournament match?</h2><p className="mt-2 text-sm leading-6 text-muted">Your opposing team will immediately advance and your team will be eliminated from this split.</p><div className="mt-6 flex justify-end gap-2"><button onClick={() => setConfirmForfeit(false)} className="rounded-full border border-white/10 px-5 py-2.5 text-sm font-semibold text-white">Cancel</button><button disabled={working} onClick={() => void action("forfeit")} className="rounded-full bg-rose-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">Confirm forfeit</button></div></div></div>}
     </div>
