@@ -3,9 +3,9 @@ import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { canAccessAdmin } from "@/lib/admin-access";
 import { RANKS, getRankInfo } from "@/lib/ranks";
-import { fetchRhythiaModeRp } from "@/lib/rhythia";
 import { setUserPointOverride } from "@/lib/rhythia-mode-points";
 import { getCachedModePoints } from "@/lib/profile-points";
+import { rebuildRhythiaScorePoints } from "@/lib/rhythia-full-score-import";
 
 export const dynamic = "force-dynamic";
 
@@ -26,12 +26,7 @@ function balancedPoints(total: number, current: { lock: number; spin: number; vr
 
 async function applyPoints(userId: string, points: { rpl: number; rps: number; rpv: number }) {
   const rhp = points.rpl + points.rps + points.rpv;
-  await Promise.all([
-    setUserPointOverride(userId, "rpl", points.rpl),
-    setUserPointOverride(userId, "rps", points.rps),
-    setUserPointOverride(userId, "rpv", points.rpv),
-    setUserPointOverride(userId, "rhp", rhp),
-  ]);
+  await Promise.all([setUserPointOverride(userId, "rpl", points.rpl), setUserPointOverride(userId, "rps", points.rps), setUserPointOverride(userId, "rpv", points.rpv), setUserPointOverride(userId, "rhp", rhp)]);
   await prisma.user.update({ where: { id: userId }, data: { rhp } });
   return rhp;
 }
@@ -40,42 +35,36 @@ export async function PATCH(request: Request) {
   const admin = await getSessionUser();
   if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (!(await canAccessAdmin(admin))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
   const userIds = Array.isArray(body?.userIds) ? [...new Set(body.userIds.filter((value): value is string => typeof value === "string" && value.length > 0))] : [];
   const action = typeof body?.action === "string" ? body.action : "set-rank";
-
   if (!userIds.length) return NextResponse.json({ error: "Select at least one player." }, { status: 400 });
   if (userIds.length > 500) return NextResponse.json({ error: "You can update at most 500 players at once." }, { status: 400 });
-
   const users = await prisma.user.findMany({ where: { id: { in: userIds } }, select: { id: true, username: true, profileHandle: true, rhp: true, rhythiaProfile: { select: { profileId: true } } } });
   if (users.length !== userIds.length) return NextResponse.json({ error: "One or more selected players could not be found." }, { status: 404 });
 
-  if (action === "use-rp") {
+  if (action === "rebuild-rp" || action === "use-rp") {
     let changed = 0;
     let skipped = 0;
     const failures: string[] = [];
+    const results: Array<{ userId: string; rpl: number; rps: number; rpv: number; rhp: number; passedScores: number; uniqueScoredMaps: number }> = [];
     for (const user of users) {
       if (!user.rhythiaProfile?.profileId) { skipped++; continue; }
       try {
-        const source = await fetchRhythiaModeRp(user.rhythiaProfile.profileId);
-        const points = { rpl: Math.round(source.lock / 2), rps: Math.round(source.spin / 2), rpv: Math.round(source.vr / 2) };
-        const rhp = await applyPoints(user.id, points);
+        const result = await rebuildRhythiaScorePoints(user.id);
+        results.push({ userId: user.id, ...result });
         changed++;
-        await prisma.moderationAction.create({ data: { actorId: admin.id, action: "rhythia_rp_applied", targetType: "user", targetId: user.id, metadata: { source, divisor: 2, ...points, rhp, bulk: users.length > 1 } } });
-      } catch (error) {
-        failures.push(`${user.username}: ${error instanceof Error ? error.message : "Rhythia RP could not be read."}`);
-      }
+        await prisma.moderationAction.create({ data: { actorId: admin.id, action: "rhythia_scores_rebuilt", targetType: "user", targetId: user.id, metadata: { ...result, bulk: users.length > 1 } } });
+      } catch (error) { failures.push(`${user.username}: ${error instanceof Error ? error.message : "Rhythia scores could not be rebuilt."}`); }
     }
     if (changed === 0 && failures.length) return NextResponse.json({ error: `No players were updated. ${failures.slice(0, 3).join(" ")}` }, { status: 502 });
-    return NextResponse.json({ ok: true, changed, skipped, failed: failures.length, failures: failures.slice(0, 10), divisor: 2 });
+    return NextResponse.json({ ok: true, changed, skipped, failed: failures.length, failures: failures.slice(0, 10), results });
   }
 
   const explicitRhp = body?.rhp !== undefined ? Number(body.rhp) : null;
   const rankIndex = Number(body?.rankIndex);
   if (explicitRhp != null && (!Number.isInteger(explicitRhp) || explicitRhp < 0 || explicitRhp > 1000000)) return NextResponse.json({ error: "RHP must be a whole number between 0 and 1000000." }, { status: 400 });
   if (explicitRhp == null && (!Number.isInteger(rankIndex) || rankIndex < 0 || rankIndex >= RANKS.length)) return NextResponse.json({ error: "Invalid rank." }, { status: 400 });
-
   const targetRhp = explicitRhp ?? RANKS[rankIndex].minRhp;
   const targetRank = getRankInfo(targetRhp);
   let changed = 0;
@@ -86,10 +75,6 @@ export async function PATCH(request: Request) {
     changed++;
     await prisma.moderationAction.create({ data: { actorId: admin.id, action: explicitRhp != null ? "rhp_balanced" : "rank_changed", targetType: "user", targetId: user.id, metadata: { fromRank: getRankInfo(user.rhp).name, fromRhp: user.rhp, toRank: targetRank.name, toRhp: rhp, ...points } } });
   }
-
-  if (explicitRhp == null && users.length) {
-    await prisma.notification.createMany({ data: users.map((user) => ({ userId: user.id, type: "rank_change", title: "Rank updated", message: `Your rank has been changed to ${targetRank.name}.`, url: `/profile/${encodeURIComponent(user.profileHandle)}` })) });
-  }
-
+  if (explicitRhp == null && users.length) await prisma.notification.createMany({ data: users.map((user) => ({ userId: user.id, type: "rank_change", title: "Rank updated", message: `Your rank has been changed to ${targetRank.name}.`, url: `/profile/${encodeURIComponent(user.profileHandle)}` })) });
   return NextResponse.json({ ok: true, changed, rank: targetRank.name, rhp: targetRhp });
 }
