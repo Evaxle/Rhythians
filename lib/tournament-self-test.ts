@@ -22,7 +22,10 @@ export async function runTournamentSelfTest(tournamentId?: string | null) {
   for (const mode of TOURNAMENT_MODES) {
     const teamSize = tournamentTeamSize(mode);
     const caps = TOURNAMENT_CAPS[mode];
-    const valid = teamSize >= 1 && caps.every((cap) => cap % teamSize === 0 && (cap / teamSize & cap / teamSize - 1) === 0);
+    const valid = teamSize >= 1 && caps.every((cap) => {
+      const teamCount = cap / teamSize;
+      return cap % teamSize === 0 && (teamCount & (teamCount - 1)) === 0;
+    });
     add(checks, `${mode} bracket configuration`, valid ? "pass" : "fail", valid ? `${caps.join(" / ")} players produce power-of-two team brackets.` : "A player cap does not produce a valid power-of-two bracket.");
     const minimum = tournamentCapState(mode, caps[0]);
     add(checks, `${mode} cap logic`, minimum.canStart && minimum.secured === caps[0] ? "pass" : "fail", `Minimum secured cap resolves to ${minimum.secured}.`);
