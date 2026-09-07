@@ -16,7 +16,7 @@ function formatIdentity(signup: any) {
 
 function csvCell(value: unknown) {
   const text = value == null ? "" : String(value);
-  return `"${text.replaceAll('"', '""')}"`;
+  return `"${text.replace(/"/g, '""')}"`;
 }
 
 export function TournamentSignupsAdmin() {
@@ -209,7 +209,7 @@ export function TournamentSignupsAdmin() {
 
                   <div>
                     <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-muted"><Users size={13} /> Bracket placement</p>
-                    {team ? <><p className="mt-2 font-semibold text-white">Seed #{team.seed}</p><p className="mt-1 text-xs leading-5 text-muted">{team.members?.map((member: any) => member.displayName ?? member.username).join(" + ")}</p>{match ? <p className="mt-3 text-xs text-accent">Round {match.round} · {String(match.status).replaceAll("_", " ")}</p> : <p className="mt-3 text-xs text-muted">Waiting for next bracket match</p>}</> : <p className="mt-2 text-sm text-muted">Not bracketed yet.</p>}
+                    {team ? <><p className="mt-2 font-semibold text-white">Seed #{team.seed}</p><p className="mt-1 text-xs leading-5 text-muted">{team.members?.map((member: any) => member.displayName ?? member.username).join(" + ")}</p>{match ? <p className="mt-3 text-xs text-accent">Round {match.round} · {String(match.status).replace(/_/g, " ")}</p> : <p className="mt-3 text-xs text-muted">Waiting for next bracket match</p>}</> : <p className="mt-2 text-sm text-muted">Not bracketed yet.</p>}
                   </div>
                 </div>
 
