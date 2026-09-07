@@ -27,9 +27,7 @@ export function TournamentCapacityNotice() {
         if (!response.ok) return;
         const result = await response.json();
         if (active) setData(result);
-      } catch {
-        // The main tournament view already handles its own load errors.
-      }
+      } catch {}
     };
     void load();
     const timer = setInterval(() => void load(), 15000);
@@ -41,7 +39,9 @@ export function TournamentCapacityNotice() {
 
   const scheduled = data?.scheduled;
   const signup = scheduled?.viewerSignup;
-  const playerSplit = signup?.status !== "withdrawn" && (signup?.split === "lower" || signup?.split === "higher") ? signup.split as Split : null;
+  const signupSplit = signup?.status !== "withdrawn" && (signup?.split === "lower" || signup?.split === "higher") ? signup.split as Split : null;
+  const viewerSplit = scheduled?.viewerSplit === "lower" || scheduled?.viewerSplit === "higher" ? scheduled.viewerSplit as Split : null;
+  const playerSplit = signupSplit ?? viewerSplit;
   const playerCap = useMemo<CapState | null>(() => playerSplit ? scheduled?.caps?.[playerSplit] ?? null : null, [playerSplit, scheduled]);
   const playersNeeded = playerCap ? Math.max(0, Number(playerCap.minimum) - Number(playerCap.count)) : 0;
   const needsPlayers = Boolean(playerSplit && playerCap && !playerCap.canStart && playersNeeded > 0);
