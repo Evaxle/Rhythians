@@ -3,6 +3,7 @@ import { getSessionUser } from "@/lib/auth";
 import { postponeDueTournaments } from "@/lib/tournament-schedule";
 import { parseTournamentSplit, requestTournamentSplit, splitForRhp, withdrawTournamentSignup } from "@/lib/tournaments";
 import { getTournamentsRuntimeHome, registerForTournamentRuntime } from "@/lib/tournament-runtime";
+import { publicTournamentHome, publicTournamentState } from "@/lib/tournament-public-state";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +15,7 @@ export async function GET() {
     const signupSplit = home.scheduled.viewerSignup?.status !== "withdrawn" ? home.scheduled.viewerSignup?.split : null;
     (home.scheduled as any).viewerSplit = signupSplit === "lower" || signupSplit === "higher" ? signupSplit : splitForRhp(Number(user.rhp ?? 0));
   }
-  return NextResponse.json(home);
+  return NextResponse.json(publicTournamentHome(home));
 }
 
 export async function POST(request: Request) {
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
         streamPlatform: body.streamPlatform,
         streamIdentity: body.streamIdentity,
       });
-      return NextResponse.json({ ok: true, state });
+      return NextResponse.json({ ok: true, state: publicTournamentState(state) });
     }
     if (body.action === "withdraw") {
       await withdrawTournamentSignup(body.tournamentId, user.id);
