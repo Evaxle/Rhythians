@@ -1,0 +1,120 @@
+import { randomUUID } from "node:crypto";
+import { prisma } from "@/lib/db";
+import type { TournamentSplit } from "@/lib/tournaments";
+
+export type TournamentPoolStage = "regular" | "finals";
+
+export const TOURNAMENT_POOL_RULES = {
+  lower: { regular: [1.3, 2.3], finals: [2.3, 2.7] },
+  higher: { regular: [3.3, 3.5], finals: [3.5, 3.7] },
+} as const;
+
+export const AUTO_REGULAR_MAPS = 100;
+export const AUTO_FINALS_MAPS = 6;
+
+function rangeFor(split: TournamentSplit, stage: TournamentPoolStage) {
+  return TOURNAMENT_POOL_RULES[split][stage];
+}
+
+export function poolRangeLabel(split: TournamentSplit, stage: TournamentPoolStage) {
+  const [min, max] = rangeFor(split, stage);
+  return `${min.toFixed(1)}–${max.toFixed(1)}`;
+}
+
+export async function generateAutomaticTournamentMapPool(tournamentId: string) {
+  const tournament = (await prisma.$queryRawUnsafe<any[]>(`SELECT id,status FROM "Tournament" WHERE id=$1`, tournamentId))[0];
+  if (!tournament || tournament.status !== "scheduled") throw new Error("Automatic map pools can only be generated for scheduled tournaments.");
+
+  const selected: Record<TournamentSplit, { regular: number; finals: number }> = {
+    lower: { regular: 0, finals: 0 },
+    higher: { regular: 0, finals: 0 },
+  };
+
+  await prisma.$transaction(async (tx) => {
+    await tx.$executeRawUnsafe(`DELETE FROM "TournamentMapPool" WHERE "tournamentId"=$1`, tournamentId);
+    for (const split of ["lower", "higher"] as const) {
+      for (const stage of ["regular", "finals"] as const) {
+        const [min, max] = rangeFor(split, stage);
+        const limit = stage === "regular" ? AUTO_REGULAR_MAPS : AUTO_FINALS_MAPS;
+        const maps = await tx.$queryRawUnsafe<Array<{ id: string; playcount: number | null }>>(
+          `SELECT m.id,COALESCE(dm.playcount,0)::int AS playcount
+           FROM "ChallengeMap" m
+           LEFT JOIN LATERAL (
+             SELECT d.playcount FROM "DailyMap" d
+             WHERE d."beatmapId"=m."sourceBeatmapId" AND d.playcount IS NOT NULL
+             ORDER BY d."createdAt" DESC LIMIT 1
+           ) dm ON TRUE
+           WHERE m.status::text='approved'
+             AND m.rating IS NOT NULL
+             AND m."reviewerNote" IS DISTINCT FROM 'rhythia-unranked'
+             AND m.rating >= $1 AND m.rating <= $2
+           ORDER BY COALESCE(dm.playcount,0) DESC,m."updatedAt" DESC,m.id
+           LIMIT $3`,
+          min, max, limit,
+        );
+        if (maps.length < limit) throw new Error(`${split === "lower" ? "Lower" : "Higher"} ${stage} pool needs ${limit} ranked maps in the ${min.toFixed(1)}–${max.toFixed(1)} rating range, but only ${maps.length} are currently available.`);
+        for (const map of maps) {
+          await tx.$executeRawUnsafe(
+            `INSERT INTO "TournamentMapPool" (id,"tournamentId",split,"mapId","stage","autoSelected","sourcePlaycount","createdAt") VALUES ($1,$2,$3,$4,$5,TRUE,$6,CURRENT_TIMESTAMP)`,
+            randomUUID(), tournamentId, split, map.id, stage, Number(map.playcount ?? 0),
+          );
+        }
+        selected[split][stage] = maps.length;
+      }
+    }
+  });
+  return selected;
+}
+
+export async function tournamentPoolViewer(tournamentId: string, userId: string) {
+  const signup = (await prisma.$queryRawUnsafe<any[]>(`SELECT split,status FROM "TournamentSignup" WHERE "tournamentId"=$1 AND "userId"=$2`, tournamentId, userId))[0];
+  if (!signup || ["withdrawn", "kicked"].includes(String(signup.status))) throw new Error("You must be signed up for this tournament to view its map pool.");
+  const split = signup.split as TournamentSplit;
+  const maps = await prisma.$queryRawUnsafe<any[]>(
+    `SELECT p.id,p."mapId",p.stage,p."sourcePlaycount",m.title,m.artist,m.rating,m.length,m."imageUrl",m."sourceUrl",
+      COALESCE(v.likes,0)::int AS likes,COALESCE(v.dislikes,0)::int AS dislikes,uv.value AS "viewerVote"
+     FROM "TournamentMapPool" p JOIN "ChallengeMap" m ON m.id=p."mapId"
+     LEFT JOIN LATERAL (SELECT COUNT(*) FILTER (WHERE value=1) likes,COUNT(*) FILTER (WHERE value=-1) dislikes FROM "TournamentMapVote" WHERE "tournamentId"=$1 AND "mapId"=p."mapId") v ON TRUE
+     LEFT JOIN "TournamentMapVote" uv ON uv."tournamentId"=$1 AND uv."mapId"=p."mapId" AND uv."userId"=$2
+     WHERE p."tournamentId"=$1 AND p.split=$3 ORDER BY CASE p.stage WHEN 'regular' THEN 0 ELSE 1 END,p."sourcePlaycount" DESC NULLS LAST,m.title`,
+    tournamentId, userId, split,
+  );
+  return { split, rules: TOURNAMENT_POOL_RULES[split], maps };
+}
+
+export async function voteTournamentMap(tournamentId: string, userId: string, mapId: string, value: 1 | -1) {
+  const view = await tournamentPoolViewer(tournamentId, userId);
+  if (!view.maps.some((map) => map.mapId === mapId)) throw new Error("That map is not in your tournament split pool.");
+  await prisma.$executeRawUnsafe(
+    `INSERT INTO "TournamentMapVote" (id,"tournamentId","mapId","userId",value,"createdAt","updatedAt") VALUES ($1,$2,$3,$4,$5,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) ON CONFLICT ("tournamentId","mapId","userId") DO UPDATE SET value=EXCLUDED.value,"updatedAt"=CURRENT_TIMESTAMP`,
+    randomUUID(), tournamentId, mapId, userId, value,
+  );
+}
+
+export async function reportTournamentMap(tournamentId: string, userId: string, mapId: string, reason: string) {
+  const clean = reason.trim().slice(0, 500);
+  if (clean.length < 5) throw new Error("Give a short reason for the map report.");
+  const view = await tournamentPoolViewer(tournamentId, userId);
+  if (!view.maps.some((map) => map.mapId === mapId)) throw new Error("That map is not in your tournament split pool.");
+  await prisma.$executeRawUnsafe(
+    `INSERT INTO "TournamentMapReport" (id,"tournamentId","mapId","userId",reason) VALUES ($1,$2,$3,$4,$5) ON CONFLICT ("tournamentId","mapId","userId") DO UPDATE SET reason=EXCLUDED.reason,status='pending',"resolvedAt"=NULL`,
+    randomUUID(), tournamentId, mapId, userId, clean,
+  );
+}
+
+export async function recommendTournamentMap(tournamentId: string, userId: string, mapUrl: string, stage: TournamentPoolStage) {
+  const view = await tournamentPoolViewer(tournamentId, userId);
+  const url = mapUrl.trim();
+  const match = url.match(/(?:rhythia\.com|rhythians[^/]*)(?:\/maps?\/)(\d+)/i);
+  if (!match) throw new Error("Provide a Rhythia or Rhythians map URL containing the map ID.");
+  const rawId = Number(match[1]);
+  const sourceId = rawId > 0x7fffffff ? rawId - 0x100000000 : rawId;
+  const map = await prisma.challengeMap.findFirst({ where: { sourceBeatmapId: sourceId }, select: { id: true, rating: true, status: true, reviewerNote: true } });
+  if (!map || String(map.status) !== "approved" || map.reviewerNote === "rhythia-unranked" || map.rating == null) throw new Error("That URL does not resolve to a currently ranked map in Rhythians.");
+  const [min, max] = rangeFor(view.split, stage);
+  if (map.rating < min || map.rating > max) throw new Error(`${stage === "finals" ? "Finals/semi-finals" : "Regular"} recommendations for your ${view.split} split must be rated ${min.toFixed(1)}–${max.toFixed(1)}.`);
+  await prisma.$executeRawUnsafe(
+    `INSERT INTO "TournamentMapRecommendation" (id,"tournamentId","userId",split,stage,"mapUrl","sourceBeatmapId") VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+    randomUUID(), tournamentId, userId, view.split, stage, url.slice(0, 500), sourceId,
+  );
+}
