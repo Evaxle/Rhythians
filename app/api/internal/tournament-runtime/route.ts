@@ -1,3 +1,4 @@
+import "@/lib/tournament-cap-overrides";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { syncTournamentRuntime } from "@/lib/tournament-runtime";
