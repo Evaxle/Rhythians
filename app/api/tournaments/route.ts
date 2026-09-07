@@ -1,6 +1,8 @@
+import "@/lib/tournament-cap-overrides";
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { postponeDueTournaments } from "@/lib/tournament-schedule";
+import { prepareTournamentCapacityForSignup } from "@/lib/tournament-cap-overrides";
 import { parseTournamentSplit, requestTournamentSplit, splitForRhp, withdrawTournamentSignup } from "@/lib/tournaments";
 import { getTournamentsRuntimeHome, registerForTournamentRuntime } from "@/lib/tournament-runtime";
 import { publicTournamentHome, publicTournamentState } from "@/lib/tournament-public-state";
@@ -25,6 +27,7 @@ export async function POST(request: Request) {
   if (!body || typeof body.tournamentId !== "string") return NextResponse.json({ error: "Tournament required." }, { status: 400 });
   try {
     if (body.action === "signup") {
+      await prepareTournamentCapacityForSignup(body.tournamentId, splitForRhp(Number(user.rhp ?? 0)));
       const state = await registerForTournamentRuntime(body.tournamentId, {
         id: user.id,
         streamOptIn: body.streamOptIn === true,
