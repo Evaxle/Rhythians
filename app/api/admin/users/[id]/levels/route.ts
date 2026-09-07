@@ -6,7 +6,8 @@ import { CATEGORIES, MAX_CATEGORY_LEVEL, type Category } from "@/lib/category-co
 import { ensureChallengeLevelTable, MAX_CHALLENGE_LEVEL, getUserChallengeLevel } from "@/lib/challenge";
 import { getUserCategoryLevels } from "@/lib/categories";
 import { ensureUserRbpSeason, getRbpProfile } from "@/lib/rbp";
-import { getUserPointOverrides, setUserPointOverride, syncUserModeScores, type EditablePointSystem } from "@/lib/rhythia-mode-points";
+import { getUserPointOverrides, setUserPointOverride, type EditablePointSystem } from "@/lib/rhythia-mode-points";
+import { getReliableModePoints } from "@/lib/profile-points";
 import { randomUUID } from "node:crypto";
 
 export const dynamic = "force-dynamic";
@@ -21,14 +22,17 @@ async function authorize() {
 }
 
 async function getPoints(id: string) {
-  const mode = await syncUserModeScores(id);
-  const overrides = await getUserPointOverrides(id);
-  const rbp = await getRbpProfile(id);
+  const [mode, overrides, rbp] = await Promise.all([
+    getReliableModePoints(id, { forceRefresh: true }).catch(() => null),
+    getUserPointOverrides(id).catch(() => new Map<EditablePointSystem, number>()),
+    getRbpProfile(id).catch(() => null),
+  ]);
+  const fallbackUser = mode ? null : await prisma.user.findUnique({ where: { id }, select: { rhp: true } }).catch(() => null);
   return {
-    rhp: overrides.get("rhp") ?? mode.rhp,
-    rpl: overrides.get("rpl") ?? mode.rpl,
-    rps: overrides.get("rps") ?? mode.rps,
-    rpv: overrides.get("rpv") ?? mode.rpv,
+    rhp: overrides.get("rhp") ?? mode?.rhp ?? fallbackUser?.rhp ?? 0,
+    rpl: overrides.get("rpl") ?? mode?.points.lock ?? 0,
+    rps: overrides.get("rps") ?? mode?.points.spin ?? 0,
+    rpv: overrides.get("rpv") ?? mode?.points.vr ?? 0,
     rbp: rbp?.player.rbp ?? 0,
   };
 }
