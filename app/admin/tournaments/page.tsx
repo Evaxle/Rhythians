@@ -5,7 +5,13 @@ import { getTournamentAdminState } from "@/lib/tournaments";
 export const dynamic = "force-dynamic";
 
 export default async function AdminTournamentsPage() {
-  const state = await getTournamentAdminState(null).catch(() => null);
+  const initialState = await getTournamentAdminState(null).catch(() => null);
+  const nextScheduledId = initialState?.tournaments
+    ?.filter((tournament: any) => tournament.status === "scheduled" && tournament.publishedAt)
+    .sort((a: any, b: any) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())[0]?.id ?? null;
+  const state = nextScheduledId
+    ? await getTournamentAdminState(nextScheduledId).catch(() => initialState)
+    : initialState;
   const selected = state?.selected ?? null;
   const signups = selected?.signups ?? [];
   const activeSignups = signups.filter((signup: any) => signup.status !== "withdrawn");
@@ -36,7 +42,7 @@ export default async function AdminTournamentsPage() {
     </section>
 
     <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.2em] text-accent">Current admin snapshot</p><h2 className="mt-2 text-2xl font-semibold text-white">{selected?.tournament?.name ?? "No tournament records yet"}</h2>{selected?.tournament && <p className="mt-1 text-sm text-muted">{selected.tournament.mode} · {selected.tournament.status} · {new Date(selected.tournament.scheduledAt).toLocaleString()}</p>}</div>{selected?.preflight && <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold ${selected.preflight.ready ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-200" : "border-amber-400/20 bg-amber-400/10 text-amber-200"}`}><ShieldCheck size={14} />{selected.preflight.ready ? "Preflight ready" : `${selected.preflight.errors.length} preflight blocker${selected.preflight.errors.length === 1 ? "" : "s"}`}</div>}</div>
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.2em] text-accent">Next scheduled tournament</p><h2 className="mt-2 text-2xl font-semibold text-white">{selected?.tournament?.name ?? "No published tournament scheduled"}</h2>{selected?.tournament && <p className="mt-1 text-sm text-muted">{selected.tournament.mode} · {selected.tournament.status} · {new Date(selected.tournament.scheduledAt).toLocaleString()}</p>}</div>{selected?.preflight && <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold ${selected.preflight.ready ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-200" : "border-amber-400/20 bg-amber-400/10 text-amber-200"}`}><ShieldCheck size={14} />{selected.preflight.ready ? "Preflight ready" : `${selected.preflight.errors.length} preflight blocker${selected.preflight.errors.length === 1 ? "" : "s"}`}</div>}</div>
       <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         <div className="rounded-2xl border border-white/10 bg-black/15 p-4"><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted">Active signups</p><p className="mt-2 flex items-center gap-2 text-2xl font-bold text-white"><Users size={18} className="text-accent" />{activeSignups.length}</p></div>
         <div className="rounded-2xl border border-white/10 bg-black/15 p-4"><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted">Lower</p><p className="mt-2 text-2xl font-bold text-sky-200">{activeSignups.filter((signup: any) => signup.split === "lower").length}</p></div>

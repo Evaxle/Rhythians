@@ -1,0 +1,69 @@
+html.mobile-device,
+html.mobile-device body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+html.mobile-device .site-desktop-nav {
+  display: none !important;
+}
+
+html.mobile-device .site-mobile-nav {
+  display: block !important;
+}
+
+html.mobile-device .site-header-inner {
+  max-width: 100%;
+  gap: 0.35rem;
+  padding-left: max(0.5rem, env(safe-area-inset-left));
+  padding-right: max(0.5rem, env(safe-area-inset-right));
+}
+
+html.mobile-device .site-brand-text,
+html.mobile-device .site-brand-meta,
+html.mobile-device .site-mobile-menu-label,
+html.mobile-device .site-search-label,
+html.mobile-device .site-login-label {
+  display: none !important;
+}
+
+html.mobile-device .site-header-actions {
+  margin-left: auto;
+  gap: 0.25rem;
+}
+
+html.mobile-device .site-mobile-menu-panel {
+  right: 0;
+  width: min(18rem, calc(100vw - 1rem));
+  max-height: calc(100dvh - 5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .site-desktop-nav {
+    display: none !important;
+  }
+
+  .site-mobile-nav {
+    display: block !important;
+  }
+
+  .site-mobile-menu-panel {
+    width: min(18rem, calc(100vw - 1rem));
+    max-height: calc(100dvh - 5rem);
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  main {
+    min-width: 0;
+    overflow-x: clip;
+  }
+
+  footer {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
