@@ -12,7 +12,7 @@ import { randomUUID } from "node:crypto";
 
 export const dynamic = "force-dynamic";
 type Props = { params: Promise<{ id: string }> };
-const POINT_SYSTEMS = ["rhp", "rpl", "rps", "rpv", "rbp"] as const;
+const POINT_SYSTEMS = ["rpl", "rps", "rpv", "rbp"] as const;
 
 async function authorize() {
   const admin = await getSessionUser();
@@ -27,12 +27,14 @@ async function getPoints(id: string) {
     getUserPointOverrides(id).catch(() => new Map<EditablePointSystem, number>()),
     getRbpProfile(id).catch(() => null),
   ]);
-  const fallbackUser = mode ? null : await prisma.user.findUnique({ where: { id }, select: { rhp: true } }).catch(() => null);
+  const rpl = overrides.get("rpl") ?? mode?.points.lock ?? 0;
+  const rps = overrides.get("rps") ?? mode?.points.spin ?? 0;
+  const rpv = overrides.get("rpv") ?? mode?.points.vr ?? 0;
   return {
-    rhp: overrides.get("rhp") ?? mode?.rhp ?? fallbackUser?.rhp ?? 0,
-    rpl: overrides.get("rpl") ?? mode?.points.lock ?? 0,
-    rps: overrides.get("rps") ?? mode?.points.spin ?? 0,
-    rpv: overrides.get("rpv") ?? mode?.points.vr ?? 0,
+    rhp: rpl + rps + rpv,
+    rpl,
+    rps,
+    rpv,
     rbp: rbp?.player.rbp ?? 0,
   };
 }
@@ -98,7 +100,22 @@ export async function PATCH(request: Request, { params }: Props) {
     });
   }
 
-  for (const system of ["rhp", "rpl", "rps", "rpv"] as const) if (pointChanges[system] !== undefined) await setUserPointOverride(id, system, pointChanges[system] ?? 0);
+  const modePointChanged = pointChanges.rpl !== undefined || pointChanges.rps !== undefined || pointChanges.rpv !== undefined;
+  let derivedRhp: number | undefined;
+  if (modePointChanged) {
+    const current = await getPoints(id);
+    const rpl = pointChanges.rpl ?? current.rpl;
+    const rps = pointChanges.rps ?? current.rps;
+    const rpv = pointChanges.rpv ?? current.rpv;
+    derivedRhp = rpl + rps + rpv;
+
+    await setUserPointOverride(id, "rpl", rpl);
+    await setUserPointOverride(id, "rps", rps);
+    await setUserPointOverride(id, "rpv", rpv);
+    await setUserPointOverride(id, "rhp", derivedRhp);
+    await prisma.user.update({ where: { id }, data: { rhp: derivedRhp } });
+  }
+
   if (pointChanges.rbp !== undefined) {
     const rbp = await ensureUserRbpSeason(id);
     if (!rbp) return NextResponse.json({ error: "The current battle season is unavailable." }, { status: 503 });
@@ -106,6 +123,6 @@ export async function PATCH(request: Request, { params }: Props) {
   }
 
   const points = await getPoints(id);
-  await prisma.moderationAction.create({ data: { actorId: admin.id, action: "user_progression_edited", targetType: "user", targetId: id, metadata: { challengeLevel, categoryLevels, points: pointChanges } } });
+  await prisma.moderationAction.create({ data: { actorId: admin.id, action: "user_progression_edited", targetType: "user", targetId: id, metadata: { challengeLevel, categoryLevels, points: pointChanges, derivedRhp } } });
   return NextResponse.json({ challengeLevel, categoryLevels, points });
 }
