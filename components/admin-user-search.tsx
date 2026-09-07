@@ -4,6 +4,7 @@ import { useState } from "react";
 import { User, Search, ShieldAlert, ShieldOff, BellOff, Bell, TriangleAlert, RotateCcw } from "lucide-react";
 import { FlagIcon } from "@/components/flag-icon";
 import { getRankInfo } from "@/lib/ranks";
+import { AdminUserProfileControls } from "@/components/admin-user-profile-controls";
 
 type SearchedUser = {
   id: string;
@@ -76,7 +77,7 @@ function timeUntil(value: string | null | undefined) {
   const days = Math.floor(ms / DAY_MS);
   const hours = Math.floor((ms % DAY_MS) / (60 * 60 * 1000));
   if (days > 0) return `${days}d ${hours}h remaining`;
-  const mins = Math.floor((ms % (60 * 60 * 1000)) / 60000);
+  const mins = Math.floor((ms % (60 * 60 * 1000)) / 60000;
   return `${hours > 0 ? `${hours}h ` : ""}${mins}m remaining`;
 }
 
@@ -101,7 +102,6 @@ export function AdminUserSearch() {
   const [editForm, setEditForm] = useState({ displayName: "", bio: "", website: "", profileHandle: "" });
   const [title, setTitle] = useState("");
   const [titleColor, setTitleColor] = useState("#a78bfa");
-  const [rhpInput, setRhpInput] = useState("");
   const [resetting, setResetting] = useState(false);
 
   async function search() {
@@ -195,32 +195,6 @@ export function AdminUserSearch() {
       await search();
     } catch (titleError) {
       setError(titleError instanceof Error ? titleError.message : "Could not save profile title.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function saveRhp() {
-    if (!user) return;
-    const rhp = Number(rhpInput);
-    if (!Number.isFinite(rhp) || rhp < 0) {
-      setError("Enter a valid RHP value (0 or more).");
-      return;
-    }
-    setBusy(true);
-    setError("");
-    try {
-      const response = await fetch(`/api/admin/users/${encodeURIComponent(user.id)}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rhp: Math.round(rhp) }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error ?? "Could not update RHP.");
-      setRhpInput("");
-      await search();
-    } catch (rhpError) {
-      setError(rhpError instanceof Error ? rhpError.message : "Could not update RHP.");
     } finally {
       setBusy(false);
     }
@@ -368,11 +342,8 @@ export function AdminUserSearch() {
                   );
                 })()}
                 <div className="mt-2 border-t border-border pt-3">
-                  <p className="text-xs text-muted">Set RHP directly</p>
-                  <div className="mt-2 flex gap-2">
-                    <input value={rhpInput} onChange={(e) => setRhpInput(e.target.value)} type="number" min={0} placeholder={String(user.ranked.rhp)} className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-white outline-none focus:border-accent" />
-                    <button onClick={saveRhp} disabled={busy || rhpInput === ""} className="shrink-0 rounded-xl bg-accent px-4 py-2 text-xs font-semibold text-white transition hover:bg-accent2 disabled:opacity-50">{busy ? "Saving…" : "Save"}</button>
-                  </div>
+                  <p className="text-xs text-muted">Edit RPL, RPS, RPV, and RBP. RHP is calculated automatically from RPL + RPS + RPV; RBP stays separate.</p>
+                  <AdminUserProfileControls userId={user.id} />
                 </div>
                 <button onClick={resetRanked} disabled={resetting || busy} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-red-400/40 bg-red-400/10 px-4 py-2 text-xs font-semibold text-red-200 transition hover:bg-red-400/20 disabled:opacity-50"><RotateCcw size={13} /> {resetting ? "Resetting…" : "Reset ranked status to zero"}</button>
               </div>
