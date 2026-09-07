@@ -29,6 +29,10 @@ export default async function AdminTournamentsPage() {
   const higherCount = activeSignups.filter((signup: any) => signup.split === "higher").length;
   const lowerCap = mode ? tournamentCapState(mode, lowerCount) : null;
   const higherCap = mode ? tournamentCapState(mode, higherCount) : null;
+  const capacityRows = lowerCap && higherCap ? [
+    { label: "Lower", cap: lowerCap, textClass: "text-sky-200", gradientClass: "from-sky-400/80 to-cyan-300/80" },
+    { label: "Higher", cap: higherCap, textClass: "text-violet-200", gradientClass: "from-violet-400/80 to-fuchsia-300/80" },
+  ] : [];
 
   return <div className="space-y-6">
     <section className="rounded-3xl border border-border bg-surface/95 p-7 shadow-glow">
@@ -68,15 +72,14 @@ export default async function AdminTournamentsPage() {
           <p className="text-xs text-muted">Caps: {lowerCap.caps.join(" / ")} players per split</p>
         </div>
         <div className="mt-5 grid gap-4 lg:grid-cols-2">
-          {[["Lower", lowerCap, "text-sky-200", "from-sky-400/80 to-cyan-300/80"], ["Higher", higherCap, "text-violet-200", "from-violet-400/80 to-fuchsia-300/80"]].map(([label, cap, textClass, gradientClass]) => {
-            const splitCap = cap as ReturnType<typeof tournamentCapState>;
-            const needed = splitCap.next == null ? 0 : Math.max(0, splitCap.next - splitCap.count);
-            const target = splitCap.next ?? splitCap.maximum;
-            const progress = Math.min(100, Math.round((splitCap.count / target) * 100));
-            return <div key={label as string} className="rounded-2xl bg-black/20 p-4 ring-1 ring-white/8">
-              <div className="flex items-start justify-between gap-4"><div><p className={`text-sm font-bold ${textClass}`}>{label}</p><p className="mt-1 text-2xl font-black text-white">{splitCap.count}<span className="text-sm font-semibold text-muted"> / {target}</span></p></div><span className="rounded-full bg-white/[0.06] px-3 py-1 text-[11px] font-semibold text-muted">{splitCap.full ? "Maximum bracket full" : splitCap.secured > 0 ? `${capLabel(mode, splitCap.secured)} secured` : `Minimum ${capLabel(mode, splitCap.minimum)}`}</span></div>
-              <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-white/[0.07]"><div className={`h-full rounded-full bg-gradient-to-r ${gradientClass}`} style={{ width: `${Math.max(splitCap.count > 0 ? 4 : 0, progress)}%` }} /></div>
-              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs"><span className="text-muted">{splitCap.full ? capLabel(mode, splitCap.maximum) : `Next: ${capLabel(mode, target)}`}</span><span className={needed === 0 ? "font-semibold text-emerald-300" : "font-semibold text-white"}>{splitCap.full ? "Full" : `${needed} player${needed === 1 ? "" : "s"} needed`}</span></div>
+          {capacityRows.map(({ label, cap, textClass, gradientClass }) => {
+            const needed = cap.next == null ? 0 : Math.max(0, cap.next - cap.count);
+            const target = cap.next ?? cap.maximum;
+            const progress = Math.min(100, Math.round((cap.count / target) * 100));
+            return <div key={label} className="rounded-2xl bg-black/20 p-4 ring-1 ring-white/8">
+              <div className="flex items-start justify-between gap-4"><div><p className={`text-sm font-bold ${textClass}`}>{label}</p><p className="mt-1 text-2xl font-black text-white">{cap.count}<span className="text-sm font-semibold text-muted"> / {target}</span></p></div><span className="rounded-full bg-white/[0.06] px-3 py-1 text-[11px] font-semibold text-muted">{cap.full ? "Maximum bracket full" : cap.secured > 0 ? `${capLabel(mode, cap.secured)} secured` : `Minimum ${capLabel(mode, cap.minimum)}`}</span></div>
+              <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-white/[0.07]"><div className={`h-full rounded-full bg-gradient-to-r ${gradientClass}`} style={{ width: `${Math.max(cap.count > 0 ? 4 : 0, progress)}%` }} /></div>
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs"><span className="text-muted">{cap.full ? capLabel(mode, cap.maximum) : `Next: ${capLabel(mode, target)}`}</span><span className={needed === 0 ? "font-semibold text-emerald-300" : "font-semibold text-white"}>{cap.full ? "Full" : `${needed} player${needed === 1 ? "" : "s"} needed`}</span></div>
             </div>;
           })}
         </div>
