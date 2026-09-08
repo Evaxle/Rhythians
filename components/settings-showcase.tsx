@@ -19,6 +19,7 @@ type Entry = {
   profileHandle: string;
   avatar: string | null;
   globalRank: number | null;
+  rhythiansGlobalRank: number | null;
   rhp: number;
   profileUsername: string | null;
   profileUrl: string | null;
@@ -37,6 +38,7 @@ export function SettingsShowcase() {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setError("");
     fetch("/api/settings", { cache: "no-store" })
       .then(async (response) => {
         const data = await response.json().catch(() => null);
@@ -67,7 +69,7 @@ export function SettingsShowcase() {
           <div>
             <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-accent"><Settings2 size={15} /> Community settings</p>
             <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Player settings</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-muted">Browse shared Rhythia settings with live connected-profile information and looping gameplay previews.</p>
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-muted">Browse shared Rhythia settings with the player&apos;s real connected Rhythia rank, Rhythians leaderboard position, downloadable RHS file, and looping gameplay preview.</p>
           </div>
           <div className="flex rounded-2xl border border-border bg-background/60 p-1">
             <button type="button" onClick={() => setMode("spin")} className={`rounded-xl px-5 py-2.5 text-sm font-semibold transition ${mode === "spin" ? "bg-accent text-white shadow-lg" : "text-muted hover:text-white"}`}>Spin</button>
@@ -88,7 +90,7 @@ export function SettingsShowcase() {
         </section>
       ) : (
         <section className="space-y-5">
-          {visible.map((entry, index) => {
+          {visible.map((entry) => {
             const rank = getRankInfo(Number(entry.rhp ?? 0));
             const displayName = entry.displayName || entry.profileUsername || entry.username;
             return (
@@ -105,16 +107,23 @@ export function SettingsShowcase() {
                       <div className="min-w-0">
                         <a href={`/profile/${encodeURIComponent(entry.profileHandle)}`} className="block truncate text-base font-semibold text-white hover:text-accent">{displayName}</a>
                         <p className="mt-1 truncate text-xs text-muted">{entry.profileUsername ? `Rhythia: ${entry.profileUsername}` : `@${entry.profileHandle}`}</p>
-                        <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted">
-                          <span>{entry.globalRank ? `Global #${entry.globalRank.toLocaleString()}` : "Global rank unavailable"}</span>
-                          {entry.country ? <span>· {entry.flag ? `${entry.flag} ` : ""}{entry.country}</span> : null}
-                        </div>
+                        {entry.country ? <p className="mt-1 text-xs text-muted">{entry.flag ? `${entry.flag} ` : ""}{entry.country}</p> : null}
                       </div>
                     </div>
 
                     <div className="mt-6 grid gap-3 sm:grid-cols-2">
                       <div className="rounded-2xl border border-border bg-background/50 p-3">
-                        <div className="flex items-center gap-2"><RankIcon rank={rank} size={30} /><div><p className="text-[10px] uppercase tracking-[0.16em] text-muted">RHP rank</p><p className="text-sm font-semibold" style={{ color: rank.color }}>{rank.isExpert ? "Expert" : `${rank.name} ${rank.tier}`}</p></div></div>
+                        <p className="text-[10px] uppercase tracking-[0.16em] text-muted">Rhythians global rank</p>
+                        <p className="mt-1 text-lg font-bold text-white">{entry.rhythiansGlobalRank ? `#${entry.rhythiansGlobalRank.toLocaleString()}` : "Unavailable"}</p>
+                        <p className="mt-1 text-xs text-muted">Placement on the Rhythians RHP leaderboard</p>
+                      </div>
+                      <div className="rounded-2xl border border-border bg-background/50 p-3">
+                        <p className="text-[10px] uppercase tracking-[0.16em] text-muted">Rhythia global rank</p>
+                        <p className="mt-1 text-lg font-bold text-white">{entry.globalRank ? `#${entry.globalRank.toLocaleString()}` : "Unavailable"}</p>
+                        <p className="mt-1 text-xs text-muted">Live rank from the connected Rhythia profile</p>
+                      </div>
+                      <div className="rounded-2xl border border-border bg-background/50 p-3">
+                        <div className="flex items-center gap-2"><RankIcon rank={rank} size={30} /><div><p className="text-[10px] uppercase tracking-[0.16em] text-muted">Player classification</p><p className="text-sm font-semibold" style={{ color: entry.rhythianRankColor || rank.color }}>{entry.rhythianRank || (rank.isExpert ? "Expert" : `${rank.name} ${rank.tier}`)}</p></div></div>
                       </div>
                       <div className="rounded-2xl border border-border bg-background/50 p-3">
                         <p className="text-[10px] uppercase tracking-[0.16em] text-muted">Rhythians points</p>
@@ -126,7 +135,7 @@ export function SettingsShowcase() {
                     {entry.description ? <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{entry.description}</p> : null}
 
                     <div className="mt-6 flex flex-wrap gap-2">
-                      {entry.settingsFileUrl ? <a href={entry.settingsFileUrl} download={entry.settingsFileName} className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent2"><Download size={14} /> Download RHS</a> : null}
+                      {entry.settingsFileUrl ? <a href={entry.settingsFileUrl} className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent2"><Download size={14} /> Download {entry.settingsFileName || "RHS"}</a> : null}
                       {entry.profileUrl ? <a href={entry.profileUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-border bg-background/50 px-4 py-2 text-sm font-semibold text-muted transition hover:border-accent/40 hover:text-white"><ExternalLink size={14} /> Rhythia profile</a> : null}
                     </div>
                   </div>
@@ -136,7 +145,6 @@ export function SettingsShowcase() {
                     <span className="pointer-events-none absolute bottom-3 left-3 rounded-full border border-white/10 bg-black/60 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white/80 backdrop-blur">Muted · looping preview</span>
                   </div>
                 </div>
-                <span className="absolute right-4 top-4 rounded-full border border-white/10 bg-black/50 px-2.5 py-1 text-xs font-bold tabular-nums backdrop-blur" style={{ color: rank.color }}>#{index + 1}</span>
               </article>
             );
           })}
