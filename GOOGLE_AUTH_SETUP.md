@@ -7,13 +7,14 @@ Rhythians uses Google OAuth directly with the existing Rhythians session system.
 1. Open Google Cloud Console and select or create the project you want to use for Rhythians.
 2. Open Google Auth Platform and configure the OAuth consent screen.
 3. Set the app name to `Rhythians` and add your support/developer contact email.
-4. Add `rhythians.vercel.app` as an authorized domain if Google asks for one.
-5. Create an OAuth client ID with application type `Web application`.
-6. Add this Authorized JavaScript origin:
+4. Create an OAuth client ID with application type `Web application`.
+5. Add this Authorized JavaScript origin:
    - `https://rhythians.vercel.app`
-7. Add this Authorized redirect URI exactly:
+6. Add this Authorized redirect URI exactly:
    - `https://rhythians.vercel.app/api/auth/google/callback`
-8. Copy the generated Client ID and Client Secret.
+7. Copy the generated Client ID and Client Secret.
+
+If Google requires an Authorized Domain that you must verify ownership of for branding or production verification, use a custom domain that you own and connect it to Rhythians. Do not attempt to verify ownership of `vercel.app`. After moving authentication to a custom domain, update the OAuth origin, redirect URI, and `GOOGLE_REDIRECT_URI` to use that domain.
 
 ## Vercel environment variables
 
