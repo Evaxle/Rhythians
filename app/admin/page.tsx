@@ -15,6 +15,7 @@ export default function AdminDashboardPage() {
       <AdminDailyRefresh />
       <RatingCalculators />
       <div className="grid gap-6 lg:grid-cols-3">
+        <Link href="/admin/ranking" className="rounded-3xl border border-accent/30 bg-accent/10 p-6 text-sm font-semibold text-white transition hover:border-accent/60">Ranking system controls</Link>
         <Link href="/admin/users" className="rounded-3xl border border-border bg-surface/95 p-6 text-sm text-white transition hover:border-accent/40">Users and rating tools</Link>
         <Link href="/admin/maps" className="rounded-3xl border border-border bg-surface/95 p-6 text-sm text-white transition hover:border-accent/40">Manage ranked maps</Link>
         <Link href="/admin/clips" className="rounded-3xl border border-border bg-surface/95 p-6 text-sm text-white transition hover:border-accent/40">Review clips</Link>
