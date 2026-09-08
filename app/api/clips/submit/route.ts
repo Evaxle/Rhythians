@@ -53,7 +53,7 @@ export async function POST(request: Request) {
       const validated = validateExternalClipUrl(sourceType, sourceUrl);
       canonicalSourceUrl = validated.url;
       storagePath = externalClipPath(sourceType, validated.url);
-      const suppliedThumbnail = typeof body?.sourceThumbnailUrl === "string" ? body.sourceThumbnailUrl.trim() : "";
+      const suppliedThumbnail = sourceType === "twitch" && typeof body?.sourceThumbnailUrl === "string" ? body.sourceThumbnailUrl.trim() : "";
       const thumbnailUrl = suppliedThumbnail || validated.thumbnailUrl;
       if (thumbnailUrl) {
         const parsed = new URL(thumbnailUrl);
