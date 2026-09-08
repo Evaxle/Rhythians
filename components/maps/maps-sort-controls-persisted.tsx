@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { ComponentProps } from "react";
 import { Box, Glasses, Layers3, LockKeyhole, SlidersHorizontal, Sparkles } from "lucide-react";
 import { MapsBrowser } from "@/components/maps/maps-browser";
+import { modeRankInfo } from "@/lib/mode-ranks";
 
 export type MapModeTab = "all" | "lock" | "spin" | "vr" | "legacy";
 type SortKey = "rating" | "name" | "mapper" | "artist" | "length" | "notes" | "rhp";
@@ -13,12 +14,12 @@ type SavedMapFilters = { sortKey: SortKey; direction: Direction; scoreFilter: Sc
 export type ModeScoreMap = Record<string, { lock: number; spin: number; vr: number }>;
 
 const FILTER_STORAGE_KEY = "rhythians:maps:filters:v2";
-const tabs: Array<{ key: MapModeTab; label: string; detail: string; icon: typeof Layers3 }> = [
-  { key: "all", label: "All eligible", detail: "Your rank", icon: Layers3 },
-  { key: "lock", label: "RPL", detail: "Lock", icon: LockKeyhole },
-  { key: "spin", label: "RPS", detail: "Spin", icon: Sparkles },
-  { key: "vr", label: "RPV", detail: "VR", icon: Glasses },
-  { key: "legacy", label: "Legacy", detail: "Ranked archive", icon: Box },
+const tabs: Array<{ key: MapModeTab; label: string; icon: typeof Layers3 }> = [
+  { key: "all", label: "All eligible", icon: Layers3 },
+  { key: "lock", label: "RPL", icon: LockKeyhole },
+  { key: "spin", label: "RPS", icon: Sparkles },
+  { key: "vr", label: "RPV", icon: Glasses },
+  { key: "legacy", label: "Legacy", icon: Box },
 ];
 
 function textValue(value: string | null | undefined) { return (value ?? "").trim().toLowerCase(); }
@@ -64,6 +65,20 @@ export function MapsSortControlsPersisted({ maps, rankInfo, userRhp, currentUser
     } catch {}
   }, [sortKey, direction, scoreFilter, showUnranked, showLegacy, modeTab]);
 
+  const totals = modeScores.__totals__ ?? { lock: 0, spin: 0, vr: 0 };
+  const modeRanks = {
+    lock: modeRankInfo(Number(totals.lock ?? 0), "lock"),
+    spin: modeRankInfo(Number(totals.spin ?? 0), "spin"),
+    vr: modeRankInfo(Number(totals.vr ?? 0), "vr"),
+  };
+  const rankText = (key: MapModeTab) => {
+    if (key === "all") return rankInfo.isExpert ? `Expert · ${userRhp.toLocaleString()} RHP` : `${rankInfo.name} ${rankInfo.tier} · ${userRhp.toLocaleString()} RHP`;
+    if (key === "legacy") return "Ranked archive";
+    const info = modeRanks[key];
+    const points = Number(totals[key] ?? 0);
+    return `${info.isExpert ? "Expert" : `${info.name} ${info.tier}`} · ${points.toLocaleString()} ${key === "lock" ? "RPL" : key === "spin" ? "RPS" : "RPV"}`;
+  };
+
   const filteredMaps = useMemo(() => maps.filter((map) => {
     if (!map.isLegacy && !map.isRanked && !showUnranked) return false;
     if (modeTab === "legacy" && !map.isLegacy) return false;
@@ -88,11 +103,11 @@ export function MapsSortControlsPersisted({ maps, rankInfo, userRhp, currentUser
 
   return <div className="space-y-4">
     <nav className="grid grid-cols-2 gap-2 rounded-[1.75rem] border border-white/10 bg-black/15 p-2 sm:grid-cols-5" aria-label="Map point systems">
-      {tabs.map(({ key, label, detail, icon: Icon }) => {
+      {tabs.map(({ key, label, icon: Icon }) => {
         const active = modeTab === key;
         return <button key={key} type="button" onClick={() => { setModeTab(key); if (key === "legacy") setShowLegacy(true); }} className={`group rounded-2xl border px-3 py-3 text-left transition ${active ? "border-accent/45 bg-accent/12 shadow-[0_8px_30px_rgba(124,143,240,.12)]" : "border-transparent bg-white/[0.025] hover:border-white/10 hover:bg-white/[0.05]"}`}>
           <div className="flex items-center gap-2"><Icon size={15} className={active ? "text-accent" : "text-muted group-hover:text-white"} /><span className="text-sm font-bold text-white">{label}</span></div>
-          <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.13em] text-muted">{detail}</span>
+          <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.08em] text-muted">{rankText(key)}</span>
         </button>;
       })}
     </nav>
