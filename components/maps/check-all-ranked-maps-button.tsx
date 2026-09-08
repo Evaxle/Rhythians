@@ -22,7 +22,7 @@ export function CheckAllRankedMapsButton() {
       if (!response.ok) throw new Error(data.error ?? "Unable to check your scores.");
       lastCheckRef.current = Date.now();
       const summary = `Synced ${data.foundScores} unique scores · 🔒 ${data.rpl} RPL · 🌀 ${data.rps} RPS · 🥽 ${data.rpv} RPV · ${data.rhp} RHP.`;
-      if (manual || Number(data.added ?? 0) > 0) setMessage(summary);
+      if (manual || Number(data.awarded ?? 0) > 0) setMessage(summary);
       router.refresh();
     } catch (error) {
       if (manual) setMessage(error instanceof Error ? error.message : "Unable to check your scores.");
