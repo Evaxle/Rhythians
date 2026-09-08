@@ -10,7 +10,7 @@ const SECURITY_HEADERS: Record<string, string> = {
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors http://tauri.localhost https://tauri.localhost http://localhost:1420 http://127.0.0.1:1420",
-    "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://www.tiktok.com https://clips.twitch.tv",
+    "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://www.tiktok.com https://clips.twitch.tv https://medal.tv https://*.medal.tv",
     "object-src 'none'",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
     "style-src 'self' 'unsafe-inline'",
