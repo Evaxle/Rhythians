@@ -1,4 +1,5 @@
 import type { PrismaClient } from "../generated/prisma/client";
+import { rhythiaRequest } from "@/lib/rhythia";
 
 const AUTOMATIC_RANKS = [
   { name: "Beginner", slug: "beginner", displayOrder: 1, color: "#60a5fa" },
@@ -18,6 +19,31 @@ export function classificationForGlobalRank(globalRank: number | null | undefine
   if (globalRank <= 1000) return "experienced";
   if (globalRank <= 5000) return "intermediate";
   return "beginner";
+}
+
+function parseDateValue(value: unknown) {
+  if (typeof value !== "string" && typeof value !== "number") return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function findAccountCreatedAt(value: unknown): Date | null {
+  if (!value || typeof value !== "object") return null;
+  const record = value as Record<string, unknown>;
+  for (const key of ["created_at", "createdAt", "registered_at", "registeredAt", "joined_at", "joinedAt", "registration_date", "registrationDate"]) {
+    const parsed = parseDateValue(record[key]);
+    if (parsed) return parsed;
+  }
+  for (const key of ["user", "profile", "data", "account"]) {
+    const nested = findAccountCreatedAt(record[key]);
+    if (nested) return nested;
+  }
+  return null;
+}
+
+export async function fetchRhythiaAccountCreatedAt(profileId: number) {
+  const profile = await rhythiaRequest<Record<string, unknown>>("getProfile", { id: profileId });
+  return findAccountCreatedAt(profile);
 }
 
 export function accountTagsForCreatedAt(accountCreatedAt: Date | null | undefined) {
