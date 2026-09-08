@@ -43,6 +43,7 @@ export default async function ClipPage({ params }: Props) {
           userTags: {
             include: { tag: true },
           },
+          playerRank: true,
           rhythiaProfile: { select: { id: true, profileId: true, country: true, flag: true, isOnline: true, lastActiveAt: true, statusCheckedAt: true } },
         },
       },
@@ -57,6 +58,7 @@ export default async function ClipPage({ params }: Props) {
               userTags: {
                 include: { tag: true },
               },
+              playerRank: true,
               rhythiaProfile: { select: { country: true, flag: true } },
             },
           },
@@ -70,6 +72,7 @@ export default async function ClipPage({ params }: Props) {
               userTags: {
                 include: { tag: true },
               },
+              playerRank: true,
               rhythiaProfile: { select: { country: true, flag: true } },
             },
           },
@@ -170,6 +173,7 @@ export default async function ClipPage({ params }: Props) {
                     />
                   )}
                 </p>
+                {clip.uploader.playerRank && <p className="text-xs font-semibold" style={{ color: clip.uploader.playerRank.color ?? "#7289da" }}>{clip.uploader.playerRank.name}</p>}
                 <p className="text-xs text-muted">
                   {clip.createdAt.toLocaleDateString()}
                 </p>
@@ -272,6 +276,7 @@ export default async function ClipPage({ params }: Props) {
                   avatar: comment.author.avatar,
                   country: comment.author.rhythiaProfile?.country ?? null,
                   flag: comment.author.rhythiaProfile?.flag ?? null,
+                  playerRank: comment.author.playerRank ? { name: comment.author.playerRank.name, color: comment.author.playerRank.color } : null,
                   userTags: comment.author.userTags.map((ut) => ({
                     tag: { name: ut.tag.name, slug: ut.tag.slug },
                   })),
