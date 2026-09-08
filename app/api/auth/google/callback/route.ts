@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { createSession, setSessionCookie } from "@/lib/auth";
 import { recordReferral, REFERRAL_COOKIE_NAME } from "@/lib/referrals";
-import { NEXT_COOKIE, STATE_COOKIE } from "@/app/api/auth/google/route";
+import { GOOGLE_NEXT_COOKIE, GOOGLE_STATE_COOKIE } from "@/lib/google-auth";
 
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const GOOGLE_USERINFO_URL = "https://openidconnect.googleapis.com/v1/userinfo";
@@ -38,7 +38,7 @@ async function uniqueProfileHandle(value: string) {
 }
 
 function clearOAuthCookies(response: NextResponse) {
-  for (const name of [STATE_COOKIE, NEXT_COOKIE]) {
+  for (const name of [GOOGLE_STATE_COOKIE, GOOGLE_NEXT_COOKIE]) {
     response.cookies.set({ name, value: "", httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: 0 });
   }
 }
@@ -48,9 +48,10 @@ export async function GET(request: Request) {
   const code = requestUrl.searchParams.get("code");
   const state = requestUrl.searchParams.get("state");
   const cookieHeader = request.headers.get("cookie") ?? "";
-  const savedState = cookieHeader.match(new RegExp(`${STATE_COOKIE}=([^;]+)`))?.[1] ?? null;
-  const savedNext = cookieHeader.match(new RegExp(`${NEXT_COOKIE}=([^;]+)`))?.[1] ?? "/";
-  const next = decodeURIComponent(savedNext).startsWith("/") && !decodeURIComponent(savedNext).startsWith("//") ? decodeURIComponent(savedNext) : "/";
+  const savedState = cookieHeader.match(new RegExp(`${GOOGLE_STATE_COOKIE}=([^;]+)`))?.[1] ?? null;
+  const savedNext = cookieHeader.match(new RegExp(`${GOOGLE_NEXT_COOKIE}=([^;]+)`))?.[1] ?? "/";
+  const decodedNext = decodeURIComponent(savedNext);
+  const next = decodedNext.startsWith("/") && !decodedNext.startsWith("//") ? decodedNext : "/";
 
   if (!code || !state || !savedState || state !== decodeURIComponent(savedState)) {
     const response = NextResponse.redirect(new URL("/login?error=google_state", request.url));
