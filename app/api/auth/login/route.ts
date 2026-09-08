@@ -36,7 +36,7 @@ export async function POST(request: Request) {
   if (!(await verifyPassword(password, user.passwordHash))) return NextResponse.json({ error: "Invalid credentials." }, { status: 401 });
   if (user.isSuspended) return NextResponse.json({ error: "This account has been suspended." }, { status: 403 });
 
-  const redirectTo = next ?? (user.onboardingCompleted ? "/" : "/onboarding");
+  const redirectTo = next ?? "/";
   if (user.emailTwoFactorEnabled && user.emailVerifiedAt && user.email) {
     await prisma.emailMfaChallenge.deleteMany({ where: { userId: user.id, usedAt: null } });
     const code = createSecurityCode();
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
   }
 
   const token = await createSession(user.id);
-  const response = NextResponse.json({ user: { id: user.id, username: user.username, profileHandle: user.profileHandle, onboardingCompleted: user.onboardingCompleted }, redirectTo });
+  const response = NextResponse.json({ user: { id: user.id, username: user.username, profileHandle: user.profileHandle }, redirectTo });
   setSessionCookie(response, token);
   return response;
 }
