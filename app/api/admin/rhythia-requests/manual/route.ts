@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       await tx.$executeRawUnsafe('DELETE FROM "UserPointOverride" WHERE "userId"=$1 AND "system" IN (\'rhp\',\'rpl\',\'rps\',\'rpv\')', userId);
       await tx.rhythiaProfile.delete({ where: { userId } });
       await tx.user.update({ where: { id: userId }, data: { rhythiaVerified: false, scoreImportDone: false, lastRhythiaRpCheckAt: null, playerRankId: null, rhp: 0 } });
-      await tx.rhythiaProfileRequest.updateMany({ where: { userId, status: "pending" }, data: { status: "rejected", adminNote: `Link removed by admin ${admin.username}.`, resolvedAt: new Date(), resolvedBy: admin.id } });
+      await tx.rhythiaProfileRequest.updateMany({ where: { userId, status: "pending" }, data: { status: "denied", adminNote: `Link removed by admin ${admin.username}.`, resolvedAt: new Date(), resolvedBy: admin.id } });
       await tx.notification.create({ data: { userId, type: "moderation", title: "Rhythia profile unlinked", message: "Your linked Rhythia profile was removed by an admin. You can link a Rhythia account again from your profile.", url: "/settings" } });
       await tx.moderationAction.create({ data: { actorId: admin.id, action: "rhythia_profile_manually_unlinked", targetType: "user", targetId: userId, metadata: { profileId: oldProfile.profileId, profileUrl: oldProfile.profileUrl, rhythiaUsername: oldProfile.username } } });
     });
