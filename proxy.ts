@@ -10,6 +10,7 @@ const SECURITY_HEADERS: Record<string, string> = {
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors http://tauri.localhost https://tauri.localhost http://localhost:1420 http://127.0.0.1:1420",
+    "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://www.tiktok.com https://clips.twitch.tv",
     "object-src 'none'",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
     "style-src 'self' 'unsafe-inline'",
@@ -50,14 +51,10 @@ export function proxy(request: NextRequest) {
   }
 
   const response = NextResponse.next();
-  for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
-    response.headers.set(key, value);
-  }
+  for (const [key, value] of Object.entries(SECURITY_HEADERS)) response.headers.set(key, value);
   return response;
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|rhythians.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|mp4|webm|mov)$).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|rhythians.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|mp4|webm|mov)$).*)"],
 };
