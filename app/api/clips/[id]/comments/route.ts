@@ -39,8 +39,12 @@ export async function POST(request: Request, { params }: Props) {
     include: {
       author: {
         select: {
+          id: true,
           username: true,
           discriminator: true,
+          profileHandle: true,
+          avatar: true,
+          playerRank: { select: { name: true, color: true } },
           rhythiaProfile: { select: { country: true, flag: true } },
           userTags: {
             include: { tag: true },
@@ -56,10 +60,14 @@ export async function POST(request: Request, { params }: Props) {
       text: comment.text,
       createdAt: comment.createdAt.toISOString(),
       author: {
+        id: comment.author.id,
         username: comment.author.username,
         discriminator: comment.author.discriminator,
+        profileHandle: comment.author.profileHandle,
+        avatar: comment.author.avatar,
         country: comment.author.rhythiaProfile?.country ?? null,
         flag: comment.author.rhythiaProfile?.flag ?? null,
+        playerRank: comment.author.playerRank,
         userTags: comment.author.userTags.map((ut) => ({
           tag: { name: ut.tag.name, slug: ut.tag.slug },
         })),
