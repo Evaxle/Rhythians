@@ -9,14 +9,14 @@ export type RankDefinition = {
 
 export const RANKS: RankDefinition[] = [
   { index: 0, name: "Copper", minRhp: 0, color: "#b87333", rangeMin: 0.0, rangeMax: 1.09 },
-  { index: 1, name: "Bronze", minRhp: 500, color: "#cd7f32", rangeMin: 1.1, rangeMax: 1.49 },
-  { index: 2, name: "Silver", minRhp: 1000, color: "#c0c0c0", rangeMin: 1.5, rangeMax: 1.89 },
-  { index: 3, name: "Gold", minRhp: 1500, color: "#ffd700", rangeMin: 1.9, rangeMax: 2.29 },
-  { index: 4, name: "Platinum", minRhp: 2000, color: "#7fd4ff", rangeMin: 2.3, rangeMax: 2.69 },
-  { index: 5, name: "Emerald", minRhp: 2500, color: "#50c878", rangeMin: 2.7, rangeMax: 2.99 },
-  { index: 6, name: "Diamond", minRhp: 3000, color: "#b9f2ff", rangeMin: 3.0, rangeMax: 3.29 },
-  { index: 7, name: "Master", minRhp: 3500, color: "#a855f7", rangeMin: 3.3, rangeMax: 3.69 },
-  { index: 8, name: "Expert", minRhp: 4000, color: "#f43f5e", rangeMin: 3.7, rangeMax: 9.99 },
+  { index: 1, name: "Bronze", minRhp: 750, color: "#cd7f32", rangeMin: 1.1, rangeMax: 1.49 },
+  { index: 2, name: "Silver", minRhp: 1600, color: "#c0c0c0", rangeMin: 1.5, rangeMax: 1.89 },
+  { index: 3, name: "Gold", minRhp: 2700, color: "#ffd700", rangeMin: 1.9, rangeMax: 2.29 },
+  { index: 4, name: "Platinum", minRhp: 4000, color: "#7fd4ff", rangeMin: 2.3, rangeMax: 2.69 },
+  { index: 5, name: "Emerald", minRhp: 5500, color: "#50c878", rangeMin: 2.7, rangeMax: 2.99 },
+  { index: 6, name: "Diamond", minRhp: 7200, color: "#b9f2ff", rangeMin: 3.0, rangeMax: 3.29 },
+  { index: 7, name: "Master", minRhp: 9200, color: "#a855f7", rangeMin: 3.3, rangeMax: 3.69 },
+  { index: 8, name: "Expert", minRhp: 12000, color: "#f43f5e", rangeMin: 3.7, rangeMax: 9.99 },
 ];
 
 export const RANK_TIERS = 5;
@@ -42,19 +42,33 @@ export type RankInfo = {
   rangeMax: number;
 };
 
+export function rankTierBounds(rankIndex: number, tier: number) {
+  const index = Math.max(0, Math.min(RANKS.length - 1, Math.floor(rankIndex)));
+  const rank = RANKS[index];
+  if (index === RANKS.length - 1) return { start: rank.minRhp, end: Number.POSITIVE_INFINITY };
+  const safeTier = Math.max(1, Math.min(RANK_TIERS, Math.floor(tier)));
+  const next = RANKS[index + 1].minRhp;
+  const span = next - rank.minRhp;
+  const start = rank.minRhp + Math.floor(span * (safeTier - 1) / RANK_TIERS);
+  const end = safeTier === RANK_TIERS ? next : rank.minRhp + Math.floor(span * safeTier / RANK_TIERS);
+  return { start, end };
+}
+
 export function getRankInfo(rhp: number): RankInfo {
   const safe = Math.max(0, Math.floor(rhp));
-  const index = Math.min(RANKS.length - 1, Math.floor(safe / RANK_SPAN));
+  let index = RANKS.length - 1;
+  for (let i = RANKS.length - 1; i >= 0; i -= 1) if (safe >= RANKS[i].minRhp) { index = i; break; }
   const rank = RANKS[index];
+  const isExpert = index === RANKS.length - 1;
+  const nextRankStart = isExpert ? null : RANKS[index + 1].minRhp;
+  if (isExpert) return { index, name: rank.name, tier: 1, isExpert: true, minRhp: rank.minRhp, maxRhp: null, tierStart: rank.minRhp, tierEnd: Number.POSITIVE_INFINITY, nextTierStart: rank.minRhp, nextRankStart: null, color: rank.color, progressToNextTier: 1, rangeMin: rank.rangeMin, rangeMax: rank.rangeMax };
+  const rankSpan = nextRankStart! - rank.minRhp;
   const within = safe - rank.minRhp;
-  const tier = Math.min(RANK_TIERS, Math.floor(within / TIER_SPAN) + 1);
-  const tierStart = rank.minRhp + (tier - 1) * TIER_SPAN;
-  const tierEnd = Math.min(tierStart + TIER_SPAN, rank.minRhp + RANK_SPAN);
-  const nextTierStart = Math.min(rank.minRhp + tier * TIER_SPAN, rank.minRhp + RANK_SPAN);
-  const progressToNextTier = Math.min(1, Math.max(0, (safe - tierStart) / TIER_SPAN));
-  const nextRankStart = index < RANKS.length - 1 ? RANKS[index + 1].minRhp : null;
-
-  return { index, name: rank.name, tier, isExpert: index === RANKS.length - 1, minRhp: rank.minRhp, maxRhp: index < RANKS.length - 1 ? rank.minRhp + RANK_SPAN : null, tierStart, tierEnd, nextTierStart, nextRankStart, color: rank.color, progressToNextTier, rangeMin: rank.rangeMin, rangeMax: rank.rangeMax };
+  const tier = Math.min(RANK_TIERS, Math.floor(within * RANK_TIERS / rankSpan) + 1);
+  const bounds = rankTierBounds(index, tier);
+  const tierSpan = Math.max(1, bounds.end - bounds.start);
+  const progressToNextTier = Math.min(1, Math.max(0, (safe - bounds.start) / tierSpan));
+  return { index, name: rank.name, tier, isExpert: false, minRhp: rank.minRhp, maxRhp: nextRankStart, tierStart: bounds.start, tierEnd: bounds.end, nextTierStart: bounds.end, nextRankStart, color: rank.color, progressToNextTier, rangeMin: rank.rangeMin, rangeMax: rank.rangeMax };
 }
 
 export function isMapInRankRange(rating: number, rankIndex: number): boolean {
@@ -67,13 +81,8 @@ export function rankIndexForRating(rating: number): number {
   return index === -1 ? RANKS.length - 1 : index;
 }
 
-export function roundRating(value: number): number {
-  return Math.round(value * 100) / 100;
-}
-
-export function fairRatingFromStars(stars: number): number {
-  return roundRating(stars * 0.41);
-}
+export function roundRating(value: number): number { return Math.round(value * 100) / 100; }
+export function fairRatingFromStars(stars: number): number { return roundRating(stars * 0.41); }
 
 export function difficultyFactorForRating(rating: number, rankIndex: number): number {
   const rank = RANKS[rankIndex] ?? RANKS[RANKS.length - 1];
@@ -90,7 +99,6 @@ export function baseRhpForRating(rating: number, rankIndex?: number): number {
 }
 
 const MAP_LENGTH_REFERENCE_SECONDS = 180;
-
 export function lengthMultiplier(lengthSeconds: number | null | undefined): number {
   if (lengthSeconds == null || !Number.isFinite(lengthSeconds) || lengthSeconds <= 0) return 1;
   const ratio = Math.sqrt(lengthSeconds / MAP_LENGTH_REFERENCE_SECONDS);
@@ -118,9 +126,7 @@ export function rhpGainForMap(rating: number, accuracy: number | null, speed?: n
   return Math.max(5, Math.round(base * multiplier));
 }
 
-export function rhpFromRhythiaRp(rp: number): number {
-  return 0;
-}
+export function rhpFromRhythiaRp(_rp: number): number { return 0; }
 
 export function rhpLossForMap(rating: number, context: { totalBeaters: number; yourPlace: number }): number {
   const base = Math.max(5, Math.round(rating * 10));
@@ -135,11 +141,7 @@ export function accuracyFromMisses(notes: number | null, misses: number | null):
   return Math.max(0, Math.min(100, ((notes - misses) / notes) * 100));
 }
 
-export function rankLabel(info: RankInfo): string {
-  if (info.isExpert) return "Expert";
-  return `${info.name} ${info.tier}`;
-}
-
+export function rankLabel(info: RankInfo): string { return info.isExpert ? "Expert" : `${info.name} ${info.tier}`; }
 export function describeRatingRange(rating: number): string {
   const matched = RANKS.find((rank) => rating >= rank.rangeMin && rating <= rank.rangeMax);
   return matched?.name ?? (rating > RANKS[RANKS.length - 1].rangeMax ? RANKS[RANKS.length - 1].name : RANKS[0].name);
