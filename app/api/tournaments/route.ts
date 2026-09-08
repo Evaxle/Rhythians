@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { fetchRhythiaProfile } from "@/lib/rhythia";
+import { fetchRhythiaAccountCreatedAt, syncAutomaticPlayerClassification } from "@/lib/player-classification";
 import { postponeDueTournaments } from "@/lib/tournament-schedule";
 import { prepareTournamentCapacityForSignup } from "@/lib/tournament-cap-overrides";
 import { parseTournamentSplit, requestTournamentSplit, splitForRhp, withdrawTournamentSignup, type TournamentSplit } from "@/lib/tournaments";
@@ -17,8 +18,12 @@ async function tournamentSplitForUser(userId: string, fallbackRhp: number): Prom
   let globalRank = linked.globalRank;
   try {
     const profile = await fetchRhythiaProfile(linked.profileId);
+    const accountCreatedAt = await fetchRhythiaAccountCreatedAt(linked.profileId).catch(() => null);
     globalRank = profile.globalRank;
-    await prisma.rhythiaProfile.update({ where: { userId }, data: { globalRank: profile.globalRank, countryRank: profile.countryRank, rhythmPoints: profile.rhythmPoints, username: profile.username, country: profile.country, flag: profile.flag, title: profile.title, syncedAt: new Date() } });
+    await prisma.$transaction(async (tx) => {
+      await tx.rhythiaProfile.update({ where: { userId }, data: { globalRank: profile.globalRank, countryRank: profile.countryRank, rhythmPoints: profile.rhythmPoints, username: profile.username, country: profile.country, flag: profile.flag, title: profile.title, syncedAt: new Date() } });
+      await syncAutomaticPlayerClassification(tx, userId, profile.globalRank, accountCreatedAt);
+    });
   } catch {}
   if (typeof globalRank === "number" && Number.isFinite(globalRank) && globalRank > 0) return globalRank <= 500 ? "higher" : "lower";
   return splitForRhp(fallbackRhp);
