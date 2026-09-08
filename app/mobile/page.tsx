@@ -1,11 +1,18 @@
 import Link from "next/link";
-import { ArrowRight, Bell, Download, Gauge, Map, MessageCircle, ShieldCheck, Smartphone, Sparkles, Trophy } from "lucide-react";
+import { ArrowRight, Bell, Download, Gauge, Map, MessageCircle, ShieldCheck, Smartphone, Sparkles, Trophy, type LucideIcon } from "lucide-react";
 import { MobileAppInstall } from "@/components/mobile-app-install";
 
 export const metadata = {
   title: "Rhythians Mobile App",
   description: "Install Rhythians on your phone as a fast standalone mobile web app.",
 };
+
+const features: Array<{ icon: LucideIcon; title: string; text: string }> = [
+  { icon: Trophy, title: "Battles & tournaments", text: "Join battles, follow brackets, and submit tournament results from your phone." },
+  { icon: Map, title: "Maps", text: "Browse ranked maps, categories, daily maps, and your progression." },
+  { icon: MessageCircle, title: "Community", text: "Use comments, messaging, profiles, clips, and community features." },
+  { icon: Bell, title: "Standalone experience", text: "Launch from your home screen without the normal browser chrome." },
+];
 
 export default function MobilePage() {
   return (
@@ -31,15 +38,7 @@ export default function MobilePage() {
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          [Trophy, "Battles & tournaments", "Join battles, follow brackets, and submit tournament results from your phone."],
-          [Map, "Maps", "Browse ranked maps, categories, daily maps, and your progression."],
-          [MessageCircle, "Community", "Use comments, messaging, profiles, clips, and community features."],
-          [Bell, "Standalone experience", "Launch from your home screen without the normal browser chrome."],
-        ].map(([Icon, title, text]) => {
-          const FeatureIcon = Icon as typeof Trophy;
-          return <div key={String(title)} className="ui-card rounded-3xl p-5"><span className="inline-flex rounded-2xl bg-accent/10 p-3 text-accent"><FeatureIcon size={21} /></span><h2 className="mt-4 font-semibold text-white">{String(title)}</h2><p className="mt-2 text-sm leading-6 text-muted">{String(text)}</p></div>;
-        })}
+        {features.map(({ icon: Icon, title, text }) => <div key={title} className="ui-card rounded-3xl p-5"><span className="inline-flex rounded-2xl bg-accent/10 p-3 text-accent"><Icon size={21} /></span><h2 className="mt-4 font-semibold text-white">{title}</h2><p className="mt-2 text-sm leading-6 text-muted">{text}</p></div>)}
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
