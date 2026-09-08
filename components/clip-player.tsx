@@ -1,16 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { tiktokVideoId, twitchClipSlug, youtubeVideoId } from "@/lib/clip-source";
+import { medalClipId, tiktokVideoId, twitchClipSlug, youtubeVideoId } from "@/lib/clip-source";
 import "plyr/dist/plyr.css";
 
-function externalEmbed(src: string, hostname: string | null) {
+export function externalVideoEmbed(src: string, hostname: string | null, autoplay = false, loop = false) {
   const youtube = youtubeVideoId(src);
-  if (youtube) return { type: "youtube", url: `https://www.youtube.com/embed/${youtube}?rel=0` };
+  if (youtube) return { type: "youtube", url: `https://www.youtube.com/embed/${youtube}?rel=0&autoplay=${autoplay ? 1 : 0}&mute=${autoplay ? 1 : 0}&loop=${loop ? 1 : 0}&playlist=${youtube}` };
   const tiktok = tiktokVideoId(src);
-  if (tiktok) return { type: "tiktok", url: `https://www.tiktok.com/player/v1/${tiktok}?autoplay=0` };
+  if (tiktok) return { type: "tiktok", url: `https://www.tiktok.com/player/v1/${tiktok}?autoplay=${autoplay ? 1 : 0}&loop=${loop ? 1 : 0}&mute=${autoplay ? 1 : 0}` };
   const twitch = twitchClipSlug(src);
-  if (twitch) return { type: "twitch", url: hostname ? `https://clips.twitch.tv/embed?clip=${encodeURIComponent(twitch)}&parent=${encodeURIComponent(hostname)}&autoplay=false` : null };
+  if (twitch) return { type: "twitch", url: hostname ? `https://clips.twitch.tv/embed?clip=${encodeURIComponent(twitch)}&parent=${encodeURIComponent(hostname)}&autoplay=${autoplay ? "true" : "false"}&muted=${autoplay ? "true" : "false"}` : null };
+  const medal = medalClipId(src);
+  if (medal) return { type: "medal", url: `https://medal.tv/clip/${encodeURIComponent(medal)}?autoplay=${autoplay ? "1" : "0"}&muted=${autoplay ? "1" : "0"}` };
   return null;
 }
 
@@ -18,7 +20,7 @@ export function ClipPlayer({ src }: { src: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hostname, setHostname] = useState<string | null>(null);
   useEffect(() => setHostname(window.location.hostname), []);
-  const embed = useMemo(() => externalEmbed(src, hostname), [src, hostname]);
+  const embed = useMemo(() => externalVideoEmbed(src, hostname), [src, hostname]);
 
   useEffect(() => {
     if (embed) return;
@@ -36,7 +38,7 @@ export function ClipPlayer({ src }: { src: string }) {
   }, [embed]);
 
   if (embed) {
-    if (!embed.url) return <div className="flex h-full min-h-[300px] items-center justify-center text-sm text-muted">Loading Twitch clip…</div>;
+    if (!embed.url) return <div className="flex h-full min-h-[300px] items-center justify-center text-sm text-muted">Loading external clip…</div>;
     return <iframe src={embed.url} title={`${embed.type} clip`} allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture; fullscreen" allowFullScreen className="h-full min-h-[300px] w-full border-0" />;
   }
 
