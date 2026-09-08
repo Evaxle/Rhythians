@@ -1,6 +1,7 @@
 import { prisma } from "./db";
 import { supabaseAdmin } from "./supabase";
 import { censorProfanity } from "./profanity";
+import { parseExternalPath } from "./clip-source";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const daysAgo = (n: number) => new Date(Date.now() - n * DAY_MS);
@@ -23,12 +24,7 @@ async function censorComments(): Promise<number> {
   let total = 0;
   let cursor: string | undefined;
   for (;;) {
-    const rows = await prisma.comment.findMany({
-      take: 500,
-      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      orderBy: { id: "asc" },
-      select: { id: true, text: true },
-    });
+    const rows = await prisma.comment.findMany({ take: 500, ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}), orderBy: { id: "asc" }, select: { id: true, text: true } });
     if (rows.length === 0) break;
     for (const row of rows) {
       const filtered = censorProfanity(row.text);
@@ -46,12 +42,7 @@ async function censorCoachComments(): Promise<number> {
   let total = 0;
   let cursor: string | undefined;
   for (;;) {
-    const rows = await prisma.coachComment.findMany({
-      take: 500,
-      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      orderBy: { id: "asc" },
-      select: { id: true, text: true },
-    });
+    const rows = await prisma.coachComment.findMany({ take: 500, ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}), orderBy: { id: "asc" }, select: { id: true, text: true } });
     if (rows.length === 0) break;
     for (const row of rows) {
       const filtered = censorProfanity(row.text);
@@ -69,12 +60,7 @@ async function censorMessages(): Promise<number> {
   let total = 0;
   let cursor: string | undefined;
   for (;;) {
-    const rows = await prisma.message.findMany({
-      take: 500,
-      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      orderBy: { id: "asc" },
-      select: { id: true, content: true },
-    });
+    const rows = await prisma.message.findMany({ take: 500, ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}), orderBy: { id: "asc" }, select: { id: true, content: true } });
     if (rows.length === 0) break;
     for (const row of rows) {
       const filtered = censorProfanity(row.content);
@@ -90,10 +76,12 @@ async function censorMessages(): Promise<number> {
 
 async function removeStorageFiles(paths: string[]) {
   if (!supabaseAdmin || paths.length === 0) return 0;
+  const localPaths = paths.filter((path) => !parseExternalPath(path));
+  if (localPaths.length === 0) return 0;
   const bucket = process.env.STORAGE_BUCKET ?? "media";
   let removed = 0;
-  for (let i = 0; i < paths.length; i += 100) {
-    const batch = paths.slice(i, i + 100);
+  for (let i = 0; i < localPaths.length; i += 100) {
+    const batch = localPaths.slice(i, i + 100);
     const { error } = await supabaseAdmin.storage.from(bucket).remove(batch);
     if (!error) removed += batch.length;
   }
@@ -101,9 +89,7 @@ async function removeStorageFiles(paths: string[]) {
 }
 
 async function cleanupClipStorage() {
-  if (!supabaseAdmin) {
-    return { deletedClipFiles: 0, rejectedClipFiles: 0, orphanedClipFiles: 0, orphanedThumbnailFiles: 0 };
-  }
+  if (!supabaseAdmin) return { deletedClipFiles: 0, rejectedClipFiles: 0, orphanedClipFiles: 0, orphanedThumbnailFiles: 0 };
 
   const cutoff = daysAgo(7);
   const [deletedClips, rejectedClips, allClips] = await Promise.all([
@@ -123,15 +109,8 @@ async function cleanupClipStorage() {
     supabaseAdmin.storage.from(bucket).list("thumbnails", { limit: 1000 }),
   ]);
 
-  const staleClipObjectPaths = (clipObjects.data ?? [])
-    .filter((object) => object.created_at && new Date(object.created_at) < cutoff)
-    .map((object) => `clips/${object.name}`)
-    .filter((path) => !referencedClipPaths.has(path));
-
-  const staleThumbnailObjectPaths = (thumbnailObjects.data ?? [])
-    .filter((object) => object.created_at && new Date(object.created_at) < cutoff)
-    .map((object) => `thumbnails/${object.name}`)
-    .filter((path) => !referencedThumbnailPaths.has(path));
+  const staleClipObjectPaths = (clipObjects.data ?? []).filter((object) => object.created_at && new Date(object.created_at) < cutoff).map((object) => `clips/${object.name}`).filter((path) => !referencedClipPaths.has(path));
+  const staleThumbnailObjectPaths = (thumbnailObjects.data ?? []).filter((object) => object.created_at && new Date(object.created_at) < cutoff).map((object) => `thumbnails/${object.name}`).filter((path) => !referencedThumbnailPaths.has(path));
 
   const [deletedClipFiles, rejectedClipFiles, orphanedClipFiles, orphanedThumbnailFiles] = await Promise.all([
     removeStorageFiles(deletedPaths),
@@ -144,11 +123,7 @@ async function cleanupClipStorage() {
 }
 
 async function backfillProfanity() {
-  return {
-    commentsCensored: await censorComments(),
-    coachCommentsCensored: await censorCoachComments(),
-    messagesCensored: await censorMessages(),
-  };
+  return { commentsCensored: await censorComments(), coachCommentsCensored: await censorCoachComments(), messagesCensored: await censorMessages() };
 }
 
 export async function runDbCleanup(options: { forceBackfill?: boolean } = {}) {
@@ -171,8 +146,7 @@ export async function runDbCleanup(options: { forceBackfill?: boolean } = {}) {
   results.dismissedReportsDeleted = (await prisma.report.deleteMany({ where: { status: "dismissed", resolvedAt: { lt: daysAgo(90) } } })).count;
   results.resolvedRequestsDeleted = (await prisma.rhythiaProfileRequest.deleteMany({ where: { status: { in: ["approved", "denied"] }, resolvedAt: { lt: daysAgo(90) } } })).count;
 
-  const storageCleanup = await cleanupClipStorage();
-  Object.assign(results, storageCleanup);
+  Object.assign(results, await cleanupClipStorage());
 
   const backfillDone = await prisma.siteSetting.findUnique({ where: { key: "profanity_backfill_done" } });
   if (options.forceBackfill || !backfillDone) {
@@ -180,13 +154,7 @@ export async function runDbCleanup(options: { forceBackfill?: boolean } = {}) {
     results.commentsCensored = backfill.commentsCensored;
     results.coachCommentsCensored = backfill.coachCommentsCensored;
     results.messagesCensored = backfill.messagesCensored;
-    if (!backfillDone) {
-      await prisma.siteSetting.upsert({
-        where: { key: "profanity_backfill_done" },
-        update: { value: new Date().toISOString() },
-        create: { key: "profanity_backfill_done", value: new Date().toISOString() },
-      });
-    }
+    if (!backfillDone) await prisma.siteSetting.upsert({ where: { key: "profanity_backfill_done" }, update: { value: new Date().toISOString() }, create: { key: "profanity_backfill_done", value: new Date().toISOString() } });
   }
 
   return results;
