@@ -1,0 +1,12 @@
+ALTER TABLE "StreamerProfilePost"
+  ADD COLUMN IF NOT EXISTS "postUrl" TEXT,
+  ADD COLUMN IF NOT EXISTS "embedUrl" TEXT,
+  ADD COLUMN IF NOT EXISTS "thumbnailUrl" TEXT,
+  ADD COLUMN IF NOT EXISTS "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+UPDATE "StreamerProfilePost"
+SET "postUrl" = url
+WHERE "postUrl" IS NULL AND url IS NOT NULL;
+
+ALTER TABLE "StreamerProfilePost"
+  ALTER COLUMN "postUrl" SET NOT NULL;
