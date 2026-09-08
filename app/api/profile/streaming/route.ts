@@ -22,15 +22,16 @@ export async function POST(request: Request) {
   const p = platform(body?.platform);
   if (!p) return NextResponse.json({ error: "Choose Twitch or TikTok." }, { status: 400 });
   try {
+    if (body?.action === "unlink") {
+      await prisma.$executeRawUnsafe(`DELETE FROM "StreamerAccount" WHERE "userId"=$1 AND platform=$2`, user.id, p);
+      return NextResponse.json({ ok: true });
+    }
+    if (p === "tiktok") throw new Error("TikTok accounts are connected through TikTok Login Kit.");
     if (body?.action === "start") {
       if (typeof body.url !== "string") throw new Error("Profile URL is required.");
       return NextResponse.json(await startStreamerVerification(user.id, p, body.url));
     }
     if (body?.action === "check") return NextResponse.json(await checkStreamerVerification(user.id, p));
-    if (body?.action === "unlink") {
-      await prisma.$executeRawUnsafe(`DELETE FROM "StreamerAccount" WHERE "userId"=$1 AND platform=$2`, user.id, p);
-      return NextResponse.json({ ok: true });
-    }
     throw new Error("Unknown action.");
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Streamer account update failed." }, { status: 400 });
