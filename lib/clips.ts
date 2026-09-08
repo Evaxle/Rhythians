@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { supabaseAdmin } from "@/lib/supabase";
+import { parseExternalPath } from "@/lib/clip-source";
 
 const getCachedVideoUrl = unstable_cache(
   async (path: string) => {
@@ -27,11 +28,15 @@ const getCachedThumbnailUrl = unstable_cache(
 );
 
 export async function getVideoUrl(path: string) {
+  const external = parseExternalPath(path);
+  if (external && ["tiktok", "youtube", "twitch"].includes(external.type)) return external.url;
   return getCachedVideoUrl(path);
 }
 
 export async function getThumbnailUrl(path: string | null) {
   if (!path) return null;
+  const external = parseExternalPath(path);
+  if (external?.type === "image") return external.url;
   return getCachedThumbnailUrl(path);
 }
 
