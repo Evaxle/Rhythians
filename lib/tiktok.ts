@@ -8,9 +8,9 @@ const TIKTOK_API = "https://open.tiktokapis.com/v2";
 export const TIKTOK_SCOPES = ["user.info.basic", "user.info.profile", "video.list"];
 
 function config() {
-  const clientKey = process.env.TIKTOK_CLIENT_KEY;
-  const clientSecret = process.env.TIKTOK_CLIENT_SECRET;
-  const redirectUri = process.env.TIKTOK_REDIRECT_URI ?? "https://rhythians.vercel.app/api/profile/streaming/tiktok/callback";
+  const clientKey = process.env.TIKTOK_CLIENT_KEY?.trim();
+  const clientSecret = process.env.TIKTOK_CLIENT_SECRET?.trim();
+  const redirectUri = (process.env.TIKTOK_REDIRECT_URI ?? "https://rhythians.vercel.app/api/profile/streaming/tiktok/callback").trim();
   if (!clientKey || !clientSecret) throw new Error("TikTok integration is not configured yet.");
   return { clientKey, clientSecret, redirectUri };
 }
@@ -28,11 +28,17 @@ export function createTikTokAuthorization() {
 }
 
 type TokenPayload = { access_token: string; expires_in: number; open_id: string; refresh_expires_in: number; refresh_token: string; scope: string; token_type: string };
+type TikTokError = { error?: string; error_description?: string; log_id?: string };
+
+function errorMessage(data: TikTokError | null, fallback: string) {
+  const detail = data?.error_description?.trim() || data?.error?.trim() || fallback;
+  return data?.log_id ? `${detail} (TikTok log ID: ${data.log_id})` : detail;
+}
 
 async function tokenRequest(params: URLSearchParams) {
   const response = await fetch(TIKTOK_TOKEN, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: params, cache: "no-store" });
-  const data = await response.json().catch(() => null) as (TokenPayload & { error?: string; error_description?: string }) | null;
-  if (!response.ok || !data?.access_token) throw new Error(data?.error_description ?? data?.error ?? "TikTok token exchange failed.");
+  const data = await response.json().catch(() => null) as (TokenPayload & TikTokError) | null;
+  if (!response.ok || !data?.access_token) throw new Error(errorMessage(data, "TikTok token exchange failed."));
   return data;
 }
 
@@ -46,11 +52,19 @@ async function refreshTikTokToken(refreshToken: string) {
   return tokenRequest(new URLSearchParams({ client_key: clientKey, client_secret: clientSecret, grant_type: "refresh_token", refresh_token: refreshToken }));
 }
 
+function apiError(payload: any, fallback: string) {
+  const error = payload?.error;
+  if (!error || !error.code || error.code === "ok") return null;
+  const detail = String(error.message || error.code || fallback).trim() || fallback;
+  return error.log_id ? `${detail} (TikTok log ID: ${error.log_id})` : detail;
+}
+
 export async function getTikTokUser(accessToken: string) {
   const fields = "open_id,avatar_url,display_name,profile_deep_link,bio_description,is_verified,username";
   const response = await fetch(`${TIKTOK_API}/user/info/?fields=${encodeURIComponent(fields)}`, { headers: { Authorization: `Bearer ${accessToken}` }, cache: "no-store" });
   const payload = await response.json().catch(() => null) as any;
-  if (!response.ok || payload?.error?.code) throw new Error(payload?.error?.message ?? "TikTok profile lookup failed.");
+  const failure = apiError(payload, "TikTok profile lookup failed.");
+  if (!response.ok || failure) throw new Error(failure ?? `TikTok profile lookup failed (${response.status}).`);
   return payload?.data?.user;
 }
 
@@ -80,7 +94,8 @@ export async function listTikTokVideos(userId: string) {
   const fields = "id,title,video_description,duration,cover_image_url,embed_link,share_url,create_time";
   const response = await fetch(`${TIKTOK_API}/video/list/?fields=${encodeURIComponent(fields)}`, { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify({ max_count: 20 }), cache: "no-store" });
   const payload = await response.json().catch(() => null) as any;
-  if (!response.ok || payload?.error?.code) throw new Error(payload?.error?.message ?? "TikTok video lookup failed.");
+  const failure = apiError(payload, "TikTok video lookup failed.");
+  if (!response.ok || failure) throw new Error(failure ?? `TikTok video lookup failed (${response.status}).`);
   return payload?.data?.videos ?? [];
 }
 
