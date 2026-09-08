@@ -10,6 +10,7 @@ const AUTOMATIC_RANKS = [
 
 const AUTOMATIC_RANK_TAG_SLUGS = AUTOMATIC_RANKS.map((rank) => rank.slug);
 const AUTOMATIC_ACCOUNT_TAG_SLUGS = ["veteran", "mentor"] as const;
+const ACCOUNT_DATE_KEYS = ["created_at", "createdAt", "registered_at", "registeredAt", "joined_at", "joinedAt", "registration_date", "registrationDate"] as const;
 
 type ClassificationClient = Pick<PrismaClient, "playerRank" | "user" | "tag" | "userTag">;
 
@@ -27,18 +28,24 @@ function parseDateValue(value: unknown) {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
-function findAccountCreatedAt(value: unknown): Date | null {
+function dateFromRecord(value: unknown) {
   if (!value || typeof value !== "object") return null;
   const record = value as Record<string, unknown>;
-  for (const key of ["created_at", "createdAt", "registered_at", "registeredAt", "joined_at", "joinedAt", "registration_date", "registrationDate"]) {
+  for (const key of ACCOUNT_DATE_KEYS) {
     const parsed = parseDateValue(record[key]);
     if (parsed) return parsed;
   }
-  for (const key of ["user", "profile", "data", "account"]) {
-    const nested = findAccountCreatedAt(record[key]);
-    if (nested) return nested;
-  }
   return null;
+}
+
+function findAccountCreatedAt(profile: Record<string, unknown>) {
+  const userDate = dateFromRecord(profile.user);
+  if (userDate) return userDate;
+  const accountDate = dateFromRecord(profile.account);
+  if (accountDate) return accountDate;
+  const profileDate = dateFromRecord(profile.profile);
+  if (profileDate) return profileDate;
+  return dateFromRecord(profile);
 }
 
 export async function fetchRhythiaAccountCreatedAt(profileId: number) {
@@ -91,6 +98,8 @@ export async function syncAutomaticPlayerClassification(
     });
   }
 
+  if (!accountCreatedAt) return { classification, accountTags: null };
+
   const desiredAccountTags = accountTagsForCreatedAt(accountCreatedAt);
   const accountTags = await Promise.all(
     AUTOMATIC_ACCOUNT_TAG_SLUGS.map((slug) =>
@@ -103,12 +112,10 @@ export async function syncAutomaticPlayerClassification(
     )
   );
 
-  await client.userTag.deleteMany({
-    where: {
-      userId,
-      tagId: { in: accountTags.filter((tag) => !desiredAccountTags.includes(tag.slug)).map((tag) => tag.id) },
-    },
-  });
+  const unwantedTagIds = accountTags.filter((tag) => !desiredAccountTags.includes(tag.slug)).map((tag) => tag.id);
+  if (unwantedTagIds.length) {
+    await client.userTag.deleteMany({ where: { userId, tagId: { in: unwantedTagIds } } });
+  }
 
   for (const tag of accountTags) {
     if (!desiredAccountTags.includes(tag.slug)) continue;
