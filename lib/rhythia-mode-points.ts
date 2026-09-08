@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/db";
 import { rhythiaRequest } from "@/lib/rhythia";
-import { accuracyFromMisses, accuracyMultiplier, RANKS, type RankInfo, getRankInfo } from "@/lib/ranks";
+import { accuracyFromMisses, accuracyMultiplier, RANKS, RANK_TIERS, type RankInfo } from "@/lib/ranks";
 import { MODE_RULES, type ModeKey, type ModePoints } from "@/lib/rhythia-mode-rules";
+import { loadRankingConfig, overallRhpFromModes } from "@/lib/ranking-system";
 
 export { MODE_RULES } from "@/lib/rhythia-mode-rules";
 export type { ModeKey, ModePoints } from "@/lib/rhythia-mode-rules";
@@ -9,24 +10,29 @@ export type EditablePointSystem = "rhp" | "rpl" | "rps" | "rpv";
 export type RhythiaModeScoreRow = { id: string; mapKey: string; mapTitle: string; scoreId: number; cameraMode: ModeKey; points: number; accuracy: number | null; awardedSp: number | null };
 type ScorePayload = { id: number; beatmapTitle?: string | null; beatmapId?: number | null; mapId?: number | null; beatmapHash?: string | null; passed?: boolean | null; misses?: number | null; beatmapNotes?: number | null; accuracy?: number | null; speed?: number | null; awarded_sp?: number | null; created_at?: string | null; cameraMode?: string | null; gameMode?: string | null; mode?: string | null; spin?: boolean | null; vr?: boolean | null; isVr?: boolean | null; mods?: string | null };
 type ScoreBucket = { name: "lastDay" | "top" | "vrTop" | "vrRecent"; scores: ScorePayload[] };
+type Baseline = { overallFloor: number; rplBase: number; rpsBase: number; rpvBase: number };
 const UNRANKED_MARKER = "rhythia-unranked";
 
 function normalize(value: string | null | undefined) { return (value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
 
+function scaledRankStart(index: number, mode: ModeKey) { return Math.round(RANKS[index].minRhp * MODE_RULES[mode].rankScale); }
+
 export function modeRankInfo(points: number, mode: ModeKey): RankInfo {
-  const rule = MODE_RULES[mode];
   const safe = Math.max(0, Math.floor(points));
-  const rankSpan = rule.tierSpan * 5;
-  const index = Math.min(RANKS.length - 1, Math.floor(safe / rankSpan));
+  let index = RANKS.length - 1;
+  for (let i = RANKS.length - 1; i >= 0; i -= 1) if (safe >= scaledRankStart(i, mode)) { index = i; break; }
   const rank = RANKS[index];
-  const within = safe - index * rankSpan;
-  const tier = Math.min(5, Math.floor(within / rule.tierSpan) + 1);
-  const tierStart = index * rankSpan + Math.min(4, Math.floor(within / rule.tierSpan)) * rule.tierSpan;
-  const tierEnd = Math.min(tierStart + rule.tierSpan, index * rankSpan + rankSpan);
-  const nextTierStart = Math.min(index * rankSpan + tier * rule.tierSpan, index * rankSpan + rankSpan);
-  const progressToNextTier = Math.min(1, Math.max(0, (safe - tierStart) / rule.tierSpan));
-  const nextRankStart = index < RANKS.length - 1 ? (index + 1) * rankSpan : null;
-  return { index, name: rank.name, tier, isExpert: index === RANKS.length - 1, minRhp: index * rankSpan, maxRhp: index < RANKS.length - 1 ? (index + 1) * rankSpan : null, tierStart, tierEnd, nextTierStart, nextRankStart, color: rank.color, progressToNextTier, rangeMin: rank.rangeMin, rangeMax: rank.rangeMax };
+  const isExpert = index === RANKS.length - 1;
+  const min = scaledRankStart(index, mode);
+  if (isExpert) return { index, name: rank.name, tier: 1, isExpert: true, minRhp: min, maxRhp: null, tierStart: min, tierEnd: Number.POSITIVE_INFINITY, nextTierStart: min, nextRankStart: null, color: rank.color, progressToNextTier: 1, rangeMin: rank.rangeMin, rangeMax: rank.rangeMax };
+  const next = scaledRankStart(index + 1, mode);
+  const span = Math.max(1, next - min);
+  const within = safe - min;
+  const tier = Math.min(RANK_TIERS, Math.floor(within * RANK_TIERS / span) + 1);
+  const tierStart = min + Math.floor(span * (tier - 1) / RANK_TIERS);
+  const tierEnd = tier === RANK_TIERS ? next : min + Math.floor(span * tier / RANK_TIERS);
+  const progressToNextTier = Math.min(1, Math.max(0, (safe - tierStart) / Math.max(1, tierEnd - tierStart)));
+  return { index, name: rank.name, tier, isExpert: false, minRhp: min, maxRhp: next, tierStart, tierEnd, nextTierStart: tierEnd, nextRankStart: next, color: rank.color, progressToNextTier, rangeMin: rank.rangeMin, rangeMax: rank.rangeMax };
 }
 
 export function modeRankLabel(points: number, mode: ModeKey) { const info = modeRankInfo(points, mode); return info.isExpert ? "Expert" : `${info.name} ${info.tier}`; }
@@ -77,6 +83,11 @@ async function getOverrides(userId: string) {
   return new Map(rows.map((row) => [row.system, Number(row.points)]));
 }
 
+async function getBaseline(userId: string): Promise<Baseline> {
+  const rows = await prisma.$queryRawUnsafe<Baseline[]>('SELECT "overallFloor","rplBase","rpsBase","rpvBase" FROM "RankingBaseline" WHERE "userId"=$1 LIMIT 1', userId);
+  return rows[0] ?? { overallFloor: 0, rplBase: 0, rpsBase: 0, rpvBase: 0 };
+}
+
 export async function getUserPointOverrides(userId: string) { return getOverrides(userId); }
 
 export async function setUserPointOverride(userId: string, system: EditablePointSystem, points: number | null) {
@@ -88,19 +99,16 @@ export async function setUserPointOverride(userId: string, system: EditablePoint
 }
 
 export async function syncUserModeScores(userId: string) {
-  const [profile, user, overrides] = await Promise.all([
+  const [profile, user, overrides, baseline, config] = await Promise.all([
     prisma.rhythiaProfile.findUnique({ where: { userId }, select: { profileId: true } }),
     prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } }),
     getOverrides(userId),
+    getBaseline(userId),
+    loadRankingConfig(),
   ]);
-  if (!profile || !user) return { rpl: 0, rps: 0, rpv: 0, rhp: 0, rows: [] as RhythiaModeScoreRow[], foundModes: { lock: 0, spin: 0, vr: 0 }, added: 0, rankIndex: 0 };
-  const baseRhpForRank = overrides.get("rhp") ?? user.rhp;
-  const rankInfo = getRankInfo(baseRhpForRank);
-  const maps = await prisma.challengeMap.findMany({ where: { status: "approved", rating: { not: null, gte: rankInfo.rangeMin, lte: rankInfo.rangeMax }, OR: [{ reviewerNote: null }, { reviewerNote: { not: UNRANKED_MARKER } }] }, select: { id: true, title: true, sourceBeatmapId: true } });
-  const [scores, transactions] = await Promise.all([
-    fetchModeScores(profile.profileId),
-    prisma.rhpTransaction.aggregate({ where: { userId, reason: { notIn: ["challenge_map", "challenge_map_fail", "ranked_map", "battle_win", "battle_loss"] } }, _sum: { amount: true } }),
-  ]);
+  if (!profile || !user) return { rpl: 0, rps: 0, rpv: 0, rhp: user?.rhp ?? 0, rows: [] as RhythiaModeScoreRow[], foundModes: { lock: 0, spin: 0, vr: 0 }, added: 0, rankIndex: 0 };
+  const maps = await prisma.challengeMap.findMany({ where: { status: "approved", rating: { not: null }, OR: [{ reviewerNote: null }, { reviewerNote: { not: UNRANKED_MARKER } }] }, select: { id: true, title: true, sourceBeatmapId: true } });
+  const scores = await fetchModeScores(profile.profileId);
   const byBeatmapId = new Map<number, (typeof maps)[number]>();
   const byTitle = new Map<string, (typeof maps)[number]>();
   for (const map of maps) { if (map.sourceBeatmapId != null) byBeatmapId.set(map.sourceBeatmapId, map); byTitle.set(normalize(map.title), map); }
@@ -124,12 +132,11 @@ export async function syncUserModeScores(userId: string) {
   const added = rows.filter((row) => !previousKeys.has(`${row.mapKey}:${row.cameraMode}:${row.scoreId}`)).length;
   const rawTotals: ModePoints = { lock: 0, spin: 0, vr: 0 };
   for (const row of rows) rawTotals[row.cameraMode] += row.points;
-  const totals: ModePoints = { lock: overrides.get("rpl") ?? rawTotals.lock, spin: overrides.get("rps") ?? rawTotals.spin, vr: overrides.get("rpv") ?? rawTotals.vr };
-  const legacyRhp = transactions._sum.amount ?? 0;
-  const calculatedRhp = Math.max(0, legacyRhp + totals.lock + totals.spin + totals.vr);
-  const totalRhp = overrides.get("rhp") ?? calculatedRhp;
+  const calculated: ModePoints = { lock: baseline.rplBase + rawTotals.lock, spin: baseline.rpsBase + rawTotals.spin, vr: baseline.rpvBase + rawTotals.vr };
+  const totals: ModePoints = { lock: overrides.get("rpl") ?? calculated.lock, spin: overrides.get("rps") ?? calculated.spin, vr: overrides.get("rpv") ?? calculated.vr };
+  const totalRhp = overrides.get("rhp") ?? overallRhpFromModes(totals, baseline.overallFloor, config);
   await prisma.$transaction(async (tx) => { await tx.rhythiaModeScore.deleteMany({ where: { userId } }); if (rows.length) await tx.rhythiaModeScore.createMany({ data: rows.map((row) => ({ userId, ...row })) }); await tx.user.update({ where: { id: userId }, data: { rhp: totalRhp, scoreImportDone: true, lastRhythiaRpCheckAt: new Date() } }); });
-  return { rpl: totals.lock, rps: totals.spin, rpv: totals.vr, rhp: totalRhp, rows: rows.map((row) => ({ id: `${row.scoreId}-${row.cameraMode}`, ...row })) as RhythiaModeScoreRow[], foundModes: { lock: rows.filter((row) => row.cameraMode === "lock").length, spin: rows.filter((row) => row.cameraMode === "spin").length, vr: rows.filter((row) => row.cameraMode === "vr").length }, added, rankIndex: rankInfo.index, raw: rawTotals };
+  return { rpl: totals.lock, rps: totals.spin, rpv: totals.vr, rhp: totalRhp, rows: rows.map((row) => ({ id: `${row.scoreId}-${row.cameraMode}`, ...row })) as RhythiaModeScoreRow[], foundModes: { lock: rows.filter((row) => row.cameraMode === "lock").length, spin: rows.filter((row) => row.cameraMode === "spin").length, vr: rows.filter((row) => row.cameraMode === "vr").length }, added, rankIndex: modeRankInfo(totals.lock, "lock").index, raw: rawTotals };
 }
 
 export async function getModeScoreMap(userId: string) {
@@ -141,7 +148,8 @@ export async function getModeScoreMap(userId: string) {
 
 export async function getModeLeaderboard(mode: ModeKey, limit = 100) {
   const system = mode === "lock" ? "rpl" : mode === "spin" ? "rps" : "rpv";
-  const rows = await prisma.$queryRawUnsafe<Array<{ userId: string; username: string; displayName: string | null; profileHandle: string; avatar: string | null; points: number }>>(`SELECT u."id" AS "userId",u."username",u."displayName",u."profileHandle",u."avatar",COALESCE(o."points",SUM(r."points"),0)::int AS "points" FROM "User" u LEFT JOIN "RhythiaModeScore" r ON r."userId"=u."id" AND r."cameraMode"=$1 LEFT JOIN "UserPointOverride" o ON o."userId"=u."id" AND o."system"=$2 WHERE u."profileHandle" <> 'rhythia-imports' AND (r."userId" IS NOT NULL OR o."userId" IS NOT NULL) GROUP BY u."id",o."userId",o."points" ORDER BY "points" DESC,u."username" ASC LIMIT $3`, mode, system, limit);
+  const baseColumn = mode === "lock" ? '"rplBase"' : mode === "spin" ? '"rpsBase"' : '"rpvBase"';
+  const rows = await prisma.$queryRawUnsafe<Array<{ userId: string; username: string; displayName: string | null; profileHandle: string; avatar: string | null; points: number }>>(`SELECT u.id AS "userId",u.username,u."displayName",u."profileHandle",u.avatar,COALESCE(o.points,COALESCE(b.${baseColumn},0)+COALESCE(SUM(r.points),0),0)::int AS points FROM "User" u LEFT JOIN "RhythiaModeScore" r ON r."userId"=u.id AND r."cameraMode"=$1 LEFT JOIN "UserPointOverride" o ON o."userId"=u.id AND o.system=$2 LEFT JOIN "RankingBaseline" b ON b."userId"=u.id WHERE u."profileHandle" <> 'rhythia-imports' AND (r."userId" IS NOT NULL OR o."userId" IS NOT NULL OR b."userId" IS NOT NULL) GROUP BY u.id,o."userId",o.points,b."userId",b.${baseColumn} ORDER BY points DESC,u.username ASC LIMIT $3`, mode, system, limit);
   return rows.map((row, index) => ({ ...row, position: index + 1, rankInfo: modeRankInfo(row.points, mode) }));
 }
 
