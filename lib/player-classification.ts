@@ -1,0 +1,97 @@
+import type { PrismaClient } from "../generated/prisma/client";
+
+const AUTOMATIC_RANKS = [
+  { name: "Beginner", slug: "beginner", displayOrder: 1, color: "#60a5fa" },
+  { name: "Intermediate", slug: "intermediate", displayOrder: 2, color: "#4ade80" },
+  { name: "Experienced", slug: "experienced", displayOrder: 3, color: "#facc15" },
+  { name: "Expert", slug: "expert", displayOrder: 4, color: "#f87171" },
+] as const;
+
+const AUTOMATIC_RANK_TAG_SLUGS = AUTOMATIC_RANKS.map((rank) => rank.slug);
+const AUTOMATIC_ACCOUNT_TAG_SLUGS = ["veteran", "mentor"] as const;
+
+type ClassificationClient = Pick<PrismaClient, "playerRank" | "user" | "tag" | "userTag">;
+
+export function classificationForGlobalRank(globalRank: number | null | undefined) {
+  if (!globalRank || globalRank < 1) return null;
+  if (globalRank <= 500) return "expert";
+  if (globalRank <= 1000) return "experienced";
+  if (globalRank <= 5000) return "intermediate";
+  return "beginner";
+}
+
+export function accountTagsForCreatedAt(accountCreatedAt: Date | null | undefined) {
+  if (!accountCreatedAt) return [] as string[];
+  const year = accountCreatedAt.getUTCFullYear();
+  const tags: string[] = [];
+  if (year === 2024) tags.push("veteran");
+  if (year === 2024 || year === 2025) tags.push("mentor");
+  return tags;
+}
+
+export async function syncAutomaticPlayerClassification(
+  client: ClassificationClient,
+  userId: string,
+  globalRank: number | null | undefined,
+  accountCreatedAt: Date | null | undefined
+) {
+  const classification = classificationForGlobalRank(globalRank);
+
+  for (const rank of AUTOMATIC_RANKS) {
+    await client.playerRank.upsert({
+      where: { slug: rank.slug },
+      update: { name: rank.name, displayOrder: rank.displayOrder, color: rank.color, enabled: true },
+      create: rank,
+    });
+  }
+
+  const playerRank = classification
+    ? await client.playerRank.findUnique({ where: { slug: classification }, select: { id: true } })
+    : null;
+
+  await client.user.update({
+    where: { id: userId },
+    data: { playerRankId: playerRank?.id ?? null, onboardingCompleted: true },
+  });
+
+  const oldRankTags = await client.tag.findMany({
+    where: { slug: { in: [...AUTOMATIC_RANK_TAG_SLUGS] } },
+    select: { id: true },
+  });
+
+  if (oldRankTags.length) {
+    await client.userTag.deleteMany({
+      where: { userId, tagId: { in: oldRankTags.map((tag) => tag.id) } },
+    });
+  }
+
+  const desiredAccountTags = accountTagsForCreatedAt(accountCreatedAt);
+  const accountTags = await Promise.all(
+    AUTOMATIC_ACCOUNT_TAG_SLUGS.map((slug) =>
+      client.tag.upsert({
+        where: { slug },
+        update: {},
+        create: { slug, name: slug.charAt(0).toUpperCase() + slug.slice(1) },
+        select: { id: true, slug: true },
+      })
+    )
+  );
+
+  await client.userTag.deleteMany({
+    where: {
+      userId,
+      tagId: { in: accountTags.filter((tag) => !desiredAccountTags.includes(tag.slug)).map((tag) => tag.id) },
+    },
+  });
+
+  for (const tag of accountTags) {
+    if (!desiredAccountTags.includes(tag.slug)) continue;
+    await client.userTag.upsert({
+      where: { userId_tagId: { userId, tagId: tag.id } },
+      update: { source: "manual" },
+      create: { userId, tagId: tag.id, source: "manual" },
+    });
+  }
+
+  return { classification, accountTags: desiredAccountTags };
+}
