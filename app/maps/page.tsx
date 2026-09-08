@@ -3,7 +3,7 @@ import { Link2, LogIn, Map as MapIcon } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { getApprovedMaps } from "@/lib/maps-legacy";
-import { RANKS, RANK_TIERS, TIER_SPAN, getRankInfo } from "@/lib/ranks";
+import { RANKS, RANK_TIERS, getRankInfo, rankTierBounds } from "@/lib/ranks";
 import { MapsSortControlsPersisted } from "@/components/maps/maps-sort-controls-persisted";
 import { CheckAllRankedMapsButton } from "@/components/maps/check-all-ranked-maps-button";
 import { DownloadRankedMapsButton } from "@/components/maps/download-ranked-maps-button";
@@ -32,7 +32,7 @@ export default async function MapsPage() {
   const progressValue = rankInfo.isExpert ? 1 : rankInfo.progressToNextTier;
   const progressPercent = Math.round(progressValue * 100);
   const remainingRhp = rankInfo.isExpert ? 0 : Math.max(0, rankInfo.nextTierStart - Math.max(0, Math.floor(userRhp)));
-  const ladder = RANKS.flatMap((rank) => rank.index === RANKS.length - 1 ? [{ rank, tier: 1, minRhp: rank.minRhp }] : Array.from({ length: RANK_TIERS }, (_, tierIndex) => ({ rank, tier: tierIndex + 1, minRhp: rank.minRhp + tierIndex * TIER_SPAN }))).reverse();
+  const ladder = RANKS.flatMap((rank) => rank.index === RANKS.length - 1 ? [{ rank, tier: 1, minRhp: rank.minRhp }] : Array.from({ length: RANK_TIERS }, (_, tierIndex) => ({ rank, tier: tierIndex + 1, minRhp: rankTierBounds(rank.index, tierIndex + 1).start }))).reverse();
   const modeScores = modeSync ? Object.fromEntries(modeSync.rows.map((row) => [row.mapKey + "::" + row.cameraMode, row.points])) : {};
   const modeScoreMap: Record<string, ModePoints> = {};
   if (modeSync) for (const row of modeSync.rows) { const key = row.mapTitle.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); modeScoreMap[key] ??= { lock: 0, spin: 0, vr: 0 }; modeScoreMap[key][row.cameraMode] = Math.max(modeScoreMap[key][row.cameraMode], row.points); }
