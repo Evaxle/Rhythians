@@ -4,6 +4,7 @@ import { canAccessAdmin } from "@/lib/admin-access";
 import { prisma } from "@/lib/db";
 import { fetchRhythiaProfile } from "@/lib/rhythia";
 import { rebuildRhythiaScorePoints } from "@/lib/rhythia-full-score-import";
+import { fetchRhythiaAccountCreatedAt, syncAutomaticPlayerClassification } from "@/lib/player-classification";
 
 export const dynamic = "force-dynamic";
 
@@ -25,10 +26,12 @@ export async function PATCH(request: Request) {
   }
   try {
     const profile = await fetchRhythiaProfile(requestRow.profileId);
+    const accountCreatedAt = await fetchRhythiaAccountCreatedAt(requestRow.profileId).catch(() => null);
     const { bio: _bio, ...profileData } = profile;
     await prisma.$transaction(async (tx) => {
       await tx.rhythiaProfile.upsert({ where: { userId: requestRow.userId }, create: { userId: requestRow.userId, profileUrl: requestRow.profileUrl, ...profileData }, update: { profileUrl: requestRow.profileUrl, ...profileData, syncedAt: new Date() } });
       await tx.user.update({ where: { id: requestRow.userId }, data: { rhythiaVerified: true } });
+      await syncAutomaticPlayerClassification(tx, requestRow.userId, profile.globalRank, accountCreatedAt);
       await tx.rhythiaProfileRequest.update({ where: { id }, data: { status: "approved", adminNote: note || requestRow.adminNote, resolvedAt: new Date(), resolvedBy: admin.id } });
       await tx.notification.create({ data: { userId: requestRow.userId, type: "moderation", title: "Rhythia verification approved", message: "Your Rhythia verification request was approved manually.", url: "/settings" } });
     });
