@@ -29,6 +29,8 @@ import { getReliableModePoints } from "@/lib/profile-points";
 export const dynamic = "force-dynamic";
 type Props = { params: Promise<{ username: string }> };
 
+const AUTOMATIC_TAG_SLUGS = new Set(["beginner", "intermediate", "experienced", "expert", "veteran", "mentor"]);
+
 function loadProfileUser(username: string) {
   return prisma.user.findFirst({
     where: { profileHandle: username },
@@ -76,8 +78,10 @@ export default async function ProfilePage({ params }: Props) {
   const profileTitle = titleResult.status === "fulfilled" ? titleResult.value[0] ?? null : null;
   const selectedTagIds = selectedTagResult.status === "fulfilled" ? selectedTagResult.value.map((entry) => entry.tagId) : [];
   const selectedTags = selectedTagIds.map((id) => user.userTags.find((entry) => entry.tagId === id)).filter((entry): entry is NonNullable<typeof entry> => Boolean(entry));
-  const editableTags = user.userTags.filter((entry) => entry.tag.slug !== "rhythian-coach" && entry.tag.slug !== "contributor");
-  const editableSelectedTagIds = selectedTags.filter((entry) => entry.tag.slug !== "rhythian-coach" && entry.tag.slug !== "contributor").map((entry) => entry.tagId);
+  const automaticProfileTags = user.userTags.filter((entry) => entry.tag.slug === "veteran" || entry.tag.slug === "mentor");
+  const displayTags = [...selectedTags, ...automaticProfileTags.filter((entry) => !selectedTags.some((selected) => selected.tagId === entry.tagId))];
+  const editableTags = user.userTags.filter((entry) => entry.tag.slug !== "rhythian-coach" && entry.tag.slug !== "contributor" && !AUTOMATIC_TAG_SLUGS.has(entry.tag.slug));
+  const editableSelectedTagIds = selectedTags.filter((entry) => entry.tag.slug !== "rhythian-coach" && entry.tag.slug !== "contributor" && !AUTOMATIC_TAG_SLUGS.has(entry.tag.slug)).map((entry) => entry.tagId);
   const referralProgress = isOwnProfile ? await getReferralProgress(user.id) : null;
 
   let presence: { isOnline: boolean; lastActiveAt: Date | null } | null = null;
@@ -105,11 +109,12 @@ export default async function ProfilePage({ params }: Props) {
               <p className="text-xs font-bold uppercase tracking-[0.28em] text-accent">Rhythians profile</p>
               <h1 className="mt-2 flex flex-wrap items-center gap-2 text-3xl font-semibold tracking-[-0.04em] text-white sm:text-4xl"><UserName username={user.displayName ?? user.username} isCoach={isCoach} />{user.rhythiaProfile?.flag && <FlagIcon flag={user.rhythiaProfile.flag} country={user.rhythiaProfile.country} size="md" />}{user.rhythiaVerified && <RhythiaVerifiedBadge size="sm" />}</h1>
               <p className="mt-1 text-sm text-muted">@{user.profileHandle}</p>
+              {user.playerRank && <p className="mt-2 text-sm font-semibold" style={{ color: user.playerRank.color ?? "#7289da" }}>{user.playerRank.name}</p>}
               {profileTitle && <p className="mt-2 text-sm font-semibold" style={titleStyle}>{profileTitle.title}</p>}
               <div className="mt-3 flex flex-wrap gap-2">{user.rhythiaProfile && <span title={presenceLabel} className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${presence?.isOnline ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300" : "border-white/10 bg-white/5 text-muted"}`}><span className={`h-1.5 w-1.5 rounded-full ${presence?.isOnline ? "bg-emerald-400" : "bg-white/30"}`} />{presence?.isOnline ? "Online" : presenceLabel}</span>}<span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-muted"><CalendarDays size={12} /> Joined {user.joinedAt.toLocaleDateString()}</span></div>
             </div>
           </div>
-          {selectedTags.length > 0 && <div className="mt-5"><UserTags tags={selectedTags} size="md" /></div>}
+          {displayTags.length > 0 && <div className="mt-5"><UserTags tags={displayTags} size="md" /></div>}
           {user.bio ? <p className="mt-5 whitespace-pre-wrap text-sm leading-7 text-white/70">{user.bio}</p> : <p className="mt-5 text-sm text-muted">No profile bio has been added yet.</p>}
           <div className="mt-6 flex flex-wrap gap-2">{user.rhythiaProfile && <a href={user.rhythiaProfile.profileUrl} target="_blank" rel="noreferrer" className="ui-button border border-white/10 bg-white/5 text-white"><ExternalLink size={16} /> Rhythia profile</a>}{isOwnProfile && <RhythiaConnect connectedUrl={user.rhythiaProfile?.profileUrl} />}{!isOwnProfile && <><FriendButton userId={user.id} /><ProfileBattleButton userId={user.id} /><Link href={`/messages?user=${encodeURIComponent(user.profileHandle)}`} className="ui-button border border-white/10 bg-white/5 text-white"><MessageCircle size={16} /> Message</Link></>}{currentUser && !isOwnProfile && <ReportButton targetType="user" targetId={user.id} targetLabel={user.username} />}</div>
           {isOwnProfile && referralProgress && <div className="mt-auto border-t border-white/10 pt-5"><ProfileShare userId={user.id} progress={referralProgress.count} earned={referralProgress.earned} /></div>}

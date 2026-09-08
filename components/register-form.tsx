@@ -37,7 +37,7 @@ export function RegisterForm() {
         throw new Error(`Registration request failed (${response.status}).`);
       }
       if (!response.ok) throw new Error(data.error ?? "Could not create your account.");
-      router.push(data.redirectTo ?? "/onboarding");
+      router.push(data.redirectTo ?? "/");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not create your account.");

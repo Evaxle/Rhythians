@@ -1,3 +1,4 @@
+import "@/lib/tournament-cap-overrides";
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { canAccessAdmin } from "@/lib/admin-access";

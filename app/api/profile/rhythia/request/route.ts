@@ -4,6 +4,7 @@ import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { fetchRhythiaProfile, parseRhythiaUrl } from "@/lib/rhythia";
 import { rebuildRhythiaScorePoints } from "@/lib/rhythia-full-score-import";
+import { fetchRhythiaAccountCreatedAt, syncAutomaticPlayerClassification } from "@/lib/player-classification";
 
 function hashCode(code: string) {
   return createHash("sha256").update(code).digest("hex");
@@ -48,6 +49,7 @@ export async function POST(request: Request) {
       const linkedToOtherUser = await prisma.rhythiaProfile.findUnique({ where: { profileId: pending.profileId }, select: { userId: true } });
       if (linkedToOtherUser && linkedToOtherUser.userId !== user.id) return NextResponse.json({ error: "That Rhythia profile is already linked to another account." }, { status: 409 });
 
+      const accountCreatedAt = await fetchRhythiaAccountCreatedAt(pending.profileId).catch(() => null);
       const { bio: _bio, ...profileData } = profile;
       const previous = await prisma.rhythiaProfile.findUnique({ where: { userId: user.id }, select: { profileId: true } });
       const firstLink = !previous;
@@ -58,6 +60,7 @@ export async function POST(request: Request) {
           update: { profileUrl: pending.profileUrl, ...profileData, syncedAt: new Date() },
         });
         await tx.user.update({ where: { id: user.id }, data: { rhythiaVerified: true } });
+        await syncAutomaticPlayerClassification(tx, user.id, profile.globalRank, accountCreatedAt);
         await tx.rhythiaProfileRequest.delete({ where: { id: pending.id } });
         return profileRow;
       });

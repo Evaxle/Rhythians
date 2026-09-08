@@ -62,7 +62,7 @@ export async function POST(request: Request) {
       email,
       passwordHash: await hashPassword(password),
       profileHandle,
-      onboardingCompleted: false,
+      onboardingCompleted: true,
     },
   });
 
@@ -76,8 +76,8 @@ export async function POST(request: Request) {
 
   const token = await createSession(user.id);
   const response = NextResponse.json({
-    user: { id: user.id, username: user.username, profileHandle: user.profileHandle, onboardingCompleted: user.onboardingCompleted },
-    redirectTo: "/onboarding",
+    user: { id: user.id, username: user.username, profileHandle: user.profileHandle },
+    redirectTo: "/",
   });
   setSessionCookie(response, token);
   response.cookies.set({ name: REFERRAL_COOKIE_NAME, value: "", httpOnly: false, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: 0 });
