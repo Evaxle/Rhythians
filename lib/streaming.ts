@@ -1,13 +1,17 @@
 import { prisma } from "@/lib/db";
 
+let twitchTokenCache: { clientId: string; token: string; expiresAt: number } | null = null;
+
 async function twitchAppToken() {
   const clientId = process.env.TWITCH_CLIENT_ID;
   const secret = process.env.TWITCH_CLIENT_SECRET;
   if (!clientId || !secret) throw new Error("Twitch integration is not configured yet.");
+  if (twitchTokenCache?.clientId === clientId && twitchTokenCache.expiresAt > Date.now() + 60_000) return { clientId, token: twitchTokenCache.token };
   const response = await fetch("https://id.twitch.tv/oauth2/token", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: new URLSearchParams({ client_id: clientId, client_secret: secret, grant_type: "client_credentials" }), cache: "no-store" });
   if (!response.ok) throw new Error("Twitch authentication failed.");
-  const data = await response.json() as { access_token?: string };
+  const data = await response.json() as { access_token?: string; expires_in?: number };
   if (!data.access_token) throw new Error("Twitch authentication failed.");
+  twitchTokenCache = { clientId, token: data.access_token, expiresAt: Date.now() + Math.max(60, data.expires_in ?? 3600) * 1000 };
   return { clientId, token: data.access_token };
 }
 
@@ -24,19 +28,20 @@ async function refreshTwitch(accounts: any[]) {
     const live = new Set((payload.data ?? []).map(stream => stream.user_login.toLowerCase()));
     for (const account of batch) {
       const isLive = live.has(String(account.username).toLowerCase());
-      await prisma.$executeRawUnsafe(`UPDATE "StreamerAccount" SET "isLive"=$2,"liveUrl"=$3,"liveCheckedAt"=CURRENT_TIMESTAMP,"updatedAt"=CURRENT_TIMESTAMP WHERE id=$1`, account.id, isLive, isLive ? account.profileUrl : null);
+      const liveUrl = isLive ? account.profileUrl : null;
+      await prisma.$executeRawUnsafe(`UPDATE "StreamerAccount" SET "isLive"=$2,"liveUrl"=$3,"liveCheckedAt"=CURRENT_TIMESTAMP,"updatedAt"=CASE WHEN "isLive" IS DISTINCT FROM $2 OR "liveUrl" IS DISTINCT FROM $3 THEN CURRENT_TIMESTAMP ELSE "updatedAt" END WHERE id=$1`, account.id, isLive, liveUrl);
     }
   }
 }
 
 async function refreshTikTok(accounts: any[]) {
   if (!accounts.length) return;
-  await prisma.$executeRawUnsafe(`UPDATE "StreamerAccount" SET "isLive"=FALSE,"liveUrl"=NULL,"liveCheckedAt"=CURRENT_TIMESTAMP WHERE verified=TRUE AND platform='tiktok'`);
+  await prisma.$executeRawUnsafe(`UPDATE "StreamerAccount" SET "isLive"=FALSE,"liveUrl"=NULL,"liveCheckedAt"=CURRENT_TIMESTAMP,"updatedAt"=CASE WHEN "isLive"=TRUE OR "liveUrl" IS NOT NULL THEN CURRENT_TIMESTAMP ELSE "updatedAt" END WHERE verified=TRUE AND platform='tiktok' AND ("liveCheckedAt" IS NULL OR "liveCheckedAt" < CURRENT_TIMESTAMP - INTERVAL '1 minute')`);
 }
 
 export async function refreshLiveStreamers() {
-  const accounts = await prisma.$queryRawUnsafe<any[]>(`SELECT id,platform,username,"profileUrl" FROM "StreamerAccount" WHERE verified=TRUE ORDER BY "liveCheckedAt" ASC NULLS FIRST LIMIT 500`);
-  await Promise.allSettled([
+  const accounts = await prisma.$queryRawUnsafe<any[]>(`SELECT id,platform,username,"profileUrl" FROM "StreamerAccount" WHERE verified=TRUE AND ("liveCheckedAt" IS NULL OR "liveCheckedAt" < CURRENT_TIMESTAMP - INTERVAL '30 seconds') ORDER BY "liveCheckedAt" ASC NULLS FIRST LIMIT 500`);
+  if (accounts.length) await Promise.allSettled([
     refreshTwitch(accounts.filter(account => account.platform === "twitch")),
     refreshTikTok(accounts.filter(account => account.platform === "tiktok")),
   ]);

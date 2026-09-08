@@ -7,7 +7,10 @@ export function UnreadIndicator() {
 
   useEffect(() => {
     let active = true;
+    let loading = false;
     async function refresh() {
+      if (loading || document.visibilityState === "hidden") return;
+      loading = true;
       try {
         const response = await fetch("/api/messages/conversations", { cache: "no-store" });
         if (!response.ok) return;
@@ -16,15 +19,20 @@ export function UnreadIndicator() {
         const hasUnread = (data.conversations ?? []).some((conversation: { unreadCount?: number }) => Number(conversation.unreadCount ?? 0) > 0);
         setUnread(hasUnread);
         document.title = hasUnread ? "● Rhythians" : "Rhythians";
-      } catch {}
+      } catch {} finally {
+        loading = false;
+      }
     }
     void refresh();
-    const interval = window.setInterval(refresh, 3000);
-    window.addEventListener("focus", refresh);
+    const interval = window.setInterval(refresh, 30_000);
+    const onVisible = () => { if (document.visibilityState === "visible") void refresh(); };
+    window.addEventListener("focus", onVisible);
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
       active = false;
       window.clearInterval(interval);
-      window.removeEventListener("focus", refresh);
+      window.removeEventListener("focus", onVisible);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, []);
 
