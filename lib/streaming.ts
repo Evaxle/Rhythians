@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { getAvatarUrl } from "@/lib/avatar";
 
 let twitchTokenCache: { clientId: string; token: string; expiresAt: number } | null = null;
 
@@ -49,14 +50,53 @@ export async function refreshLiveStreamers() {
 }
 
 export async function getLiveStreamers(limit = 5) {
-  return prisma.$queryRawUnsafe<any[]>(`WITH live_users AS (
-    SELECT u.id AS "userId",u."discordId",u.username AS "rhythiansUsername",u."displayName",u."profileHandle",u.avatar,u.rhp,
-      (SELECT COUNT(*)::int+1 FROM "User" ranked WHERE ranked.rhp>u.rhp) AS "globalPosition"
+  const rows = await prisma.$queryRawUnsafe<Array<{
+    platform: string;
+    username: string;
+    profileUrl: string;
+    liveUrl: string | null;
+    userId: string;
+    discordId: string | null;
+    rhythiansUsername: string;
+    displayName: string | null;
+    profileHandle: string;
+    avatar: string | null;
+    rhp: number;
+    rhythiansGlobalRank: number;
+    rhythiaUsername: string | null;
+    rhythiaProfileUrl: string | null;
+    rhythiaGlobalRank: number | null;
+    playerRankName: string | null;
+    playerRankColor: string | null;
+  }>>(`WITH live_users AS (
+    SELECT
+      u.id AS "userId",
+      u."discordId",
+      u.username AS "rhythiansUsername",
+      u."displayName",
+      u."profileHandle",
+      u.avatar,
+      u.rhp,
+      (SELECT COUNT(*)::int + 1 FROM "User" ranked WHERE ranked.rhp > u.rhp AND ranked."profileHandle" <> 'rhythia-imports') AS "rhythiansGlobalRank",
+      rp.username AS "rhythiaUsername",
+      rp."profileUrl" AS "rhythiaProfileUrl",
+      rp."globalRank" AS "rhythiaGlobalRank",
+      pr.name AS "playerRankName",
+      pr.color AS "playerRankColor"
     FROM "User" u
-    WHERE EXISTS (SELECT 1 FROM "StreamerAccount" linked WHERE linked."userId"=u.id AND linked.verified=TRUE AND linked."isLive"=TRUE)
-    ORDER BY u.rhp DESC,u.id LIMIT $1
+    LEFT JOIN "RhythiaProfile" rp ON rp."userId" = u.id
+    LEFT JOIN "PlayerRank" pr ON pr.id = u."playerRankId"
+    WHERE u."profileHandle" <> 'rhythia-imports'
+      AND EXISTS (SELECT 1 FROM "StreamerAccount" linked WHERE linked."userId" = u.id AND linked.verified = TRUE AND linked."isLive" = TRUE)
+    ORDER BY u.rhp DESC, u.id
+    LIMIT $1
   )
   SELECT sa.platform,sa.username,sa."profileUrl",sa."liveUrl",lu.* FROM live_users lu
   JOIN "StreamerAccount" sa ON sa."userId"=lu."userId" AND sa.verified=TRUE AND sa."isLive"=TRUE
   ORDER BY lu.rhp DESC,lu."userId",sa.platform`, limit);
+
+  return rows.map((row) => ({
+    ...row,
+    avatar: getAvatarUrl({ avatar: row.avatar, discordId: row.discordId }, 128),
+  }));
 }
