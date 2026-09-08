@@ -61,16 +61,10 @@ export async function getGuildMember(accessToken: string): Promise<DiscordGuildM
 }
 
 export const ROLE_TO_TAG_MAP: Record<string, string> = {
-  beginner: "beginner",
-  intermediate: "intermediate",
-  experienced: "experienced",
-  expert: "expert",
   "content creator": "content-creator",
-  veteran: "veteran",
   "rhythian coach": "rhythian-coach",
   tester: "tester",
   admin: "admin",
-  mentor: "mentor",
   "post-reviewer": "post-reviewer",
   "map-reviewer": "map-reviewer",
   mapper: "mapper",
