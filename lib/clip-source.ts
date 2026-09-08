@@ -1,8 +1,9 @@
-export type ClipSourceType = "upload" | "tiktok" | "youtube" | "twitch";
+export type ClipSourceType = "upload" | "tiktok" | "youtube" | "twitch" | "medal";
+export type ExternalClipSourceType = Exclude<ClipSourceType, "upload">;
 
 const PREFIX = "external:";
 
-export function externalClipPath(platform: Exclude<ClipSourceType, "upload">, url: string) {
+export function externalClipPath(platform: ExternalClipSourceType, url: string) {
   return `${PREFIX}${platform}:${encodeURIComponent(url)}`;
 }
 
@@ -54,7 +55,26 @@ export function twitchClipSlug(value: string) {
   return null;
 }
 
-export function validateExternalClipUrl(platform: Exclude<ClipSourceType, "upload">, value: string) {
+export function medalClipId(value: string) {
+  try {
+    const url = new URL(value);
+    if (!(url.hostname === "medal.tv" || url.hostname.endsWith(".medal.tv"))) return null;
+    const parts = url.pathname.split("/").filter(Boolean);
+    const clipIndex = parts.findIndex((part) => part === "clips" || part === "clip");
+    return clipIndex >= 0 ? parts[clipIndex + 1] ?? null : null;
+  } catch {}
+  return null;
+}
+
+export function identifyExternalClipSource(value: string): ExternalClipSourceType | null {
+  if (youtubeVideoId(value)) return "youtube";
+  if (tiktokVideoId(value)) return "tiktok";
+  if (twitchClipSlug(value)) return "twitch";
+  if (medalClipId(value)) return "medal";
+  return null;
+}
+
+export function validateExternalClipUrl(platform: ExternalClipSourceType, value: string) {
   if (platform === "youtube") {
     const id = youtubeVideoId(value);
     if (!id) throw new Error("Enter a valid YouTube video, Shorts, or live-video URL.");
@@ -63,9 +83,14 @@ export function validateExternalClipUrl(platform: Exclude<ClipSourceType, "uploa
   if (platform === "tiktok") {
     const id = tiktokVideoId(value);
     if (!id) throw new Error("Enter the full TikTok video URL containing /video/ followed by the video ID.");
-    return { url: `https://www.tiktok.com/video/${id}`, id, thumbnailUrl: null };
+    return { url: value.trim(), id, thumbnailUrl: null };
   }
-  const id = twitchClipSlug(value);
-  if (!id) throw new Error("Enter a valid Twitch clip URL.");
-  return { url: `https://clips.twitch.tv/${id}`, id, thumbnailUrl: null };
+  if (platform === "twitch") {
+    const id = twitchClipSlug(value);
+    if (!id) throw new Error("Enter a valid Twitch clip URL.");
+    return { url: `https://clips.twitch.tv/${id}`, id, thumbnailUrl: null };
+  }
+  const id = medalClipId(value);
+  if (!id) throw new Error("Enter a valid Medal.tv clip URL.");
+  return { url: `https://medal.tv/clips/${id}`, id, thumbnailUrl: null };
 }
