@@ -15,8 +15,8 @@ export const RANKS: RankDefinition[] = [
   { index: 4, name: "Platinum", minRhp: 4000, color: "#7fd4ff", rangeMin: 2.3, rangeMax: 2.69 },
   { index: 5, name: "Emerald", minRhp: 5500, color: "#50c878", rangeMin: 2.7, rangeMax: 2.99 },
   { index: 6, name: "Diamond", minRhp: 7200, color: "#b9f2ff", rangeMin: 3.0, rangeMax: 3.29 },
-  { index: 7, name: "Master", minRhp: 9200, color: "#a855f7", rangeMin: 3.3, rangeMax: 3.69 },
-  { index: 8, name: "Expert", minRhp: 12000, color: "#f43f5e", rangeMin: 3.7, rangeMax: 9.99 },
+  { index: 7, name: "Master", minRhp: 9000, color: "#a855f7", rangeMin: 3.3, rangeMax: 3.69 },
+  { index: 8, name: "Expert", minRhp: 11000, color: "#f43f5e", rangeMin: 3.7, rangeMax: 9.99 },
 ];
 
 export const RANK_TIERS = 5;
