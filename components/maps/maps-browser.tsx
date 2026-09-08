@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CheckCircle2, Glasses, LockKeyhole, Search, Sparkles, XCircle } from "lucide-react";
 import type { RankInfo } from "@/lib/ranks";
 import { getRankInfo, isMapInRankRange, RANKS } from "@/lib/ranks";
+import { modeRankInfo, type ModePoints } from "@/lib/rhythia-mode-points";
 import { RankIcon } from "@/components/rank-icon";
 import type { MapModeTab, ModeScoreMap } from "@/components/maps/maps-sort-controls-persisted";
 
@@ -35,8 +36,15 @@ export function MapsBrowser({ maps, rankInfo, userRhp, showLegacy: externalShowL
   useEffect(() => { if (externalShowLegacy !== undefined) setShowLegacy(externalShowLegacy); }, [externalShowLegacy]);
   useEffect(() => setVisibleCount(PAGE_SIZE), [modeTab, showAll, showLegacy]);
 
-  const modePoints = useMemo(() => Object.values(modeScores).reduce((sum, row) => ({ lock: sum.lock + Number(row.lock || 0), spin: sum.spin + Number(row.spin || 0), vr: sum.vr + Number(row.vr || 0) }), { lock: 0, spin: 0, vr: 0 }), [modeScores]);
-  const modeRanks = useMemo(() => ({ lock: getRankInfo(modePoints.lock), spin: getRankInfo(modePoints.spin), vr: getRankInfo(modePoints.vr) }), [modePoints]);
+  const modePoints = useMemo<ModePoints>(() => {
+    const totals = modeScores.__totals__;
+    if (totals) return { lock: Number(totals.lock || 0), spin: Number(totals.spin || 0), vr: Number(totals.vr || 0) };
+    return Object.entries(modeScores).reduce((sum, [key, row]) => {
+      if (key === "__totals__") return sum;
+      sum.lock += Number(row.lock || 0); sum.spin += Number(row.spin || 0); sum.vr += Number(row.vr || 0); return sum;
+    }, { lock: 0, spin: 0, vr: 0 });
+  }, [modeScores]);
+  const modeRanks = useMemo(() => ({ lock: modeRankInfo(modePoints.lock, "lock"), spin: modeRankInfo(modePoints.spin, "spin"), vr: modeRankInfo(modePoints.vr, "vr") }), [modePoints]);
   const activeMode: ModeKey | null = modeTab === "lock" || modeTab === "spin" || modeTab === "vr" ? modeTab : null;
   const activeRank = activeMode ? modeRanks[activeMode] : rankInfo;
   const activePoints = activeMode ? modePoints[activeMode] : userRhp;
@@ -62,7 +70,7 @@ export function MapsBrowser({ maps, rankInfo, userRhp, showLegacy: externalShowL
 
   return <div className="space-y-5">
     <section className="rounded-[1.8rem] border border-white/10 bg-gradient-to-br from-white/[0.055] to-black/10 p-5 shadow-glow"><div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"><div className="flex min-w-0 items-center gap-3"><RankIcon rank={activeRank} size={44} /><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-muted">{activeMode ? `${MODE_META[activeMode].short} eligible maps` : "Available for your overall rank"}</p><p className="mt-1 text-lg font-bold text-white"><span style={{ color: activeRank.color }}>{labelRank(activeRank)}</span> · {eligibleCount} maps</p><p className="mt-1 text-xs text-muted">Rating {activeRank.rangeMin.toFixed(2)}–{activeRank.rangeMax.toFixed(2)} · {activePoints.toLocaleString()} {activeMode ? MODE_META[activeMode].short : "RHP"}</p></div></div><label className="flex w-fit cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-black/15 px-3 py-2.5"><input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} className="h-4 w-4 accent-accent" /><span className="text-xs font-semibold text-white">Show maps outside this rank</span></label></div><div className="relative mt-4"><Search size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted" /><input type="search" value={query} onChange={(e) => { setQuery(e.target.value); setVisibleCount(PAGE_SIZE); }} placeholder="Search map, artist, or mapper" className="w-full rounded-2xl border border-white/10 bg-black/15 py-3 pl-11 pr-4 text-sm text-white placeholder:text-muted focus:border-accent/45 focus:outline-none" /></div></section>
-    {activeMode && <div className="rounded-2xl border border-accent/20 bg-accent/[0.06] p-4 text-xs leading-5 text-white">This view uses your <b>{MODE_META[activeMode].short}</b> rank, not your overall RHP rank. A red X means that map cannot currently award {MODE_META[activeMode].short}.</div>}
+    {activeMode && <div className="rounded-2xl border border-accent/20 bg-accent/[0.06] p-4 text-xs leading-5 text-white">This view uses your <b>{MODE_META[activeMode].short}</b> rank from your synced {MODE_META[activeMode].short} total, not your overall RHP rank. A red X means that map cannot currently award {MODE_META[activeMode].short}.</div>}
     {filtered.length === 0 ? <div className="rounded-[1.8rem] border border-dashed border-white/10 bg-black/10 p-10 text-center text-sm text-muted">No maps match this eligibility view.</div> : <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">{visibleMaps.map((map) => {
       const mapScores = modeScores[titleKey(map.title)] ?? { lock: 0, spin: 0, vr: 0 }; const displayRank = map.rating != null ? RANKS[map.rankIndex] : null; const displayRankColor = displayRank?.color ?? map.rankColor; const displayRankInfo = getRankInfo(displayRank?.minRhp ?? rankInfo.minRhp); const eligible = activeMode ? eligibleFor(map, activeMode) : visibleForTab(map); const duration = lengthLabel(map.length); const message = messages[map.id];
       return <article key={map.id} className="group flex min-h-[390px] flex-col overflow-hidden rounded-[1.75rem] border bg-gradient-to-br from-white/[0.045] to-black/15 shadow-glow transition hover:-translate-y-1" style={{ borderColor: eligible ? `${displayRankColor}55` : "rgba(244,63,94,.22)" }}>
