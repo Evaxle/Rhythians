@@ -1,0 +1,1 @@
+ALTER TABLE "StreamerProfilePost" ALTER COLUMN "url" DROP NOT NULL;
