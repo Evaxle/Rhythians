@@ -4,6 +4,7 @@ import { canAccessAdmin } from "@/lib/admin-access";
 import { prisma } from "@/lib/db";
 import { fetchRhythiaProfile, parseRhythiaUrl } from "@/lib/rhythia";
 import { rebuildRhythiaScorePoints } from "@/lib/rhythia-full-score-import";
+import { fetchRhythiaAccountCreatedAt, syncAutomaticPlayerClassification } from "@/lib/player-classification";
 
 export const dynamic = "force-dynamic";
 
@@ -23,10 +24,12 @@ export async function POST(request: Request) {
   if (linked && linked.userId !== userId) return NextResponse.json({ error: "That Rhythia profile is already linked to another user." }, { status: 409 });
   try {
     const profile = await fetchRhythiaProfile(parsed.id);
+    const accountCreatedAt = await fetchRhythiaAccountCreatedAt(parsed.id).catch(() => null);
     const { bio: _bio, ...profileData } = profile;
     await prisma.$transaction(async (tx) => {
       await tx.rhythiaProfile.upsert({ where: { userId }, create: { userId, profileUrl: parsed.url, ...profileData }, update: { profileUrl: parsed.url, ...profileData, syncedAt: new Date() } });
       await tx.user.update({ where: { id: userId }, data: { rhythiaVerified: true } });
+      await syncAutomaticPlayerClassification(tx, userId, profile.globalRank, accountCreatedAt);
       await tx.rhythiaProfileRequest.updateMany({ where: { userId, status: "pending" }, data: { status: "approved", adminNote: `Manually linked by admin ${admin.username}.`, resolvedAt: new Date(), resolvedBy: admin.id } });
       await tx.notification.create({ data: { userId, type: "moderation", title: "Rhythia profile linked", message: "Your Rhythia profile has been manually linked by an admin.", url: "/settings" } });
       await tx.moderationAction.create({ data: { actorId: admin.id, action: "rhythia_profile_manually_linked", targetType: "user", targetId: userId, metadata: { profileId: profile.profileId, profileUrl: parsed.url } } });
