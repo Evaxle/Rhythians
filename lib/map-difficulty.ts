@@ -1,10 +1,11 @@
 import { unzipSync } from "fflate";
 import { roundRating } from "@/lib/ranks";
 
-export const MAP_ANALYZER_VERSION = 1;
+export const MAP_ANALYZER_VERSION = 2;
 export const MIN_ANALYSIS_NOTES = 3;
 
 export type MapNote = { time: number; x: number; y: number };
+export type MapPattern = "rest" | "stream" | "stream-lean" | "mixed" | "jump-lean" | "jump";
 export type MapSectionAnalysis = {
   startMs: number;
   endMs: number;
@@ -13,7 +14,18 @@ export type MapSectionAnalysis = {
   jumpness: number;
   direction: number;
   distance: number;
-  pattern: "stream" | "stream-lean" | "mixed" | "jump-lean" | "jump";
+  pattern: Exclude<MapPattern, "rest">;
+};
+export type MapPatternSegment = {
+  startMs: number;
+  endMs: number;
+  pattern: MapPattern;
+  averageStrain: number;
+  peakStrain: number;
+  averageNps: number;
+  jumpness: number;
+  direction: number;
+  distance: number;
 };
 export type MapModeRewards = { lock: number; vr: number; spin: number };
 export type MapSpeedProfile = { speed: number; rating: number; rewards: MapModeRewards };
@@ -35,6 +47,7 @@ export type MapDifficultyAnalysis = {
   rewards: MapModeRewards;
   speedProfiles: MapSpeedProfile[];
   topSections: MapSectionAnalysis[];
+  patternSegments: MapPatternSegment[];
 };
 
 type MarkerDefinition = { id: string; types: number[] };
@@ -261,6 +274,39 @@ function analyzeAtSpeed(notes: MapNote[], speed: number): SpeedAnalysis {
   return { rating, staminaIndex, activeDurationMs, longestHardSectionMs, sections, transitions };
 }
 
+function buildPatternSegments(sections: MapSectionAnalysis[], endMs: number): MapPatternSegment[] {
+  if (endMs <= 0) return [];
+  const sectionMap = new Map(sections.map((section) => [Math.floor(section.startMs / 1500), section]));
+  const bucketCount = Math.max(1, Math.ceil(endMs / 1500));
+  const buckets = Array.from({ length: bucketCount }, (_, index) => {
+    const section = sectionMap.get(index);
+    if (!section) return { startMs: index * 1500, endMs: Math.min(endMs, index * 1500 + 1500), pattern: "rest" as const, strain: 0, peak: 0, nps: 0, jumpness: 0, direction: 0, distance: 0 };
+    return { startMs: section.startMs, endMs: Math.min(endMs, section.endMs), pattern: section.pattern as MapPattern, strain: section.strain, peak: section.strain, nps: section.nps, jumpness: section.jumpness, direction: section.direction, distance: section.distance };
+  }).filter((bucket) => bucket.endMs > bucket.startMs);
+  const groups: typeof buckets[] = [];
+  for (const bucket of buckets) {
+    const last = groups[groups.length - 1];
+    if (last && last[last.length - 1].pattern === bucket.pattern && last[last.length - 1].endMs === bucket.startMs) last.push(bucket);
+    else groups.push([bucket]);
+  }
+  return groups.map((group) => {
+    const pattern = group[0].pattern;
+    const active = pattern === "rest" ? 0 : group.length;
+    const average = (key: "strain" | "nps" | "jumpness" | "direction" | "distance") => active ? group.reduce((sum, value) => sum + value[key], 0) / active : 0;
+    return {
+      startMs: group[0].startMs,
+      endMs: group[group.length - 1].endMs,
+      pattern,
+      averageStrain: roundRating(average("strain")),
+      peakStrain: roundRating(Math.max(...group.map((value) => value.peak))),
+      averageNps: roundRating(average("nps")),
+      jumpness: roundRating(average("jumpness")),
+      direction: roundRating(average("direction")),
+      distance: roundRating(average("distance")),
+    };
+  });
+}
+
 export function analyzeMapNotes(notes: MapNote[]): MapDifficultyAnalysis {
   const clean = notes.filter((note) => Number.isFinite(note.time) && Number.isFinite(note.x) && Number.isFinite(note.y)).sort((a, b) => a.time - b.time);
   if (clean.length < MIN_ANALYSIS_NOTES) throw new Error(`Map needs at least ${MIN_ANALYSIS_NOTES} valid notes for difficulty analysis.`);
@@ -285,7 +331,8 @@ export function analyzeMapNotes(notes: MapNote[]): MapDifficultyAnalysis {
     speedProfiles.push({ speed: roundRating(speed), rating: analysis.rating, rewards: modeRewards(analysis.rating, analysis.staminaIndex) });
   }
   const topSections = [...base.sections].sort((a, b) => b.strain - a.strain).slice(0, 8).map((section) => ({ ...section, strain: roundRating(section.strain), nps: roundRating(section.nps), jumpness: roundRating(section.jumpness), direction: roundRating(section.direction), distance: roundRating(section.distance) }));
-  return { version: MAP_ANALYZER_VERSION, rating: base.rating, directionScore, distanceScore, npsScore, staminaIndex: roundRating(base.staminaIndex), activeDurationMs: base.activeDurationMs, longestHardSectionMs: base.longestHardSectionMs, peakJumpNps, peakStreamNps, peakJumpStrain, peakStreamStrain, jumpRatio, noteCount: clean.length, rewards, speedProfiles, topSections };
+  const patternSegments = buildPatternSegments(base.sections, Math.max(clean[clean.length - 1].time, 1500));
+  return { version: MAP_ANALYZER_VERSION, rating: base.rating, directionScore, distanceScore, npsScore, staminaIndex: roundRating(base.staminaIndex), activeDurationMs: base.activeDurationMs, longestHardSectionMs: base.longestHardSectionMs, peakJumpNps, peakStreamNps, peakJumpStrain, peakStreamStrain, jumpRatio, noteCount: clean.length, rewards, speedProfiles, topSections, patternSegments };
 }
 
 export function analyzeMapBytes(data: Uint8Array) { return analyzeMapNotes(parseMapNotes(data)); }
