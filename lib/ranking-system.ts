@@ -14,6 +14,7 @@ export type RankingConfig = {
   unrankedRpWeight: number;
   maxPlacementRhp: number;
   modeFallbackFraction: number;
+  modeProgressionWeight: number;
   strongestModeWeight: number;
   secondModeWeight: number;
   thirdModeWeight: number;
@@ -29,6 +30,7 @@ export const DEFAULT_RANKING_CONFIG: RankingConfig = {
   unrankedRpWeight: 0.55,
   maxPlacementRhp: 15000,
   modeFallbackFraction: 0.4,
+  modeProgressionWeight: 0.4,
   strongestModeWeight: 0.75,
   secondModeWeight: 0.2,
   thirdModeWeight: 0.05,
@@ -51,6 +53,7 @@ export function sanitizeRankingConfig(value: unknown): RankingConfig {
     unrankedRpWeight: Math.min(1, Math.max(0, finite(source.unrankedRpWeight, DEFAULT_RANKING_CONFIG.unrankedRpWeight))),
     maxPlacementRhp: Math.max(RANKS[RANKS.length - 1].minRhp, Math.round(finite(source.maxPlacementRhp, DEFAULT_RANKING_CONFIG.maxPlacementRhp))),
     modeFallbackFraction: Math.min(1, Math.max(0, finite(source.modeFallbackFraction, DEFAULT_RANKING_CONFIG.modeFallbackFraction))),
+    modeProgressionWeight: Math.min(1, Math.max(0, finite(source.modeProgressionWeight, DEFAULT_RANKING_CONFIG.modeProgressionWeight))),
     strongestModeWeight: Math.max(0, finite(source.strongestModeWeight, DEFAULT_RANKING_CONFIG.strongestModeWeight)),
     secondModeWeight: Math.max(0, finite(source.secondModeWeight, DEFAULT_RANKING_CONFIG.secondModeWeight)),
     thirdModeWeight: Math.max(0, finite(source.thirdModeWeight, DEFAULT_RANKING_CONFIG.thirdModeWeight)),
@@ -100,7 +103,8 @@ export function overallRhpFromModes(points: ModePoints, overallFloor: number, co
   const placement = Math.max(0, Math.round(overallFloor));
   const weighted = weightedModeEquivalent(points, config);
   const placementModeBaseline = placement * config.modeFallbackFraction;
-  return Math.max(0, Math.round(placement + Math.max(0, weighted - placementModeBaseline)));
+  const earnedProgression = Math.max(0, weighted - placementModeBaseline) * config.modeProgressionWeight;
+  return Math.max(0, Math.round(placement + earnedProgression));
 }
 
 export function fallbackModeTarget(overallPlacement: number, mode: ModeKey, config: RankingConfig) {
@@ -200,7 +204,7 @@ export async function applyRankingReset(actorId: string, configInput?: RankingCo
       await tx.$executeRawUnsafe('INSERT INTO "RankingBaseline" ("userId","overallFloor","rplBase","rpsBase","rpvBase",source,"lastResetId","updatedAt") VALUES ($1,$2,$3,$4,$5,\'placement-v2\',$6::uuid,CURRENT_TIMESTAMP) ON CONFLICT ("userId") DO UPDATE SET "overallFloor"=EXCLUDED."overallFloor","rplBase"=EXCLUDED."rplBase","rpsBase"=EXCLUDED."rpsBase","rpvBase"=EXCLUDED."rpvBase",source=EXCLUDED.source,"lastResetId"=EXCLUDED."lastResetId","updatedAt"=CURRENT_TIMESTAMP', source.userId, placement, rplBase, rpsBase, rpvBase, resetId);
       await tx.$executeRawUnsafe('UPDATE "User" SET rhp=$2 WHERE id=$1', source.userId, row.newRhp);
       if (seasonId) await tx.$executeRawUnsafe('INSERT INTO "RbpUserSeason" (id,"seasonId","userId","placementRankIndex",rbp,"createdAt","updatedAt") VALUES (gen_random_uuid(),$1,$2,$3,$4,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) ON CONFLICT ("seasonId","userId") DO UPDATE SET "placementRankIndex"=EXCLUDED."placementRankIndex",rbp=EXCLUDED.rbp,"updatedAt"=CURRENT_TIMESTAMP', seasonId, source.userId, getRankInfo(row.battleSeed).index, row.battleSeed);
-      await tx.$executeRawUnsafe('INSERT INTO "RankingResetAudit" ("resetId","userId","oldRhp","newRhp","oldRpl","newRpl","oldRps","newRps","oldRpv","newRpv","oldRbp","newRbp","rhythiaGlobalRank","rhythiaRp",metadata) VALUES ($1::uuid,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15::jsonb)', resetId, source.userId, source.oldRhp, row.newRhp, oldMap.get("rpl") ?? source.rawLock, row.rpl, oldMap.get("rps") ?? source.rawSpin, row.rps, oldMap.get("rpv") ?? source.rawVr, row.rpv, oldRbp, seasonId ? row.battleSeed : null, source.globalRank, source.rhythmPoints, JSON.stringify({ placement, rplBase, rpsBase, rpvBase, configVersion: 2 }));
+      await tx.$executeRawUnsafe('INSERT INTO "RankingResetAudit" ("resetId","userId","oldRhp","newRhp","oldRpl","newRpl","oldRps","newRps","oldRpv","newRpv","oldRbp","newRbp","rhythiaGlobalRank","rhythiaRp",metadata) VALUES ($1::uuid,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15::jsonb)', resetId, source.userId, source.oldRhp, row.newRhp, oldMap.get("rpl") ?? source.rawLock, row.rpl, oldMap.get("rps") ?? source.rawSpin, row.rps, oldMap.get("rpv") ?? source.rawVr, row.rpv, oldRbp, seasonId ? row.battleSeed : null, source.globalRank, source.rhythmPoints, JSON.stringify({ placement, rplBase, rpsBase, rpvBase, configVersion: 2, modeProgressionWeight: config.modeProgressionWeight }));
     }
     await tx.moderationAction.create({ data: { actorId, action: "ranking_system_v2_reset", targetType: "ranking", targetId: resetId, metadata: { users: sources.length, config } } });
   });
