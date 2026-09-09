@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { getAvatarUrl } from "@/lib/avatar";
-import { getRankInfo } from "@/lib/ranks";
+import { getRankInfo, RANKS } from "@/lib/ranks";
 
 export const BATTLE_MODES = ["1v1", "2v2", "3v3", "15v15"] as const;
 export const TEAM_MODES = ["regular", "captains"] as const;
@@ -16,7 +16,7 @@ export function rankedLoss(winnerScore: number, loserScore: number) { const diff
 export async function getBattleUser(userId: string) { const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, username: true, displayName: true, profileHandle: true, avatar: true, discordId: true, rhp: true, userTags: { select: { tag: { select: { name: true, slug: true } } } } } }); if (!user) return null; return { ...user, avatar: getAvatarUrl(user, 256) }; }
 export function rankTierValue(rhp: number) { const rank = getRankInfo(rhp); return rank.index * 5 + Math.max(0, rank.tier - 1); }
 export function averageRankTier(rhps: number[]) { if (!rhps.length) return 0; return Math.round(rhps.reduce((sum, rhp) => sum + rankTierValue(rhp), 0) / rhps.length); }
-export function rankIndexFromTierValue(value: number) { return Math.max(0, Math.min(8, Math.floor(Math.max(0, value) / 5))); }
+export function rankIndexFromTierValue(value: number) { return Math.max(0, Math.min(RANKS.length - 1, Math.floor(Math.max(0, value) / 5))); }
 export function casualRanksCompatible(rhps: number[]) { if (!rhps.length) return false; const ranks = rhps.map((rhp) => getRankInfo(rhp).index); return Math.max(...ranks) - Math.min(...ranks) <= 1; }
 
 async function randomMaps(status: "approved" | "legacy", minRating: number, maxRating: number, maxLength: number | null, excluded: string[] = []) {
@@ -29,7 +29,8 @@ async function randomMaps(status: "approved" | "legacy", minRating: number, maxR
 }
 
 export async function selectBattleMap(rankIndex: number, maxLength: number | null = 240, excluded: string[] = []) {
-  const rank = getRankInfo(Math.max(0, Math.min(8, rankIndex)) * 500);
+  const safeIndex = Math.max(0, Math.min(RANKS.length - 1, Math.floor(rankIndex)));
+  const rank = getRankInfo(RANKS[safeIndex].minRhp);
   const preferredStatus: "approved" | "legacy" = Math.random() < 0.5 ? "approved" : "legacy";
   let maps = await randomMaps(preferredStatus, rank.rangeMin, rank.rangeMax, maxLength, excluded);
   if (!maps.length) maps = await randomMaps(preferredStatus === "approved" ? "legacy" : "approved", rank.rangeMin, rank.rangeMax, maxLength, excluded);

@@ -1,6 +1,7 @@
 import { LockKeyhole, Move, Scan } from "lucide-react";
 import { RankIcon } from "@/components/rank-icon";
-import { MODE_RULES, modeRankInfo, type ModeKey, type ModePoints } from "@/lib/rhythia-mode-points";
+import { modeRankInfo } from "@/lib/mode-ranks";
+import { MODE_RULES, type ModeKey, type ModePoints } from "@/lib/rhythia-mode-rules";
 
 const icons = { lock: LockKeyhole, spin: Move, vr: Scan };
 function modeLabel(info: ReturnType<typeof modeRankInfo>) { return info.isExpert ? "Expert" : `${info.name} ${info.tier}`; }

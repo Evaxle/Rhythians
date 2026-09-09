@@ -5,7 +5,8 @@ import Link from "next/link";
 import { CheckCircle2, Glasses, LockKeyhole, Search, Sparkles, XCircle } from "lucide-react";
 import type { RankInfo } from "@/lib/ranks";
 import { getRankInfo, isMapInRankRange, RANKS } from "@/lib/ranks";
-import { modeRankInfo, type ModePoints } from "@/lib/rhythia-mode-points";
+import { modeRankInfo } from "@/lib/mode-ranks";
+import type { ModePoints } from "@/lib/rhythia-mode-rules";
 import { RankIcon } from "@/components/rank-icon";
 import type { MapModeTab, ModeScoreMap } from "@/components/maps/maps-sort-controls-persisted";
 

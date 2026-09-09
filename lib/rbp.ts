@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { RANKS, getRankInfo } from "@/lib/ranks";
+import { battleSeedForRhp } from "@/lib/ranking-system";
 import { getSeasonalPath } from "@/lib/seasonal-path";
 import { teamScore } from "@/lib/battles";
 import type { Prisma } from "@/generated/prisma/client";
@@ -51,9 +52,8 @@ export async function ensureUserRbpSeason(userId: string) {
   if (existing[0]) return { season, player: existing[0] };
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } });
   if (!user) return null;
-  const normalRank = getRankInfo(user.rhp).index;
-  const placementRankIndex = Math.max(0, normalRank - 1);
-  const startingRbp = RANKS[placementRankIndex]?.minRhp ?? 0;
+  const startingRbp = battleSeedForRhp(user.rhp);
+  const placementRankIndex = getRankInfo(startingRbp).index;
   await prisma.$executeRawUnsafe('INSERT INTO "RbpUserSeason" ("id","seasonId","userId","placementRankIndex","rbp") VALUES (gen_random_uuid(),$1,$2,$3,$4) ON CONFLICT ("seasonId","userId") DO NOTHING', season.id, userId, placementRankIndex, startingRbp);
   const player = await prisma.$queryRawUnsafe<Array<{ id: string; rbp: number; placementRankIndex: number }>>('SELECT "id","rbp","placementRankIndex" FROM "RbpUserSeason" WHERE "seasonId"=$1 AND "userId"=$2 LIMIT 1', season.id, userId);
   return player[0] ? { season, player: player[0] } : null;
@@ -99,7 +99,7 @@ export async function resolveFinishedRbpMatch(matchId: string, forcedWinnerTeam:
       }
       const inserted = await insertResult(tx, { seasonId: season.id, matchId, userId: player.userId, opponentUserId: opponentPlayer?.userId ?? null, result, delta, accuracy: player.accuracy, opponentAccuracy: opponent, reason });
       if (!inserted.length) continue;
-      if (delta) await tx.$executeRawUnsafe('UPDATE "RbpUserSeason" SET "rbp"=GREATEST(0,"rbp"+$1),"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=$2', delta, userSeason[0].id,);
+      if (delta) await tx.$executeRawUnsafe('UPDATE "RbpUserSeason" SET "rbp"=GREATEST(0,"rbp"+$1),"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=$2', delta, userSeason[0].id);
     }
   });
   return { winnerTeam, scoreOne, scoreTwo };
@@ -121,11 +121,11 @@ export async function forfeitRbpMatch(matchId: string, userId: string, matchStat
       const isLeaver = player.userId === userId;
       const delta = isLeaver ? -RBP_FORFEIT : RBP_FORFEIT;
       const result = isLeaver ? "forfeit" : "win";
-      const reason = isLeaver ? "unsportsmanlike" : "opponent_forfeit";
+      const resultReason = isLeaver ? "unsportsmanlike" : "opponent_forfeit";
       const opponent = players.find((candidate) => candidate.userId !== player.userId) ?? null;
       const userSeason = await tx.$queryRawUnsafe<Array<{ id: string }>>('SELECT "id" FROM "RbpUserSeason" WHERE "seasonId"=$1 AND "userId"=$2 LIMIT 1', season.id, player.userId);
       if (!userSeason[0]) continue;
-      const inserted = await insertResult(tx, { seasonId: season.id, matchId, userId: player.userId, opponentUserId: opponent?.userId ?? null, result, delta, accuracy: player.accuracy, opponentAccuracy: opponent?.accuracy ?? null, reason });
+      const inserted = await insertResult(tx, { seasonId: season.id, matchId, userId: player.userId, opponentUserId: opponent?.userId ?? null, result, delta, accuracy: player.accuracy, opponentAccuracy: opponent?.accuracy ?? null, reason: resultReason });
       if (!inserted.length) continue;
       await tx.$executeRawUnsafe('UPDATE "RbpUserSeason" SET "rbp"=GREATEST(0,"rbp"+$1),"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=$2', delta, userSeason[0].id);
     }

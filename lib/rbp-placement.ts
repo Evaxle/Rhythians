@@ -1,30 +1,23 @@
 import { prisma } from "@/lib/db";
 import { getCurrentRbpSeason } from "@/lib/rbp";
+import { battleSeedForRhp } from "@/lib/ranking-system";
+import { getRankInfo } from "@/lib/ranks";
 
 export async function placeBattleRanks(userIds?: string[], replace = false) {
   const season = await getCurrentRbpSeason();
   if (!season) return { season: null, changed: 0 };
   const ids = userIds?.filter(Boolean) ?? [];
-  const filter = ids.length ? 'AND u.id = ANY($3::text[])' : '';
-  const params: unknown[] = [season.id, replace];
-  if (ids.length) params.push(ids);
-  const rows = await prisma.$queryRawUnsafe<Array<{ userId: string }>>(
-    `INSERT INTO "RbpUserSeason" ("id","seasonId","userId","placementRankIndex","rbp","createdAt","updatedAt")
-     SELECT gen_random_uuid(),$1,u.id,
-       GREATEST(0,LEAST(8,FLOOR(GREATEST(0,u.rhp)::numeric/500)::integer)-1),
-       GREATEST(0,LEAST(8,FLOOR(GREATEST(0,u.rhp)::numeric/500)::integer)-1)*500,
-       CURRENT_TIMESTAMP,CURRENT_TIMESTAMP
-     FROM "User" u
-     WHERE u."profileHandle" <> 'rhythia-imports' ${filter}
-     ON CONFLICT ("seasonId","userId") DO UPDATE SET
-       "placementRankIndex"=EXCLUDED."placementRankIndex","rbp"=EXCLUDED."rbp","updatedAt"=CURRENT_TIMESTAMP
-     WHERE $2::boolean
-     RETURNING "userId"`,
-    ...params,
-  );
-  return { season, changed: rows.length };
+  const users = await prisma.user.findMany({ where: { profileHandle: { not: "rhythia-imports" }, ...(ids.length ? { id: { in: ids } } : {}) }, select: { id: true, rhp: true } });
+  let changed = 0;
+  await prisma.$transaction(async tx => {
+    for (const user of users) {
+      const rbp = battleSeedForRhp(user.rhp);
+      const placementRankIndex = getRankInfo(rbp).index;
+      const rows = await tx.$queryRawUnsafe<Array<{ userId: string }>>('INSERT INTO "RbpUserSeason" (id,"seasonId","userId","placementRankIndex",rbp,"createdAt","updatedAt") VALUES (gen_random_uuid(),$1,$2,$3,$4,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) ON CONFLICT ("seasonId","userId") DO UPDATE SET "placementRankIndex"=EXCLUDED."placementRankIndex",rbp=EXCLUDED.rbp,"updatedAt"=CURRENT_TIMESTAMP WHERE $5::boolean RETURNING "userId"', season.id, user.id, placementRankIndex, rbp, replace);
+      changed += rows.length;
+    }
+  });
+  return { season, changed };
 }
 
-export async function placeLinkedUserInBattleRank(userId: string) {
-  return placeBattleRanks([userId], false);
-}
+export async function placeLinkedUserInBattleRank(userId: string) { return placeBattleRanks([userId], false); }

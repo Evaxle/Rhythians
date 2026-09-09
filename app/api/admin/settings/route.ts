@@ -4,12 +4,11 @@ import { getSessionUser } from "@/lib/auth";
 import { canAccessAdmin } from "@/lib/admin-access";
 import { prisma } from "@/lib/db";
 import { supabaseAdmin } from "@/lib/supabase";
+import { identifyExternalClipSource, validateExternalClipUrl } from "@/lib/clip-source";
 
 const bucket = () => process.env.STORAGE_BUCKET ?? "media";
 const MAX_SETTINGS_SIZE = 25 * 1024 * 1024;
 const MAX_VIDEO_SIZE = 250 * 1024 * 1024;
-const settingsExtension = (name: string) => /\.rhs$/i.test(name);
-const videoExtension = (name: string) => /\.(mp4|webm|mov|m4v)$/i.test(name);
 
 async function authorize() {
   const user = await getSessionUser();
@@ -32,24 +31,30 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => null) as Record<string, unknown> | null;
 
   if (body?.action === "upload") {
+    const result: Record<string, string> = {};
     const settingsFileName = typeof body.settingsFileName === "string" ? body.settingsFileName.trim() : "";
+    const settingsFileSize = Number(body.settingsFileSize ?? 0);
+    if (settingsFileName) {
+      if (!/\.rhs$/i.test(settingsFileName)) return NextResponse.json({ error: "Settings file must be an .rhs file." }, { status: 400 });
+      if (!Number.isFinite(settingsFileSize) || settingsFileSize <= 0 || settingsFileSize > MAX_SETTINGS_SIZE) return NextResponse.json({ error: "Settings file must be between 1 byte and 25 MB." }, { status: 400 });
+      const path = `settings/${randomUUID()}/${settingsFileName.replace(/[^a-zA-Z0-9._-]/g, "-")}`;
+      const upload = await supabaseAdmin.storage.from(bucket()).createSignedUploadUrl(path);
+      if (upload.error || !upload.data) return NextResponse.json({ error: "Could not create the settings upload URL." }, { status: 500 });
+      result.settingsUploadUrl = upload.data.signedUrl;
+      result.settingsPath = path;
+    }
     const videoFileName = typeof body.videoFileName === "string" ? body.videoFileName.trim() : "";
-    const settingsFileSize = Number(body.settingsFileSize);
-    const videoFileSize = Number(body.videoFileSize);
-    const settingsContentType = typeof body.settingsContentType === "string" ? body.settingsContentType : "application/octet-stream";
-    const videoContentType = typeof body.videoContentType === "string" ? body.videoContentType : "video/mp4";
-    if (!settingsExtension(settingsFileName)) return NextResponse.json({ error: "Settings file must be an .rhs file." }, { status: 400 });
-    if (!videoExtension(videoFileName)) return NextResponse.json({ error: "Gameplay preview must be MP4, WebM, MOV, or M4V so it can autoplay in browsers." }, { status: 400 });
-    if (!Number.isFinite(settingsFileSize) || settingsFileSize <= 0 || settingsFileSize > MAX_SETTINGS_SIZE) return NextResponse.json({ error: "Settings file must be between 1 byte and 25 MB." }, { status: 400 });
-    if (!Number.isFinite(videoFileSize) || videoFileSize <= 0 || videoFileSize > MAX_VIDEO_SIZE) return NextResponse.json({ error: "Video must be between 1 byte and 250 MB." }, { status: 400 });
-    const settingsPath = `settings/${randomUUID()}/${settingsFileName.replace(/[^a-zA-Z0-9._-]/g, "-")}`;
-    const videoPath = `settings/${randomUUID()}/${videoFileName.replace(/[^a-zA-Z0-9._-]/g, "-")}`;
-    const [settingsUpload, videoUpload] = await Promise.all([
-      supabaseAdmin.storage.from(bucket()).createSignedUploadUrl(settingsPath),
-      supabaseAdmin.storage.from(bucket()).createSignedUploadUrl(videoPath),
-    ]);
-    if (settingsUpload.error || !settingsUpload.data || videoUpload.error || !videoUpload.data) return NextResponse.json({ error: "Could not create upload URLs." }, { status: 500 });
-    return NextResponse.json({ settingsUploadUrl: settingsUpload.data.signedUrl, videoUploadUrl: videoUpload.data.signedUrl, settingsPath, videoPath, settingsContentType, videoContentType });
+    const videoFileSize = Number(body.videoFileSize ?? 0);
+    if (videoFileName) {
+      if (!/\.(mp4|webm|mov|m4v)$/i.test(videoFileName)) return NextResponse.json({ error: "Gameplay preview must be MP4, WebM, MOV, or M4V." }, { status: 400 });
+      if (!Number.isFinite(videoFileSize) || videoFileSize <= 0 || videoFileSize > MAX_VIDEO_SIZE) return NextResponse.json({ error: "Video must be between 1 byte and 250 MB." }, { status: 400 });
+      const path = `settings/${randomUUID()}/${videoFileName.replace(/[^a-zA-Z0-9._-]/g, "-")}`;
+      const upload = await supabaseAdmin.storage.from(bucket()).createSignedUploadUrl(path);
+      if (upload.error || !upload.data) return NextResponse.json({ error: "Could not create the video upload URL." }, { status: 500 });
+      result.videoUploadUrl = upload.data.signedUrl;
+      result.videoPath = path;
+    }
+    return NextResponse.json(result);
   }
 
   if (body?.action === "create" || body?.action === "update") {
@@ -58,27 +63,31 @@ export async function POST(request: Request) {
     const userId = typeof body.userId === "string" ? body.userId : "";
     const settingsPath = typeof body.settingsPath === "string" ? body.settingsPath : "";
     const videoPath = typeof body.videoPath === "string" ? body.videoPath : "";
+    const externalVideoUrl = typeof body.externalVideoUrl === "string" ? body.externalVideoUrl.trim() : "";
     const settingsFileName = typeof body.settingsFileName === "string" ? body.settingsFileName : "";
     const title = typeof body.title === "string" ? body.title.trim() || null : null;
     const description = typeof body.description === "string" ? body.description.trim() || null : null;
     if (!cameraMode || !userId) return NextResponse.json({ error: "Camera mode and connected user are required." }, { status: 400 });
     const linked = await prisma.rhythiaProfile.findUnique({ where: { userId }, select: { userId: true } });
     if (!linked) return NextResponse.json({ error: "The selected user does not have a connected Rhythia account." }, { status: 400 });
-    if (body.action === "create" && (!settingsPath || !videoPath || !settingsFileName)) return NextResponse.json({ error: "Settings and video files are required." }, { status: 400 });
+    let externalValue = "";
+    if (externalVideoUrl) {
+      const source = identifyExternalClipSource(externalVideoUrl);
+      if (!source) return NextResponse.json({ error: "Use a valid TikTok, YouTube, Twitch, or Medal.tv video URL." }, { status: 400 });
+      externalValue = validateExternalClipUrl(source, externalVideoUrl).url;
+    }
 
     if (body.action === "update") {
       if (!id) return NextResponse.json({ error: "Settings entry is required." }, { status: 400 });
-      const current = await prisma.$queryRawUnsafe<Array<{ id: string; settingsFileUrl: string; settingsFileName: string; videoUrl: string }>>(`SELECT "id","settingsFileUrl","settingsFileName","videoUrl" FROM "SettingsShowcase" WHERE "id"=$1 LIMIT 1`, id);
+      const current = await prisma.$queryRawUnsafe<Array<{ settingsFileUrl: string; settingsFileName: string; videoUrl: string }>>(`SELECT "settingsFileUrl","settingsFileName","videoUrl" FROM "SettingsShowcase" WHERE "id"=$1 LIMIT 1`, id);
       if (!current[0]) return NextResponse.json({ error: "Settings entry not found." }, { status: 404 });
-      const settingsValue = settingsPath || current[0].settingsFileUrl;
-      const videoValue = videoPath || current[0].videoUrl;
-      const fileName = settingsFileName || current[0].settingsFileName;
-      await prisma.$executeRawUnsafe(`UPDATE "SettingsShowcase" SET "cameraMode"=$1,"userId"=$2,"settingsFileUrl"=$3,"settingsFileName"=$4,"videoUrl"=$5,"title"=$6,"description"=$7,"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=$8`, cameraMode, userId, settingsValue, fileName, videoValue, title, description, id);
+      await prisma.$executeRawUnsafe(`UPDATE "SettingsShowcase" SET "cameraMode"=$1,"userId"=$2,"settingsFileUrl"=$3,"settingsFileName"=$4,"videoUrl"=$5,"title"=$6,"description"=$7,"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=$8`, cameraMode, userId, settingsPath || current[0].settingsFileUrl, settingsFileName || current[0].settingsFileName, externalValue || videoPath || current[0].videoUrl, title, description, id);
       return NextResponse.json({ id });
     }
 
+    if (!settingsPath || !settingsFileName || (!videoPath && !externalValue)) return NextResponse.json({ error: "A settings file and either a gameplay video file or supported video URL are required." }, { status: 400 });
     const newId = randomUUID();
-    await prisma.$executeRawUnsafe(`INSERT INTO "SettingsShowcase" ("id","cameraMode","userId","settingsFileUrl","settingsFileName","videoUrl","title","description") VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`, newId, cameraMode, userId, settingsPath, settingsFileName, videoPath, title, description);
+    await prisma.$executeRawUnsafe(`INSERT INTO "SettingsShowcase" ("id","cameraMode","userId","settingsFileUrl","settingsFileName","videoUrl","title","description") VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`, newId, cameraMode, userId, settingsPath, settingsFileName, externalValue || videoPath, title, description);
     return NextResponse.json({ id: newId }, { status: 201 });
   }
 
