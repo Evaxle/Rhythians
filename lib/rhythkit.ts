@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { getRankInfo, RANKS } from "@/lib/ranks";
 
 export function randomToken(prefix: string) {
   return `${prefix}${crypto.randomBytes(32).toString("hex")}`;
@@ -15,20 +16,10 @@ export function randomUserCode() {
 }
 
 export function getRankIndex(rhp: number) {
-  return Math.min(8, Math.floor(Math.max(0, Math.floor(rhp)) / 500));
+  return getRankInfo(rhp).index;
 }
 
 export function getRankRange(index: number) {
-  const ranges = [
-    [0, 1.09],
-    [1.1, 1.49],
-    [1.5, 1.89],
-    [1.9, 2.29],
-    [2.3, 2.69],
-    [2.7, 2.99],
-    [3, 3.29],
-    [3.3, 3.69],
-    [3.7, 9.99],
-  ];
-  return ranges[index] ?? ranges[8];
+  const rank = RANKS[Math.max(0, Math.min(RANKS.length - 1, Math.floor(index)))] ?? RANKS[RANKS.length - 1];
+  return [rank.rangeMin, rank.rangeMax];
 }
