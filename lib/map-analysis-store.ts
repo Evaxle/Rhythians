@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { analyzeMapBytes, MAP_ANALYZER_VERSION, type MapDifficultyAnalysis, type MapSpeedProfile } from "@/lib/map-difficulty";
 
+export { MAP_ANALYZER_VERSION };
 export const UNRANKED_MAP_MARKER = "rhythia-unranked";
 
 export type StoredMapAnalysis = {
