@@ -31,7 +31,6 @@ export async function checkAndAwardDailyAcrossRankChange(userId: string) {
     await prisma.$transaction([
       prisma.dailyMapBeat.create({ data: { dailyMapId: daily.id, userId, points: 0, scoreId: hit.id, accuracy: hit.accuracy ?? null, misses: hit.misses } }),
       prisma.user.update({ where: { id: userId }, data: { dailyStreak: newStreak, lastDailyBeatAt: now } }),
-      prisma.notification.create({ data: { userId, type: "daily_map", title: "Daily map beaten", message: `Daily streak updated to ${newStreak} day${newStreak === 1 ? "" : "s"}. Rank points are awarded only by the analyzed-map progression system.`, url: "/daily" } }),
     ]);
   } catch {
     const beat = await prisma.dailyMapBeat.findFirst({ where: { userId, createdAt: { gte: today } }, orderBy: { createdAt: "desc" } });
