@@ -13,11 +13,18 @@ const MODES: ModeKey[] = ["lock", "spin", "vr"];
 type QuestMap = { id: string; title: string; artist: string | null; mapperName: string | null; imageUrl: string | null; sourceUrl: string | null; mapFileUrl: string; sourceBeatmapId: number | null; rating: number; rpl: number; rps: number; rpv: number; speedProfiles: unknown };
 type QuestRow = { id: string; date: Date; userId: string; mode: string; mapId: string };
 type ClaimRow = { id: string; date: Date; userId: string; questId: string; mode: string; mapId: string; scoreId: number; basePoints: number; bonusPoints: number; createdAt: Date };
-type ScorePayload = { id: number; beatmapTitle?: string | null; beatmapId?: number | null; mapId?: number | null; passed?: boolean | null; speed?: number | null; created_at?: string | null; cameraMode?: string | null; gameMode?: string | null; mode?: string | null; spin?: boolean | null; vr?: boolean | null; isVr?: boolean | null; mods?: string | null };
+type FlagValue = boolean | number | string | null;
+type ScorePayload = { id: number; beatmapTitle?: string | null; beatmapId?: number | null; mapId?: number | null; passed?: FlagValue; speed?: number | null; created_at?: string | null; cameraMode?: string | null; gameMode?: string | null; mode?: string | null; spin?: FlagValue; vr?: FlagValue; isVr?: FlagValue; mods?: string | string[] | null };
 type ScoreBucket = { name: "lastDay" | "top" | "vrTop" | "vrRecent"; scores: ScorePayload[] };
 
 function normalize(value: string | null | undefined) { return (value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
 function sourceId(value: number) { return Number.isSafeInteger(value) && value > 0x7fffffff && value <= 0xffffffff ? value - 0x100000000 : value; }
+function enabled(value: FlagValue | undefined) {
+  if (value === true || value === 1) return true;
+  if (typeof value === "string") return ["true", "1", "yes", "on", "vr", "spin"].includes(value.trim().toLowerCase());
+  return false;
+}
+function modsText(value: ScorePayload["mods"]) { return Array.isArray(value) ? value.join(" ") : value ?? ""; }
 function parseProfiles(value: unknown): MapSpeedProfile[] {
   if (Array.isArray(value)) return value as MapSpeedProfile[];
   if (typeof value === "string") { try { const parsed = JSON.parse(value); return Array.isArray(parsed) ? parsed as MapSpeedProfile[] : []; } catch { return []; } }
@@ -25,8 +32,9 @@ function parseProfiles(value: unknown): MapSpeedProfile[] {
 }
 function modeFor(score: ScorePayload, bucket: ScoreBucket["name"]): ModeKey {
   const explicit = `${score.cameraMode ?? ""} ${score.gameMode ?? ""} ${score.mode ?? ""}`.toLowerCase();
-  if (explicit.includes("vr") || explicit.includes("virtual reality") || score.vr === true || score.isVr === true || bucket === "vrTop" || bucket === "vrRecent") return "vr";
-  if (explicit.includes("spin") || score.spin === true || /(^|[\s,;+])spin([\s,;+]|$)/i.test(score.mods ?? "")) return "spin";
+  const mods = modsText(score.mods);
+  if (explicit.includes("vr") || explicit.includes("virtual reality") || enabled(score.vr) || enabled(score.isVr) || /(^|[\s,;+])vr([\s,;+]|$)/i.test(mods) || /virtual\s*reality/i.test(mods) || bucket === "vrTop" || bucket === "vrRecent") return "vr";
+  if (explicit.includes("spin") || enabled(score.spin) || /(^|[\s,;+])spin([\s,;+]|$)/i.test(mods)) return "spin";
   return "lock";
 }
 function baseReward(map: QuestMap, mode: ModeKey, speed: number) {
@@ -78,6 +86,18 @@ async function eligibleMaps() {
     ORDER BY a.rating ASC,c.id ASC`, MAP_ANALYZER_VERSION);
 }
 
+async function questMapsByIds(ids: string[]) {
+  const maps: QuestMap[] = [];
+  for (const id of ids) {
+    const rows = await prisma.$queryRawUnsafe<QuestMap[]>(`
+      SELECT c.id,c.title,c.artist,c."mapperName",c."imageUrl",c."sourceUrl",c."mapFileUrl",c."sourceBeatmapId",a.rating,a.rpl,a.rps,a.rpv,a."speedProfiles"
+      FROM "ChallengeMap" c JOIN "MapDifficultyAnalysis" a ON a."mapId"=c.id
+      WHERE c.id=$1 AND a.status='analyzed' AND a."pointEligible"=TRUE AND a."analyzerVersion"=$2 LIMIT 1`, id, MAP_ANALYZER_VERSION);
+    if (rows[0]) maps.push(rows[0]);
+  }
+  return maps;
+}
+
 async function createTodayQuests(userId: string, date: Date) {
   const existing = await prisma.$queryRawUnsafe<QuestRow[]>('SELECT * FROM "DailyModeQuest" WHERE "userId"=$1 AND "date"=$2 ORDER BY mode', userId, date);
   if (existing.length === 3) return existing;
@@ -111,9 +131,10 @@ async function recentScores(userId: string) {
   const buckets: ScoreBucket[] = [{ name: "lastDay", scores: data.lastDay ?? [] }, { name: "top", scores: data.top ?? [] }, { name: "vrTop", scores: data.vrTop ?? [] }, { name: "vrRecent", scores: data.vrRecent ?? [] }];
   const best = new Map<number, { score: ScorePayload; mode: ModeKey; recent: boolean; confidence: number }>();
   for (const bucket of buckets) for (const score of bucket.scores) {
-    if (!score || typeof score.id !== "number" || score.passed !== true) continue;
+    if (!score || typeof score.id !== "number" || !enabled(score.passed)) continue;
     const mode = modeFor(score, bucket.name);
-    const confidence = bucket.name === "vrTop" || bucket.name === "vrRecent" ? 2 : score.cameraMode || score.gameMode || score.mode || score.spin || score.vr || score.isVr ? 3 : 1;
+    const explicit = Boolean(score.cameraMode || score.gameMode || score.mode || enabled(score.spin) || enabled(score.vr) || enabled(score.isVr) || modsText(score.mods));
+    const confidence = bucket.name === "vrTop" || bucket.name === "vrRecent" ? 2 : explicit ? 3 : 1;
     const recent = bucket.name === "lastDay" || bucket.name === "vrRecent";
     const old = best.get(score.id);
     if (!old || confidence > old.confidence || recent && !old.recent) best.set(score.id, { score, mode, recent, confidence });
@@ -122,7 +143,7 @@ async function recentScores(userId: string) {
 }
 
 function scoreMatchesQuest(entry: { score: ScorePayload; mode: ModeKey; recent: boolean }, map: QuestMap, mode: ModeKey, date: Date) {
-  if (entry.mode !== mode || entry.score.passed !== true) return false;
+  if (entry.mode !== mode || !enabled(entry.score.passed)) return false;
   const rawId = entry.score.beatmapId ?? entry.score.mapId ?? null;
   const idMatches = rawId != null && map.sourceBeatmapId != null && sourceId(rawId) === map.sourceBeatmapId;
   const titleMatches = normalize(entry.score.beatmapTitle) === normalize(map.title);
@@ -140,15 +161,9 @@ export async function getDailyModeQuests(userId: string, checkScores = false) {
   const rows = await createTodayQuests(userId, date);
   const claimRows = await prisma.$queryRawUnsafe<ClaimRow[]>('SELECT * FROM "DailyModeQuestClaim" WHERE "userId"=$1 AND "date"=$2 LIMIT 1', userId, date);
   const claim = claimRows[0] ?? null;
-  const maps = rows.length ? await prisma.$queryRawUnsafe<QuestMap[]>(`
-    SELECT c.id,c.title,c.artist,c."mapperName",c."imageUrl",c."sourceUrl",c."mapFileUrl",c."sourceBeatmapId",a.rating,a.rpl,a.rps,a.rpv,a."speedProfiles"
-    FROM "ChallengeMap" c JOIN "MapDifficultyAnalysis" a ON a."mapId"=c.id WHERE c.id = ANY($1::text[])`, rows.map((row) => row.mapId)) : [];
+  const maps = await questMapsByIds(rows.map((row) => row.mapId));
   const mapById = new Map(maps.map((map) => [map.id, map]));
-  let scores: Awaited<ReturnType<typeof recentScores>> = [];
-  if (checkScores && !claim) {
-    await syncUserModeScores(userId);
-    scores = await recentScores(userId);
-  }
+  const scores = checkScores && !claim ? await recentScores(userId) : [];
   return rows.map((row) => {
     const map = mapById.get(row.mapId);
     if (!map) return null;
@@ -177,13 +192,9 @@ export async function claimDailyModeQuest(userId: string, questId: string) {
   const questRows = await prisma.$queryRawUnsafe<QuestRow[]>('SELECT * FROM "DailyModeQuest" WHERE id=$1::uuid AND "userId"=$2 AND "date"=$3 LIMIT 1', questId, userId, date);
   const quest = questRows[0];
   if (!quest) throw new Error("Daily quest not found.");
-  const mapRows = await prisma.$queryRawUnsafe<QuestMap[]>(`
-    SELECT c.id,c.title,c.artist,c."mapperName",c."imageUrl",c."sourceUrl",c."mapFileUrl",c."sourceBeatmapId",a.rating,a.rpl,a.rps,a.rpv,a."speedProfiles"
-    FROM "ChallengeMap" c JOIN "MapDifficultyAnalysis" a ON a."mapId"=c.id
-    WHERE c.id=$1 AND a.status='analyzed' AND a."pointEligible"=TRUE AND a."analyzerVersion"=$2 LIMIT 1`, quest.mapId, MAP_ANALYZER_VERSION);
-  const map = mapRows[0];
+  const maps = await questMapsByIds([quest.mapId]);
+  const map = maps[0];
   if (!map) throw new Error("This quest map is not currently eligible for rank points.");
-  await syncUserModeScores(userId);
   const scores = await recentScores(userId);
   const mode = quest.mode as ModeKey;
   const matches = scores.filter((entry) => scoreMatchesQuest(entry, map, mode, date));
@@ -197,6 +208,7 @@ export async function claimDailyModeQuest(userId: string, questId: string) {
   const speed = Number.isFinite(score.speed) && (score.speed ?? 0) > 0 ? score.speed! : 1;
   const basePoints = baseReward(map, mode, speed);
   const bonusPoints = Math.max(1, Math.round(basePoints * (DAILY_QUEST_MULTIPLIER - 1)));
+  await syncUserModeScores(userId);
   await prisma.$executeRawUnsafe(`INSERT INTO "DailyModeQuestClaim" ("date","userId","questId",mode,"mapId","scoreId","basePoints","bonusPoints") VALUES ($1,$2,$3::uuid,$4,$5,$6,$7,$8)`, date, userId, quest.id, mode, map.id, score.id, basePoints, bonusPoints);
   const totals = await reconcileUserRankPoints(userId);
   await prisma.notification.create({ data: { userId, type: "rhp_earned", title: "Daily quest claimed", message: `Your ${mode === "lock" ? "RPL" : mode === "spin" ? "RPS" : "RPV"} quest clear received a 1.3× boost (+${bonusPoints}).`, url: "/daily" } });
