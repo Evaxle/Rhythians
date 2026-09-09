@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { rhythiaRequest } from "@/lib/rhythia";
-import { analysisIsCurrent, ensureMapAnalysisTable, getMapAnalysis, UNRANKED_MAP_MARKER } from "@/lib/map-analysis-store";
+import { analysisIsCurrent, ensureMapAnalysisTable, getMapAnalysis, MAP_ANALYZER_VERSION, UNRANKED_MAP_MARKER } from "@/lib/map-analysis-store";
 import { resolveRhythiaMapSource } from "@/lib/rhythia-map-source";
 
 export type SyncedRhythiaMap = { id: number; title: string | null; starRating: number | null; difficulty: number | null; noteCount: number | null; length: number | null; playcount: number | null; beatmapFile: string | null; image: string | null; mapHash: string | null; ownerUsername: string | null };
