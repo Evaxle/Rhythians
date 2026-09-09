@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { getUserPointOverrides, syncUserModeScores, type ModePoints } from "@/lib/rhythia-mode-points";
+import { calculateStoredTotals, syncUserModeScores, type ModePoints } from "@/lib/rhythia-mode-points";
 import { reconcileStoredRhp } from "@/lib/rhp-reconcile";
 
 export type ReliableModePoints = { points: ModePoints; rhp: number; source: "fresh" | "cached"; syncedAt: Date | null; warning: string | null };
@@ -7,28 +7,17 @@ export type ReliableModePoints = { points: ModePoints; rhp: number; source: "fre
 const DEFAULT_MAX_AGE_MS = 5 * 60 * 1000;
 
 export async function getCachedModePoints(userId: string): Promise<ReliableModePoints> {
-  const reconciled = await reconcileStoredRhp(userId).catch(() => null);
-  const [user, rows, overrides, baselines] = await Promise.all([
+  const [reconciled, user, totals] = await Promise.all([
+    reconcileStoredRhp(userId).catch(() => null),
     prisma.user.findUnique({ where: { id: userId }, select: { rhp: true, lastRhythiaRpCheckAt: true } }),
-    prisma.rhythiaModeScore.findMany({ where: { userId }, select: { cameraMode: true, points: true } }),
-    getUserPointOverrides(userId),
-    prisma.$queryRawUnsafe<Array<{ rplBase: number; rpsBase: number; rpvBase: number }>>('SELECT "rplBase","rpsBase","rpvBase" FROM "RankingBaseline" WHERE "userId"=$1 LIMIT 1', userId),
+    calculateStoredTotals(userId),
   ]);
-  const baseline = baselines[0] ?? { rplBase: 0, rpsBase: 0, rpvBase: 0 };
-  const raw: ModePoints = { lock: 0, spin: 0, vr: 0 };
-  for (const row of rows) raw[row.cameraMode] += Number(row.points) || 0;
-  const points = {
-    lock: overrides.get("rpl") ?? baseline.rplBase + raw.lock,
-    spin: overrides.get("rps") ?? baseline.rpsBase + raw.spin,
-    vr: overrides.get("rpv") ?? baseline.rpvBase + raw.vr,
-  };
-  return { points, rhp: reconciled?.rhp ?? overrides.get("rhp") ?? user?.rhp ?? 0, source: "cached", syncedAt: user?.lastRhythiaRpCheckAt ?? null, warning: null };
+  return { points: { lock: totals.rpl, spin: totals.rps, vr: totals.rpv }, rhp: reconciled?.rhp ?? totals.rhp ?? user?.rhp ?? 0, source: "cached", syncedAt: user?.lastRhythiaRpCheckAt ?? null, warning: null };
 }
 
 export async function syncHalfRhythiaRp(userId: string): Promise<ReliableModePoints> {
   const result = await syncUserModeScores(userId);
-  const syncedAt = new Date();
-  return { points: { lock: result.rpl, spin: result.rps, vr: result.rpv }, rhp: result.rhp, source: "fresh", syncedAt, warning: null };
+  return { points: { lock: result.rpl, spin: result.rps, vr: result.rpv }, rhp: result.rhp, source: "fresh", syncedAt: new Date(), warning: null };
 }
 
 export async function getReliableModePoints(userId: string, options: { forceRefresh?: boolean; maxAgeMs?: number } = {}): Promise<ReliableModePoints> {
