@@ -6,7 +6,6 @@ import { submitChallengeMap } from "@/lib/maps";
 import { checkRateLimit } from "@/lib/security";
 import { parseRhythiaMapUrl } from "@/lib/rhythia";
 import { fetchRhythiaMapById } from "@/lib/daily";
-import { fairRatingFromStars } from "@/lib/ranks";
 import { embedRhythiansId } from "@/lib/rhythkit-map-file";
 import { setMapSubmissionMetadata, type MapSubmissionType } from "@/lib/map-submission-metadata";
 import { supabaseAdmin } from "@/lib/supabase";
@@ -127,13 +126,12 @@ export async function POST(request: Request) {
     const mapId = crypto.randomUUID();
     const dash = title.indexOf(" - ");
     const artist = dash > 0 ? title.slice(0, dash).trim() : null;
-    const requestedRating = fairRatingFromStars(Number(fetched.starRating ?? 0));
     try {
       await validateMapFile(fetched.downloadUrl, mapId);
-      const map = await submitChallengeMap({ id: mapId, title, artist, description: null, mapFileUrl: fetched.downloadUrl, imageUrl: fetched.imageUrl, requestedRating, mapperName: fetched.ownerUsername, noteCount: fetched.noteCount, length: fetched.length, submittedById: user.id, sourceBeatmapId: fetched.id, sourceUrl: parsedMapUrl.url, isAutoImported: true });
+      const map = await submitChallengeMap({ id: mapId, title, artist, description: null, mapFileUrl: fetched.downloadUrl, imageUrl: fetched.imageUrl, requestedRating: 0, mapperName: fetched.ownerUsername, noteCount: fetched.noteCount, length: fetched.length, submittedById: user.id, sourceBeatmapId: fetched.id, sourceUrl: parsedMapUrl.url, isAutoImported: true });
       await setMapSubmissionMetadata(map.id, submissionType);
-      await prisma.moderationAction.create({ data: { actorId: user.id, action: "ranked_map_submitted", targetType: "map_submission", targetId: map.id, metadata: { title: map.title, submissionType, requestedRating: map.requestedRating, sourceUrl: parsedMapUrl.url, sourceBeatmapId: fetched.id } } });
-      return NextResponse.json({ mapId: map.id, status: map.status, submissionType, requestedRating: map.requestedRating, downloadUrl: `/api/maps/download?id=${encodeURIComponent(map.id)}` });
+      await prisma.moderationAction.create({ data: { actorId: user.id, action: "ranked_map_submitted", targetType: "map_submission", targetId: map.id, metadata: { title: map.title, submissionType, analyzerVersion: "pending", sourceUrl: parsedMapUrl.url, sourceBeatmapId: fetched.id } } });
+      return NextResponse.json({ mapId: map.id, status: map.status, submissionType, analysis: "pending", downloadUrl: `/api/maps/download?id=${encodeURIComponent(map.id)}` });
     } catch (error: any) {
       if (error?.code === "P2002") return NextResponse.json({ error: "This map has already been submitted." }, { status: 409 });
       return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to submit this map." }, { status: 422 });
