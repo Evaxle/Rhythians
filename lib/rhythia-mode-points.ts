@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/db";
 import { rhythiaRequest } from "@/lib/rhythia";
-import { accuracyFromMisses, accuracyMultiplier, RANKS, RANK_TIERS, type RankInfo } from "@/lib/ranks";
+import { accuracyFromMisses, accuracyMultiplier, difficultyFactorForRating, rankIndexForRating, RANKS, RANK_TIERS, type RankInfo } from "@/lib/ranks";
 import { MODE_RULES, type ModeKey, type ModePoints } from "@/lib/rhythia-mode-rules";
-import { loadRankingConfig, overallRhpFromModes } from "@/lib/ranking-system";
+import { ensureRankingBaseline, loadRankingConfig, overallRhpFromModes } from "@/lib/ranking-system";
 
 export { MODE_RULES } from "@/lib/rhythia-mode-rules";
 export type { ModeKey, ModePoints } from "@/lib/rhythia-mode-rules";
@@ -10,7 +10,6 @@ export type EditablePointSystem = "rhp" | "rpl" | "rps" | "rpv";
 export type RhythiaModeScoreRow = { id: string; mapKey: string; mapTitle: string; scoreId: number; cameraMode: ModeKey; points: number; accuracy: number | null; awardedSp: number | null };
 type ScorePayload = { id: number; beatmapTitle?: string | null; beatmapId?: number | null; mapId?: number | null; beatmapHash?: string | null; passed?: boolean | null; misses?: number | null; beatmapNotes?: number | null; accuracy?: number | null; speed?: number | null; awarded_sp?: number | null; created_at?: string | null; cameraMode?: string | null; gameMode?: string | null; mode?: string | null; spin?: boolean | null; vr?: boolean | null; isVr?: boolean | null; mods?: string | null };
 type ScoreBucket = { name: "lastDay" | "top" | "vrTop" | "vrRecent"; scores: ScorePayload[] };
-type Baseline = { overallFloor: number; rplBase: number; rpsBase: number; rpvBase: number };
 const UNRANKED_MARKER = "rhythia-unranked";
 
 function normalize(value: string | null | undefined) { return (value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
@@ -55,12 +54,24 @@ function modeDetails(score: ScorePayload, sourceBucket: ScoreBucket["name"]) {
 
 export function scoreCameraMode(score: ScorePayload, sourceBucket: ScoreBucket["name"]): ModeKey { return modeDetails(score, sourceBucket).mode; }
 
-export function pointsForModeScore(score: ScorePayload, mode: ModeKey) {
+export function modeDifficultyMultiplier(rating: number | null | undefined) {
+  if (rating == null || !Number.isFinite(rating)) return 0.7;
+  if (rating <= RANKS[0].rangeMin) return 0.45;
+  const last = RANKS[RANKS.length - 1];
+  if (rating >= last.rangeMax) return 1;
+  const rankIndex = rankIndexForRating(rating);
+  const withinRank = difficultyFactorForRating(rating, rankIndex);
+  const normalized = Math.min(1, Math.max(0, (rankIndex + withinRank) / RANKS.length));
+  return 0.45 + 0.55 * normalized;
+}
+
+export function pointsForModeScore(score: ScorePayload, mode: ModeKey, rating?: number | null) {
   if (score.passed !== true) return 0;
   const rule = MODE_RULES[mode];
   const accuracy = score.accuracy ?? accuracyFromMisses(score.beatmapNotes ?? null, score.misses ?? null);
-  const multiplier = accuracy == null ? 1 : accuracyMultiplier(accuracy);
-  return Math.max(1, Math.min(rule.maxPoints, Math.round(rule.maxPoints * multiplier)));
+  const accuracyFactor = accuracy == null ? 1 : accuracyMultiplier(accuracy);
+  const difficultyFactor = modeDifficultyMultiplier(rating);
+  return Math.max(1, Math.min(rule.maxPoints, Math.round(rule.maxPoints * accuracyFactor * difficultyFactor)));
 }
 
 async function fetchModeScores(profileId: number) {
@@ -83,11 +94,6 @@ async function getOverrides(userId: string) {
   return new Map(rows.map((row) => [row.system, Number(row.points)]));
 }
 
-async function getBaseline(userId: string): Promise<Baseline> {
-  const rows = await prisma.$queryRawUnsafe<Baseline[]>('SELECT "overallFloor","rplBase","rpsBase","rpvBase" FROM "RankingBaseline" WHERE "userId"=$1 LIMIT 1', userId);
-  return rows[0] ?? { overallFloor: 0, rplBase: 0, rpsBase: 0, rpvBase: 0 };
-}
-
 export async function getUserPointOverrides(userId: string) { return getOverrides(userId); }
 
 export async function setUserPointOverride(userId: string, system: EditablePointSystem, points: number | null) {
@@ -103,11 +109,11 @@ export async function syncUserModeScores(userId: string) {
     prisma.rhythiaProfile.findUnique({ where: { userId }, select: { profileId: true } }),
     prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } }),
     getOverrides(userId),
-    getBaseline(userId),
+    ensureRankingBaseline(userId),
     loadRankingConfig(),
   ]);
   if (!profile || !user) return { rpl: 0, rps: 0, rpv: 0, rhp: user?.rhp ?? 0, rows: [] as RhythiaModeScoreRow[], foundModes: { lock: 0, spin: 0, vr: 0 }, added: 0, rankIndex: 0 };
-  const maps = await prisma.challengeMap.findMany({ where: { status: "approved", rating: { not: null }, OR: [{ reviewerNote: null }, { reviewerNote: { not: UNRANKED_MARKER } }] }, select: { id: true, title: true, sourceBeatmapId: true } });
+  const maps = await prisma.challengeMap.findMany({ where: { status: "approved", rating: { not: null }, OR: [{ reviewerNote: null }, { reviewerNote: { not: UNRANKED_MARKER } }] }, select: { id: true, title: true, sourceBeatmapId: true, rating: true } });
   const scores = await fetchModeScores(profile.profileId);
   const byBeatmapId = new Map<number, (typeof maps)[number]>();
   const byTitle = new Map<string, (typeof maps)[number]>();
@@ -118,7 +124,7 @@ export async function syncUserModeScores(userId: string) {
     const beatmapId = entry.score.beatmapId ?? entry.score.mapId ?? null;
     const map = beatmapId != null ? byBeatmapId.get(beatmapId) ?? byTitle.get(normalize(entry.score.beatmapTitle)) : byTitle.get(normalize(entry.score.beatmapTitle));
     if (!map) continue;
-    const points = pointsForModeScore(entry.score, entry.mode);
+    const points = pointsForModeScore(entry.score, entry.mode, map.rating);
     if (points <= 0) continue;
     const mapKey = map.sourceBeatmapId != null ? `rhythia:${map.sourceBeatmapId}` : `map:${map.id}`;
     const key = `${mapKey}:${entry.mode}`;

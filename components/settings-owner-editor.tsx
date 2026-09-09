@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { RefreshCw, Upload } from "lucide-react";
+import { uploadFileToSignedStorageUrl } from "@/lib/signed-storage-upload";
 
 export function SettingsOwnerEditor({ id, onUpdated }: { id: string; onUpdated: () => void }) {
   const [open, setOpen] = useState(false);
@@ -28,13 +29,11 @@ export function SettingsOwnerEditor({ id, onUpdated }: { id: string; onUpdated: 
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || "Could not prepare the upload.");
         if (settingsFile && data.settingsUploadUrl) {
-          const upload = await fetch(data.settingsUploadUrl, { method: "PUT", headers: { "Content-Type": "application/octet-stream" }, body: settingsFile });
-          if (!upload.ok) throw new Error("The RHS file failed to upload.");
+          await uploadFileToSignedStorageUrl(data.settingsUploadUrl, settingsFile);
           settingsPath = data.settingsPath;
         }
         if (videoFile && data.videoUploadUrl) {
-          const upload = await fetch(data.videoUploadUrl, { method: "PUT", headers: { "Content-Type": videoFile.type || "video/mp4" }, body: videoFile });
-          if (!upload.ok) throw new Error("The gameplay video failed to upload.");
+          await uploadFileToSignedStorageUrl(data.videoUploadUrl, videoFile);
           videoPath = data.videoPath;
         }
       }

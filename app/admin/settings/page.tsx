@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { MessageSettings } from "@/components/admin/message-settings";
+import { uploadFileToSignedStorageUrl } from "@/lib/signed-storage-upload";
 
 interface UserOption { userId: string; profileId: number; username: string | null; globalRank: number | null; profileUrl: string; avatarUrl: string | null; user: { username: string; displayName: string | null; profileHandle: string } }
 interface Entry { id: string; cameraMode: string; userId: string; settingsFileName: string; username: string; displayName: string | null; profileUsername: string | null; globalRank: number | null; title: string | null; description: string | null }
@@ -46,8 +47,8 @@ export default function AdminSettingsPage() {
         const prepared = await prepare.json();
         if (!prepare.ok) throw new Error(prepared.error ?? "Could not prepare uploads.");
         uploadData = prepared;
-        if (settingsFile && uploadData.settingsUploadUrl) { const upload = await fetch(uploadData.settingsUploadUrl, { method: "PUT", headers: { "Content-Type": "application/octet-stream" }, body: settingsFile }); if (!upload.ok) throw new Error("The settings file failed to upload."); }
-        if (videoFile && uploadData.videoUploadUrl) { const upload = await fetch(uploadData.videoUploadUrl, { method: "PUT", headers: { "Content-Type": videoFile.type || "video/mp4" }, body: videoFile }); if (!upload.ok) throw new Error("The gameplay video failed to upload."); }
+        if (settingsFile && uploadData.settingsUploadUrl) await uploadFileToSignedStorageUrl(uploadData.settingsUploadUrl, settingsFile);
+        if (videoFile && uploadData.videoUploadUrl) await uploadFileToSignedStorageUrl(uploadData.videoUploadUrl, videoFile);
       }
       const response = await fetch("/api/admin/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: editingId ? "update" : "create", id: editingId || undefined, cameraMode: mode, userId, settingsPath: uploadData.settingsPath, videoPath: uploadData.videoPath, externalVideoUrl: videoUrl.trim(), settingsFileName: settingsFile?.name, title, description }) });
       const data = await response.json();
