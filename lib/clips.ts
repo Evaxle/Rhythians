@@ -2,6 +2,7 @@ import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { supabaseAdmin } from "@/lib/supabase";
 import { parseExternalPath } from "@/lib/clip-source";
+import { bandwidthProtectionEnabled } from "@/lib/bandwidth-protection";
 
 const getCachedVideoUrl = unstable_cache(
   async (path: string) => {
@@ -30,6 +31,7 @@ const getCachedThumbnailUrl = unstable_cache(
 export async function getVideoUrl(path: string) {
   const external = parseExternalPath(path);
   if (external && ["tiktok", "youtube", "twitch"].includes(external.type)) return external.url;
+  if (bandwidthProtectionEnabled) return null;
   return getCachedVideoUrl(path);
 }
 
