@@ -33,8 +33,9 @@ export function RankSync({ initialRhp, initialUpdatedAt }: Props) {
       }
     };
 
-    const interval = window.setInterval(() => void check(), 60_000);
-    const onVisible = () => void check();
+    void check();
+    const interval = window.setInterval(() => void check(), 30_000);
+    const onVisible = () => { if (document.visibilityState === "visible") void check(); };
     window.addEventListener("focus", onVisible);
     document.addEventListener("visibilitychange", onVisible);
 
