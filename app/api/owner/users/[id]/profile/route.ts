@@ -66,13 +66,23 @@ export async function PATCH(request: Request, { params }: Props) {
     }
   }
 
+  const auditTitle = typeof body.title === "string" ? body.title.trim().slice(0, 40) : null;
+  const auditTitleColor = typeof body.titleColor === "string" ? body.titleColor.trim() : null;
+  const auditTitleNeon = body.titleNeon === true;
+
   await prisma.moderationAction.create({
     data: {
       actorId: owner.id,
       action: "owner_profile_inline_edited",
       targetType: "user",
       targetId: id,
-      metadata: { ...data, rhp: updatedRhp, title: body.title, titleColor: body.titleColor, titleNeon: body.titleNeon },
+      metadata: {
+        ...data,
+        rhp: updatedRhp ?? null,
+        title: auditTitle,
+        titleColor: auditTitleColor,
+        titleNeon: auditTitleNeon,
+      },
     },
   });
 
