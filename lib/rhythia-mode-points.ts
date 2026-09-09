@@ -8,10 +8,14 @@ export { MODE_RULES } from "@/lib/rhythia-mode-rules";
 export type { ModeKey, ModePoints } from "@/lib/rhythia-mode-rules";
 export type EditablePointSystem = "rhp" | "rpl" | "rps" | "rpv";
 export type RhythiaModeScoreRow = { id: string; mapKey: string; mapTitle: string; scoreId: number; cameraMode: ModeKey; points: number; accuracy: number | null; awardedSp: number | null; speed: number | null };
+export type RecentModeScore = { id: number; beatmapTitle: string; sourceBeatmapId: number | null; cameraMode: ModeKey; speed: number; accuracy: number | null; awardedSp: number | null; createdAt: Date | null; passed: boolean };
 
 type ScorePayload = { id: number; beatmapTitle?: string | null; beatmapId?: number | null; mapId?: number | null; beatmapHash?: string | null; passed?: boolean | null; misses?: number | null; beatmapNotes?: number | null; accuracy?: number | null; speed?: number | null; awarded_sp?: number | null; created_at?: string | null; cameraMode?: string | null; gameMode?: string | null; mode?: string | null; spin?: boolean | null; vr?: boolean | null; isVr?: boolean | null; mods?: string | null };
 type ScoreBucket = { name: "lastDay" | "top" | "vrTop" | "vrRecent"; scores: ScorePayload[] };
 type AnalyzedMapRow = { id: string; title: string; sourceBeatmapId: number | null; rating: number; rpl: number; rpv: number; rps: number; speedProfiles: unknown };
+type QuestBonusRow = { mode: string; bonusPoints: number };
+
+const RHP_MULTI_CLEAR_WEIGHTS = [1, 0.55, 0.35] as const;
 
 function normalize(value: string | null | undefined) { return (value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
 function normalizeSourceId(value: number) { return Number.isSafeInteger(value) && value > 0x7fffffff && value <= 0xffffffff ? value - 0x100000000 : value; }
@@ -62,6 +66,27 @@ async function fetchModeScores(profileId: number) {
   return [...byId.values()];
 }
 
+export async function fetchRecentModeScoresForUser(userId: string): Promise<RecentModeScore[]> {
+  const profile = await prisma.rhythiaProfile.findUnique({ where: { userId }, select: { profileId: true } });
+  if (!profile) return [];
+  const entries = await fetchModeScores(profile.profileId);
+  return entries.map(({ score, mode }) => {
+    const source = score.beatmapId ?? score.mapId ?? null;
+    const created = score.created_at ? new Date(score.created_at) : null;
+    return {
+      id: score.id,
+      beatmapTitle: score.beatmapTitle?.trim() ?? "",
+      sourceBeatmapId: source == null ? null : normalizeSourceId(source),
+      cameraMode: mode,
+      speed: Number.isFinite(score.speed) && (score.speed ?? 0) > 0 ? score.speed! : 1,
+      accuracy: accuracyFromScore(score),
+      awardedSp: score.awarded_sp ?? null,
+      createdAt: created && Number.isFinite(created.getTime()) ? created : null,
+      passed: score.passed === true,
+    };
+  });
+}
+
 async function analyzedMaps() {
   await ensureMapAnalysisTable();
   return prisma.$queryRawUnsafe<AnalyzedMapRow[]>(`
@@ -83,6 +108,12 @@ async function getOverrides(userId: string) {
   const rows = await prisma.$queryRawUnsafe<Array<{ system: EditablePointSystem; points: number }>>('SELECT "system","points" FROM "UserPointOverride" WHERE "userId"=$1', userId).catch(() => []);
   return new Map(rows.map((row) => [row.system, Number(row.points)]));
 }
+async function getQuestBonuses(userId: string) {
+  const rows = await prisma.$queryRawUnsafe<QuestBonusRow[]>('SELECT mode,"bonusPoints" FROM "DailyModeQuestClaim" WHERE "userId"=$1', userId).catch(() => []);
+  const bonuses: ModePoints = { lock: 0, spin: 0, vr: 0 };
+  for (const row of rows) if (row.mode === "lock" || row.mode === "spin" || row.mode === "vr") bonuses[row.mode] += Math.max(0, Number(row.bonusPoints) || 0);
+  return bonuses;
+}
 export async function getUserPointOverrides(userId: string) { return getOverrides(userId); }
 export async function setUserPointOverride(userId: string, system: EditablePointSystem, points: number | null) {
   if (points == null) {
@@ -93,20 +124,30 @@ export async function setUserPointOverride(userId: string, system: EditablePoint
 }
 
 export async function calculateStoredTotals(userId: string) {
-  const [rows, overrides] = await Promise.all([
+  const [rows, overrides, questBonuses] = await Promise.all([
     prisma.rhythiaModeScore.findMany({ where: { userId }, select: { mapKey: true, cameraMode: true, points: true } }),
     getOverrides(userId),
+    getQuestBonuses(userId),
   ]);
-  const raw: ModePoints = { lock: 0, spin: 0, vr: 0 };
-  const bestOverall = new Map<string, number>();
+  const raw: ModePoints = { lock: questBonuses.lock, spin: questBonuses.spin, vr: questBonuses.vr };
+  const byMap = new Map<string, number[]>();
   for (const row of rows) {
     const mode = row.cameraMode as ModeKey;
-    raw[mode] += Math.max(0, Number(row.points) || 0);
-    bestOverall.set(row.mapKey, Math.max(bestOverall.get(row.mapKey) ?? 0, Math.max(0, Number(row.points) || 0)));
+    const points = Math.max(0, Number(row.points) || 0);
+    raw[mode] += points;
+    const values = byMap.get(row.mapKey) ?? [];
+    values.push(points);
+    byMap.set(row.mapKey, values);
   }
-  const earnedRhp = [...bestOverall.values()].reduce((sum, value) => sum + value, 0);
+  let passRhp = 0;
+  for (const values of byMap.values()) {
+    values.sort((a, b) => b - a);
+    passRhp += values.slice(0, 3).reduce((sum, value, index) => sum + value * RHP_MULTI_CLEAR_WEIGHTS[index], 0);
+  }
+  const questRhp = questBonuses.lock + questBonuses.spin + questBonuses.vr;
+  const earnedRhp = Math.round(passRhp + questRhp);
   const totals: ModePoints = { lock: overrides.get("rpl") ?? raw.lock, spin: overrides.get("rps") ?? raw.spin, vr: overrides.get("rpv") ?? raw.vr };
-  return { rpl: totals.lock, rps: totals.spin, rpv: totals.vr, rhp: overrides.get("rhp") ?? earnedRhp, raw, earnedRhp };
+  return { rpl: totals.lock, rps: totals.spin, rpv: totals.vr, rhp: overrides.get("rhp") ?? earnedRhp, raw, earnedRhp, questBonuses };
 }
 
 export async function reconcileUserRankPoints(userId: string) {
@@ -234,14 +275,27 @@ export async function getModeScoreMap(userId: string) {
 
 export async function getModeLeaderboard(mode: ModeKey, limit = 100) {
   const system = mode === "lock" ? "rpl" : mode === "spin" ? "rps" : "rpv";
-  const rows = await prisma.$queryRawUnsafe<Array<{ userId: string; username: string; displayName: string | null; profileHandle: string; avatar: string | null; points: number }>>(`
-    SELECT u.id AS "userId",u.username,u."displayName",u."profileHandle",u.avatar,
-      COALESCE(o.points,COALESCE(SUM(r.points),0))::int AS points
-    FROM "User" u
-    LEFT JOIN "RhythiaModeScore" r ON r."userId"=u.id AND r."cameraMode"=$1::"CameraMode"
-    LEFT JOIN "UserPointOverride" o ON o."userId"=u.id AND o.system=$2
-    WHERE u."profileHandle" <> 'rhythia-imports'
-    GROUP BY u.id,u.username,u."displayName",u."profileHandle",u.avatar,o.points
-    ORDER BY points DESC,u.username ASC LIMIT $3`, mode, system, Math.max(1, Math.min(500, limit)));
-  return rows;
+  const safeLimit = Math.max(1, Math.min(500, limit));
+  try {
+    return await prisma.$queryRawUnsafe<Array<{ userId: string; username: string; displayName: string | null; profileHandle: string; avatar: string | null; points: number }>>(`
+      SELECT u.id AS "userId",u.username,u."displayName",u."profileHandle",u.avatar,
+        COALESCE(o.points,COALESCE(SUM(r.points),0)+COALESCE(MAX(q.points),0))::int AS points
+      FROM "User" u
+      LEFT JOIN "RhythiaModeScore" r ON r."userId"=u.id AND r."cameraMode"=$1::"CameraMode"
+      LEFT JOIN "UserPointOverride" o ON o."userId"=u.id AND o.system=$2
+      LEFT JOIN (SELECT "userId",SUM("bonusPoints")::int AS points FROM "DailyModeQuestClaim" WHERE mode=$1 GROUP BY "userId") q ON q."userId"=u.id
+      WHERE u."profileHandle" <> 'rhythia-imports'
+      GROUP BY u.id,u.username,u."displayName",u."profileHandle",u.avatar,o.points
+      ORDER BY points DESC,u.username ASC LIMIT $3`, mode, system, safeLimit);
+  } catch {
+    return prisma.$queryRawUnsafe<Array<{ userId: string; username: string; displayName: string | null; profileHandle: string; avatar: string | null; points: number }>>(`
+      SELECT u.id AS "userId",u.username,u."displayName",u."profileHandle",u.avatar,
+        COALESCE(o.points,COALESCE(SUM(r.points),0))::int AS points
+      FROM "User" u
+      LEFT JOIN "RhythiaModeScore" r ON r."userId"=u.id AND r."cameraMode"=$1::"CameraMode"
+      LEFT JOIN "UserPointOverride" o ON o."userId"=u.id AND o.system=$2
+      WHERE u."profileHandle" <> 'rhythia-imports'
+      GROUP BY u.id,u.username,u."displayName",u."profileHandle",u.avatar,o.points
+      ORDER BY points DESC,u.username ASC LIMIT $3`, mode, system, safeLimit);
+  }
 }
