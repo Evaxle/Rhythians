@@ -1,9 +1,8 @@
 import crypto from "node:crypto";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getRankIndex, getRankRange } from "@/lib/rhythkit";
 import { getRhythKitInstallation } from "@/lib/rhythkit-api";
-import { rhpGainForMap } from "@/lib/ranks";
+import { syncUserModeScores } from "@/lib/rhythia-mode-points";
 
 type ScoreBody = {
   challengeMapId?: unknown;
@@ -37,7 +36,7 @@ export async function GET(request: Request) {
     ok: true,
     scores: rows.map((score) => ({
       title: score.title,
-      rating: Math.max(0, Math.min(10, score.rating ?? 0)),
+      rating: Math.max(0, Math.min(12, score.rating ?? 0)),
       accuracy: score.accuracy ?? 0,
       misses: Math.max(0, Math.trunc(score.misses ?? 0)),
       points: Math.trunc(score.points),
@@ -75,8 +74,8 @@ export async function POST(request: Request) {
     );
     if (duplicate.length > 0) return { kind: "duplicate" as const };
 
-    const maps = await tx.$queryRawUnsafe<Array<{ id: string; title: string; rating: number | null; length: number | null; status: string; reviewerNote: string | null }>>(
-      `SELECT "id", "title", "rating", "length", "status", "reviewerNote" FROM "ChallengeMap" WHERE "id" = $1 LIMIT 1`,
+    const maps = await tx.$queryRawUnsafe<Array<{ id: string; status: string }>>(
+      `SELECT "id", "status" FROM "ChallengeMap" WHERE "id" = $1 LIMIT 1`,
       challengeMapId
     );
     const map = maps[0];
@@ -90,24 +89,9 @@ export async function POST(request: Request) {
     if (!user) return { kind: "unauthorized" as const };
     if (user.isSuspended && (!user.suspendedUntil || user.suspendedUntil > new Date())) return { kind: "suspended" as const };
 
-    const existingCompletion = await tx.$queryRawUnsafe<Array<{ id: string; passed: boolean }>>(
-      `SELECT "id", "passed" FROM "ChallengeMapCompletion" WHERE "challengeMapId" = $1 AND "userId" = $2 LIMIT 1`,
-      challengeMapId,
-      installation.userId
-    );
-    if (existingCompletion[0]?.passed) return { kind: "already_completed" as const };
-
-    const ranked = map.status === "approved" && map.rating != null && map.reviewerNote !== "rhythia-unranked";
-    const legacy = map.status === "legacy";
-    const rankIndex = getRankIndex(user.rhp);
-    const [minRating, maxRating] = getRankRange(rankIndex);
-    const eligibleForRhp = legacy || (ranked && map.rating != null && map.rating >= minRating && map.rating <= maxRating);
-    const calculatedPoints = eligibleForRhp && map.rating != null ? rhpGainForMap(map.rating, accuracy, speed, rankIndex, map.length != null ? map.length / 1000 : null) : 0;
-    const points = legacy ? Math.min(25, calculatedPoints) : calculatedPoints;
     const scoreId = crypto.randomUUID();
-
     const inserted = await tx.$queryRawUnsafe<Array<{ id: string }>>(
-      `INSERT INTO "RhythKitScore" ("id", "userId", "installationId", "challengeMapId", "clientScoreId", "accuracy", "misses", "speed", "points", "rhpAwarded", "submittedAt") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $9, NOW()) ON CONFLICT ("installationId", "clientScoreId") DO NOTHING RETURNING "id"`,
+      `INSERT INTO "RhythKitScore" ("id", "userId", "installationId", "challengeMapId", "clientScoreId", "accuracy", "misses", "speed", "points", "rhpAwarded", "submittedAt") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 0, 0, NOW()) ON CONFLICT ("installationId", "clientScoreId") DO NOTHING RETURNING "id"`,
       scoreId,
       installation.userId,
       installation.installationId,
@@ -115,47 +99,21 @@ export async function POST(request: Request) {
       clientScoreId,
       accuracy,
       misses,
-      speed,
-      points
+      speed
     );
     if (inserted.length === 0) return { kind: "duplicate" as const };
-
-    const completion = await tx.$queryRawUnsafe<Array<{ id: string }>>(
-      `INSERT INTO "ChallengeMapCompletion" ("id", "challengeMapId", "userId", "rating", "accuracy", "passed", "points", "createdAt", "updatedAt") VALUES ($1, $2, $3, $4, $5, true, $6, NOW(), NOW()) ON CONFLICT ("challengeMapId", "userId") DO NOTHING RETURNING "id"`,
-      crypto.randomUUID(),
-      challengeMapId,
-      installation.userId,
-      map.rating ?? 0,
-      accuracy,
-      points
-    );
-    if (completion.length === 0) return { kind: "already_completed" as const };
-
-    if (points > 0) {
-      const updated = await tx.$queryRawUnsafe<Array<{ rhp: number }>>(
-        `UPDATE "User" SET "rhp" = "rhp" + $1, "avgMapRating" = CASE WHEN "avgMapRating" IS NULL THEN $2 ELSE "avgMapRating" END, "updatedAt" = NOW() WHERE "id" = $3 RETURNING "rhp"`,
-        points,
-        map.rating,
-        installation.userId
-      );
-      await tx.$executeRawUnsafe(
-        `INSERT INTO "RhpTransaction" ("id", "userId", "amount", "reason", "description", "createdAt") VALUES ($1, $2, $3, $4, $5, NOW())`,
-        crypto.randomUUID(),
-        installation.userId,
-        points,
-        legacy ? "legacy_map" : "ranked_map",
-        `RhythKit completed ${legacy ? "legacy" : "ranked"} map [${map.id}]: ${map.title}`
-      );
-      return { kind: "success" as const, points, rhp: updated[0]?.rhp ?? user.rhp + points };
-    }
-
-    return { kind: "success" as const, points: 0, rhp: user.rhp };
+    return { kind: "success" as const, beforeRhp: user.rhp };
   });
 
   if (result.kind === "duplicate") return NextResponse.json({ ok: false, error: "duplicate" }, { status: 409 });
-  if (result.kind === "already_completed") return NextResponse.json({ ok: false, error: "already_submitted" }, { status: 409 });
   if (result.kind === "not_found") return NextResponse.json({ ok: false, error: "Map not found." }, { status: 404 });
   if (result.kind === "unauthorized") return NextResponse.json({ ok: false, error: "Unauthorized." }, { status: 401 });
   if (result.kind === "suspended") return NextResponse.json({ ok: false, error: "Account is suspended." }, { status: 403 });
-  return NextResponse.json({ ok: true, points: result.points });
+
+  try {
+    const synced = await syncUserModeScores(installation.userId);
+    return NextResponse.json({ ok: true, points: Math.max(0, synced.rhp - result.beforeRhp), rhp: synced.rhp, rpl: synced.rpl, rps: synced.rps, rpv: synced.rpv, verifiedByRhythia: true });
+  } catch {
+    return NextResponse.json({ ok: true, points: 0, pendingRhythiaVerification: true });
+  }
 }
