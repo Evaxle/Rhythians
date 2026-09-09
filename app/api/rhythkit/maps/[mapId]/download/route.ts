@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getRhythKitInstallation } from "@/lib/rhythkit-api";
 import { embedRhythiansId } from "@/lib/rhythkit-map-file";
 import { resolveRhythKitMapSource } from "@/lib/rhythkit-map-download";
+import { bandwidthProtectionEnabled, bandwidthProtectionMessage } from "@/lib/bandwidth-protection";
 
 export const runtime = "nodejs";
 
@@ -13,6 +14,7 @@ function safeFileName(value: string) {
 export async function GET(request: Request, { params }: { params: Promise<{ mapId: string }> }) {
   const installation = await getRhythKitInstallation(request);
   if (!installation) return NextResponse.json({ ok: false, error: "Unauthorized." }, { status: 401 });
+  if (bandwidthProtectionEnabled) return NextResponse.json({ ok: false, error: bandwidthProtectionMessage, code: "BANDWIDTH_PROTECTION" }, { status: 503, headers: { "Retry-After": "3600" } });
   const { mapId: id } = await params;
   const rows = await prisma.$queryRawUnsafe<Array<{ id: string; title: string; mapFileUrl: string; rating: number | null; status: string; reviewerNote: string | null; length: number | null; isAutoImported: boolean }>>(
     `SELECT "id", "title", "mapFileUrl", "rating", "status", "reviewerNote", "length", "isAutoImported" FROM "ChallengeMap" WHERE "id" = $1 LIMIT 1`,
@@ -45,10 +47,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ mapI
   try {
     data = embedRhythiansId(original, source.extension, map.id);
   } catch {
-    // Any member can download any map; if the Rhythians id can't be embedded
-    // (unknown format, legacy archive file), serve the original file instead
-    // of rejecting the download. RHP eligibility is decided when scores are
-    // submitted, not here.
     data = original;
   }
 
