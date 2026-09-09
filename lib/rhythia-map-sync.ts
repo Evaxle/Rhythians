@@ -17,11 +17,16 @@ function normalizeMap(raw: SyncedRhythiaMap): SyncedRhythiaMap | null { const va
 async function fetchStatus(status: RhythiaMapStatus) { const apiStatus = status === "LEGACY" ? "APPROVED" : status; const maps: SyncedRhythiaMap[] = []; const seenIds = new Set<number>(); let page = 1; let total: number | null = null; while (page <= MAX_PAGES) { const data = await rhythiaRequest<BeatmapResponse>("getBeatmaps", { status: apiStatus, page, minStars: 0, maxStars: 20, sort: "newest", sortDirection: "asc", session: "" }); const pageMaps = asMapArray(data).map(normalizeMap).filter((map): map is SyncedRhythiaMap => map !== null); if (pageMaps.length === 0) break; let addedThisPage = 0; for (const map of pageMaps) { if (seenIds.has(map.id)) continue; seenIds.add(map.id); maps.push(map); addedThisPage += 1; } if (typeof data.total === "number" && Number.isFinite(data.total)) total = data.total; const hasExplicitEnd = data.hasNextPage === false || data.hasMore === false; const reachedTotal = total !== null && maps.length >= total; const reportedPages = typeof data.pages === "number" && Number.isFinite(data.pages) ? data.pages : null; if (reachedTotal || hasExplicitEnd || (reportedPages !== null && page >= reportedPages) || addedThisPage === 0) break; page += 1; } return maps; }
 function artistFromTitle(title: string) { const separator = title.indexOf(" - "); return separator > 0 ? title.slice(0, separator).trim() : null; }
 function mapPageUrl(id: number) { return `https://www.rhythia.com/maps/${id}`; }
-async function fillMissingAssets(map: SyncedRhythiaMap) {
-  if (map.beatmapFile?.trim() && map.image?.trim()) return map;
+function absoluteAsset(value: string | null, base: string) {
+  if (!value?.trim()) return null;
+  try { return new URL(value.trim(), base).toString(); } catch { return null; }
+}
+async function fillMissingAssets(rawMap: SyncedRhythiaMap) {
+  const map = { ...rawMap, beatmapFile: absoluteAsset(rawMap.beatmapFile, "https://production.rhythia.com/"), image: absoluteAsset(rawMap.image, "https://production.rhythia.com/") };
+  if (map.beatmapFile && map.image) return map;
   try {
     const resolved = await resolveRhythiaMapSource(map.id);
-    return { ...map, title: map.title ?? resolved.title, beatmapFile: map.beatmapFile?.trim() || resolved.mapFileUrl, image: map.image?.trim() || resolved.imageUrl, ownerUsername: map.ownerUsername ?? resolved.mapperName, noteCount: map.noteCount ?? resolved.noteCount, length: map.length ?? resolved.length };
+    return { ...map, title: map.title ?? resolved.title, beatmapFile: map.beatmapFile || resolved.mapFileUrl, image: map.image || resolved.imageUrl, ownerUsername: map.ownerUsername ?? resolved.mapperName, noteCount: map.noteCount ?? resolved.noteCount, length: map.length ?? resolved.length };
   } catch { return map; }
 }
 
