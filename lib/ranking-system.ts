@@ -28,7 +28,7 @@ export const DEFAULT_RANKING_CONFIG: RankingConfig = {
   beginnerFloor: 0,
   unrankedRpWeight: 0.55,
   maxPlacementRhp: 15000,
-  modeFallbackFraction: 0.45,
+  modeFallbackFraction: 0.4,
   strongestModeWeight: 0.75,
   secondModeWeight: 0.2,
   thirdModeWeight: 0.05,
@@ -91,14 +91,38 @@ export function modeScale(mode: ModeKey) { return MODE_RULES[mode].rankScale; }
 export function modeEquivalentRhp(points: number, mode: ModeKey) { return Math.max(0, points) / modeScale(mode); }
 export function modePointsFromEquivalentRhp(rhp: number, mode: ModeKey) { return Math.max(0, Math.round(rhp * modeScale(mode))); }
 
+function weightedModeEquivalent(points: ModePoints, config: RankingConfig) {
+  const equivalents = (["lock", "spin", "vr"] as ModeKey[]).map((mode) => modeEquivalentRhp(points[mode], mode)).sort((a, b) => b - a);
+  return equivalents[0] * config.strongestModeWeight + equivalents[1] * config.secondModeWeight + equivalents[2] * config.thirdModeWeight;
+}
+
 export function overallRhpFromModes(points: ModePoints, overallFloor: number, config: RankingConfig) {
-  const equivalents = (["lock", "spin", "vr"] as ModeKey[]).map(mode => modeEquivalentRhp(points[mode], mode)).sort((a, b) => b - a);
-  const weighted = equivalents[0] * config.strongestModeWeight + equivalents[1] * config.secondModeWeight + equivalents[2] * config.thirdModeWeight;
-  return Math.max(Math.max(0, Math.round(overallFloor)), Math.round(weighted));
+  const placement = Math.max(0, Math.round(overallFloor));
+  const weighted = weightedModeEquivalent(points, config);
+  const placementModeBaseline = placement * config.modeFallbackFraction;
+  return Math.max(0, Math.round(placement + Math.max(0, weighted - placementModeBaseline)));
 }
 
 export function fallbackModeTarget(overallPlacement: number, mode: ModeKey, config: RankingConfig) {
   return modePointsFromEquivalentRhp(overallPlacement * config.modeFallbackFraction, mode);
+}
+
+export async function ensureRankingBaseline(userId: string) {
+  const existing = await prisma.$queryRawUnsafe<Array<{ overallFloor: number; rplBase: number; rpsBase: number; rpvBase: number }>>('SELECT "overallFloor","rplBase","rpsBase","rpvBase" FROM "RankingBaseline" WHERE "userId"=$1 LIMIT 1', userId);
+  if (existing[0]) return existing[0];
+  const profile = await prisma.rhythiaProfile.findUnique({ where: { userId }, select: { globalRank: true, rhythmPoints: true } });
+  if (!profile) return { overallFloor: 0, rplBase: 0, rpsBase: 0, rpvBase: 0 };
+  const config = await loadRankingConfig();
+  const placement = initialOverallPlacement({ globalRank: profile.globalRank, rhythmPoints: profile.rhythmPoints }, config);
+  const baseline = {
+    overallFloor: placement,
+    rplBase: fallbackModeTarget(placement, "lock", config),
+    rpsBase: fallbackModeTarget(placement, "spin", config),
+    rpvBase: fallbackModeTarget(placement, "vr", config),
+  };
+  await prisma.$executeRawUnsafe('INSERT INTO "RankingBaseline" ("userId","overallFloor","rplBase","rpsBase","rpvBase",source,"updatedAt") VALUES ($1,$2,$3,$4,$5,\'placement-v2-auto\',CURRENT_TIMESTAMP) ON CONFLICT ("userId") DO NOTHING', userId, baseline.overallFloor, baseline.rplBase, baseline.rpsBase, baseline.rpvBase);
+  const saved = await prisma.$queryRawUnsafe<Array<{ overallFloor: number; rplBase: number; rpsBase: number; rpvBase: number }>>('SELECT "overallFloor","rplBase","rpsBase","rpvBase" FROM "RankingBaseline" WHERE "userId"=$1 LIMIT 1', userId);
+  return saved[0] ?? baseline;
 }
 
 export function battleSeedForRhp(rhp: number) {
@@ -138,11 +162,10 @@ export async function previewRankingReset(configInput?: RankingConfig) {
   const result: RankingResetPreviewRow[] = [];
   for (const row of rows) {
     const placement = initialOverallPlacement({ globalRank: row.globalRank, rhythmPoints: row.rhythmPoints }, config);
-    const raw: ModePoints = { lock: row.rawLock, spin: row.rawSpin, vr: row.rawVr };
     const totals: ModePoints = {
-      lock: Math.max(raw.lock, fallbackModeTarget(placement, "lock", config)),
-      spin: Math.max(raw.spin, fallbackModeTarget(placement, "spin", config)),
-      vr: Math.max(raw.vr, fallbackModeTarget(placement, "vr", config)),
+      lock: fallbackModeTarget(placement, "lock", config) + row.rawLock,
+      spin: fallbackModeTarget(placement, "spin", config) + row.rawSpin,
+      vr: fallbackModeTarget(placement, "vr", config) + row.rawVr,
     };
     const newRhp = overallRhpFromModes(totals, placement, config);
     result.push({ userId: row.userId, username: row.username, globalRank: row.globalRank, rhythmPoints: row.rhythmPoints, oldRhp: row.oldRhp, newRhp, rpl: totals.lock, rps: totals.spin, rpv: totals.vr, battleSeed: battleSeedForRhp(newRhp) });
@@ -163,9 +186,9 @@ export async function applyRankingReset(actorId: string, configInput?: RankingCo
     for (const source of sources) {
       const row = previewByUser.get(source.userId)!;
       const placement = initialOverallPlacement({ globalRank: source.globalRank, rhythmPoints: source.rhythmPoints }, config);
-      const rplBase = Math.max(0, row.rpl - source.rawLock);
-      const rpsBase = Math.max(0, row.rps - source.rawSpin);
-      const rpvBase = Math.max(0, row.rpv - source.rawVr);
+      const rplBase = fallbackModeTarget(placement, "lock", config);
+      const rpsBase = fallbackModeTarget(placement, "spin", config);
+      const rpvBase = fallbackModeTarget(placement, "vr", config);
       const oldOverrides = await tx.$queryRawUnsafe<Array<{ system: string; points: number }>>('SELECT system,points FROM "UserPointOverride" WHERE "userId"=$1 AND system IN (\'rhp\',\'rpl\',\'rps\',\'rpv\')', source.userId);
       const oldMap = new Map(oldOverrides.map(item => [item.system, Number(item.points)]));
       let oldRbp: number | null = null;
