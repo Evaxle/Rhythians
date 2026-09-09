@@ -3,6 +3,7 @@ import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { embedRhythiansId, extensionFromMapUrl } from "@/lib/rhythkit-map-file";
 import { supabaseAdmin } from "@/lib/supabase";
+import { bandwidthProtectionEnabled, bandwidthProtectionMessage } from "@/lib/bandwidth-protection";
 
 export const runtime = "nodejs";
 const bucket = () => process.env.STORAGE_BUCKET ?? "media";
@@ -27,6 +28,7 @@ async function findMap(id: string) {
 export async function GET(request: Request) {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "You must be signed in." }, { status: 401 });
+  if (bandwidthProtectionEnabled) return NextResponse.json({ error: bandwidthProtectionMessage, code: "BANDWIDTH_PROTECTION" }, { status: 503, headers: { "Retry-After": "3600" } });
   const id = new URL(request.url).searchParams.get("id")?.trim();
   if (!id) return NextResponse.json({ error: "Map id is required." }, { status: 400 });
   const map = await findMap(id);
