@@ -114,15 +114,6 @@ function stringField(record: JsonRecord, keys: string[]) {
   for (const key of keys) if (typeof record[key] === "string" && (record[key] as string).trim()) return (record[key] as string).trim();
   return null;
 }
-function booleanField(record: JsonRecord, keys: string[]) {
-  for (const key of keys) {
-    const value = record[key];
-    if (typeof value === "boolean") return value;
-    if (value === 1 || value === "1" || value === "true") return true;
-    if (value === 0 || value === "0" || value === "false") return false;
-  }
-  return null;
-}
 function scoreId(record: JsonRecord) { const value = numberField(record, ["id", "scoreId", "score_id"]); return value != null && Number.isInteger(value) && value > 0 ? value : null; }
 function scoreCreatedAt(record: JsonRecord) {
   const raw = record.created_at ?? record.createdAt ?? record.timestamp ?? record.date;
@@ -137,14 +128,14 @@ function scoreAccuracy(record: JsonRecord) {
   const misses = numberField(record, ["misses", "miss"]);
   return notes && notes > 0 && misses != null ? clamp((notes - misses) / notes) : null;
 }
-function scoreReplayUrl(record: JsonRecord) {
+function scoreReplayUrl(record: JsonRecord): string | null {
   const direct = stringField(record, ["replay_url", "replayUrl", "replayURL", "replay", "replay_file", "replayFile", "replay_download_url", "replayDownloadUrl"]);
   if (direct) return direct;
   for (const [key, value] of Object.entries(record)) {
     if (!/replay/i.test(key)) continue;
     if (typeof value === "string" && value.trim()) return value.trim();
     if (value && typeof value === "object" && !Array.isArray(value)) {
-      const nested = scoreReplayUrl(value as JsonRecord);
+      const nested: string | null = scoreReplayUrl(value as JsonRecord);
       if (nested) return nested;
     }
   }
