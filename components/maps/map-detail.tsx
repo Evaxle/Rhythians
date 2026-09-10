@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Archive, Download, ExternalLink, Trophy } from "lucide-react";
+import { Archive, ChevronDown, ChevronUp, Download, ExternalLink, Trophy } from "lucide-react";
 import { getRankInfo, mapTierForRating, RANKS, type RankInfo } from "@/lib/ranks";
 import { RankIcon } from "@/components/rank-icon";
 import { MapAnalysisTimeline } from "@/components/maps/map-analysis-timeline";
@@ -20,6 +20,7 @@ export function MapDetail({ map, userRank: _userRank, currentUserId }: Props) {
   const [data, setData] = useState(map);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showRankabilityDetails, setShowRankabilityDetails] = useState(false);
 
   useEffect(() => {
     if (!map.isRanked) return;
@@ -63,13 +64,15 @@ export function MapDetail({ map, userRank: _userRank, currentUserId }: Props) {
         </div>
 
         <div className={`mt-6 grid gap-3 ${data.isRanked ? "sm:grid-cols-2 lg:grid-cols-6" : "sm:grid-cols-2 lg:grid-cols-4"}`}>
-          <div className="rounded-2xl border border-accent/30 bg-accent/[0.08] p-4"><p className="text-xs uppercase tracking-wider text-muted">Rankability</p><p className="mt-1 text-2xl font-black text-white">{data.rankability.toFixed(2)}<span className="text-sm font-semibold text-muted"> / 5.00</span></p><p className="mt-1 text-[11px] leading-4 text-muted">Competitive ranking suitability from the latest map analysis.</p></div>
+          <div className="rounded-2xl border border-accent/30 bg-accent/[0.08] p-4"><p className="text-xs uppercase tracking-wider text-muted">Rankability</p><p className="mt-1 text-3xl font-black text-white">{data.rankability.toFixed(2)}<span className="text-sm font-semibold text-muted"> / 5.00</span></p><p className="mt-1 text-[11px] leading-4 text-muted">Competitive ranking suitability from the current analysis.</p><button type="button" onClick={() => setShowRankabilityDetails((value) => !value)} className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-accent hover:text-white">{showRankabilityDetails ? <ChevronUp size={14} /> : <ChevronDown size={14} />}{showRankabilityDetails ? "Hide details" : "View more details"}</button></div>
           <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">Rating</p><p className="mt-1 text-xl font-semibold" style={{ color: data.rankColor }}>{data.rating.toFixed(2)}</p></div>
           {data.isRanked && <><div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">RPL</p><p className="mt-1 text-xl font-semibold text-white">{data.rpl}</p></div><div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">RPV</p><p className="mt-1 text-xl font-semibold text-white">{data.rpv}</p></div><div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">RPS</p><p className="mt-1 text-xl font-semibold text-white">{data.rps}</p></div></>}
           {data.isLegacy && <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">Archive status</p><p className="mt-1 flex items-center gap-2 text-xl font-semibold text-white"><Archive size={18} /> Legacy</p></div>}
           {data.sourceStatus === "unranked" && <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">Map status</p><p className="mt-1 text-xl font-semibold text-white">Unranked</p></div>}
           <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">Length</p><p className="mt-1 text-xl font-semibold text-white">{length ?? "—"}</p></div>
         </div>
+
+        {showRankabilityDetails && <div className="mt-4 rounded-2xl border border-accent/25 bg-black/20 p-4 sm:p-5"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs font-black uppercase tracking-[0.16em] text-accent">Rankability breakdown</p><h2 className="mt-1 text-xl font-bold text-white">Why this map received {data.rankability.toFixed(2)} / 5.00</h2></div><div className="text-right"><p className="text-xs text-muted">Raw analysis score</p><p className="text-lg font-black text-white">{data.rankabilityDetails.rawScore.toFixed(2)} / 5.00</p></div></div><div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">{data.rankabilityDetails.factors.map((factor) => <div key={factor.key} className="rounded-xl border border-white/10 bg-white/[0.03] p-3"><div className="flex items-center justify-between gap-3"><p className="text-sm font-bold text-white">{factor.label}</p><p className="text-sm font-black text-accent">{factor.score.toFixed(2)} / 5.00</p></div><div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-accent" style={{ width: `${Math.max(0, Math.min(100, factor.score / 5 * 100))}%` }} /></div><p className="mt-2 text-[11px] leading-5 text-muted">Weight {(factor.weight * 100).toFixed(0)}% · contribution +{factor.contribution.toFixed(2)}</p><p className="mt-1 text-[11px] leading-5 text-muted">{factor.reason}</p></div>)}</div>{data.rankabilityDetails.strengths.length > 0 && <div className="mt-4 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06] p-3"><p className="text-xs font-bold uppercase tracking-wider text-emerald-300">Why it scores higher</p><div className="mt-2 space-y-1 text-xs text-muted">{data.rankabilityDetails.strengths.map((item) => <p key={item}>• {item}</p>)}</div></div>}{data.rankabilityDetails.limitations.length > 0 && <div className="mt-3 rounded-xl border border-amber-400/20 bg-amber-400/[0.06] p-3"><p className="text-xs font-bold uppercase tracking-wider text-amber-200">Why it is not higher</p><div className="mt-2 space-y-1 text-xs leading-5 text-muted">{data.rankabilityDetails.limitations.map((item) => <p key={item}>• {item}</p>)}</div></div>}<p className="mt-3 text-[11px] leading-5 text-muted">Rankability is separate from difficulty rating. It measures whether the map has enough representative, consistent, analyzable gameplay to be suitable for competitive ranking. This score does not rank or unrank the map.</p></div>}
 
         <div className="mt-6 flex flex-wrap gap-2 text-xs text-muted">
           <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">{mapDifficulty}</span>
@@ -78,7 +81,6 @@ export function MapDetail({ map, userRank: _userRank, currentUserId }: Props) {
           {data.noteCount != null && <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">{data.noteCount.toLocaleString()} notes</span>}
           {data.sourceBeatmapId != null && <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">Rhythia map #{data.sourceBeatmapId}</span>}
           <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">Analyzer v{data.analysis.analyzerVersion}</span>
-          {data.isRanked && <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">Leaderboard visibility follows your current rank without deleting the stored completion</span>}
         </div>
       </div>
     </section>
