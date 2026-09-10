@@ -2,9 +2,9 @@ import Link from "next/link";
 import { ArrowRight, CalendarDays, Download, Link2, LogIn, CheckCircle2, AlertTriangle } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
-import { getOrCreateDailyMap, formatDailyDate, rhpForMap } from "@/lib/daily";
+import { getOrCreateDailyMap, formatDailyDate } from "@/lib/daily";
 import { getUserDailyStatusAcrossRankChange } from "@/lib/daily-compat";
-import { getRankInfo, fairRatingFromStars } from "@/lib/ranks";
+import { getRankInfo } from "@/lib/ranks";
 import { RankIcon } from "@/components/rank-icon";
 
 export async function HomeDailySection() {
@@ -18,7 +18,7 @@ export async function HomeDailySection() {
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent/15 text-accent"><LogIn size={24} /></div>
           <div>
             <h3 className="text-lg font-semibold text-white">Sign in to access the daily map</h3>
-            <p className="mt-2 text-sm leading-6 text-muted">A new ranked map every day with Rhythian Points on the line. Sign in and link your Rhythia account to take part.</p>
+            <p className="mt-2 text-sm leading-6 text-muted">A new map every day for your streak. Sign in and link your Rhythia account to take part.</p>
             <Link href="/login" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-accent transition hover:text-white">Sign in <ArrowRight size={16} /></Link>
           </div>
         </div>
@@ -35,7 +35,7 @@ export async function HomeDailySection() {
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent/15 text-accent"><Link2 size={24} /></div>
           <div>
             <h3 className="text-lg font-semibold text-white">Link your Rhythia account to play</h3>
-            <p className="mt-2 text-sm leading-6 text-muted">The daily map, leaderboards, and Rhythian Points are reserved for members with a linked Rhythia profile.</p>
+            <p className="mt-2 text-sm leading-6 text-muted">The daily map and leaderboard are available to members with a linked Rhythia profile.</p>
             <Link href={`/profile/${user.profileHandle}`} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-accent transition hover:text-white">Link your account <ArrowRight size={16} /></Link>
           </div>
         </div>
@@ -59,7 +59,7 @@ export async function HomeDailySection() {
       {status?.beatFromPreviousRank && (
         <div className="mt-4 flex items-start gap-3 rounded-2xl border border-yellow-400/30 bg-yellow-400/10 p-4 text-sm text-yellow-100">
           <AlertTriangle size={17} className="mt-0.5 shrink-0" />
-          <p>You already beat today&apos;s daily map for your previous rank. It counted for today, so beating the new rank&apos;s daily map will not award another daily completion or RHP.</p>
+          <p>You already beat today&apos;s daily map for your previous rank. It still counts for today&apos;s streak.</p>
         </div>
       )}
 
@@ -68,11 +68,10 @@ export async function HomeDailySection() {
           <p className="text-sm text-muted">{daily.artist ?? "Unknown artist"}</p>
           <h3 className="mt-1 truncate text-xl font-semibold text-white">{daily.title}</h3>
           <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-muted">
-            <span className="inline-flex items-center gap-1 font-semibold text-white">{fairRatingFromStars(daily.starRating).toFixed(2)} rating</span><span>·</span>
             <span>Mapped by {daily.mapperName ?? "Unknown"}</span><span>·</span>
-            <span className="font-semibold text-accent">{rhpForMap(daily.starRating, rankInfo.index)} RHP</span>
+            <span className="font-semibold text-accent">Daily streak only</span>
           </div>
-          {status?.beat && <p className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-300"><CheckCircle2 size={14} /> Beaten · {status.beat.points} RHP earned</p>}
+          {status?.beat && <p className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-300"><CheckCircle2 size={14} /> Beaten · streak recorded</p>}
         </div>
         <div className="flex shrink-0 flex-col gap-2 sm:items-end">
           <a href={daily.downloadUrl} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent/20"><Download size={15} /> Download map</a>

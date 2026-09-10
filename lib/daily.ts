@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { rhythiaRequest } from "@/lib/rhythia";
-import { RANKS, getRankInfo, fairRatingFromStars, rhpGainForMap, type RankInfo } from "@/lib/ranks";
+import { RANKS, getRankInfo, fairRatingFromStars, type RankInfo } from "@/lib/ranks";
 
 const RANKED_SNAPSHOT_KEY = "daily_ranked_maps_snapshot";
 const RANKED_SNAPSHOT_TTL_MS = 24 * 60 * 60 * 1000;
@@ -45,25 +45,19 @@ export type RhythiaScoreEntry = {
   awarded_sp?: number | null;
 };
 
-// The daily map uses the same balanced gain as challenge maps: a base that
-// depends on your rank (Copper 20 ... Expert 10 at 100% accuracy), scaled by
-// accuracy and speed modifiers at award time.
-export function rhpForMap(starRating: number, rankIndex = 0): number {
-  const rating = fairRatingFromStars(Number.isFinite(starRating) ? starRating : 0);
-  return rhpGainForMap(rating, 100, undefined, rankIndex);
-}
+export function rhpForMap(_starRating: number, _rankIndex = 0) { return 0; }
 
-export function startOfDayUTC(value: Date | string = new Date()): Date {
+export function startOfDayUTC(value: Date | string = new Date()) {
   const date = typeof value === "string" ? new Date(value) : value;
   return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
 }
 
-export function startOfMonthUTC(value: Date | string = new Date()): Date {
+export function startOfMonthUTC(value: Date | string = new Date()) {
   const date = typeof value === "string" ? new Date(value) : value;
   return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1));
 }
 
-export function formatDailyDate(date: Date): string {
+export function formatDailyDate(date: Date) {
   return date.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric", timeZone: "UTC" });
 }
 
@@ -77,9 +71,9 @@ function mulberry32(seed: number) {
   };
 }
 
-function shuffle<T>(list: T[], random: () => number): T[] {
+function shuffle<T>(list: T[], random: () => number) {
   const copy = [...list];
-  for (let i = copy.length - 1; i > 0; i--) {
+  for (let i = copy.length - 1; i > 0; i -= 1) {
     const j = Math.floor(random() * (i + 1));
     [copy[i], copy[j]] = [copy[j], copy[i]];
   }
@@ -87,19 +81,7 @@ function shuffle<T>(list: T[], random: () => number): T[] {
 }
 
 function toRankedMap(map: RhythiaBeatmap): RankedMap {
-  return {
-    id: map.id,
-    title: map.title ?? "Unknown map",
-    starRating: map.starRating,
-    difficulty: map.difficulty,
-    noteCount: map.noteCount,
-    length: map.length,
-    playcount: map.playcount,
-    downloadUrl: map.beatmapFile,
-    imageUrl: map.image,
-    mapHash: map.mapHash,
-    ownerUsername: map.ownerUsername,
-  };
+  return { id: map.id, title: map.title ?? "Unknown map", starRating: map.starRating, difficulty: map.difficulty, noteCount: map.noteCount, length: map.length, playcount: map.playcount, downloadUrl: map.beatmapFile, imageUrl: map.image, mapHash: map.mapHash, ownerUsername: map.ownerUsername };
 }
 
 export async function fetchRankedMaps(): Promise<RankedMap[]> {
@@ -107,12 +89,8 @@ export async function fetchRankedMaps(): Promise<RankedMap[]> {
   let page = 1;
   let total = Infinity;
   while (maps.length < total && page <= 40) {
-    const data = await rhythiaRequest<{ total?: number; beatmaps?: RhythiaBeatmap[] }>("getBeatmaps", {
-      status: "RANKED",
-      page,
-      session: "",
-    });
-    if (!data.beatmaps || data.beatmaps.length === 0) break;
+    const data = await rhythiaRequest<{ total?: number; beatmaps?: RhythiaBeatmap[] }>("getBeatmaps", { status: "RANKED", page, session: "" });
+    if (!data.beatmaps?.length) break;
     if (typeof data.total === "number") total = data.total;
     maps.push(...data.beatmaps.map(toRankedMap));
     page += 1;
@@ -125,33 +103,18 @@ export async function getRankedMapsCached(): Promise<RankedMap[]> {
     const cached = await prisma.siteSetting.findUnique({ where: { key: RANKED_SNAPSHOT_KEY } });
     if (cached?.value) {
       const parsed = JSON.parse(cached.value) as { fetchedAt: string; maps: RankedMap[] };
-      if (Array.isArray(parsed.maps) && parsed.maps.length > 0 && Date.now() - new Date(parsed.fetchedAt).getTime() < RANKED_SNAPSHOT_TTL_MS) {
-        return parsed.maps;
-      }
+      if (Array.isArray(parsed.maps) && parsed.maps.length && Date.now() - new Date(parsed.fetchedAt).getTime() < RANKED_SNAPSHOT_TTL_MS) return parsed.maps;
     }
-  } catch {
-    // Corrupt or missing cache, fetch below.
-  }
-
+  } catch {}
   const maps = await fetchRankedMaps();
   try {
-    await prisma.siteSetting.upsert({
-      where: { key: RANKED_SNAPSHOT_KEY },
-      update: { value: JSON.stringify({ fetchedAt: new Date().toISOString(), maps }) },
-      create: {
-        key: RANKED_SNAPSHOT_KEY,
-        value: JSON.stringify({ fetchedAt: new Date().toISOString(), maps }),
-        description: "Cached snapshot of currently ranked Rhythia beatmaps used to pick daily maps.",
-      },
-    });
-  } catch {
-    // Cache write failures shouldn't block the daily pick.
-  }
+    const value = JSON.stringify({ fetchedAt: new Date().toISOString(), maps });
+    await prisma.siteSetting.upsert({ where: { key: RANKED_SNAPSHOT_KEY }, update: { value }, create: { key: RANKED_SNAPSHOT_KEY, value, description: "Cached snapshot of currently ranked Rhythia beatmaps used to pick daily maps." } });
+  } catch {}
   return maps;
 }
 
-// Convert a Rhythia star rating into our map-rating scale and pick only maps that fall within a rank's range.
-export function mapsForRank(maps: RankedMap[], rankIndex: number): RankedMap[] {
+export function mapsForRank(maps: RankedMap[], rankIndex: number) {
   const rank = RANKS[rankIndex] ?? RANKS[RANKS.length - 1];
   return maps.filter((map) => {
     const rating = fairRatingFromStars(map.starRating ?? 0);
@@ -159,13 +122,12 @@ export function mapsForRank(maps: RankedMap[], rankIndex: number): RankedMap[] {
   });
 }
 
-export function pickDailyMap(maps: RankedMap[], usedIds: Set<number>, date: Date): RankedMap {
+export function pickDailyMap(maps: RankedMap[], usedIds: Set<number>, date: Date) {
   const available = maps.filter((map) => !usedIds.has(map.id));
-  const pool = available.length > 0 ? available : maps;
-  const seed = Math.floor(date.getTime() / 86_400_000);
-  const random = mulberry32(seed);
-  const shuffled = shuffle(pool, random);
-  return shuffled[0];
+  const pool = available.length ? available : maps;
+  if (!pool.length) throw new Error("No ranked Rhythia maps are available for this daily range.");
+  const random = mulberry32(Math.floor(date.getTime() / 86_400_000));
+  return shuffle(pool, random)[0];
 }
 
 export type DailyMapRow = {
@@ -187,179 +149,80 @@ export type DailyMapRow = {
   createdAt: Date;
 };
 
-export async function getOrCreateDailyMap(
-  rankIndex: number,
-  date: Date | string = new Date(),
-  blockedIds: number[] = []
-): Promise<DailyMapRow> {
+export async function getOrCreateDailyMap(rankIndex: number, date: Date | string = new Date(), blockedIds: number[] = []): Promise<DailyMapRow> {
   const day = startOfDayUTC(date);
   const safeRank = Math.max(0, Math.min(RANKS.length - 1, rankIndex));
-
-  const existing = await prisma.dailyMap.findUnique({
-    where: { date_rankIndex: { date: day, rankIndex: safeRank } },
-  });
+  const existing = await prisma.dailyMap.findUnique({ where: { date_rankIndex: { date: day, rankIndex: safeRank } } });
   if (existing) return existing;
-
   const maps = await getRankedMapsCached();
   const rankMaps = mapsForRank(maps, safeRank);
-
   const monthStart = startOfMonthUTC(day);
-  const used = await prisma.dailyMap.findMany({
-    where: { date: { gte: monthStart }, rankIndex: safeRank },
-    select: { beatmapId: true },
-  });
+  const used = await prisma.dailyMap.findMany({ where: { date: { gte: monthStart }, rankIndex: safeRank }, select: { beatmapId: true } });
   const usedIds = new Set(used.map((record) => record.beatmapId));
   blockedIds.forEach((id) => usedIds.add(id));
-  const pick = pickDailyMap(rankMaps, usedIds, day);
-
+  const pick = pickDailyMap(rankMaps.length ? rankMaps : maps, usedIds, day);
   const dash = pick.title.indexOf(" - ");
   const artist = dash > 0 ? pick.title.slice(0, dash).trim() : null;
-
   try {
-    return await prisma.dailyMap.create({
-      data: {
-        date: day,
-        rankIndex: safeRank,
-        beatmapId: pick.id,
-        title: pick.title,
-        artist,
-        difficulty: pick.difficulty,
-        starRating: pick.starRating ?? 0,
-        noteCount: pick.noteCount,
-        length: pick.length,
-        playcount: pick.playcount,
-        mapHash: pick.mapHash,
-        downloadUrl: pick.downloadUrl ?? "",
-        imageUrl: pick.imageUrl,
-        mapperName: pick.ownerUsername,
-      },
-    });
+    return await prisma.dailyMap.create({ data: { date: day, rankIndex: safeRank, beatmapId: pick.id, title: pick.title, artist, difficulty: pick.difficulty, starRating: pick.starRating ?? 0, noteCount: pick.noteCount, length: pick.length, playcount: pick.playcount, mapHash: pick.mapHash, downloadUrl: pick.downloadUrl ?? "", imageUrl: pick.imageUrl, mapperName: pick.ownerUsername } });
   } catch (error) {
-    // A concurrent request may have created the daily map first.
-    const created = await prisma.dailyMap.findUnique({
-      where: { date_rankIndex: { date: day, rankIndex: safeRank } },
-    });
+    const created = await prisma.dailyMap.findUnique({ where: { date_rankIndex: { date: day, rankIndex: safeRank } } });
     if (created) return created;
     throw error;
   }
 }
 
-function normalizeTitle(value: string | null | undefined): string {
-  return (value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
-}
+function normalizeTitle(value: string | null | undefined) { return (value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
 
-export function findScoreForMap(scores: RhythiaScoreEntry[], title: string): RhythiaScoreEntry | null {
+export function findScoreForMap(scores: RhythiaScoreEntry[], title: string) {
   const target = normalizeTitle(title);
   if (!target) return null;
   return scores.find((score) => score.passed && normalizeTitle(score.beatmapTitle) === target) ?? null;
 }
 
-export async function fetchRhythiaScores(profileId: number): Promise<{ recent: RhythiaScoreEntry[]; top: RhythiaScoreEntry[] }> {
+export async function fetchRhythiaScores(profileId: number) {
   const data = await rhythiaRequest<{ lastDay?: RhythiaScoreEntry[]; top?: RhythiaScoreEntry[] }>("getUserScores", { id: profileId, limit: 100 });
   return { recent: data.lastDay ?? [], top: data.top ?? [] };
 }
 
-export async function fetchAllRhythiaScores(profileId: number): Promise<RhythiaScoreEntry[]> {
-  const data = await rhythiaRequest<{
-    lastDay?: RhythiaScoreEntry[];
-    top?: RhythiaScoreEntry[];
-    vrTop?: RhythiaScoreEntry[];
-    vrRecent?: RhythiaScoreEntry[];
-  }>("getUserScores", { id: profileId, limit: 100 });
+export async function fetchAllRhythiaScores(profileId: number) {
+  const data = await rhythiaRequest<{ lastDay?: RhythiaScoreEntry[]; top?: RhythiaScoreEntry[]; vrTop?: RhythiaScoreEntry[]; vrRecent?: RhythiaScoreEntry[] }>("getUserScores", { id: profileId, limit: 100 });
   const seen = new Map<number, RhythiaScoreEntry>();
-  for (const entry of [...(data.lastDay ?? []), ...(data.top ?? []), ...(data.vrTop ?? []), ...(data.vrRecent ?? [])]) {
-    if (entry && typeof entry.id === "number" && !seen.has(entry.id)) seen.set(entry.id, entry);
-  }
+  for (const entry of [...(data.lastDay ?? []), ...(data.top ?? []), ...(data.vrTop ?? []), ...(data.vrRecent ?? [])]) if (entry && typeof entry.id === "number" && !seen.has(entry.id)) seen.set(entry.id, entry);
   return [...seen.values()];
 }
 
-export type DailyCheckResult = {
-  status: "beat" | "not_beat" | "already" | "no_profile";
-  points: number;
-  streak: number;
-};
+export type DailyCheckResult = { status: "beat" | "not_beat" | "already" | "no_profile"; points: number; streak: number };
 
 export async function checkAndAwardDaily(userId: string): Promise<DailyCheckResult> {
   const profile = await prisma.rhythiaProfile.findUnique({ where: { userId } });
   if (!profile) return { status: "no_profile", points: 0, streak: 0 };
-
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true, dailyStreak: true, lastDailyBeatAt: true } });
   if (!user) return { status: "no_profile", points: 0, streak: 0 };
-
   const rankInfo = getRankInfo(user.rhp);
   const daily = await getOrCreateDailyMap(rankInfo.index);
-
-  const existing = await prisma.dailyMapBeat.findUnique({
-    where: { dailyMapId_userId: { dailyMapId: daily.id, userId } },
-  });
-  if (existing) {
-    return { status: "already", points: existing.points, streak: user.dailyStreak };
-  }
-
-  let scores: { recent: RhythiaScoreEntry[]; top: RhythiaScoreEntry[] };
-  try {
-    scores = await fetchRhythiaScores(profile.profileId);
-  } catch {
-    return { status: "not_beat", points: 0, streak: user.dailyStreak };
-  }
-
+  const existing = await prisma.dailyMapBeat.findUnique({ where: { dailyMapId_userId: { dailyMapId: daily.id, userId } } });
+  if (existing) return { status: "already", points: 0, streak: user.dailyStreak };
+  let scores: Awaited<ReturnType<typeof fetchRhythiaScores>>;
+  try { scores = await fetchRhythiaScores(profile.profileId); } catch { return { status: "not_beat", points: 0, streak: user.dailyStreak }; }
   const hit = findScoreForMap(scores.recent, daily.title) ?? findScoreForMap(scores.top, daily.title);
   if (!hit) return { status: "not_beat", points: 0, streak: user.dailyStreak };
-
-  const points = rhpGainForMap(fairRatingFromStars(daily.starRating), hit.accuracy ?? null, hit.speed, rankInfo.index);
   const now = new Date();
-
-  // Streak: if the user beat a daily map yesterday (UTC), increment; otherwise reset to 1.
   const today = startOfDayUTC(now);
   const yesterday = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - 1));
   const lastBeatDay = user.lastDailyBeatAt ? startOfDayUTC(user.lastDailyBeatAt) : null;
-  const isConsecutive = lastBeatDay != null && lastBeatDay.getTime() === yesterday.getTime();
-  const newStreak = isConsecutive ? user.dailyStreak + 1 : 1;
-
+  const newStreak = lastBeatDay?.getTime() === yesterday.getTime() ? user.dailyStreak + 1 : 1;
   try {
     await prisma.$transaction([
-      prisma.dailyMapBeat.create({
-        data: {
-          dailyMapId: daily.id,
-          userId,
-          points,
-          scoreId: hit.id,
-          accuracy: hit.accuracy ?? null,
-          misses: hit.misses,
-        },
-      }),
-      prisma.user.update({
-        where: { id: userId },
-        data: { rhp: { increment: points }, dailyStreak: newStreak, lastDailyBeatAt: now },
-      }),
-      prisma.rhpTransaction.create({
-        data: {
-          userId,
-          amount: points,
-          reason: "daily_map",
-          description: `Beaten daily map: ${daily.title}`,
-        },
-      }),
-      prisma.notification.create({
-        data: {
-          userId,
-          type: "rhp_earned",
-          title: "Daily map beaten",
-          message: `You earned ${points} RHP for beating today's daily map: ${daily.title}. Streak: ${newStreak} day${newStreak === 1 ? "" : "s"}.`,
-          url: "/daily",
-        },
-      }),
+      prisma.dailyMapBeat.create({ data: { dailyMapId: daily.id, userId, points: 0, scoreId: hit.id, accuracy: hit.accuracy ?? null, misses: hit.misses } }),
+      prisma.user.update({ where: { id: userId }, data: { dailyStreak: newStreak, lastDailyBeatAt: now } }),
     ]);
   } catch {
-    // Likely a race: already awarded by a concurrent request.
-    const beat = await prisma.dailyMapBeat.findUnique({
-      where: { dailyMapId_userId: { dailyMapId: daily.id, userId } },
-    });
-    if (beat) return { status: "already", points: beat.points, streak: user.dailyStreak };
+    const beat = await prisma.dailyMapBeat.findUnique({ where: { dailyMapId_userId: { dailyMapId: daily.id, userId } } });
+    if (beat) return { status: "already", points: 0, streak: user.dailyStreak };
     throw new Error("Unable to record the daily map completion.");
   }
-
-  return { status: "beat", points, streak: newStreak };
+  return { status: "beat", points: 0, streak: newStreak };
 }
 
 export type DailyLeaderboardRow = {
@@ -375,51 +238,21 @@ export type DailyLeaderboardRow = {
   rankInfo: RankInfo;
 };
 
-// Per-rank daily leaderboard, ranked by daily map streak (consecutive days beaten).
-// A streak only counts if the user's last beat was today or yesterday; if they missed
-// a day the streak is effectively broken and shows as 0.
 export async function getDailyLeaderboard(rankIndex: number, limit = 100): Promise<DailyLeaderboardRow[]> {
   const rank = RANKS[rankIndex];
   const minRhp = rank.minRhp;
   const maxRhp = rankIndex < RANKS.length - 1 ? RANKS[rankIndex + 1].minRhp : null;
-
   const now = new Date();
   const today = startOfDayUTC(now);
   const yesterday = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - 1));
-
-  const users = await prisma.user.findMany({
-    where: {
-      rhp: maxRhp == null ? { gte: minRhp } : { gte: minRhp, lt: maxRhp },
-      dailyStreak: { gt: 0 },
-      lastDailyBeatAt: { not: null },
-      rhythiaVerified: true,
-      NOT: { profileHandle: "rhythia-imports" },
-    },
-    select: { id: true, username: true, displayName: true, profileHandle: true, avatar: true, rhp: true, dailyStreak: true, lastDailyBeatAt: true },
-    orderBy: [{ dailyStreak: "desc" }, { lastDailyBeatAt: "desc" }],
-    take: limit * 3,
-  });
-
+  const users = await prisma.user.findMany({ where: { rhp: maxRhp == null ? { gte: minRhp } : { gte: minRhp, lt: maxRhp }, dailyStreak: { gt: 0 }, lastDailyBeatAt: { not: null }, rhythiaVerified: true, NOT: { profileHandle: "rhythia-imports" } }, select: { id: true, username: true, displayName: true, profileHandle: true, avatar: true, rhp: true, dailyStreak: true, lastDailyBeatAt: true }, orderBy: [{ dailyStreak: "desc" }, { lastDailyBeatAt: "desc" }], take: limit * 3 });
   const rows: DailyLeaderboardRow[] = [];
   for (const user of users) {
     const lastBeatDay = user.lastDailyBeatAt ? startOfDayUTC(user.lastDailyBeatAt) : null;
-    const isActive = lastBeatDay != null && (lastBeatDay.getTime() === today.getTime() || lastBeatDay.getTime() === yesterday.getTime());
-    const effectiveStreak = isActive ? user.dailyStreak : 0;
-    if (effectiveStreak <= 0) continue;
-    rows.push({
-      position: 0,
-      userId: user.id,
-      username: user.username,
-      displayName: user.displayName,
-      profileHandle: user.profileHandle,
-      avatar: user.avatar,
-      rhp: user.rhp,
-      streak: effectiveStreak,
-      lastBeatAt: user.lastDailyBeatAt ?? new Date(0),
-      rankInfo: getRankInfo(user.rhp),
-    });
+    const active = lastBeatDay != null && (lastBeatDay.getTime() === today.getTime() || lastBeatDay.getTime() === yesterday.getTime());
+    if (!active) continue;
+    rows.push({ position: 0, userId: user.id, username: user.username, displayName: user.displayName, profileHandle: user.profileHandle, avatar: user.avatar, rhp: user.rhp, streak: user.dailyStreak, lastBeatAt: user.lastDailyBeatAt ?? new Date(0), rankInfo: getRankInfo(user.rhp) });
   }
-
   rows.sort((a, b) => b.streak - a.streak || b.lastBeatAt.getTime() - a.lastBeatAt.getTime());
   return rows.slice(0, limit).map((row, index) => ({ ...row, position: index + 1 }));
 }
@@ -427,67 +260,33 @@ export async function getDailyLeaderboard(rankIndex: number, limit = 100): Promi
 export async function getUserDailyStatus(userId: string) {
   const profile = await prisma.rhythiaProfile.findUnique({ where: { userId }, select: { id: true } });
   if (!profile) return null;
-
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true, dailyStreak: true, lastDailyBeatAt: true } });
   if (!user) return null;
-
   const rankInfo = getRankInfo(user.rhp);
   const daily = await getOrCreateDailyMap(rankInfo.index);
-  const beat = await prisma.dailyMapBeat.findUnique({
-    where: { dailyMapId_userId: { dailyMapId: daily.id, userId } },
-    select: { points: true, createdAt: true, accuracy: true, misses: true, scoreId: true },
-  });
-
+  const beat = await prisma.dailyMapBeat.findUnique({ where: { dailyMapId_userId: { dailyMapId: daily.id, userId } }, select: { points: true, createdAt: true, accuracy: true, misses: true, scoreId: true } });
   const now = new Date();
   const today = startOfDayUTC(now);
   const yesterday = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - 1));
   const lastBeatDay = user.lastDailyBeatAt ? startOfDayUTC(user.lastDailyBeatAt) : null;
-  const isActive = lastBeatDay != null && (lastBeatDay.getTime() === today.getTime() || lastBeatDay.getTime() === yesterday.getTime());
-  const effectiveStreak = isActive ? user.dailyStreak : 0;
-
-  return {
-    dailyMapId: daily.id,
-    rankIndex: rankInfo.index,
-    rankName: rankInfo.name,
-    streak: effectiveStreak,
-    beat: beat
-      ? { points: beat.points, createdAt: beat.createdAt, accuracy: beat.accuracy, misses: beat.misses, scoreId: beat.scoreId }
-      : null,
-  };
+  const active = lastBeatDay != null && (lastBeatDay.getTime() === today.getTime() || lastBeatDay.getTime() === yesterday.getTime());
+  return { dailyMapId: daily.id, rankIndex: rankInfo.index, rankName: rankInfo.name, streak: active ? user.dailyStreak : 0, beat: beat ? { points: 0, createdAt: beat.createdAt, accuracy: beat.accuracy, misses: beat.misses, scoreId: beat.scoreId } : null };
 }
 
 export async function refreshTodayDailyMap(rankIndex: number, blockedIds: number[] = []): Promise<{ map: DailyMapRow; replaced: boolean }> {
   const day = startOfDayUTC();
   const safeRank = Math.max(0, Math.min(RANKS.length - 1, rankIndex));
-  const existing = await prisma.dailyMap.findUnique({
-    where: { date_rankIndex: { date: day, rankIndex: safeRank } },
-  });
-
+  const existing = await prisma.dailyMap.findUnique({ where: { date_rankIndex: { date: day, rankIndex: safeRank } } });
   if (existing) {
     await prisma.dailyMapBeat.deleteMany({ where: { dailyMapId: existing.id } });
     await prisma.dailyMap.delete({ where: { id: existing.id } });
     return { map: await getOrCreateDailyMap(safeRank, day, [...blockedIds, existing.beatmapId]), replaced: true };
   }
-
   return { map: await getOrCreateDailyMap(safeRank, day, blockedIds), replaced: false };
 }
 
 export async function fetchRhythiaMapById(beatmapId: number) {
-  const data = await rhythiaRequest<{ total?: number; beatmaps?: Array<{
-    id: number;
-    title: string | null;
-    starRating: number | null;
-    difficulty: number | null;
-    noteCount: number | null;
-    length: number | null;
-    playcount: number | null;
-    beatmapFile: string | null;
-    image: string | null;
-    mapHash: string | null;
-    ownerUsername: string | null;
-    status: string | null;
-  }> }>("getBeatmaps", { textFilter: String(beatmapId), page: 1 });
+  const data = await rhythiaRequest<{ total?: number; beatmaps?: Array<{ id: number; title: string | null; starRating: number | null; difficulty: number | null; noteCount: number | null; length: number | null; playcount: number | null; beatmapFile: string | null; image: string | null; mapHash: string | null; ownerUsername: string | null; status: string | null }> }>("getBeatmaps", { textFilter: String(beatmapId), page: 1 });
   const match = (data.beatmaps ?? []).find((map) => map.id === beatmapId);
-  if (!match) return null;
-  return toRankedMap(match);
+  return match ? toRankedMap(match) : null;
 }

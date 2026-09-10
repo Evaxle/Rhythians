@@ -1,7 +1,7 @@
 export const MODE_RULES = {
-  lock: { key: "lock", label: "Lock", short: "RPL", maxPoints: 26, rankScale: 0.35 },
-  spin: { key: "spin", label: "Spin", short: "RPS", maxPoints: 24, rankScale: 0.32 },
-  vr: { key: "vr", label: "VR", short: "RPV", maxPoints: 23, rankScale: 0.3 },
+  lock: { key: "lock", label: "Lock", short: "RPL", rewardMultiplier: 1, maxPoints: 1000000, rankScale: 0.49 },
+  spin: { key: "spin", label: "Spin", short: "RPS", rewardMultiplier: 1.12, maxPoints: 1000000, rankScale: 0.55 },
+  vr: { key: "vr", label: "VR", short: "RPV", rewardMultiplier: 1.06, maxPoints: 1000000, rankScale: 0.52 },
 } as const;
 
 export type ModeKey = keyof typeof MODE_RULES;
