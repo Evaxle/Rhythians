@@ -1,11 +1,12 @@
 import { prisma } from "@/lib/db";
 import { getRankInfo, RANKS, rankIndexForRating } from "@/lib/ranks";
 import { analysisIsCurrent, getMapAnalysis } from "@/lib/map-analysis-store";
+import { mapRankability } from "@/lib/map-rankability";
 import type { MapPatternSegment, MapSectionAnalysis } from "@/lib/map-difficulty";
 
 export type RankedMapLeaderboardRow = { position: number; userId: string; username: string; displayName: string | null; profileHandle: string; avatar: string | null; accuracy: number | null; points: number; scoreId: number | null; rankInfo: ReturnType<typeof getRankInfo> };
-export type MapAnalysisTimelineData = { analyzerVersion: number; rating: number; directionScore: number; distanceScore: number; npsScore: number; staminaIndex: number; activeDurationMs: number; longestHardSectionMs: number; peakJumpNps: number; peakStreamNps: number; peakJumpStrain: number; peakStreamStrain: number; jumpRatio: number; patternSegments: MapPatternSegment[]; topSections: MapSectionAnalysis[] };
-export type RankedMapLeaderboard = { mapId: string; title: string; artist: string | null; description: string | null; mapFileUrl: string; imageUrl: string | null; rating: number; rankIndex: number; rankName: string; rankColor: string; rangeMin: number; rangeMax: number; mapperName: string | null; noteCount: number | null; length: number | null; sourceBeatmapId: number | null; sourceUrl: string | null; rpl: number; rpv: number; rps: number; rows: RankedMapLeaderboardRow[]; isRanked: boolean; isLegacy: boolean; sourceStatus: "ranked" | "legacy"; analysis: MapAnalysisTimelineData };
+export type MapAnalysisTimelineData = { analyzerVersion: number; rating: number; rankability: number; directionScore: number; distanceScore: number; npsScore: number; staminaIndex: number; activeDurationMs: number; longestHardSectionMs: number; peakJumpNps: number; peakStreamNps: number; peakJumpStrain: number; peakStreamStrain: number; jumpRatio: number; patternSegments: MapPatternSegment[]; topSections: MapSectionAnalysis[] };
+export type RankedMapLeaderboard = { mapId: string; title: string; artist: string | null; description: string | null; mapFileUrl: string; imageUrl: string | null; rating: number; rankability: number; rankIndex: number; rankName: string; rankColor: string; rangeMin: number; rangeMax: number; mapperName: string | null; noteCount: number | null; length: number | null; sourceBeatmapId: number | null; sourceUrl: string | null; rpl: number; rpv: number; rps: number; rows: RankedMapLeaderboardRow[]; isRanked: boolean; isLegacy: boolean; sourceStatus: "ranked" | "unranked" | "legacy"; analysis: MapAnalysisTimelineData };
 type ScoreWrite = { rating: number; accuracy: number | null; passed: boolean; points: number; scoreId: number | null; speed: number | null; rankIndex: number };
 
 async function loadMap(mapId: string) {
@@ -23,13 +24,16 @@ export async function getRankedMapDetail(mapId: string): Promise<RankedMapLeader
   if (!analysisIsCurrent(analysis) || analysis?.rating == null) return null;
   const isLegacy = analysis.sourceStatus === "legacy" || map.status === "legacy";
   const isRanked = !isLegacy && analysis.sourceStatus === "ranked" && analysis.pointEligible;
-  if (!isRanked && !isLegacy) return null;
   if (isRanked && (analysis.rpl == null || analysis.rpv == null || analysis.rps == null)) return null;
+  const sourceStatus: "ranked" | "unranked" | "legacy" = isLegacy ? "legacy" : isRanked ? "ranked" : "unranked";
   const rankIndex = rankIndexForRating(map.rating);
   const rank = RANKS[rankIndex] ?? RANKS[RANKS.length - 1];
+  const patternSegments = analysis.patternSegments as MapPatternSegment[];
+  const rankability = mapRankability({ noteCount: map.noteCount, activeDurationMs: analysis.activeDurationMs ?? 0, patternSegments, directionScore: analysis.directionScore ?? 0, distanceScore: analysis.distanceScore ?? 0, npsScore: analysis.npsScore ?? 0 });
   const timeline: MapAnalysisTimelineData = {
     analyzerVersion: analysis.analyzerVersion,
     rating: analysis.rating,
+    rankability,
     directionScore: analysis.directionScore ?? 0,
     distanceScore: analysis.distanceScore ?? 0,
     npsScore: analysis.npsScore ?? 0,
@@ -41,10 +45,10 @@ export async function getRankedMapDetail(mapId: string): Promise<RankedMapLeader
     peakJumpStrain: analysis.peakJumpStrain ?? 0,
     peakStreamStrain: analysis.peakStreamStrain ?? 0,
     jumpRatio: analysis.jumpRatio ?? 0,
-    patternSegments: analysis.patternSegments as MapPatternSegment[],
+    patternSegments,
     topSections: analysis.topSections as MapSectionAnalysis[],
   };
-  return { mapId: map.id, title: map.title, artist: map.artist, description: map.description, mapFileUrl: map.mapFileUrl, imageUrl: map.imageUrl, rating: map.rating, rankIndex: rank.index, rankName: rank.name, rankColor: rank.color, rangeMin: rank.rangeMin, rangeMax: rank.rangeMax, mapperName: map.mapperName, noteCount: map.noteCount, length: map.length, sourceBeatmapId: map.sourceBeatmapId, sourceUrl: map.sourceUrl, rpl: analysis.rpl ?? 0, rpv: analysis.rpv ?? 0, rps: analysis.rps ?? 0, rows: [], isRanked, isLegacy, sourceStatus: isLegacy ? "legacy" : "ranked", analysis: timeline };
+  return { mapId: map.id, title: map.title, artist: map.artist, description: map.description, mapFileUrl: map.mapFileUrl, imageUrl: map.imageUrl, rating: map.rating, rankability, rankIndex: rank.index, rankName: rank.name, rankColor: rank.color, rangeMin: rank.rangeMin, rangeMax: rank.rangeMax, mapperName: map.mapperName, noteCount: map.noteCount, length: map.length, sourceBeatmapId: map.sourceBeatmapId, sourceUrl: map.sourceUrl, rpl: analysis.rpl ?? 0, rpv: analysis.rpv ?? 0, rps: analysis.rps ?? 0, rows: [], isRanked, isLegacy, sourceStatus, analysis: timeline };
 }
 
 export async function upsertRankedMapScore(mapId: string, userId: string, score: ScoreWrite) {
