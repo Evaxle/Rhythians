@@ -6,13 +6,11 @@ import { CATEGORIES, MAX_CATEGORY_LEVEL, type Category } from "@/lib/category-co
 import { ensureChallengeLevelTable, MAX_CHALLENGE_LEVEL, getUserChallengeLevel } from "@/lib/challenge";
 import { getUserCategoryLevels } from "@/lib/categories";
 import { ensureUserRbpSeason, getRbpProfile } from "@/lib/rbp";
-import { getUserPointOverrides, setUserPointOverride, type EditablePointSystem } from "@/lib/rhythia-mode-points";
 import { getReliableModePoints } from "@/lib/profile-points";
 import { randomUUID } from "node:crypto";
 
 export const dynamic = "force-dynamic";
 type Props = { params: Promise<{ id: string }> };
-const POINT_SYSTEMS = ["rpl", "rps", "rpv", "rbp"] as const;
 
 async function authorize() {
   const admin = await getSessionUser();
@@ -22,21 +20,14 @@ async function authorize() {
 }
 
 async function getPoints(id: string) {
-  const [mode, overrides, rbp] = await Promise.all([
+  const [mode, rbp] = await Promise.all([
     getReliableModePoints(id, { forceRefresh: true }).catch(() => null),
-    getUserPointOverrides(id).catch(() => new Map<EditablePointSystem, number>()),
     getRbpProfile(id).catch(() => null),
   ]);
-  const rpl = overrides.get("rpl") ?? mode?.points.lock ?? 0;
-  const rps = overrides.get("rps") ?? mode?.points.spin ?? 0;
-  const rpv = overrides.get("rpv") ?? mode?.points.vr ?? 0;
-  return {
-    rhp: rpl + rps + rpv,
-    rpl,
-    rps,
-    rpv,
-    rbp: rbp?.player.rbp ?? 0,
-  };
+  const rpl = mode?.points.lock ?? 0;
+  const rps = mode?.points.spin ?? 0;
+  const rpv = mode?.points.vr ?? 0;
+  return { rhp: rpl + rps + rpv, rpl, rps, rpv, rbp: rbp?.player.rbp ?? 0 };
 }
 
 export async function GET(_request: Request, { params }: Props) {
@@ -51,7 +42,7 @@ export async function GET(_request: Request, { params }: Props) {
     prisma.$queryRawUnsafe<Array<{ title: string; color: string; neon: boolean }>>('SELECT "title", "color", "neon" FROM "UserProfileTitle" WHERE "userId"=$1 LIMIT 1', id),
     getPoints(id),
   ]);
-  return NextResponse.json({ challengeLevel, categoryLevels, profileTitle: titleRows[0]?.title ?? "", profileTitleColor: titleRows[0]?.color ?? "#a78bfa", profileTitleNeon: titleRows[0]?.neon ?? false, canEditTitle: isOwner(auth.admin), points });
+  return NextResponse.json({ challengeLevel, categoryLevels, profileTitle: titleRows[0]?.title ?? "", profileTitleColor: titleRows[0]?.color ?? "#a78bfa", profileTitleNeon: titleRows[0]?.neon ?? false, canEditTitle: isOwner(auth.admin), points, rankingPointsReadOnly: true });
 }
 
 export async function PATCH(request: Request, { params }: Props) {
@@ -64,10 +55,13 @@ export async function PATCH(request: Request, { params }: Props) {
   if (!target) return NextResponse.json({ error: "User not found." }, { status: 404 });
 
   const hasLevels = body?.challengeLevel !== undefined || body?.categoryLevels !== undefined;
-  const hasPoints = body?.points && typeof body.points === "object";
+  const requestedPoints = body?.points && typeof body.points === "object" ? body.points : {};
+  if (["rpl", "rps", "rpv", "rhp"].some((key) => key in requestedPoints)) {
+    return NextResponse.json({ error: "RPL, RPV, RPS and RHP are read-only. They are earned only from passing analyzed maps." }, { status: 400 });
+  }
+
   let challengeLevel: number | undefined;
   let categoryLevels: Array<{ category: Category; level: number }> | undefined;
-
   if (hasLevels) {
     challengeLevel = Number(body?.challengeLevel);
     if (!Number.isInteger(challengeLevel) || challengeLevel < 0 || challengeLevel > MAX_CHALLENGE_LEVEL) return NextResponse.json({ error: `Main challenge level must be between 0 and ${MAX_CHALLENGE_LEVEL}.` }, { status: 400 });
@@ -79,17 +73,13 @@ export async function PATCH(request: Request, { params }: Props) {
     }
   }
 
-  const pointChanges: Partial<Record<EditablePointSystem | "rbp", number>> = {};
-  if (hasPoints) {
-    for (const system of POINT_SYSTEMS) {
-      if (!(system in (body?.points ?? {}))) continue;
-      const value = Number(body?.points?.[system]);
-      if (!Number.isFinite(value) || value < 0 || value > 1000000) return NextResponse.json({ error: `${system.toUpperCase()} must be between 0 and 1000000.` }, { status: 400 });
-      pointChanges[system] = Math.round(value);
-    }
+  let rbpValue: number | undefined;
+  if ("rbp" in requestedPoints) {
+    const value = Number(requestedPoints.rbp);
+    if (!Number.isFinite(value) || value < 0 || value > 1000000) return NextResponse.json({ error: "RBP must be between 0 and 1000000." }, { status: 400 });
+    rbpValue = Math.round(value);
   }
-
-  if (!hasLevels && !Object.keys(pointChanges).length) return NextResponse.json({ error: "Nothing to update." }, { status: 400 });
+  if (!hasLevels && rbpValue === undefined) return NextResponse.json({ error: "Nothing to update." }, { status: 400 });
 
   if (hasLevels) {
     await ensureChallengeLevelTable();
@@ -100,29 +90,13 @@ export async function PATCH(request: Request, { params }: Props) {
     });
   }
 
-  const modePointChanged = pointChanges.rpl !== undefined || pointChanges.rps !== undefined || pointChanges.rpv !== undefined;
-  let derivedRhp: number | undefined;
-  if (modePointChanged) {
-    const current = await getPoints(id);
-    const rpl = pointChanges.rpl ?? current.rpl;
-    const rps = pointChanges.rps ?? current.rps;
-    const rpv = pointChanges.rpv ?? current.rpv;
-    derivedRhp = rpl + rps + rpv;
-
-    await setUserPointOverride(id, "rpl", rpl);
-    await setUserPointOverride(id, "rps", rps);
-    await setUserPointOverride(id, "rpv", rpv);
-    await setUserPointOverride(id, "rhp", derivedRhp);
-    await prisma.user.update({ where: { id }, data: { rhp: derivedRhp } });
-  }
-
-  if (pointChanges.rbp !== undefined) {
+  if (rbpValue !== undefined) {
     const rbp = await ensureUserRbpSeason(id);
     if (!rbp) return NextResponse.json({ error: "The current battle season is unavailable." }, { status: 503 });
-    await prisma.$executeRawUnsafe('UPDATE "RbpUserSeason" SET "rbp"=$1,"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=$2', pointChanges.rbp, rbp.player.id);
+    await prisma.$executeRawUnsafe('UPDATE "RbpUserSeason" SET "rbp"=$1,"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=$2', rbpValue, rbp.player.id);
   }
 
   const points = await getPoints(id);
-  await prisma.moderationAction.create({ data: { actorId: admin.id, action: "user_progression_edited", targetType: "user", targetId: id, metadata: { challengeLevel, categoryLevels, points: pointChanges, derivedRhp } } });
-  return NextResponse.json({ challengeLevel, categoryLevels, points });
+  await prisma.moderationAction.create({ data: { actorId: admin.id, action: "user_progression_edited", targetType: "user", targetId: id, metadata: { challengeLevel, categoryLevels, rbp: rbpValue } } });
+  return NextResponse.json({ challengeLevel, categoryLevels, points, rankingPointsReadOnly: true });
 }

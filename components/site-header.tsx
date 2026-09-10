@@ -26,7 +26,6 @@ import { canAccessAdmin } from "@/lib/admin-access";
 import { NotificationsBell } from "@/components/notifications-bell";
 import { ProfileMenu } from "@/components/profile-menu";
 import { UnreadIndicator } from "@/components/messages/unread-indicator";
-import { version } from "@/package.json";
 import type { getSessionUser } from "@/lib/auth";
 
 type SessionUser = NonNullable<Awaited<ReturnType<typeof getSessionUser>>>;
@@ -68,7 +67,7 @@ export async function SiteHeader({ user }: { user: SessionUser | null }) {
           </span>
           <span className="site-brand-text hidden text-[15px] font-bold tracking-tight text-white sm:block sm:text-base">Rhythians</span>
           <span className="site-brand-meta hidden rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-muted xl:inline">Beta</span>
-          <span className="site-brand-meta hidden text-[10px] font-medium text-muted 2xl:inline">v{version}</span>
+          <span className="site-brand-meta hidden text-[10px] font-medium text-muted 2xl:inline">v7</span>
         </Link>
 
         <nav className="site-desktop-nav hidden min-w-0 flex-1 items-center justify-center gap-1 xl:flex" aria-label="Primary navigation">

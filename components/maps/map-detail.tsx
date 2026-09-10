@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Archive, Download, ExternalLink, Trophy } from "lucide-react";
+import { Archive, Download, ExternalLink, ShieldCheck, ShieldX, Trophy } from "lucide-react";
 import { getRankInfo, mapTierForRating, RANKS, type RankInfo } from "@/lib/ranks";
 import { RankIcon } from "@/components/rank-icon";
 import { MapAnalysisTimeline } from "@/components/maps/map-analysis-timeline";
@@ -22,7 +22,7 @@ export function MapDetail({ map, userRank: _userRank, currentUserId }: Props) {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!map.isRanked) return;
+    if (!map.pointEligible) return;
     const controller = new AbortController();
     setLoading(true);
     setError("");
@@ -38,7 +38,7 @@ export function MapDetail({ map, userRank: _userRank, currentUserId }: Props) {
       })
       .finally(() => setLoading(false));
     return () => controller.abort();
-  }, [map.isRanked, map.mapId]);
+  }, [map.pointEligible, map.mapId]);
 
   const length = useMemo(() => lengthLabel(data.length), [data.length]);
   const downloadUrl = `/api/maps/download?id=${encodeURIComponent(data.mapId)}`;
@@ -50,49 +50,21 @@ export function MapDetail({ map, userRank: _userRank, currentUserId }: Props) {
     <section className="overflow-hidden rounded-3xl border border-border bg-surface/95 shadow-glow">
       {data.imageUrl && <img src={data.imageUrl} alt="" className="h-64 w-full object-cover opacity-80" />}
       <div className="p-6 sm:p-8">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0">
-            <div className="flex items-center gap-3"><RankIcon rank={rank} size={44} /><p className="text-sm uppercase tracking-[0.2em]" style={{ color: data.rankColor }}>{mapDifficulty}{data.isLegacy ? " · Legacy" : ""}</p></div>
-            <h1 className="mt-2 text-3xl font-semibold text-white sm:text-4xl">{data.title}</h1>
-            <p className="mt-2 text-sm text-muted">{data.artist ?? "Unknown artist"} · Mapped by {data.mapperName ?? "Unknown"}</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <a href={downloadUrl} className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-accent2"><Download size={15} /> Download map</a>
-            {data.sourceUrl && <a href={data.sourceUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition hover:border-accent/40"><ExternalLink size={15} /> View on Rhythia</a>}
-          </div>
-        </div>
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between"><div className="min-w-0"><div className="flex items-center gap-3"><RankIcon rank={rank} size={44} /><p className="text-sm uppercase tracking-[0.2em]" style={{ color: data.rankColor }}>{mapDifficulty}{data.isLegacy ? " · Legacy" : ""}</p></div><h1 className="mt-2 text-3xl font-semibold text-white sm:text-4xl">{data.title}</h1><p className="mt-2 text-sm text-muted">{data.artist ?? "Unknown artist"} · Mapped by {data.mapperName ?? "Unknown"}</p></div><div className="flex flex-wrap gap-2"><a href={downloadUrl} className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-accent2"><Download size={15} /> Download map</a>{data.sourceUrl && <a href={data.sourceUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition hover:border-accent/40"><ExternalLink size={15} /> View on Rhythia</a>}</div></div>
 
-        <div className={`mt-6 grid gap-3 ${data.isRanked ? "sm:grid-cols-2 lg:grid-cols-5" : "sm:grid-cols-3"}`}>
-          <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">Rating</p><p className="mt-1 text-xl font-semibold" style={{ color: data.rankColor }}>{data.rating.toFixed(2)}</p></div>
-          {data.isRanked && <><div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">RPL</p><p className="mt-1 text-xl font-semibold text-white">{data.rpl}</p></div><div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">RPV</p><p className="mt-1 text-xl font-semibold text-white">{data.rpv}</p></div><div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">RPS</p><p className="mt-1 text-xl font-semibold text-white">{data.rps}</p></div></>}
-          {data.isLegacy && <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">Archive status</p><p className="mt-1 flex items-center gap-2 text-xl font-semibold text-white"><Archive size={18} /> Legacy</p></div>}
+        <div className={`mt-6 grid gap-3 ${data.pointEligible ? "sm:grid-cols-2 lg:grid-cols-6" : "sm:grid-cols-2 lg:grid-cols-4"}`}>
+          <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">Difficulty</p><p className="mt-1 text-xl font-semibold" style={{ color: data.rankColor }}>{data.rating.toFixed(2)}</p></div>
+          <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">Rankability</p><p className="mt-1 text-xl font-semibold text-white">{data.analysis.rankabilityScore.toFixed(2)}/5</p></div>
+          {data.pointEligible && <><div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">RPL</p><p className="mt-1 text-xl font-semibold text-white">{data.rpl}</p></div><div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">RPV</p><p className="mt-1 text-xl font-semibold text-white">{data.rpv}</p></div><div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">RPS</p><p className="mt-1 text-xl font-semibold text-white">{data.rps}</p></div></>}
           <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">Length</p><p className="mt-1 text-xl font-semibold text-white">{length ?? "—"}</p></div>
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-2 text-xs text-muted">
-          <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">{mapDifficulty}</span>
-          <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">Rank range {data.rangeMin.toFixed(2)}–{data.rankIndex === RANKS.length - 1 ? `${data.rangeMin.toFixed(2)}+` : data.rangeMax.toFixed(2)}</span>
-          {data.noteCount != null && <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">{data.noteCount.toLocaleString()} notes</span>}
-          {data.sourceBeatmapId != null && <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">Rhythia map #{data.sourceBeatmapId}</span>}
-          <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">Analyzer v{data.analysis.analyzerVersion}</span>
-          {data.isRanked && <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">Leaderboard visibility follows your current rank without deleting the stored completion</span>}
-        </div>
+        <div className="mt-6 flex flex-wrap gap-2 text-xs text-muted"><span className="rounded-full border border-border bg-background/60 px-3 py-1.5">{mapDifficulty}</span><span className="rounded-full border border-border bg-background/60 px-3 py-1.5">Rank range {data.rangeMin.toFixed(2)}–{data.rankIndex === RANKS.length - 1 ? `${data.rangeMin.toFixed(2)}+` : data.rangeMax.toFixed(2)}</span>{data.noteCount != null && <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">{data.noteCount.toLocaleString()} notes</span>}{data.sourceBeatmapId != null && <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">Rhythia map #{data.sourceBeatmapId}</span>}<span className="rounded-full border border-border bg-background/60 px-3 py-1.5">Difficulty v{data.analysis.analyzerVersion}</span><span className="rounded-full border border-border bg-background/60 px-3 py-1.5">Rankability v{data.analysis.rankabilityVersion}</span>{data.isLegacy && <span className="inline-flex items-center gap-1 rounded-full border border-border bg-background/60 px-3 py-1.5"><Archive size={12}/> Legacy</span>}<span className={`inline-flex items-center gap-1 rounded-full border px-3 py-1.5 ${data.pointEligible ? "border-emerald-400/20 text-emerald-200" : "border-white/10 text-muted"}`}>{data.pointEligible ? <ShieldCheck size={12}/> : <ShieldX size={12}/>} {data.pointEligible ? "Points enabled" : "Points disabled"}</span></div>
       </div>
     </section>
 
     <MapAnalysisTimeline analysis={data.analysis} isLegacy={data.isLegacy} />
 
-    {data.isRanked ? <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow sm:p-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div><p className="flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-accent"><Trophy size={16} /> Map leaderboard</p><h2 className="mt-1 flex items-center gap-3 text-2xl font-semibold text-white"><RankIcon rank={rank} size={40} />{mapDifficulty} leaderboard</h2><p className="mt-2 text-sm text-muted">Only players currently in this map&apos;s rank appear. Moving ranks hides the leaderboard entry while preserving the score and completion.</p></div>
-        <Link href="/maps" className="text-sm font-semibold text-accent hover:text-white">Back to ranked maps</Link>
-      </div>
-      <div className="mt-4 overflow-hidden rounded-2xl border border-border">
-        {loading ? <p className="p-8 text-sm text-muted">Loading leaderboard...</p> : error ? <p className="p-8 text-sm text-red-300">{error}</p> : data.rows.length === 0 ? <p className="p-8 text-sm text-muted">No current-rank scores are listed for this map.</p> : data.rows.map((row) => {
-          const current = row.userId === currentUserId;
-          return <div key={row.userId} className={`grid grid-cols-[2.5rem_minmax(0,1fr)_6rem_5rem] items-center gap-3 border-b border-border px-4 py-3 last:border-0 ${current ? "bg-accent/10" : "bg-background/60"}`}><span className="text-sm font-bold text-muted">{row.position}</span><div className="flex min-w-0 items-center gap-3"><RankIcon rank={row.rankInfo} size={38} /><div className="min-w-0"><Link href={`/profile/${row.profileHandle}`} className={`truncate text-sm font-semibold hover:text-accent ${current ? "text-accent" : "text-white"}`}>{row.displayName ?? row.username}{current ? " (you)" : ""}</Link><p className="text-xs text-muted">{row.rankInfo.isExpert ? "Expert" : `${row.rankInfo.name} ${row.rankInfo.tier}`}</p></div></div><span className="text-right text-sm text-muted">{row.accuracy != null ? `${row.accuracy.toFixed(2)}%` : "—"}</span><span className="text-right text-sm font-semibold text-white">{row.points}</span></div>;
-        })}
-      </div>
-    </section> : <div className="flex justify-end"><Link href="/maps" className="text-sm font-semibold text-accent hover:text-white">Back to maps</Link></div>}
+    {data.pointEligible ? <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow sm:p-8"><div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p className="flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-accent"><Trophy size={16} /> Map leaderboard</p><h2 className="mt-1 flex items-center gap-3 text-2xl font-semibold text-white"><RankIcon rank={rank} size={40} />{mapDifficulty} leaderboard</h2><p className="mt-2 text-sm text-muted">This {data.isLegacy ? "Legacy" : "Ranked"} map passed the competitive-quality gate. Only players currently in this map&apos;s rank appear here; stored passes remain intact when a player changes rank.</p></div><Link href="/maps" className="text-sm font-semibold text-accent hover:text-white">Back to maps</Link></div><div className="mt-4 overflow-hidden rounded-2xl border border-border">{loading ? <p className="p-8 text-sm text-muted">Loading leaderboard...</p> : error ? <p className="p-8 text-sm text-red-300">{error}</p> : data.rows.length === 0 ? <p className="p-8 text-sm text-muted">No current-rank scores are listed for this map.</p> : data.rows.map((row) => { const current = row.userId === currentUserId; return <div key={row.userId} className={`grid grid-cols-[2.5rem_minmax(0,1fr)_6rem_5rem] items-center gap-3 border-b border-border px-4 py-3 last:border-0 ${current ? "bg-accent/10" : "bg-background/60"}`}><span className="text-sm font-bold text-muted">{row.position}</span><div className="flex min-w-0 items-center gap-3"><RankIcon rank={row.rankInfo} size={38} /><div className="min-w-0"><Link href={`/profile/${row.profileHandle}`} className={`truncate text-sm font-semibold hover:text-accent ${current ? "text-accent" : "text-white"}`}>{row.displayName ?? row.username}{current ? " (you)" : ""}</Link><p className="text-xs text-muted">{row.rankInfo.isExpert ? "Expert" : `${row.rankInfo.name} ${row.rankInfo.tier}`}</p></div></div><span className="text-right text-sm text-muted">{row.accuracy != null ? `${row.accuracy.toFixed(2)}%` : "—"}</span><span className="text-right text-sm font-semibold text-white">{row.points}</span></div>; })}</div></section> : <div className="flex justify-end"><Link href="/maps" className="text-sm font-semibold text-accent hover:text-white">Back to maps</Link></div>}
   </div>;
 }
