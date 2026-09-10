@@ -26,7 +26,7 @@ export async function getRankedMapDetail(mapId: string): Promise<RankedMapLeader
 
 export async function upsertRankedMapScore(mapId: string, userId: string, score: ScoreWrite) {
   const detail = await getRankedMapDetail(mapId);
-  if (!detail || detail.rankIndex !== score.rankIndex) return false;
+  if (!detail) return false;
   const existing = await prisma.challengeMapCompletion.findUnique({ where: { challengeMapId_userId: { challengeMapId: detail.mapId, userId } } });
   const shouldReplace = !existing || score.passed !== existing.passed ? score.passed : score.points > existing.points || score.points === existing.points && (score.accuracy ?? -1) > (existing.accuracy ?? -1);
   if (!shouldReplace) return false;
