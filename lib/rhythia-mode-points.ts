@@ -57,8 +57,6 @@ type ScorePayload = {
 type ScoreBucket = { name: string; scores: ScorePayload[] };
 type AnalyzedMapRow = { id: string; title: string; sourceBeatmapId: number | null; rating: number; rpl: number; rpv: number; rps: number; speedProfiles: unknown; patternSegments: unknown };
 
-const RHP_MULTI_CLEAR_WEIGHTS = [1, 0.55, 0.35] as const;
-
 function clamp(value: number, min = 0, max = 1) { return Math.min(max, Math.max(min, value)); }
 function normalize(value: string | null | undefined) { return (value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
 function normalizeSourceId(value: number) { return Number.isSafeInteger(value) && value > 0x7fffffff && value <= 0xffffffff ? value - 0x100000000 : value; }
@@ -267,24 +265,17 @@ export async function setUserPointOverride(userId: string, system: EditablePoint
 }
 
 export async function calculateStoredTotals(userId: string) {
-  const rows = await prisma.rhythiaModeScore.findMany({ where: { userId }, select: { mapKey: true, cameraMode: true, points: true } });
+  const rows = await prisma.rhythiaModeScore.findMany({ where: { userId }, select: { cameraMode: true, points: true } });
   const raw: ModePoints = { lock: 0, spin: 0, vr: 0 };
-  const byMap = new Map<string, number[]>();
   for (const row of rows) {
     const mode = row.cameraMode as ModeKey;
-    const points = Math.max(0, Number(row.points) || 0);
-    raw[mode] += points;
-    const values = byMap.get(row.mapKey) ?? [];
-    values.push(points);
-    byMap.set(row.mapKey, values);
+    raw[mode] += Math.max(0, Number(row.points) || 0);
   }
-  let earnedRhp = 0;
-  for (const values of byMap.values()) {
-    values.sort((a, b) => b - a);
-    earnedRhp += values.slice(0, 3).reduce((sum, value, index) => sum + value * RHP_MULTI_CLEAR_WEIGHTS[index], 0);
-  }
-  earnedRhp = Math.round(earnedRhp);
-  return { rpl: raw.lock, rps: raw.spin, rpv: raw.vr, rhp: earnedRhp, raw, earnedRhp };
+  const rpl = Math.round(raw.lock);
+  const rps = Math.round(raw.spin);
+  const rpv = Math.round(raw.vr);
+  const earnedRhp = rpl + rps + rpv;
+  return { rpl, rps, rpv, rhp: earnedRhp, raw: { lock: rpl, spin: rps, vr: rpv }, earnedRhp };
 }
 
 export async function reconcileUserRankPoints(userId: string) {
