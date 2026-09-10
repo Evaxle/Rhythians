@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Activity, CheckCircle2, Glasses, LockKeyhole, Search, Sparkles, XCircle } from "lucide-react";
 import type { RankInfo } from "@/lib/ranks";
 import { getRankInfo, isMapInRankRange, mapTierForRating, RANKS } from "@/lib/ranks";
@@ -17,7 +18,7 @@ const MODE_META = {
   vr: { short: "RPV", label: "VR", icon: Glasses },
 } as const;
 type ModeKey = keyof typeof MODE_META;
-type MapEntry = { id: string; title: string; artist: string | null; description: string | null; mapFileUrl: string; imageUrl: string | null; rating: number | null; rankIndex: number; rankName: string; rankColor: string; mapperName: string | null; noteCount: number | null; length: number | null; completion: { passed: boolean; points: number } | null; hasScore: boolean; submittedBy: { displayName: string | null; username: string | null; profileHandle: string | null } | null; reviewedBy: { displayName: string | null; username: string | null; profileHandle: string | null } | null; isRanked: boolean; isLegacy: boolean };
+type MapEntry = { id: string; title: string; artist: string | null; description: string | null; mapFileUrl: string; imageUrl: string | null; rating: number | null; rankIndex: number; rankName: string; rankColor: string; mapperName: string | null; noteCount: number | null; length: number | null; completion: { passed: boolean; points: number } | null; hasScore: boolean; submittedBy: { displayName: string | null; username: string | null; profileHandle: string | null } | null; reviewedBy: { displayName: string | null; username: string | null; profileHandle: string | null } | null; isRanked: boolean; isLegacy: boolean; maxRewards: ModePoints | null };
 type Props = { maps: MapEntry[]; rankInfo: RankInfo; userRhp: number; currentUserId: string | null; showLegacy?: boolean; onShowLegacyChange?: (value: boolean) => void; modeScores: ModeScoreMap; modeTab?: MapModeTab };
 
 function titleKey(value: string) { return value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
@@ -29,15 +30,16 @@ function mapRankLabel(rating: number | null, rankIndex: number, fallback: string
   return rank.index === RANKS.length - 1 ? "Expert" : `${rank.name} ${mapTierForRating(rating)}`;
 }
 
-function ModeChip({ mode, score, eligible, active }: { mode: ModeKey; score: number; eligible: boolean; active: boolean }) {
+function ModeChip({ mode, score, eligible, active, maxReward }: { mode: ModeKey; score: number; eligible: boolean; active: boolean; maxReward: number | null }) {
   const meta = MODE_META[mode]; const Icon = meta.icon; const completed = score > 0;
   return <div className={`rounded-xl border px-2.5 py-2 ${eligible ? completed ? "border-emerald-400/25 bg-emerald-400/[0.08]" : active ? "border-accent/35 bg-accent/[0.08]" : "border-white/10 bg-white/[0.025]" : "border-rose-400/15 bg-rose-400/[0.04]"}`}>
     <div className="flex items-center gap-1.5"><Icon size={12} className={completed ? "text-emerald-300" : eligible ? "text-accent" : "text-rose-300"} /><span className="text-[10px] font-black text-white">{meta.short}</span>{completed ? <CheckCircle2 size={12} className="ml-auto text-emerald-300" /> : eligible ? <span className="ml-auto text-[9px] font-bold text-accent">OK</span> : <XCircle size={12} className="ml-auto text-rose-300" />}</div>
-    <p className="mt-1 text-[9px] text-muted">{eligible ? completed ? `${score} pts` : "eligible from analysis" : "not eligible"}</p>
+    <p className="mt-1 text-[9px] text-muted">{eligible ? completed ? `${score} earned${maxReward != null ? ` · max ${maxReward}` : ""}` : maxReward != null ? `up to ${maxReward}` : "eligible from analysis" : "not eligible"}</p>
   </div>;
 }
 
 export function MapsBrowser({ maps, rankInfo, userRhp, showLegacy: externalShowLegacy, modeScores, modeTab = "all" }: Props) {
+  const router = useRouter();
   const [showAll, setShowAll] = useState(false);
   const [showLegacy, setShowLegacy] = useState(externalShowLegacy ?? false);
   const [rankOverride, setRankOverride] = useState<number | null>(null);
@@ -86,7 +88,22 @@ export function MapsBrowser({ maps, rankInfo, userRhp, showLegacy: externalShowL
   const visibleMaps = filtered.slice(0, visibleCount);
   const mapCount = maps.filter((map) => modeTab === "legacy" ? map.isLegacy && (showAll || visibleForBrowseRank(map)) : showAll ? map.isRanked : visibleForBrowseRank(map)).length;
 
-  async function checkMap(id: string) { setBusyId(id); setMessages((v) => ({ ...v, [id]: "Checking Lock, Spin, and VR passes..." })); try { const response = await fetch("/api/maps/check", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mapId: id }) }); const data = await response.json(); if (!response.ok) throw new Error(data.error ?? "Unable to check your score."); const found = Array.isArray(data.modes) ? data.modes : []; setMessages((v) => ({ ...v, [id]: found.length ? `Passes found: ${found.map((entry: any) => `${entry.label} +${entry.points} ${entry.short}`).join(" · ")}.` : "No new qualifying pass was found." })); } catch (error) { setMessages((v) => ({ ...v, [id]: error instanceof Error ? error.message : "Unable to check your score." })); } finally { setBusyId(""); } }
+  async function checkMap(id: string) {
+    setBusyId(id);
+    setMessages((v) => ({ ...v, [id]: "Checking Lock, Spin, and VR passes..." }));
+    try {
+      const response = await fetch("/api/maps/check", { method: "POST", headers: { "Content-Type": "application/json" }, cache: "no-store", body: JSON.stringify({ mapId: id }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? "Unable to check your score.");
+      const found = Array.isArray(data.modes) ? data.modes : [];
+      setMessages((v) => ({ ...v, [id]: found.length ? `Passes found: ${found.map((entry: { label: string; points: number; short: string }) => `${entry.label} +${entry.points} ${entry.short}`).join(" · ")}.` : "No qualifying pass for this ranked map was found in your Rhythia scores." }));
+      router.refresh();
+    } catch (error) {
+      setMessages((v) => ({ ...v, [id]: error instanceof Error ? error.message : "Unable to check your score." }));
+    } finally {
+      setBusyId("");
+    }
+  }
 
   return <div className="space-y-5">
     <section className="rounded-[1.8rem] border border-white/10 bg-gradient-to-br from-white/[0.055] to-black/10 p-5 shadow-glow">
@@ -114,7 +131,8 @@ export function MapsBrowser({ maps, rankInfo, userRhp, showLegacy: externalShowL
       return <article key={map.id} className="group flex min-h-[410px] flex-col overflow-hidden rounded-[1.75rem] border bg-gradient-to-br from-white/[0.045] to-black/15 shadow-glow transition hover:-translate-y-1" style={{ borderColor: eligible ? `${displayRankColor}55` : "rgba(244,63,94,.22)" }}>
         {map.imageUrl && <Link href={`/maps/${map.id}`} className="block h-28 overflow-hidden border-b border-white/10 bg-black/20"><img src={map.imageUrl} alt="" loading="lazy" className="h-full w-full object-cover opacity-80 transition duration-300 group-hover:scale-105 group-hover:opacity-100" /></Link>}
         <div className="flex flex-1 flex-col p-4"><Link href={`/maps/${map.id}`}><div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="truncate text-[11px] text-muted">{map.artist ?? "Unknown artist"}</p><h3 className="mt-1 line-clamp-2 text-lg font-bold text-white group-hover:text-accent">{map.title}</h3><p className="mt-1 truncate text-[11px] text-muted">{map.mapperName ?? map.submittedBy?.displayName ?? map.submittedBy?.username ?? "Unknown mapper"}</p></div>{map.rating != null && <div className="shrink-0 text-right"><RankIcon rank={displayRankInfo} size={36} /><span className="mt-1 inline-block text-[10px] font-black" style={{ color: displayRankColor }}>{map.rating.toFixed(2)}</span></div>}</div>
-        <div className="mt-4 grid grid-cols-3 gap-1.5"><ModeChip mode="lock" score={mapScores.lock} eligible={eligibleFor(map, "lock")} active={modeTab === "lock"} /><ModeChip mode="spin" score={mapScores.spin} eligible={eligibleFor(map, "spin")} active={modeTab === "spin"} /><ModeChip mode="vr" score={mapScores.vr} eligible={eligibleFor(map, "vr")} active={modeTab === "vr"} /></div>
+        {map.isRanked && map.maxRewards && <div className="mt-3 rounded-xl border border-accent/20 bg-accent/[0.055] px-3 py-2"><p className="text-[9px] font-bold uppercase tracking-[0.12em] text-muted">Balanced pass maximum</p><div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-[10px] font-bold text-white"><span>🔒 {map.maxRewards.lock} RPL</span><span>🌀 {map.maxRewards.spin} RPS</span><span>🥽 {map.maxRewards.vr} RPV</span></div></div>}
+        <div className="mt-4 grid grid-cols-3 gap-1.5"><ModeChip mode="lock" score={mapScores.lock} eligible={eligibleFor(map, "lock")} active={modeTab === "lock"} maxReward={map.maxRewards?.lock ?? null} /><ModeChip mode="spin" score={mapScores.spin} eligible={eligibleFor(map, "spin")} active={modeTab === "spin"} maxReward={map.maxRewards?.spin ?? null} /><ModeChip mode="vr" score={mapScores.vr} eligible={eligibleFor(map, "vr")} active={modeTab === "vr"} maxReward={map.maxRewards?.vr ?? null} /></div>
         <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] text-muted">{map.noteCount != null && <span className="rounded-full border border-white/8 bg-black/10 px-2 py-1">{map.noteCount.toLocaleString()} notes</span>}{duration && <span className="rounded-full border border-white/8 bg-black/10 px-2 py-1">{duration}</span>}<span className="rounded-full border border-white/8 bg-black/10 px-2 py-1" style={{ color: displayRankColor }}>{map.isLegacy ? `${mapDifficulty} · Legacy` : mapDifficulty}</span></div></Link>
         <div className="mt-auto pt-4"><p className="text-[10px] leading-4 text-muted">{map.isLegacy ? "Legacy archive · analysis reference only." : eligible ? activeMode ? `Eligible for ${MODE_META[activeMode].short}.` : "Eligible for your current overall rank." : "Browse-only: outside your current earning rank."}</p><div className="mt-2 flex flex-wrap justify-end gap-2"><Link href={`/maps/${map.id}`} className="inline-flex items-center gap-1.5 rounded-xl border border-accent/30 bg-accent/[0.07] px-3 py-2 text-[11px] font-bold text-white transition hover:bg-accent/[0.13]"><Activity size={12} /> View analysis</Link>{map.isRanked && <button type="button" onClick={() => void checkMap(map.id)} disabled={busyId === map.id} className="shrink-0 rounded-xl bg-accent px-3 py-2 text-[11px] font-bold text-white disabled:opacity-50">{busyId === map.id ? "Checking…" : "Check"}</button>}</div></div>{message && <p className="mt-3 rounded-xl border border-accent/25 bg-accent/[0.07] p-3 text-[11px] leading-5 text-accent">{message}</p>}</div>
       </article>;
