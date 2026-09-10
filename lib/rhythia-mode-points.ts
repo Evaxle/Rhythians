@@ -20,7 +20,7 @@ type ScorePayload = {
   mapId?: number | null;
   map_id?: number | null;
   beatmapHash?: string | null;
-  passed?: boolean | null;
+  passed?: boolean | number | string | null;
   misses?: number | null;
   beatmapNotes?: number | null;
   beatmap_notes?: number | null;
@@ -53,9 +53,7 @@ type ScorePayload = {
   modifiers_json?: unknown;
   settings?: unknown;
 };
-type ScoreBucketName = "lastDay" | "top" | "vrTop" | "vrRecent" | "recent" | "scores" | "passed" | "items" | "results" | "data";
-type ScoreBucket = { name: ScoreBucketName; scores: ScorePayload[] };
-type ScoreResponse = Partial<Record<Exclude<ScoreBucketName, "items" | "results" | "data">, ScorePayload[]>> & { items?: ScorePayload[]; results?: ScorePayload[]; data?: ScorePayload[] | { scores?: ScorePayload[] } };
+type ScoreBucket = { name: string; scores: ScorePayload[] };
 type AnalyzedMapRow = { id: string; title: string; sourceBeatmapId: number | null; rating: number; rpl: number; rpv: number; rps: number; speedProfiles: unknown };
 
 const RHP_MULTI_CLEAR_WEIGHTS = [1, 0.55, 0.35] as const;
@@ -65,12 +63,23 @@ function normalizeSourceId(value: number) { return Number.isSafeInteger(value) &
 function text(value: unknown) {
   if (Array.isArray(value)) return value.map(String).join(" ");
   if (value && typeof value === "object") return Object.entries(value as Record<string, unknown>).map(([key, item]) => `${key} ${String(item)}`).join(" ");
-  return typeof value === "string" ? value : "";
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return String(value);
+  return "";
 }
 function enabled(value: unknown) {
   if (value === true || value === 1) return true;
   if (typeof value !== "string") return false;
   return ["1", "true", "yes", "on", "enabled", "spin", "vr"].includes(value.trim().toLowerCase());
+}
+function scorePassed(score: ScorePayload) {
+  if (score.passed === true || score.passed === 1) return true;
+  if (score.passed === false || score.passed === 0) return false;
+  if (typeof score.passed === "string") {
+    const value = score.passed.trim().toLowerCase();
+    if (["true", "1", "passed", "pass", "yes"].includes(value)) return true;
+    if (["false", "0", "failed", "fail", "no"].includes(value)) return false;
+  }
+  return typeof score.accuracy === "number" && Number.isFinite(score.accuracy) && score.accuracy > 0;
 }
 function scoreTitle(score: ScorePayload) { return score.beatmapTitle ?? score.beatmap_title ?? score.title ?? ""; }
 function scoreSourceId(score: ScorePayload) { return score.beatmapId ?? score.beatmap_id ?? score.mapId ?? score.map_id ?? null; }
@@ -87,44 +96,42 @@ function parseProfiles(value: unknown): MapSpeedProfile[] {
   if (typeof value === "string") { try { const parsed = JSON.parse(value); return Array.isArray(parsed) ? parsed as MapSpeedProfile[] : []; } catch { return []; } }
   return [];
 }
-function modeDetails(score: ScorePayload, sourceBucket: ScoreBucketName) {
+function modeDetails(score: ScorePayload, sourceBucket: string) {
   const explicit = [score.cameraMode, score.camera_mode, score.gameMode, score.game_mode, score.mode, score.playMode, score.play_mode, score.camera, score.camera_mode_name, score.play_mode_name].map(text).join(" ").toLowerCase();
   const modifiers = [score.mods, score.modifiers, score.modifiers_json, score.settings].map(text).join(" ").toLowerCase();
-  if (explicit.includes("vr") || explicit.includes("virtual reality")) return { mode: "vr" as const, confidence: 3 };
-  if (explicit.includes("spin")) return { mode: "spin" as const, confidence: 3 };
-  if (explicit.includes("lock")) return { mode: "lock" as const, confidence: 3 };
-  if (enabled(score.vr) || enabled(score.isVr) || enabled(score.is_vr) || /(^|[^a-z])vr([^a-z]|$)/i.test(modifiers) || /virtual\s*reality/i.test(modifiers)) return { mode: "vr" as const, confidence: 2 };
-  if (enabled(score.spin) || enabled(score.isSpin) || enabled(score.is_spin) || enabled(score.spinMode) || enabled(score.spin_mode) || /(^|[^a-z])spin([^a-z]|$)/i.test(modifiers)) return { mode: "spin" as const, confidence: 2 };
-  if (sourceBucket === "vrTop" || sourceBucket === "vrRecent") return { mode: "vr" as const, confidence: 1 };
-  return { mode: "lock" as const, confidence: 0 };
+  const bucket = sourceBucket.toLowerCase();
+  if (explicit.includes("vr") || explicit.includes("virtual reality")) return { mode: "vr" as const, confidence: 4 };
+  if (explicit.includes("spin")) return { mode: "spin" as const, confidence: 4 };
+  if (explicit.includes("lock")) return { mode: "lock" as const, confidence: 4 };
+  if (enabled(score.vr) || enabled(score.isVr) || enabled(score.is_vr) || /(^|[^a-z])vr([^a-z]|$)/i.test(modifiers) || /virtual\s*reality/i.test(modifiers)) return { mode: "vr" as const, confidence: 3 };
+  if (enabled(score.spin) || enabled(score.isSpin) || enabled(score.is_spin) || enabled(score.spinMode) || enabled(score.spin_mode) || /(^|[^a-z])spin([^a-z]|$)/i.test(modifiers)) return { mode: "spin" as const, confidence: 3 };
+  if (bucket.includes("spin")) return { mode: "spin" as const, confidence: 2 };
+  if (bucket.includes("vr")) return { mode: "vr" as const, confidence: 2 };
+  return { mode: "lock" as const, confidence: 1 };
+}
+function scoreBuckets(value: unknown, path = "root", result: ScoreBucket[] = []) {
+  if (!value || typeof value !== "object") return result;
+  if (Array.isArray(value)) {
+    const scores = value.filter((item): item is ScorePayload => Boolean(item) && typeof item === "object" && typeof (item as Record<string, unknown>).id === "number");
+    if (scores.length) result.push({ name: path, scores });
+    return result;
+  }
+  for (const [key, nested] of Object.entries(value as Record<string, unknown>)) scoreBuckets(nested, `${path}.${key}`, result);
+  return result;
 }
 
-export function scoreCameraMode(score: ScorePayload, sourceBucket: ScoreBucketName): ModeKey { return modeDetails(score, sourceBucket).mode; }
+export function scoreCameraMode(score: ScorePayload, sourceBucket: string): ModeKey { return modeDetails(score, sourceBucket).mode; }
 export function modeDifficultyMultiplier(rating: number | null | undefined) { return rating == null || !Number.isFinite(rating) ? 0 : Math.max(0, rating); }
 export function pointsForModeScore(score: ScorePayload, mode: ModeKey, rating?: number | null) {
-  if (score.passed !== true || rating == null || !Number.isFinite(rating)) return 0;
+  if (!scorePassed(score) || rating == null || !Number.isFinite(rating)) return 0;
   const r = Math.max(0, rating);
   return Math.max(1, Math.round((12 + 8 * r + 1.5 * r * r) * MODE_RULES[mode].rewardMultiplier));
 }
 
-function scoreBuckets(data: ScoreResponse): ScoreBucket[] {
-  const buckets: ScoreBucket[] = [];
-  for (const name of ["lastDay", "top", "vrTop", "vrRecent", "recent", "scores", "passed"] as const) {
-    const scores = data[name];
-    if (Array.isArray(scores)) buckets.push({ name, scores });
-  }
-  if (Array.isArray(data.items)) buckets.push({ name: "items", scores: data.items });
-  if (Array.isArray(data.results)) buckets.push({ name: "results", scores: data.results });
-  if (Array.isArray(data.data)) buckets.push({ name: "data", scores: data.data });
-  else if (data.data && typeof data.data === "object" && Array.isArray(data.data.scores)) buckets.push({ name: "data", scores: data.data.scores });
-  return buckets;
-}
-
 async function fetchModeScores(profileId: number) {
-  const data = await rhythiaRequest<ScoreResponse>("getUserScores", { id: profileId, limit: 10000 });
+  const data = await rhythiaRequest<Record<string, unknown>>("getUserScores", { id: profileId, limit: 10000 });
   const byId = new Map<number, { score: ScorePayload; mode: ModeKey; confidence: number }>();
   for (const bucket of scoreBuckets(data)) for (const score of bucket.scores) {
-    if (!score || typeof score.id !== "number") continue;
     const details = modeDetails(score, bucket.name);
     const existing = byId.get(score.id);
     if (!existing || details.confidence > existing.confidence) byId.set(score.id, { score, mode: details.mode, confidence: details.confidence });
@@ -140,17 +147,7 @@ export async function fetchRecentModeScoresForUser(userId: string): Promise<Rece
     const source = scoreSourceId(score);
     const createdValue = scoreCreatedAt(score);
     const created = createdValue ? new Date(createdValue) : null;
-    return {
-      id: score.id,
-      beatmapTitle: scoreTitle(score).trim(),
-      sourceBeatmapId: source == null ? null : normalizeSourceId(source),
-      cameraMode: mode,
-      speed: Number.isFinite(score.speed) && (score.speed ?? 0) > 0 ? score.speed! : 1,
-      accuracy: accuracyFromScore(score),
-      awardedSp: scoreAwardedSp(score),
-      createdAt: created && Number.isFinite(created.getTime()) ? created : null,
-      passed: score.passed === true,
-    };
+    return { id: score.id, beatmapTitle: scoreTitle(score).trim(), sourceBeatmapId: source == null ? null : normalizeSourceId(source), cameraMode: mode, speed: Number.isFinite(score.speed) && (score.speed ?? 0) > 0 ? score.speed! : 1, accuracy: accuracyFromScore(score), awardedSp: scoreAwardedSp(score), createdAt: created && Number.isFinite(created.getTime()) ? created : null, passed: scorePassed(score) };
   });
 }
 
@@ -185,10 +182,7 @@ export async function setUserPointOverride(userId: string, system: EditablePoint
 }
 
 export async function calculateStoredTotals(userId: string) {
-  const [rows, overrides] = await Promise.all([
-    prisma.rhythiaModeScore.findMany({ where: { userId }, select: { mapKey: true, cameraMode: true, points: true } }),
-    getOverrides(userId),
-  ]);
+  const rows = await prisma.rhythiaModeScore.findMany({ where: { userId }, select: { mapKey: true, cameraMode: true, points: true } });
   const raw: ModePoints = { lock: 0, spin: 0, vr: 0 };
   const byMap = new Map<string, number[]>();
   for (const row of rows) {
@@ -205,8 +199,7 @@ export async function calculateStoredTotals(userId: string) {
     earnedRhp += values.slice(0, 3).reduce((sum, value, index) => sum + value * RHP_MULTI_CLEAR_WEIGHTS[index], 0);
   }
   earnedRhp = Math.round(earnedRhp);
-  const totals: ModePoints = { lock: overrides.get("rpl") ?? raw.lock, spin: overrides.get("rps") ?? raw.spin, vr: overrides.get("rpv") ?? raw.vr };
-  return { rpl: totals.lock, rps: totals.spin, rpv: totals.vr, rhp: overrides.get("rhp") ?? earnedRhp, raw, earnedRhp };
+  return { rpl: raw.lock, rps: raw.spin, rpv: raw.vr, rhp: earnedRhp, raw, earnedRhp };
 }
 
 export async function reconcileUserRankPoints(userId: string) {
@@ -251,7 +244,7 @@ export async function syncUserModeScores(userId: string) {
   }
   const candidates = new Map<string, { score: ScorePayload; mode: ModeKey; map: AnalyzedMapRow; points: number }>();
   for (const entry of scores) {
-    if (entry.score.passed !== true) continue;
+    if (!scorePassed(entry.score)) continue;
     const sourceId = scoreSourceId(entry.score);
     const normalizedId = sourceId == null ? null : normalizeSourceId(sourceId);
     const map = normalizedId != null ? byBeatmapId.get(normalizedId) ?? byTitle.get(normalize(scoreTitle(entry.score))) : byTitle.get(normalize(scoreTitle(entry.score)));
@@ -337,15 +330,12 @@ export async function getModeScoreMap(userId: string) {
 }
 
 export async function getModeLeaderboard(mode: ModeKey, limit = 100) {
-  const system = mode === "lock" ? "rpl" : mode === "spin" ? "rps" : "rpv";
   const safeLimit = Math.max(1, Math.min(500, limit));
   return prisma.$queryRawUnsafe<Array<{ userId: string; username: string; displayName: string | null; profileHandle: string; avatar: string | null; points: number }>>(`
-    SELECT u.id AS "userId",u.username,u."displayName",u."profileHandle",u.avatar,
-      COALESCE(o.points,COALESCE(SUM(r.points),0))::int AS points
+    SELECT u.id AS "userId",u.username,u."displayName",u."profileHandle",u.avatar,COALESCE(SUM(r.points),0)::int AS points
     FROM "User" u
     LEFT JOIN "RhythiaModeScore" r ON r."userId"=u.id AND r."cameraMode"=$1::"CameraMode"
-    LEFT JOIN "UserPointOverride" o ON o."userId"=u.id AND o.system=$2
     WHERE u."profileHandle" <> 'rhythia-imports'
-    GROUP BY u.id,u.username,u."displayName",u."profileHandle",u.avatar,o.points
-    ORDER BY points DESC,u.username ASC LIMIT $3`, mode, system, safeLimit);
+    GROUP BY u.id,u.username,u."displayName",u."profileHandle",u.avatar
+    ORDER BY points DESC,u.username ASC LIMIT $2`, mode, safeLimit);
 }
