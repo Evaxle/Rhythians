@@ -1,7 +1,7 @@
 import { unzipSync } from "fflate";
 import { roundRating } from "@/lib/ranks";
 
-export const MAP_ANALYZER_VERSION = 2;
+export const MAP_ANALYZER_VERSION = 3;
 export const MIN_ANALYSIS_NOTES = 3;
 
 export type MapNote = { time: number; x: number; y: number };
@@ -229,7 +229,7 @@ function analyzeAtSpeed(notes: MapNote[], speed: number): SpeedAnalysis {
     const stack = distance <= 0.03;
     const movement = stack ? 0.055 : 0.28 + 0.72 * spacing;
     const directionMultiplier = 0.68 + 0.62 * direction;
-    const jumpness = stack ? 0 : spacing;
+    const jumpness = stack ? 0 : clamp(0.84 * spacing + 0.16 * direction);
     const patternSpeed = safeSpeed <= 1 ? 1 : Math.pow(safeSpeed, 0.55 * jumpness + 0.2 * direction);
     const strain = timingLoad(nps) * movement * directionMultiplier * patternSpeed;
     transitions.push({ time: current.time, strain, nps, jumpness, direction, distance: spacing });
@@ -247,8 +247,12 @@ function analyzeAtSpeed(notes: MapNote[], speed: number): SpeedAnalysis {
     const mean = strains.reduce((sum, value) => sum + value, 0) / Math.max(1, strains.length);
     const totalWeight = values.reduce((sum, value) => sum + Math.max(0.01, value.strain), 0);
     const weighted = (key: "jumpness" | "direction" | "distance" | "nps") => values.reduce((sum, value) => sum + value[key] * Math.max(0.01, value.strain), 0) / Math.max(0.01, totalWeight);
-    const jumpness = weighted("jumpness");
-    return { startMs: index * 1500, endMs: index * 1500 + 1500, strain: peak * 0.58 + mean * 0.42, nps: weighted("nps"), jumpness, direction: weighted("direction"), distance: weighted("distance"), pattern: patternLabel(jumpness) };
+    const direction = weighted("direction");
+    const distance = weighted("distance");
+    const jumpness = clamp(weighted("jumpness"));
+    const baseStrain = peak * 0.58 + mean * 0.42;
+    const sectionPatternWeight = 0.94 + 0.1 * jumpness + 0.08 * direction;
+    return { startMs: index * 1500, endMs: index * 1500 + 1500, strain: baseStrain * sectionPatternWeight, nps: weighted("nps"), jumpness, direction, distance, pattern: patternLabel(jumpness) };
   });
   const strains = sections.map((section) => section.strain);
   const p95 = percentile(strains, 0.95);
@@ -265,10 +269,16 @@ function analyzeAtSpeed(notes: MapNote[], speed: number): SpeedAnalysis {
     longestRun = Math.max(longestRun, currentRun);
     previousIndex = index;
   }
-  const hardDuty = sections.length ? hardIndexes.size / sections.length : 0;
   const longestHardSectionMs = longestRun * 1500;
-  const staminaIndex = clamp(0.55 * hardDuty + 0.45 * Math.min(1, longestHardSectionMs / 45000));
   const activeDurationMs = sections.length * 1500;
+  const firstActiveIndex = sections.length ? Math.floor(sections[0].startMs / 1500) : 0;
+  const lastActiveIndex = sections.length ? Math.floor(sections[sections.length - 1].startMs / 1500) : 0;
+  const activeSpanBuckets = sections.length ? lastActiveIndex - firstActiveIndex + 1 : 0;
+  const activeDuty = activeSpanBuckets ? clamp(sections.length / activeSpanBuckets) : 0;
+  const hardActiveRatio = sections.length ? hardIndexes.size / sections.length : 0;
+  const sustainedHard = Math.min(1, longestHardSectionMs / 45000);
+  const staminaBase = 0.55 * hardActiveRatio + 0.45 * sustainedHard;
+  const staminaIndex = clamp(staminaBase * (0.55 + 0.45 * activeDuty));
   const adjustedCore = core * (1 + 0.08 * staminaIndex);
   const rating = roundRating(clamp(0.35 + 3.9 * Math.log1p(Math.max(0, adjustedCore)), 0, 12));
   return { rating, staminaIndex, activeDurationMs, longestHardSectionMs, sections, transitions };
