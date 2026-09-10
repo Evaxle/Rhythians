@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { canAccessAdmin } from "@/lib/admin-access";
 import { analyzePendingRankedMaps, getRankedAnalysisStats } from "@/lib/map-analysis-store";
+import { recalculateUsersForMapAnalysis } from "@/lib/rhythia-mode-points";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -24,9 +25,15 @@ export async function POST(request: Request) {
   const auth = await authorize();
   if (auth.response) return auth.response;
   const body = await request.json().catch(() => null) as { limit?: unknown } | null;
-  const limit = Math.max(1, Math.min(10, Number(body?.limit) || 5));
+  const limit = Math.max(1, Math.min(3, Number(body?.limit) || 3));
   try {
-    return NextResponse.json(await analyzePendingRankedMaps(limit));
+    const result = await analyzePendingRankedMaps(limit);
+    let recalculatedUsers = 0;
+    for (const mapId of [...result.succeededMapIds, ...result.failedMapIds]) {
+      const recalculated = await recalculateUsersForMapAnalysis(mapId);
+      recalculatedUsers += recalculated.users;
+    }
+    return NextResponse.json({ ...result, recalculatedUsers });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Ranked map analysis failed." }, { status: 400 });
   }
