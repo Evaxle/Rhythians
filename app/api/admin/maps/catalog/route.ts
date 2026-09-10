@@ -24,7 +24,7 @@ export async function GET(request: Request) {
   const where: Prisma.ChallengeMapWhereInput = { AND: filters };
   const [total, maps] = await Promise.all([
     prisma.challengeMap.count({ where }),
-    prisma.challengeMap.findMany({ where, orderBy: [{ updatedAt: "desc" }, { id: "asc" }], skip: (page - 1) * 10, take: 10, select: { id: true, title: true, artist: true, mapperName: true, rating: true, noteCount: true, length: true, status: true, reviewerNote: true, sourceBeatmapId: true, sourceUrl: true, mapFileUrl: true, isAutoImported: true, updatedAt: true } }),
+    prisma.challengeMap.findMany({ where, orderBy: [{ updatedAt: "desc" }, { id: "asc" }], skip: (page - 1) * 10, take: 10, select: { id: true, title: true, artist: true, mapperName: true, imageUrl: true, rating: true, noteCount: true, length: true, status: true, reviewerNote: true, sourceBeatmapId: true, sourceUrl: true, mapFileUrl: true, isAutoImported: true, updatedAt: true } }),
   ]);
   const rows = await Promise.all(maps.map(async (map) => {
     const analysis = await getMapAnalysis(map.id);
