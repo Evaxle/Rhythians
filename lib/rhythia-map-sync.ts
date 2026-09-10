@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { rhythiaRequest } from "@/lib/rhythia";
-import { analysisIsCurrent, ensureMapAnalysisTable, getMapAnalysis, MAP_ANALYZER_VERSION, UNRANKED_MAP_MARKER } from "@/lib/map-analysis-store";
+import { analysisIsCurrent, ensureMapAnalysisTable, getMapAnalysis, MAP_ANALYZER_VERSION, MIN_POINT_RANKABILITY, UNRANKED_MAP_MARKER } from "@/lib/map-analysis-store";
 import { resolveRhythiaMapSource } from "@/lib/rhythia-map-source";
 
 export type SyncedRhythiaMap = { id: number; title: string | null; starRating: number | null; difficulty: number | null; noteCount: number | null; length: number | null; playcount: number | null; beatmapFile: string | null; image: string | null; mapHash: string | null; ownerUsername: string | null };
@@ -25,6 +25,11 @@ async function fillMissingAssets(rawMap: SyncedRhythiaMap) {
     const resolved = await resolveRhythiaMapSource(map.id);
     return { ...map, title: map.title ?? resolved.title, beatmapFile: map.beatmapFile || resolved.mapFileUrl, image: map.image || resolved.imageUrl, ownerUsername: map.ownerUsername ?? resolved.mapperName, noteCount: map.noteCount ?? resolved.noteCount, length: map.length ?? resolved.length };
   } catch { return map; }
+}
+
+function analyzedPointEligible(analysis: Awaited<ReturnType<typeof getMapAnalysis>> | null, source: RhythiaMapStatus) {
+  if (source === "UNRANKED" || !analysis || !analysisIsCurrent(analysis)) return false;
+  return (analysis.rankabilityScore ?? 0) >= MIN_POINT_RANKABILITY;
 }
 
 export async function syncRhythiaMaps(status?: RhythiaMapStatus) {
@@ -58,13 +63,14 @@ export async function syncRhythiaMaps(status?: RhythiaMapStatus) {
       }
       if (!existing.isAutoImported) { results.skipped += 1; continue; }
       const updateData = { title, artist: artistFromTitle(title), mapFileUrl, imageUrl: map.image, requestedRating: analyzedRating ?? 0, rating: analyzedRating, mapperName: map.ownerUsername, noteCount: map.noteCount, length: map.length, sourceUrl };
+      const pointEligible = analyzedPointEligible(existingAnalysis, currentStatus);
       if (currentStatus === "LEGACY") {
         await prisma.challengeMap.update({ where: { id: existing.id }, data: { ...updateData, status: "legacy", reviewerNote: null, reviewedById: importer.id, reviewedAt: new Date() } });
-        await prisma.$executeRawUnsafe(`UPDATE "MapDifficultyAnalysis" SET "sourceStatus"='legacy',"pointEligible"=FALSE,"updatedAt"=CURRENT_TIMESTAMP WHERE "mapId"=$1`, existing.id);
+        await prisma.$executeRawUnsafe(`UPDATE "MapDifficultyAnalysis" SET "sourceStatus"='legacy',"pointEligible"=$2,"updatedAt"=CURRENT_TIMESTAMP WHERE "mapId"=$1`, existing.id, pointEligible);
         results.updated += 1;
       } else if (isRanked) {
         await prisma.challengeMap.update({ where: { id: existing.id }, data: { ...updateData, status: "approved", reviewerNote: null, reviewedById: importer.id, reviewedAt: new Date() } });
-        await prisma.$executeRawUnsafe(`UPDATE "MapDifficultyAnalysis" SET "sourceStatus"='ranked',"pointEligible"=CASE WHEN status='analyzed' AND "analyzerVersion"=$2 THEN TRUE ELSE FALSE END,"updatedAt"=CURRENT_TIMESTAMP WHERE "mapId"=$1`, existing.id, MAP_ANALYZER_VERSION);
+        await prisma.$executeRawUnsafe(`UPDATE "MapDifficultyAnalysis" SET "sourceStatus"='ranked',"pointEligible"=$2,"updatedAt"=CURRENT_TIMESTAMP WHERE "mapId"=$1`, existing.id, pointEligible);
         results.promoted += 1;
       } else {
         await prisma.challengeMap.update({ where: { id: existing.id }, data: { ...updateData, status: "approved", reviewerNote: UNRANKED_MAP_MARKER, reviewedById: importer.id, reviewedAt: new Date() } });
