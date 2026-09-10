@@ -2,9 +2,9 @@ import { prisma } from "@/lib/db";
 import { getRankInfo, RANKS, rankIndexForRating } from "@/lib/ranks";
 import { analysisIsCurrent, getMapAnalysis } from "@/lib/map-analysis-store";
 import type { MapPatternSegment, MapSectionAnalysis } from "@/lib/map-difficulty";
-import type { MapAnalysisTimelineData } from "@/components/maps/map-analysis-timeline";
 
 export type RankedMapLeaderboardRow = { position: number; userId: string; username: string; displayName: string | null; profileHandle: string; avatar: string | null; accuracy: number | null; points: number; scoreId: number | null; rankInfo: ReturnType<typeof getRankInfo> };
+export type MapAnalysisTimelineData = { analyzerVersion: number; rating: number; directionScore: number; distanceScore: number; npsScore: number; staminaIndex: number; activeDurationMs: number; longestHardSectionMs: number; peakJumpNps: number; peakStreamNps: number; peakJumpStrain: number; peakStreamStrain: number; jumpRatio: number; patternSegments: MapPatternSegment[]; topSections: MapSectionAnalysis[] };
 export type RankedMapLeaderboard = { mapId: string; title: string; artist: string | null; description: string | null; mapFileUrl: string; imageUrl: string | null; rating: number; rankIndex: number; rankName: string; rankColor: string; rangeMin: number; rangeMax: number; mapperName: string | null; noteCount: number | null; length: number | null; sourceBeatmapId: number | null; sourceUrl: string | null; rpl: number; rpv: number; rps: number; rows: RankedMapLeaderboardRow[]; isRanked: boolean; isLegacy: boolean; sourceStatus: "ranked" | "legacy"; analysis: MapAnalysisTimelineData };
 type ScoreWrite = { rating: number; accuracy: number | null; passed: boolean; points: number; scoreId: number | null; speed: number | null; rankIndex: number };
 
