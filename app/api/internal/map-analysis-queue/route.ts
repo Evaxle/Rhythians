@@ -10,13 +10,18 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 const IDLE_SYNC_MS = 5 * 60 * 1000;
+const DATABASE_CRON_KEY = "map_analysis_cron_token";
 
-function isAuthorized(request: Request) {
-  const secret = process.env.CRON_SECRET;
-  if (!secret) return request.headers.get("x-vercel-cron") === "1";
+async function isAuthorized(request: Request) {
   const url = new URL(request.url);
   const bearer = request.headers.get("authorization");
-  return bearer === `Bearer ${secret}` || url.searchParams.get("secret") === secret || request.headers.get("x-cron-secret") === secret;
+  const supplied = url.searchParams.get("token") ?? url.searchParams.get("secret") ?? request.headers.get("x-cron-secret");
+  const environmentSecret = process.env.CRON_SECRET;
+  if (environmentSecret && (bearer === `Bearer ${environmentSecret}` || supplied === environmentSecret)) return true;
+  if (!environmentSecret && request.headers.get("x-vercel-cron") === "1") return true;
+  if (!supplied) return false;
+  const databaseToken = await prisma.siteSetting.findUnique({ where: { key: DATABASE_CRON_KEY }, select: { value: true } }).catch(() => null);
+  return Boolean(databaseToken?.value && supplied === databaseToken.value);
 }
 
 async function refreshRhythiaIfIdle() {
@@ -25,16 +30,12 @@ async function refreshRhythiaIfIdle() {
   if (Number.isFinite(previous) && Date.now() - previous < IDLE_SYNC_MS) return null;
   const result = await syncRhythiaMaps();
   const now = new Date().toISOString();
-  await prisma.siteSetting.upsert({
-    where: { key: "rankability_idle_map_sync_last_run" },
-    update: { value: now },
-    create: { key: "rankability_idle_map_sync_last_run", value: now, description: "Last Rhythia catalog refresh triggered after the map-analysis queue became idle." },
-  });
+  await prisma.siteSetting.upsert({ where: { key: "rankability_idle_map_sync_last_run" }, update: { value: now }, create: { key: "rankability_idle_map_sync_last_run", value: now, description: "Last Rhythia catalog refresh triggered after the map-analysis queue became idle." } });
   return result;
 }
 
 export async function GET(request: Request) {
-  if (!isAuthorized(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!(await isAuthorized(request))) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   let ids = await claimPendingMapAnalysisIds(5);
   let sync: Awaited<ReturnType<typeof syncRhythiaMaps>> | null = null;
   if (!ids.length) {
