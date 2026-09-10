@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { canAccessAdmin } from "@/lib/admin-access";
-import { analyzeChallengeMap } from "@/lib/map-analysis-store";
+import { analyzeLegacyChallengeMap } from "@/lib/legacy-map-analysis";
 import { recalculateUsersForMapAnalysis } from "@/lib/rhythia-mode-points";
 
 export const runtime = "nodejs";
@@ -13,7 +13,7 @@ export async function POST(_request: Request, { params }: Props) {
   if (!(await canAccessAdmin(user))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const { id } = await params;
   try {
-    const analysis = await analyzeChallengeMap(id);
+    const analysis = await analyzeLegacyChallengeMap(id);
     const recalculated = await recalculateUsersForMapAnalysis(id);
     return NextResponse.json({ analysis, recalculatedUsers: recalculated.users });
   } catch (error) {
