@@ -1,9 +1,11 @@
 import { prisma } from "@/lib/db";
 import { getRankInfo, RANKS, rankIndexForRating } from "@/lib/ranks";
 import { analysisIsCurrent, getMapAnalysis } from "@/lib/map-analysis-store";
+import type { MapPatternSegment, MapSectionAnalysis } from "@/lib/map-difficulty";
+import type { MapAnalysisTimelineData } from "@/components/maps/map-analysis-timeline";
 
 export type RankedMapLeaderboardRow = { position: number; userId: string; username: string; displayName: string | null; profileHandle: string; avatar: string | null; accuracy: number | null; points: number; scoreId: number | null; rankInfo: ReturnType<typeof getRankInfo> };
-export type RankedMapLeaderboard = { mapId: string; title: string; artist: string | null; description: string | null; mapFileUrl: string; imageUrl: string | null; rating: number; rankIndex: number; rankName: string; rankColor: string; rangeMin: number; rangeMax: number; mapperName: string | null; noteCount: number | null; length: number | null; sourceBeatmapId: number | null; sourceUrl: string | null; rpl: number; rpv: number; rps: number; rows: RankedMapLeaderboardRow[]; isRanked?: boolean };
+export type RankedMapLeaderboard = { mapId: string; title: string; artist: string | null; description: string | null; mapFileUrl: string; imageUrl: string | null; rating: number; rankIndex: number; rankName: string; rankColor: string; rangeMin: number; rangeMax: number; mapperName: string | null; noteCount: number | null; length: number | null; sourceBeatmapId: number | null; sourceUrl: string | null; rpl: number; rpv: number; rps: number; rows: RankedMapLeaderboardRow[]; isRanked: boolean; isLegacy: boolean; sourceStatus: "ranked" | "legacy"; analysis: MapAnalysisTimelineData };
 type ScoreWrite = { rating: number; accuracy: number | null; passed: boolean; points: number; scoreId: number | null; speed: number | null; rankIndex: number };
 
 async function loadMap(mapId: string) {
@@ -16,17 +18,38 @@ async function loadMap(mapId: string) {
 
 export async function getRankedMapDetail(mapId: string): Promise<RankedMapLeaderboard | null> {
   const map = await loadMap(mapId);
-  if (!map || !map.mapFileUrl || map.status !== "approved" || map.rating == null) return null;
+  if (!map || !map.mapFileUrl || (map.status !== "approved" && map.status !== "legacy") || map.rating == null) return null;
   const analysis = await getMapAnalysis(map.id);
-  if (!analysisIsCurrent(analysis) || !analysis?.pointEligible || analysis.rpl == null || analysis.rpv == null || analysis.rps == null) return null;
+  if (!analysisIsCurrent(analysis) || analysis?.rating == null) return null;
+  const isLegacy = analysis.sourceStatus === "legacy" || map.status === "legacy";
+  const isRanked = !isLegacy && analysis.sourceStatus === "ranked" && analysis.pointEligible;
+  if (!isRanked && !isLegacy) return null;
+  if (isRanked && (analysis.rpl == null || analysis.rpv == null || analysis.rps == null)) return null;
   const rankIndex = rankIndexForRating(map.rating);
   const rank = RANKS[rankIndex] ?? RANKS[RANKS.length - 1];
-  return { mapId: map.id, title: map.title, artist: map.artist, description: map.description, mapFileUrl: map.mapFileUrl, imageUrl: map.imageUrl, rating: map.rating, rankIndex: rank.index, rankName: rank.name, rankColor: rank.color, rangeMin: rank.rangeMin, rangeMax: rank.rangeMax, mapperName: map.mapperName, noteCount: map.noteCount, length: map.length, sourceBeatmapId: map.sourceBeatmapId, sourceUrl: map.sourceUrl, rpl: analysis.rpl, rpv: analysis.rpv, rps: analysis.rps, rows: [], isRanked: true };
+  const timeline: MapAnalysisTimelineData = {
+    analyzerVersion: analysis.analyzerVersion,
+    rating: analysis.rating,
+    directionScore: analysis.directionScore ?? 0,
+    distanceScore: analysis.distanceScore ?? 0,
+    npsScore: analysis.npsScore ?? 0,
+    staminaIndex: analysis.staminaIndex ?? 0,
+    activeDurationMs: analysis.activeDurationMs ?? 0,
+    longestHardSectionMs: analysis.longestHardSectionMs ?? 0,
+    peakJumpNps: analysis.peakJumpNps ?? 0,
+    peakStreamNps: analysis.peakStreamNps ?? 0,
+    peakJumpStrain: analysis.peakJumpStrain ?? 0,
+    peakStreamStrain: analysis.peakStreamStrain ?? 0,
+    jumpRatio: analysis.jumpRatio ?? 0,
+    patternSegments: analysis.patternSegments as MapPatternSegment[],
+    topSections: analysis.topSections as MapSectionAnalysis[],
+  };
+  return { mapId: map.id, title: map.title, artist: map.artist, description: map.description, mapFileUrl: map.mapFileUrl, imageUrl: map.imageUrl, rating: map.rating, rankIndex: rank.index, rankName: rank.name, rankColor: rank.color, rangeMin: rank.rangeMin, rangeMax: rank.rangeMax, mapperName: map.mapperName, noteCount: map.noteCount, length: map.length, sourceBeatmapId: map.sourceBeatmapId, sourceUrl: map.sourceUrl, rpl: analysis.rpl ?? 0, rpv: analysis.rpv ?? 0, rps: analysis.rps ?? 0, rows: [], isRanked, isLegacy, sourceStatus: isLegacy ? "legacy" : "ranked", analysis: timeline };
 }
 
 export async function upsertRankedMapScore(mapId: string, userId: string, score: ScoreWrite) {
   const detail = await getRankedMapDetail(mapId);
-  if (!detail) return false;
+  if (!detail?.isRanked) return false;
   const existing = await prisma.challengeMapCompletion.findUnique({ where: { challengeMapId_userId: { challengeMapId: detail.mapId, userId } } });
   const shouldReplace = !existing || score.passed !== existing.passed ? score.passed : score.points > existing.points || score.points === existing.points && (score.accuracy ?? -1) > (existing.accuracy ?? -1);
   if (!shouldReplace) return false;
@@ -37,6 +60,7 @@ export async function upsertRankedMapScore(mapId: string, userId: string, score:
 export async function getRankedMapLeaderboard(mapId: string, _selectedRank: number | null, limit = 100): Promise<RankedMapLeaderboard | null> {
   const detail = await getRankedMapDetail(mapId);
   if (!detail) return null;
+  if (!detail.isRanked) return detail;
   const completions = await prisma.challengeMapCompletion.findMany({ where: { challengeMapId: detail.mapId, passed: true }, include: { user: { select: { id: true, username: true, displayName: true, profileHandle: true, avatar: true, rhp: true } } } });
   const eligible = completions.filter((entry) => getRankInfo(entry.user.rhp).index === detail.rankIndex).sort((a, b) => (b.accuracy ?? -1) - (a.accuracy ?? -1) || b.points - a.points || a.updatedAt.getTime() - b.updatedAt.getTime()).slice(0, Math.max(1, Math.min(500, limit)));
   const rows = eligible.map((entry, index) => ({ position: index + 1, userId: entry.user.id, username: entry.user.username, displayName: entry.user.displayName, profileHandle: entry.user.profileHandle, avatar: entry.user.avatar, accuracy: entry.accuracy, points: entry.points, scoreId: entry.scoreId, rankInfo: getRankInfo(entry.user.rhp) }));
