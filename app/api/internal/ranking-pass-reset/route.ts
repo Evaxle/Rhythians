@@ -9,30 +9,32 @@ export const maxDuration = 300;
 const TOKEN = "pass-reset-2026-09-10-7f3c91b2";
 
 function allowed(request: Request) {
+  const url = new URL(request.url);
   if (process.env.VERCEL_ENV === "production") return false;
   if (process.env.VERCEL_GIT_COMMIT_REF !== "ranking-pass-only-reset") return false;
-  return request.headers.get("x-ranking-reset-token") === TOKEN;
+  return url.searchParams.get("token") === TOKEN;
 }
 
-export async function POST(request: Request) {
+export async function GET(request: Request) {
   if (!allowed(request)) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  const body = await request.json().catch(() => ({})) as { action?: string; offset?: number; limit?: number };
+  const url = new URL(request.url);
+  const action = url.searchParams.get("action") ?? "status";
 
-  if (body.action === "reset") {
+  if (action === "reset") {
     await clearRankingForFullRebuild();
     const linked = await prisma.rhythiaProfile.count();
     return NextResponse.json({ ok: true, reset: true, linked });
   }
 
-  if (body.action === "batch") {
-    const offset = Math.max(0, Math.floor(Number(body.offset) || 0));
-    const limit = Math.max(1, Math.min(10, Math.floor(Number(body.limit) || 5)));
+  if (action === "batch") {
+    const offset = Math.max(0, Math.floor(Number(url.searchParams.get("offset")) || 0));
+    const limit = Math.max(1, Math.min(10, Math.floor(Number(url.searchParams.get("limit")) || 5)));
     const profiles = await prisma.rhythiaProfile.findMany({ select: { userId: true }, orderBy: { userId: "asc" }, skip: offset, take: limit });
     const results = await rebuildRankingUsers(profiles.map((profile) => profile.userId));
     return NextResponse.json({ ok: true, offset, processed: profiles.length, results, nextOffset: offset + profiles.length });
   }
 
-  if (body.action === "status") {
+  if (action === "status") {
     const rows = await prisma.$queryRawUnsafe<Array<{ linked: number; modeRows: number; usersWithRhp: number; mismatches: number }>>(`
       SELECT
         (SELECT COUNT(*)::int FROM "RhythiaProfile") AS linked,
