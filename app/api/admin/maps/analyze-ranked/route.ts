@@ -25,7 +25,7 @@ export async function POST(request: Request) {
   const auth = await authorize();
   if (auth.response) return auth.response;
   const body = await request.json().catch(() => null) as { limit?: unknown } | null;
-  const limit = Math.max(1, Math.min(3, Number(body?.limit) || 3));
+  const limit = Math.max(1, Math.min(2, Number(body?.limit) || 2));
   try {
     const result = await analyzePendingRankedMaps(limit);
     let recalculatedUsers = 0;
