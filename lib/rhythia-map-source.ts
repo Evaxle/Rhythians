@@ -70,7 +70,7 @@ function htmlJsonString(html: string, keys: string[]) {
 async function pageAssets(id: number) {
   const pageUrl = `https://www.rhythia.com/maps/${id}`;
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10000);
+  const timeout = setTimeout(() => controller.abort(), 8000);
   try {
     const response = await fetch(pageUrl, { cache: "no-store", redirect: "follow", signal: controller.signal, headers: { accept: "text/html", "user-agent": "Rhythians-MapAnalyzer/3.0" } });
     if (!response.ok) return { imageUrl: null, mapFileUrl: null };
@@ -90,16 +90,18 @@ async function pageAssets(id: number) {
 export async function resolveRhythiaMapSource(id: number): Promise<ResolvedRhythiaMapSource> {
   const detail = await apiDetail(id);
   const records = detail ? deepRecords(detail) : [];
-  const page = await pageAssets(id);
   const title = stringField(records, ["title", "name", "beatmapTitle"]);
   const file = stringField(records, ["beatmapFile", "beatmap_file", "downloadUrl", "download_url", "mapFileUrl", "map_file_url", "fileUrl", "file_url", "file"]);
   const image = stringField(records, ["image", "imageUrl", "image_url", "cover", "coverUrl", "cover_url", "preview", "previewUrl", "preview_url", "thumbnail", "thumbnailUrl", "thumbnail_url"]);
+  const apiFileUrl = absoluteUrl(file, "https://production.rhythia.com");
+  const apiImageUrl = absoluteUrl(image, "https://production.rhythia.com");
+  const page = apiFileUrl && apiImageUrl ? { imageUrl: null, mapFileUrl: null } : await pageAssets(id);
   const mapperName = stringField(records, ["ownerUsername", "owner_username", "mapperName", "mapper_name", "authorUsername", "author", "mapper"]);
   return {
     id,
     title,
-    mapFileUrl: absoluteUrl(file, "https://production.rhythia.com") ?? page.mapFileUrl,
-    imageUrl: absoluteUrl(image, "https://production.rhythia.com") ?? page.imageUrl,
+    mapFileUrl: apiFileUrl ?? page.mapFileUrl,
+    imageUrl: apiImageUrl ?? page.imageUrl,
     mapperName,
     noteCount: numericField(records, ["noteCount", "note_count", "notes", "beatmapNotes"]),
     length: numericField(records, ["length", "duration", "durationMs", "duration_ms"]),
