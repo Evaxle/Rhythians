@@ -17,6 +17,7 @@ export async function POST(_request: Request, { params }: Props) {
     const recalculated = await recalculateUsersForMapAnalysis(id);
     return NextResponse.json({ analysis, recalculatedUsers: recalculated.users });
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Map analysis failed." }, { status: 400 });
+    const recalculated = await recalculateUsersForMapAnalysis(id).catch(() => ({ users: 0 }));
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Map analysis failed.", recalculatedUsers: recalculated.users }, { status: 400 });
   }
 }
