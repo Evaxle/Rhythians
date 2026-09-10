@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { fetchRhythiaProfile } from "@/lib/rhythia";
-import { syncUserModeScores } from "@/lib/rhythia-mode-points";
+import { syncUserModeScores, reconcileUserRankPoints } from "@/lib/rhythia-mode-points";
+import { applyRecentPassBalance } from "@/lib/rhythia-pass-analysis";
 import { placeLinkedUserInBattleRank } from "@/lib/rbp-placement";
 import { fetchRhythiaAccountCreatedAt, syncAutomaticPlayerClassification } from "@/lib/player-classification";
 
@@ -12,7 +13,9 @@ export async function rebuildRhythiaScorePoints(userId: string) {
     fetchRhythiaProfile(linked.profileId),
     fetchRhythiaAccountCreatedAt(linked.profileId).catch(() => null),
   ]);
-  const result = await syncUserModeScores(userId);
+  const imported = await syncUserModeScores(userId);
+  const passAnalysis = await applyRecentPassBalance(userId).catch(() => ({ checked: 0, analyzed: 0, adjusted: 0, unavailable: 0, errors: 0 }));
+  const result = await reconcileUserRankPoints(userId);
   const { bio: _bio, ...profileData } = profile;
 
   await prisma.$transaction(async (tx) => {
@@ -26,8 +29,9 @@ export async function rebuildRhythiaScorePoints(userId: string) {
     rps: result.rps,
     rpv: result.rpv,
     rhp: result.rhp,
-    passedScores: result.rows.length,
-    uniqueScoredMaps: new Set(result.rows.map((row) => row.mapKey)).size,
-    modes: result.foundModes,
+    passedScores: imported.rows.length,
+    uniqueScoredMaps: new Set(imported.rows.map((row) => row.mapKey)).size,
+    modes: imported.foundModes,
+    passAnalysis,
   };
 }
