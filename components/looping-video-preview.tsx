@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { RefreshCw } from "lucide-react";
 import { medalClipId, tiktokVideoId, twitchClipSlug, youtubeVideoId } from "@/lib/clip-source";
 
 function embedUrl(src: string, hostname: string | null) {
@@ -18,23 +19,25 @@ function embedUrl(src: string, hostname: string | null) {
 export function LoopingVideoPreview({ src, title }: { src: string | null; title: string }) {
   const ref = useRef<HTMLVideoElement>(null);
   const [failed, setFailed] = useState(false);
+  const [needsPlay, setNeedsPlay] = useState(false);
+  const [retry, setRetry] = useState(0);
   const [hostname, setHostname] = useState<string | null>(null);
   useEffect(() => setHostname(window.location.hostname), []);
   const embed = useMemo(() => src ? embedUrl(src, hostname) : null, [src, hostname]);
-
+  useEffect(() => { setFailed(false); setNeedsPlay(false); setRetry(0); }, [src]);
   useEffect(() => {
     const video = ref.current;
     if (!video || !src || embed) return;
+    video.load();
     const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) void video.play().catch(() => undefined);
-      else video.pause();
+      if (!entry.isIntersecting) return video.pause();
+      void video.play().then(() => setNeedsPlay(false)).catch(() => setNeedsPlay(true));
     }, { threshold: 0.2 });
     observer.observe(video);
     return () => observer.disconnect();
-  }, [src, embed]);
-
-  if (!src || failed) return <div className="grid h-full min-h-[260px] place-items-center bg-black px-6 text-center text-sm text-muted">Video preview unavailable.</div>;
+  }, [src, embed, retry]);
+  if (!src) return <div className="grid h-full min-h-[260px] place-items-center bg-black px-6 text-center text-sm text-muted">Video preview unavailable.</div>;
   if (embed) return <iframe src={embed} title={title} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" className="h-full min-h-[260px] w-full border-0 bg-black" />;
-
-  return <video ref={ref} src={src} aria-label={title} autoPlay muted loop playsInline preload="auto" disablePictureInPicture onError={() => setFailed(true)} className="h-full min-h-[260px] w-full object-cover" />;
+  if (failed) return <div className="grid h-full min-h-[260px] place-items-center bg-black px-6 text-center"><div><p className="text-sm text-muted">This device could not load the preview.</p><button type="button" onClick={() => { setFailed(false); setRetry((v) => v + 1); }} className="mx-auto mt-3 inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-xs font-bold text-white"><RefreshCw size={13} /> Retry video</button></div></div>;
+  return <div className="relative h-full min-h-[260px] bg-black"><video key={`${src}:${retry}`} ref={ref} src={src} aria-label={title} autoPlay muted loop playsInline preload="metadata" controls={needsPlay} disablePictureInPicture onCanPlay={() => setFailed(false)} onError={() => setFailed(true)} className="h-full min-h-[260px] w-full object-cover" />{needsPlay && <button type="button" onClick={() => void ref.current?.play().then(() => setNeedsPlay(false)).catch(() => undefined)} className="absolute inset-0 m-auto h-fit w-fit rounded-full bg-black/70 px-5 py-3 text-sm font-bold text-white backdrop-blur">Play preview</button>}</div>;
 }
