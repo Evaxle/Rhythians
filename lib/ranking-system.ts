@@ -19,7 +19,7 @@ export function initialOverallPlacement(_input: { globalRank?: number | null; rh
 export function modeScale(_mode: ModeKey) { return 1; }
 export function modeEquivalentRhp(points: number, _mode: ModeKey) { return Math.max(0, points); }
 export function modePointsFromEquivalentRhp(rhp: number, _mode: ModeKey) { return Math.max(0, Math.round(rhp)); }
-export function overallRhpFromModes(points: ModePoints, _overallFloor: number, _config: RankingConfig) { return Math.max(0, Math.round(Math.max(points.lock, points.spin, points.vr))); }
+export function overallRhpFromModes(points: ModePoints, _overallFloor: number, _config: RankingConfig) { return Math.max(0, Math.round(points.lock) + Math.round(points.spin) + Math.round(points.vr)); }
 export function fallbackModeTarget(_overallPlacement: number, _mode: ModeKey, _config: RankingConfig) { return 0; }
 export async function ensureRankingBaseline(_userId: string) { return { overallFloor: 0, rplBase: 0, rpsBase: 0, rpvBase: 0 }; }
 
