@@ -108,7 +108,16 @@ export async function saveMapAnalysis(mapId: string, sourceStatus: string, analy
 
 export async function markMapAnalysisFailed(mapId: string, sourceStatus: string, error: string) {
   await ensureMapAnalysisTable();
-  await prisma.$executeRawUnsafe(`INSERT INTO "MapDifficultyAnalysis" ("mapId","analyzerVersion","status","sourceStatus","pointEligible","error","updatedAt") VALUES ($1,$2,'failed',$3,FALSE,$4,CURRENT_TIMESTAMP) ON CONFLICT ("mapId") DO UPDATE SET "analyzerVersion"=EXCLUDED."analyzerVersion","status"='failed',"sourceStatus"=EXCLUDED."sourceStatus","error"=EXCLUDED."error","updatedAt"=CURRENT_TIMESTAMP`, mapId, MAP_ANALYZER_VERSION, sourceStatus, error.slice(0, 1000));
+  await prisma.$executeRawUnsafe(`
+    INSERT INTO "MapDifficultyAnalysis" ("mapId","analyzerVersion","status","sourceStatus","pointEligible","error","updatedAt")
+    VALUES ($1,$2,'failed',$3,FALSE,$4,CURRENT_TIMESTAMP)
+    ON CONFLICT ("mapId") DO UPDATE SET
+      "analyzerVersion"=EXCLUDED."analyzerVersion","status"='failed',"sourceStatus"=EXCLUDED."sourceStatus","pointEligible"=FALSE,
+      "rating"=NULL,"directionScore"=NULL,"distanceScore"=NULL,"npsScore"=NULL,"staminaIndex"=NULL,"activeDurationMs"=NULL,"longestHardSectionMs"=NULL,
+      "peakJumpNps"=NULL,"peakStreamNps"=NULL,"peakJumpStrain"=NULL,"peakStreamStrain"=NULL,"jumpRatio"=NULL,"rpl"=NULL,"rpv"=NULL,"rps"=NULL,
+      "speedProfiles"='[]'::jsonb,"topSections"='[]'::jsonb,"patternSegments"='[]'::jsonb,"error"=EXCLUDED."error","analyzedAt"=NULL,"updatedAt"=CURRENT_TIMESTAMP`,
+    mapId, MAP_ANALYZER_VERSION, sourceStatus, error.slice(0, 1000));
+  await prisma.challengeMap.update({ where: { id: mapId }, data: { rating: null, requestedRating: 0 } }).catch(() => null);
 }
 
 export async function setMapPointEligibility(mapId: string, pointEligible: boolean) {
@@ -121,9 +130,9 @@ export async function setMapPointEligibility(mapId: string, pointEligible: boole
 
 async function downloadMap(url: string) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 20000);
+  const timeout = setTimeout(() => controller.abort(), 15000);
   try {
-    const response = await fetch(url, { cache: "no-store", redirect: "follow", signal: controller.signal, headers: { accept: "application/octet-stream,application/zip,application/json;q=0.9,*/*;q=0.1", "user-agent": "Rhythians-MapAnalyzer/2.0" } });
+    const response = await fetch(url, { cache: "no-store", redirect: "follow", signal: controller.signal, headers: { accept: "application/octet-stream,application/zip,application/json;q=0.9,*/*;q=0.1", "user-agent": `Rhythians-MapAnalyzer/${MAP_ANALYZER_VERSION}.0` } });
     if (!response.ok) throw new Error(`Map download returned HTTP ${response.status}.`);
     const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
     if (contentType.includes("text/html")) throw new Error("Map source returned an HTML page instead of the map file.");
@@ -140,9 +149,9 @@ async function downloadMap(url: string) {
 
 async function resolveMapAssets(map: { id: string; mapFileUrl: string; imageUrl: string | null; mapperName: string | null; noteCount: number | null; length: number | null; sourceBeatmapId: number | null }) {
   if (map.sourceBeatmapId == null) return map;
-  const needsResolution = looksLikeMapPage(map.mapFileUrl) || !map.imageUrl;
-  if (!needsResolution) return map;
-  const resolved = await resolveRhythiaMapSource(sourceApiId(map.sourceBeatmapId));
+  let resolved: Awaited<ReturnType<typeof resolveRhythiaMapSource>> | null = null;
+  try { resolved = await resolveRhythiaMapSource(sourceApiId(map.sourceBeatmapId)); } catch {}
+  if (!resolved) return map;
   const mapFileUrl = resolved.mapFileUrl ?? map.mapFileUrl;
   const imageUrl = resolved.imageUrl ?? map.imageUrl;
   const mapperName = resolved.mapperName ?? map.mapperName;
@@ -180,7 +189,7 @@ async function rankedAnalysisQueue(limit: number) {
       AND c."reviewerNote" IS DISTINCT FROM $1
       AND (a."mapId" IS NULL OR a."analyzerVersion" <> $2 OR a.status='unanalyzed')
     ORDER BY c."updatedAt" ASC,c.id ASC
-    LIMIT $3`, UNRANKED_MAP_MARKER, MAP_ANALYZER_VERSION, Math.max(1, Math.min(20, limit)));
+    LIMIT $3`, UNRANKED_MAP_MARKER, MAP_ANALYZER_VERSION, Math.max(1, Math.min(10, limit)));
 }
 
 export async function getRankedAnalysisStats() {
@@ -197,16 +206,25 @@ export async function getRankedAnalysisStats() {
   return { total: Number(row.total), analyzed: Number(row.analyzed), failed: Number(row.failed), pending: Number(row.pending) };
 }
 
-export async function analyzePendingRankedMaps(limit = 6) {
+export async function analyzePendingRankedMaps(limit = 3) {
   const queue = await rankedAnalysisQueue(limit);
   let succeeded = 0;
   let failed = 0;
+  const succeededMapIds: string[] = [];
+  const failedMapIds: string[] = [];
   const errors: Array<{ mapId: string; error: string }> = [];
   for (const map of queue) {
-    try { await analyzeChallengeMap(map.id); succeeded += 1; }
-    catch (error) { failed += 1; errors.push({ mapId: map.id, error: error instanceof Error ? error.message : "Analysis failed." }); }
+    try {
+      await analyzeChallengeMap(map.id);
+      succeeded += 1;
+      succeededMapIds.push(map.id);
+    } catch (error) {
+      failed += 1;
+      failedMapIds.push(map.id);
+      errors.push({ mapId: map.id, error: error instanceof Error ? error.message : "Analysis failed." });
+    }
   }
-  return { processed: queue.length, succeeded, failed, errors: errors.slice(0, 5), stats: await getRankedAnalysisStats() };
+  return { processed: queue.length, succeeded, failed, succeededMapIds, failedMapIds, errors: errors.slice(0, 5), stats: await getRankedAnalysisStats() };
 }
 
 export function analysisIsCurrent(analysis: Pick<StoredMapAnalysis, "status" | "analyzerVersion"> | null | undefined) { return Boolean(analysis && analysis.status === "analyzed" && analysis.analyzerVersion === MAP_ANALYZER_VERSION); }
