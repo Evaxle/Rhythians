@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { rhythiaRequest } from "@/lib/rhythia";
-import { speedProfileAt, MAP_ANALYZER_VERSION, type MapSpeedProfile } from "@/lib/map-difficulty";
+import { speedProfileAt, MAP_ANALYZER_VERSION, type MapPatternSegment, type MapSpeedProfile } from "@/lib/map-difficulty";
 import { ensureMapAnalysisTable } from "@/lib/map-analysis-store";
 import { MODE_RULES, type ModeKey, type ModePoints } from "@/lib/rhythia-mode-rules";
 
@@ -52,12 +52,14 @@ type ScorePayload = {
   modifiers?: unknown;
   modifiers_json?: unknown;
   settings?: unknown;
+  [key: string]: unknown;
 };
 type ScoreBucket = { name: string; scores: ScorePayload[] };
-type AnalyzedMapRow = { id: string; title: string; sourceBeatmapId: number | null; rating: number; rpl: number; rpv: number; rps: number; speedProfiles: unknown };
+type AnalyzedMapRow = { id: string; title: string; sourceBeatmapId: number | null; rating: number; rpl: number; rpv: number; rps: number; speedProfiles: unknown; patternSegments: unknown };
 
 const RHP_MULTI_CLEAR_WEIGHTS = [1, 0.55, 0.35] as const;
 
+function clamp(value: number, min = 0, max = 1) { return Math.min(max, Math.max(min, value)); }
 function normalize(value: string | null | undefined) { return (value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
 function normalizeSourceId(value: number) { return Number.isSafeInteger(value) && value > 0x7fffffff && value <= 0xffffffff ? value - 0x100000000 : value; }
 function text(value: unknown) {
@@ -91,11 +93,12 @@ function accuracyFromScore(score: ScorePayload) {
   if (!notes || notes <= 0 || score.misses == null) return null;
   return Math.max(0, Math.min(100, ((notes - score.misses) / notes) * 100));
 }
-function parseProfiles(value: unknown): MapSpeedProfile[] {
-  if (Array.isArray(value)) return value as MapSpeedProfile[];
-  if (typeof value === "string") { try { const parsed = JSON.parse(value); return Array.isArray(parsed) ? parsed as MapSpeedProfile[] : []; } catch { return []; } }
+function parseArray<T>(value: unknown): T[] {
+  if (Array.isArray(value)) return value as T[];
+  if (typeof value === "string") { try { const parsed = JSON.parse(value); return Array.isArray(parsed) ? parsed as T[] : []; } catch { return []; } }
   return [];
 }
+function parseProfiles(value: unknown) { return parseArray<MapSpeedProfile>(value); }
 function modeDetails(score: ScorePayload, sourceBucket: string) {
   const explicit = [score.cameraMode, score.camera_mode, score.gameMode, score.game_mode, score.mode, score.playMode, score.play_mode, score.camera, score.camera_mode_name, score.play_mode_name].map(text).join(" ").toLowerCase();
   const modifiers = [score.mods, score.modifiers, score.modifiers_json, score.settings].map(text).join(" ").toLowerCase();
@@ -118,6 +121,85 @@ function scoreBuckets(value: unknown, path = "root", result: ScoreBucket[] = [])
   }
   for (const [key, nested] of Object.entries(value as Record<string, unknown>)) scoreBuckets(nested, `${path}.${key}`, result);
   return result;
+}
+function numericTime(record: Record<string, unknown>) {
+  for (const key of ["time", "timeMs", "time_ms", "timestamp", "timestampMs", "timestamp_ms", "noteTime", "note_time", "noteTimeMs", "note_time_ms"]) {
+    const value = record[key];
+    const number = typeof value === "number" ? value : typeof value === "string" && value.trim() ? Number(value) : NaN;
+    if (Number.isFinite(number) && number >= 0) return number;
+  }
+  return null;
+}
+function looksLikeMiss(record: Record<string, unknown>, path: string) {
+  const state = [record.result, record.judgement, record.judgment, record.status, record.type, record.grade].map(text).join(" ").toLowerCase();
+  return path.toLowerCase().includes("miss") || state.includes("miss") || record.missed === true || record.isMiss === true || record.is_miss === true || record.hit === false;
+}
+function extractMissTimes(score: ScorePayload) {
+  const times: number[] = [];
+  const seen = new Set<unknown>();
+  function visit(value: unknown, path: string, depth: number) {
+    if (value == null || depth > 8) return;
+    if (typeof value === "number" || typeof value === "string" || typeof value === "boolean") {
+      if (path.toLowerCase().includes("misstime") || path.toLowerCase().includes("miss_time")) {
+        const number = typeof value === "number" ? value : Number(value);
+        if (Number.isFinite(number) && number >= 0) times.push(number);
+      }
+      return;
+    }
+    if (seen.has(value)) return;
+    seen.add(value);
+    if (Array.isArray(value)) {
+      for (const item of value) visit(item, path, depth + 1);
+      return;
+    }
+    const record = value as Record<string, unknown>;
+    if (looksLikeMiss(record, path)) {
+      const time = numericTime(record);
+      if (time != null) times.push(time);
+    }
+    for (const [key, nested] of Object.entries(record)) {
+      if (["beatmap", "map", "chart", "metadata"].includes(key.toLowerCase())) continue;
+      visit(nested, `${path}.${key}`, depth + 1);
+    }
+  }
+  for (const key of ["replay", "replayData", "replay_data", "judgements", "judgments", "hitResults", "hit_results", "events", "missEvents", "miss_events", "missedNotes", "missed_notes", "missTimes", "miss_times", "notes"]) {
+    if (score[key] !== undefined) visit(score[key], key, 0);
+  }
+  return [...new Set(times.map((value) => Math.round(value)))].sort((a, b) => a - b);
+}
+function missRate(score: ScorePayload) {
+  const notes = score.beatmapNotes ?? score.beatmap_notes ?? null;
+  if (notes && notes > 0 && typeof score.misses === "number" && Number.isFinite(score.misses)) return clamp(score.misses / notes);
+  const accuracy = accuracyFromScore(score);
+  return accuracy == null ? 0 : clamp(1 - accuracy / 100);
+}
+function missBalanceMultiplier(map: AnalyzedMapRow, score: ScorePayload) {
+  const rate = missRate(score);
+  if (rate <= 0) return 1;
+  const segments = parseArray<MapPatternSegment>(map.patternSegments).filter((segment) => Number.isFinite(segment.startMs) && Number.isFinite(segment.endMs) && segment.endMs > segment.startMs);
+  const times = extractMissTimes(score);
+  const aggregate = clamp(1 - Math.pow(rate, 0.68) * 1.45, 0.58, 1);
+  if (!segments.length || !times.length) return aggregate;
+  const counts = new Array(segments.length).fill(0) as number[];
+  let matched = 0;
+  let difficultySum = 0;
+  const peak = Math.max(0.001, ...segments.map((segment) => Math.max(segment.peakStrain, segment.averageStrain)));
+  for (const rawTime of times) {
+    const speed = Number.isFinite(score.speed) && (score.speed ?? 0) > 0 ? score.speed! : 1;
+    const mapTime = rawTime * speed;
+    const index = segments.findIndex((segment) => mapTime >= segment.startMs && mapTime < segment.endMs);
+    if (index < 0) continue;
+    counts[index] += 1;
+    matched += 1;
+    difficultySum += clamp(Math.max(segments[index].peakStrain, segments[index].averageStrain) / peak);
+  }
+  if (!matched) return aggregate;
+  const occupied = counts.filter((count) => count > 0);
+  const entropy = occupied.reduce((sum, count) => { const p = count / matched; return sum - p * Math.log(p); }, 0);
+  const balance = occupied.length <= 1 ? 0 : clamp(entropy / Math.log(Math.min(matched, segments.length)));
+  const hardSectionForgiveness = clamp(difficultySum / matched);
+  const placementFactor = 0.72 + 0.18 * balance + 0.10 * hardSectionForgiveness;
+  return clamp(1 - (1 - aggregate) * (2 - placementFactor), 0.52, 1);
 }
 
 export function scoreCameraMode(score: ScorePayload, sourceBucket: string): ModeKey { return modeDetails(score, sourceBucket).mode; }
@@ -154,7 +236,7 @@ export async function fetchRecentModeScoresForUser(userId: string): Promise<Rece
 async function analyzedMaps() {
   await ensureMapAnalysisTable();
   return prisma.$queryRawUnsafe<AnalyzedMapRow[]>(`
-    SELECT c.id,c.title,c."sourceBeatmapId",a.rating,a.rpl,a.rpv,a.rps,a."speedProfiles"
+    SELECT c.id,c.title,c."sourceBeatmapId",a.rating,a.rpl,a.rpv,a.rps,a."speedProfiles",a."patternSegments"
     FROM "ChallengeMap" c
     JOIN "MapDifficultyAnalysis" a ON a."mapId"=c.id
     WHERE c.status='approved' AND a.status='analyzed' AND a."pointEligible"=TRUE AND a."analyzerVersion"=$1 AND a.rating IS NOT NULL`, MAP_ANALYZER_VERSION);
@@ -166,6 +248,9 @@ function rewardFor(map: AnalyzedMapRow, mode: ModeKey, speed: number | null | un
   if (mode === "lock") return map.rpl;
   if (mode === "vr") return map.rpv;
   return map.rps;
+}
+function scoreReward(map: AnalyzedMapRow, mode: ModeKey, score: ScorePayload) {
+  return Math.max(1, Math.round(rewardFor(map, mode, score.speed) * missBalanceMultiplier(map, score)));
 }
 
 async function getOverrides(userId: string) {
@@ -209,22 +294,13 @@ export async function reconcileUserRankPoints(userId: string) {
   return { ...totals, changed: current?.rhp !== totals.rhp };
 }
 
-async function recalculateExistingRows(userId: string, maps: AnalyzedMapRow[]) {
-  const byKey = new Map(maps.map((map) => [mapKey(map), map]));
-  const keys = [...byKey.keys()];
+async function removeIneligibleRows(userId: string, maps: AnalyzedMapRow[]) {
+  const keys = maps.map(mapKey);
   if (!keys.length) {
     await prisma.rhythiaModeScore.deleteMany({ where: { userId } });
     return;
   }
   await prisma.rhythiaModeScore.deleteMany({ where: { userId, mapKey: { notIn: keys } } });
-  const existing = await prisma.rhythiaModeScore.findMany({ where: { userId, mapKey: { in: keys } }, select: { id: true, mapKey: true, cameraMode: true, speed: true, points: true } });
-  const updates = existing.map((row) => {
-    const map = byKey.get(row.mapKey);
-    if (!map) return null;
-    const points = rewardFor(map, row.cameraMode as ModeKey, row.speed);
-    return points === row.points ? null : prisma.rhythiaModeScore.update({ where: { id: row.id }, data: { points } });
-  }).filter((value): value is NonNullable<typeof value> => value !== null);
-  if (updates.length) await prisma.$transaction(updates);
 }
 
 export async function syncUserModeScores(userId: string) {
@@ -234,7 +310,7 @@ export async function syncUserModeScores(userId: string) {
     analyzedMaps(),
   ]);
   if (!profile || !user) return { rpl: 0, rps: 0, rpv: 0, rhp: user?.rhp ?? 0, rows: [] as RhythiaModeScoreRow[], foundModes: { lock: 0, spin: 0, vr: 0 }, added: 0, rankIndex: 0 };
-  await recalculateExistingRows(userId, maps);
+  await removeIneligibleRows(userId, maps);
   const scores = await fetchModeScores(profile.profileId);
   const byBeatmapId = new Map<number, AnalyzedMapRow>();
   const byTitle = new Map<string, AnalyzedMapRow>();
@@ -249,23 +325,27 @@ export async function syncUserModeScores(userId: string) {
     const normalizedId = sourceId == null ? null : normalizeSourceId(sourceId);
     const map = normalizedId != null ? byBeatmapId.get(normalizedId) ?? byTitle.get(normalize(scoreTitle(entry.score))) : byTitle.get(normalize(scoreTitle(entry.score)));
     if (!map) continue;
-    const points = rewardFor(map, entry.mode, entry.score.speed);
+    const points = scoreReward(map, entry.mode, entry.score);
     const key = `${mapKey(map)}:${entry.mode}`;
     const candidate = { score: entry.score, mode: entry.mode, map, points };
     const old = candidates.get(key);
+    const accuracy = accuracyFromScore(entry.score) ?? 0;
+    const oldAccuracy = old ? accuracyFromScore(old.score) ?? 0 : 0;
     const awarded = scoreAwardedSp(entry.score) ?? 0;
     const oldAwarded = old ? scoreAwardedSp(old.score) ?? 0 : 0;
     const created = scoreCreatedAt(entry.score) ?? "";
     const oldCreated = old ? scoreCreatedAt(old.score) ?? "" : "";
-    if (!old || points > old.points || points === old.points && awarded > oldAwarded || points === old.points && awarded === oldAwarded && created > oldCreated) candidates.set(key, candidate);
+    if (!old || points > old.points || points === old.points && accuracy > oldAccuracy || points === old.points && accuracy === oldAccuracy && awarded > oldAwarded || points === old.points && accuracy === oldAccuracy && awarded === oldAwarded && created > oldCreated) candidates.set(key, candidate);
   }
-  const previous = await prisma.rhythiaModeScore.findMany({ where: { userId }, select: { mapKey: true, cameraMode: true, scoreId: true, points: true } });
+  const previous = await prisma.rhythiaModeScore.findMany({ where: { userId }, select: { mapKey: true, cameraMode: true, scoreId: true } });
   const previousKeys = new Set(previous.map((row) => `${row.mapKey}:${row.cameraMode}:${row.scoreId}`));
+  const candidateKeys = new Set(candidates.keys());
+  const analyzedKeys = new Set(maps.map(mapKey));
+  const staleIds = previous.filter(row => analyzedKeys.has(row.mapKey) && !candidateKeys.has(`${row.mapKey}:${row.cameraMode}`));
+  if (staleIds.length) await prisma.rhythiaModeScore.deleteMany({ where: { userId, OR: staleIds.map(row => ({ mapKey: row.mapKey, cameraMode: row.cameraMode })) } });
   let added = 0;
   for (const candidate of candidates.values()) {
     const key = mapKey(candidate.map);
-    const existing = previous.find((row) => row.mapKey === key && row.cameraMode === candidate.mode);
-    if (existing && existing.points > candidate.points) continue;
     if (!previousKeys.has(`${key}:${candidate.mode}:${candidate.score.id}`)) added += 1;
     await prisma.rhythiaModeScore.upsert({
       where: { userId_mapKey_cameraMode: { userId, mapKey: key, cameraMode: candidate.mode } },
@@ -298,20 +378,17 @@ export async function syncUserModeScores(userId: string) {
 export async function recalculateUsersForMapAnalysis(mapId: string) {
   await ensureMapAnalysisTable();
   const maps = await prisma.$queryRawUnsafe<AnalyzedMapRow[]>(`
-    SELECT c.id,c.title,c."sourceBeatmapId",a.rating,a.rpl,a.rpv,a.rps,a."speedProfiles"
+    SELECT c.id,c.title,c."sourceBeatmapId",a.rating,a.rpl,a.rpv,a.rps,a."speedProfiles",a."patternSegments"
     FROM "ChallengeMap" c JOIN "MapDifficultyAnalysis" a ON a."mapId"=c.id
     WHERE c.id=$1 AND a.status='analyzed' AND a."pointEligible"=TRUE AND a."analyzerVersion"=$2 LIMIT 1`, mapId, MAP_ANALYZER_VERSION);
   const map = maps[0] ?? null;
   const mapRow = await prisma.challengeMap.findUnique({ where: { id: mapId }, select: { id: true, sourceBeatmapId: true } });
   if (!mapRow) return { users: 0 };
   const key = mapRow.sourceBeatmapId != null ? `rhythia:${mapRow.sourceBeatmapId}` : `map:${mapRow.id}`;
-  const rows = await prisma.rhythiaModeScore.findMany({ where: { mapKey: key }, select: { id: true, userId: true, cameraMode: true, speed: true } });
+  const rows = await prisma.rhythiaModeScore.findMany({ where: { mapKey: key }, select: { userId: true } });
   const userIds = [...new Set(rows.map((row) => row.userId))];
   if (!map) await prisma.rhythiaModeScore.deleteMany({ where: { mapKey: key } });
-  else {
-    const updates = rows.map((row) => prisma.rhythiaModeScore.update({ where: { id: row.id }, data: { points: rewardFor(map, row.cameraMode as ModeKey, row.speed) } }));
-    if (updates.length) await prisma.$transaction(updates);
-  }
+  else for (const userId of userIds) await syncUserModeScores(userId);
   for (const userId of userIds) await reconcileUserRankPoints(userId);
   return { users: userIds.length };
 }
