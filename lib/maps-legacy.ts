@@ -34,8 +34,8 @@ export async function getChallengeLeaderboard(rankIndex: number, limit = 100) {
 export async function getApprovedMaps(_includeAll: boolean, userId: string | null, includeUnranked = false) {
   const analyses = await currentAnalyses();
   const analysisByMap = new Map(analyses.map((row) => [row.mapId, row]));
-  const allowedIds = analyses.filter((row) => includeUnranked || row.pointEligible).map((row) => row.mapId);
-  const maps = allowedIds.length ? await prisma.challengeMap.findMany({ where: { id: { in: allowedIds }, status: "approved", rating: { not: null } }, orderBy: [{ rating: "asc" }, { createdAt: "desc" }], include: { submittedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } }, reviewedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } } } }) : [];
+  const allowedIds = analyses.filter((row) => row.pointEligible || row.sourceStatus === "legacy" || includeUnranked).map((row) => row.mapId);
+  const maps = allowedIds.length ? await prisma.challengeMap.findMany({ where: { id: { in: allowedIds }, status: { in: ["approved", "legacy"] }, rating: { not: null } }, orderBy: [{ rating: "asc" }, { createdAt: "desc" }], include: { submittedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } }, reviewedBy: { select: { username: true, displayName: true, profileHandle: true, avatar: true } } } }) : [];
   const completionState = userId && maps.length ? await prisma.challengeMapCompletion.findMany({ where: { userId, challengeMapId: { in: maps.map((map) => map.id) } }, select: { challengeMapId: true, passed: true, points: true } }) : [];
   const stateMap = new Map(completionState.map((entry) => [entry.challengeMapId, entry]));
   let scoredTitles = new Set<string>();
@@ -48,8 +48,11 @@ export async function getApprovedMaps(_includeAll: boolean, userId: string | nul
   return { rankInfo, maps: maps.map((map) => {
     const analysis = analysisByMap.get(map.id);
     const mapRankIndex = rankIndexForRating(map.rating ?? 0);
-    const isRanked = Boolean(analysis?.pointEligible);
-    return { id: map.id, title: map.title, artist: map.artist, description: map.description, mapFileUrl: map.mapFileUrl, imageUrl: map.imageUrl, rating: map.rating, rankIndex: mapRankIndex, rankName: isRanked ? RANKS[mapRankIndex]?.name ?? "Expert" : "Unranked", rankColor: isRanked ? RANKS[mapRankIndex]?.color ?? RANKS[RANKS.length - 1].color : "#f59e0b", mapperName: map.mapperName, noteCount: map.noteCount, length: map.length, submittedBy: map.submittedBy, reviewedBy: map.reviewedBy, completion: stateMap.get(map.id) ?? null, hasScore: scoredTitles.has(normalizeTitle(map.title)), isAutoImported: map.isAutoImported, isRanked, isLegacy: false, sourceStatus: analysis?.sourceStatus ?? "ranked" };
+    const sourceStatus = analysis?.sourceStatus ?? (map.status === "legacy" ? "legacy" : "ranked");
+    const isLegacy = sourceStatus === "legacy" || map.status === "legacy";
+    const isRanked = !isLegacy && Boolean(analysis?.pointEligible);
+    const rank = RANKS[mapRankIndex] ?? RANKS[RANKS.length - 1];
+    return { id: map.id, title: map.title, artist: map.artist, description: map.description, mapFileUrl: map.mapFileUrl, imageUrl: map.imageUrl, rating: map.rating, rankIndex: mapRankIndex, rankName: isLegacy ? `${rank.name} Legacy` : isRanked ? rank.name : "Unranked", rankColor: isLegacy ? rank.color : isRanked ? rank.color : "#f59e0b", mapperName: map.mapperName, noteCount: map.noteCount, length: map.length, submittedBy: map.submittedBy, reviewedBy: map.reviewedBy, completion: stateMap.get(map.id) ?? null, hasScore: scoredTitles.has(normalizeTitle(map.title)), isAutoImported: map.isAutoImported, isRanked, isLegacy, sourceStatus };
   }) };
 }
 
