@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { canAccessAdmin } from "@/lib/admin-access";
-import { analyzePendingRankedMaps, getRankedAnalysisStats } from "@/lib/map-analysis-store";
+import { analyzePendingMaps, getAllMapAnalysisStats } from "@/lib/map-analysis-refresh";
 import { recalculateUsersForMapAnalysis } from "@/lib/rhythia-mode-points";
 
 export const runtime = "nodejs";
@@ -18,7 +18,7 @@ async function authorize() {
 export async function GET() {
   const auth = await authorize();
   if (auth.response) return auth.response;
-  return NextResponse.json({ stats: await getRankedAnalysisStats() }, { headers: { "Cache-Control": "no-store" } });
+  return NextResponse.json({ stats: await getAllMapAnalysisStats() }, { headers: { "Cache-Control": "no-store" } });
 }
 
 export async function POST(request: Request) {
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => null) as { limit?: unknown } | null;
   const limit = Math.max(1, Math.min(2, Number(body?.limit) || 2));
   try {
-    const result = await analyzePendingRankedMaps(limit);
+    const result = await analyzePendingMaps(limit);
     let recalculatedUsers = 0;
     for (const mapId of [...result.succeededMapIds, ...result.failedMapIds]) {
       const recalculated = await recalculateUsersForMapAnalysis(mapId);
@@ -35,6 +35,6 @@ export async function POST(request: Request) {
     }
     return NextResponse.json({ ...result, recalculatedUsers });
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Ranked map analysis failed." }, { status: 400 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Map analysis failed." }, { status: 400 });
   }
 }
