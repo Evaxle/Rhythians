@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { canAccessAdmin } from "@/lib/admin-access";
-import { getMapAnalysis, MAP_ANALYZER_VERSION, UNRANKED_MAP_MARKER } from "@/lib/map-analysis-store";
+import { getAllAnalysisStats, getMapAnalysis, MAP_ANALYZER_VERSION, MAP_RANKABILITY_VERSION, MIN_POINT_RANKABILITY, UNRANKED_MAP_MARKER } from "@/lib/map-analysis-store";
 import type { Prisma } from "@/generated/prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -22,15 +22,17 @@ export async function GET(request: Request) {
   else filters.push({ status: { in: ["approved", "legacy"] } });
   if (query) filters.push({ OR: [{ title: { contains: query, mode: "insensitive" } }, { mapperName: { contains: query, mode: "insensitive" } }] });
   const where: Prisma.ChallengeMapWhereInput = { AND: filters };
-  const [total, maps] = await Promise.all([
+  const [total, maps, queueStats] = await Promise.all([
     prisma.challengeMap.count({ where }),
     prisma.challengeMap.findMany({ where, orderBy: [{ updatedAt: "desc" }, { id: "asc" }], skip: (page - 1) * 10, take: 10, select: { id: true, title: true, artist: true, mapperName: true, imageUrl: true, rating: true, noteCount: true, length: true, status: true, reviewerNote: true, sourceBeatmapId: true, sourceUrl: true, mapFileUrl: true, isAutoImported: true, updatedAt: true } }),
+    getAllAnalysisStats(),
   ]);
   const rows = await Promise.all(maps.map(async (map) => {
     const analysis = await getMapAnalysis(map.id);
     const sourceStatus = map.reviewerNote === UNRANKED_MAP_MARKER ? "unranked" : map.status === "legacy" ? "legacy" : "ranked";
-    const analysisStatus = !analysis ? "unanalyzed" : analysis.status === "analyzed" && analysis.analyzerVersion !== MAP_ANALYZER_VERSION ? "stale" : analysis.status;
+    const current = analysis?.status === "analyzed" && analysis.analyzerVersion === MAP_ANALYZER_VERSION && analysis.rankabilityVersion === MAP_RANKABILITY_VERSION;
+    const analysisStatus = !analysis ? "unanalyzed" : current ? "analyzed" : analysis.status === "analyzed" ? "stale" : analysis.status;
     return { ...map, updatedAt: map.updatedAt.toISOString(), sourceStatus, analysisStatus, analysis };
   }));
-  return NextResponse.json({ maps: rows, page, pageSize: 10, total, pages: Math.max(1, Math.ceil(total / 10)), analyzerVersion: MAP_ANALYZER_VERSION });
+  return NextResponse.json({ maps: rows, page, pageSize: 10, total, pages: Math.max(1, Math.ceil(total / 10)), analyzerVersion: MAP_ANALYZER_VERSION, rankabilityVersion: MAP_RANKABILITY_VERSION, minimumPointRankability: MIN_POINT_RANKABILITY, queueStats });
 }
