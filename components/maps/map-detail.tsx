@@ -52,7 +52,7 @@ export function MapDetail({ map, userRank: _userRank, currentUserId }: Props) {
       <div className="p-6 sm:p-8">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
-            <div className="flex items-center gap-3"><RankIcon rank={rank} size={44} /><p className="text-sm uppercase tracking-[0.2em]" style={{ color: data.rankColor }}>{mapDifficulty}{data.isLegacy ? " · Legacy" : ""}</p></div>
+            <div className="flex items-center gap-3"><RankIcon rank={rank} size={44} /><p className="text-sm uppercase tracking-[0.2em]" style={{ color: data.rankColor }}>{mapDifficulty}{data.isLegacy ? " · Legacy" : data.sourceStatus === "unranked" ? " · Unranked" : ""}</p></div>
             <h1 className="mt-2 text-3xl font-semibold text-white sm:text-4xl">{data.title}</h1>
             <p className="mt-2 text-sm text-muted">{data.artist ?? "Unknown artist"} · Mapped by {data.mapperName ?? "Unknown"}</p>
           </div>
@@ -62,15 +62,18 @@ export function MapDetail({ map, userRank: _userRank, currentUserId }: Props) {
           </div>
         </div>
 
-        <div className={`mt-6 grid gap-3 ${data.isRanked ? "sm:grid-cols-2 lg:grid-cols-5" : "sm:grid-cols-3"}`}>
+        <div className={`mt-6 grid gap-3 ${data.isRanked ? "sm:grid-cols-2 lg:grid-cols-6" : "sm:grid-cols-2 lg:grid-cols-4"}`}>
+          <div className="rounded-2xl border border-accent/30 bg-accent/[0.08] p-4"><p className="text-xs uppercase tracking-wider text-muted">Rankability</p><p className="mt-1 text-2xl font-black text-white">{data.rankability.toFixed(2)}<span className="text-sm font-semibold text-muted"> / 5.00</span></p><p className="mt-1 text-[11px] leading-4 text-muted">Competitive ranking suitability from the latest map analysis.</p></div>
           <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">Rating</p><p className="mt-1 text-xl font-semibold" style={{ color: data.rankColor }}>{data.rating.toFixed(2)}</p></div>
           {data.isRanked && <><div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">RPL</p><p className="mt-1 text-xl font-semibold text-white">{data.rpl}</p></div><div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">RPV</p><p className="mt-1 text-xl font-semibold text-white">{data.rpv}</p></div><div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">RPS</p><p className="mt-1 text-xl font-semibold text-white">{data.rps}</p></div></>}
           {data.isLegacy && <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">Archive status</p><p className="mt-1 flex items-center gap-2 text-xl font-semibold text-white"><Archive size={18} /> Legacy</p></div>}
+          {data.sourceStatus === "unranked" && <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">Map status</p><p className="mt-1 text-xl font-semibold text-white">Unranked</p></div>}
           <div className="rounded-2xl border border-border bg-background/60 p-4"><p className="text-xs uppercase tracking-wider text-muted">Length</p><p className="mt-1 text-xl font-semibold text-white">{length ?? "—"}</p></div>
         </div>
 
         <div className="mt-6 flex flex-wrap gap-2 text-xs text-muted">
           <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">{mapDifficulty}</span>
+          <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">Rankability {data.rankability.toFixed(2)} / 5.00</span>
           <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">Rank range {data.rangeMin.toFixed(2)}–{data.rankIndex === RANKS.length - 1 ? `${data.rangeMin.toFixed(2)}+` : data.rangeMax.toFixed(2)}</span>
           {data.noteCount != null && <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">{data.noteCount.toLocaleString()} notes</span>}
           {data.sourceBeatmapId != null && <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">Rhythia map #{data.sourceBeatmapId}</span>}
