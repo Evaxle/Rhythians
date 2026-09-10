@@ -10,19 +10,74 @@ export type EditablePointSystem = "rhp" | "rpl" | "rps" | "rpv";
 export type RhythiaModeScoreRow = { id: string; mapKey: string; mapTitle: string; scoreId: number; cameraMode: ModeKey; points: number; accuracy: number | null; awardedSp: number | null; speed: number | null };
 export type RecentModeScore = { id: number; beatmapTitle: string; sourceBeatmapId: number | null; cameraMode: ModeKey; speed: number; accuracy: number | null; awardedSp: number | null; createdAt: Date | null; passed: boolean };
 
-type ScorePayload = { id: number; beatmapTitle?: string | null; beatmapId?: number | null; mapId?: number | null; beatmapHash?: string | null; passed?: boolean | null; misses?: number | null; beatmapNotes?: number | null; accuracy?: number | null; speed?: number | null; awarded_sp?: number | null; created_at?: string | null; cameraMode?: string | null; gameMode?: string | null; mode?: string | null; spin?: boolean | null; vr?: boolean | null; isVr?: boolean | null; mods?: string | null };
+type ScorePayload = {
+  id: number;
+  beatmapTitle?: string | null;
+  beatmap_title?: string | null;
+  beatmapId?: number | null;
+  beatmap_id?: number | null;
+  mapId?: number | null;
+  map_id?: number | null;
+  beatmapHash?: string | null;
+  passed?: boolean | null;
+  misses?: number | null;
+  beatmapNotes?: number | null;
+  beatmap_notes?: number | null;
+  accuracy?: number | null;
+  speed?: number | null;
+  awarded_sp?: number | null;
+  awardedSp?: number | null;
+  created_at?: string | null;
+  createdAt?: string | null;
+  cameraMode?: unknown;
+  camera_mode?: unknown;
+  gameMode?: unknown;
+  game_mode?: unknown;
+  mode?: unknown;
+  playMode?: unknown;
+  play_mode?: unknown;
+  camera?: unknown;
+  camera_mode_name?: unknown;
+  play_mode_name?: unknown;
+  spin?: unknown;
+  isSpin?: unknown;
+  is_spin?: unknown;
+  spinMode?: unknown;
+  spin_mode?: unknown;
+  vr?: unknown;
+  isVr?: unknown;
+  is_vr?: unknown;
+  mods?: unknown;
+  modifiers?: unknown;
+  modifiers_json?: unknown;
+  settings?: unknown;
+};
 type ScoreBucket = { name: "lastDay" | "top" | "vrTop" | "vrRecent"; scores: ScorePayload[] };
 type AnalyzedMapRow = { id: string; title: string; sourceBeatmapId: number | null; rating: number; rpl: number; rpv: number; rps: number; speedProfiles: unknown };
-type QuestBonusRow = { mode: string; bonusPoints: number };
 
 const RHP_MULTI_CLEAR_WEIGHTS = [1, 0.55, 0.35] as const;
 
 function normalize(value: string | null | undefined) { return (value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
 function normalizeSourceId(value: number) { return Number.isSafeInteger(value) && value > 0x7fffffff && value <= 0xffffffff ? value - 0x100000000 : value; }
+function text(value: unknown) {
+  if (Array.isArray(value)) return value.map(String).join(" ");
+  if (value && typeof value === "object") return Object.entries(value as Record<string, unknown>).map(([key, item]) => `${key} ${String(item)}`).join(" ");
+  return typeof value === "string" ? value : "";
+}
+function enabled(value: unknown) {
+  if (value === true || value === 1) return true;
+  if (typeof value !== "string") return false;
+  return ["1", "true", "yes", "on", "enabled", "spin", "vr"].includes(value.trim().toLowerCase());
+}
+function scoreTitle(score: ScorePayload) { return score.beatmapTitle ?? score.beatmap_title ?? ""; }
+function scoreSourceId(score: ScorePayload) { return score.beatmapId ?? score.beatmap_id ?? score.mapId ?? score.map_id ?? null; }
+function scoreCreatedAt(score: ScorePayload) { return score.created_at ?? score.createdAt ?? null; }
+function scoreAwardedSp(score: ScorePayload) { return score.awarded_sp ?? score.awardedSp ?? null; }
 function accuracyFromScore(score: ScorePayload) {
   if (score.accuracy != null && Number.isFinite(score.accuracy)) return Math.max(0, Math.min(100, score.accuracy));
-  if (!score.beatmapNotes || score.beatmapNotes <= 0 || score.misses == null) return null;
-  return Math.max(0, Math.min(100, ((score.beatmapNotes - score.misses) / score.beatmapNotes) * 100));
+  const notes = score.beatmapNotes ?? score.beatmap_notes ?? null;
+  if (!notes || notes <= 0 || score.misses == null) return null;
+  return Math.max(0, Math.min(100, ((notes - score.misses) / notes) * 100));
 }
 function parseProfiles(value: unknown): MapSpeedProfile[] {
   if (Array.isArray(value)) return value as MapSpeedProfile[];
@@ -30,17 +85,13 @@ function parseProfiles(value: unknown): MapSpeedProfile[] {
   return [];
 }
 function modeDetails(score: ScorePayload, sourceBucket: ScoreBucket["name"]) {
-  const explicitValues = [score.cameraMode, score.gameMode, score.mode].filter((value): value is string => typeof value === "string" && value.trim().length > 0);
-  const explicit = normalize(explicitValues.join(" ")).replace(/ /g, "");
-  if (explicit === "vr" || explicit.includes("virtualreality")) return { mode: "vr" as const, confidence: 3 };
+  const explicit = [score.cameraMode, score.camera_mode, score.gameMode, score.game_mode, score.mode, score.playMode, score.play_mode, score.camera, score.camera_mode_name, score.play_mode_name].map(text).join(" ").toLowerCase();
+  const modifiers = [score.mods, score.modifiers, score.modifiers_json, score.settings].map(text).join(" ").toLowerCase();
+  if (explicit.includes("vr") || explicit.includes("virtual reality")) return { mode: "vr" as const, confidence: 3 };
   if (explicit.includes("spin")) return { mode: "spin" as const, confidence: 3 };
   if (explicit.includes("lock")) return { mode: "lock" as const, confidence: 3 };
-  if (score.vr === true || score.isVr === true) return { mode: "vr" as const, confidence: 2 };
-  if (score.spin === true) return { mode: "spin" as const, confidence: 2 };
-  if (typeof score.mods === "string") {
-    if (/(^|[\s,;+])vr([\s,;+]|$)/i.test(score.mods) || /virtual\s*reality/i.test(score.mods)) return { mode: "vr" as const, confidence: 2 };
-    if (/(^|[\s,;+])spin([\s,;+]|$)/i.test(score.mods)) return { mode: "spin" as const, confidence: 2 };
-  }
+  if (enabled(score.vr) || enabled(score.isVr) || enabled(score.is_vr) || /(^|[^a-z])vr([^a-z]|$)/i.test(modifiers) || /virtual\s*reality/i.test(modifiers)) return { mode: "vr" as const, confidence: 2 };
+  if (enabled(score.spin) || enabled(score.isSpin) || enabled(score.is_spin) || enabled(score.spinMode) || enabled(score.spin_mode) || /(^|[^a-z])spin([^a-z]|$)/i.test(modifiers)) return { mode: "spin" as const, confidence: 2 };
   if (sourceBucket === "vrTop" || sourceBucket === "vrRecent") return { mode: "vr" as const, confidence: 1 };
   return { mode: "lock" as const, confidence: 0 };
 }
@@ -71,16 +122,17 @@ export async function fetchRecentModeScoresForUser(userId: string): Promise<Rece
   if (!profile) return [];
   const entries = await fetchModeScores(profile.profileId);
   return entries.map(({ score, mode }) => {
-    const source = score.beatmapId ?? score.mapId ?? null;
-    const created = score.created_at ? new Date(score.created_at) : null;
+    const source = scoreSourceId(score);
+    const createdValue = scoreCreatedAt(score);
+    const created = createdValue ? new Date(createdValue) : null;
     return {
       id: score.id,
-      beatmapTitle: score.beatmapTitle?.trim() ?? "",
+      beatmapTitle: scoreTitle(score).trim(),
       sourceBeatmapId: source == null ? null : normalizeSourceId(source),
       cameraMode: mode,
       speed: Number.isFinite(score.speed) && (score.speed ?? 0) > 0 ? score.speed! : 1,
       accuracy: accuracyFromScore(score),
-      awardedSp: score.awarded_sp ?? null,
+      awardedSp: scoreAwardedSp(score),
       createdAt: created && Number.isFinite(created.getTime()) ? created : null,
       passed: score.passed === true,
     };
@@ -108,12 +160,6 @@ async function getOverrides(userId: string) {
   const rows = await prisma.$queryRawUnsafe<Array<{ system: EditablePointSystem; points: number }>>('SELECT "system","points" FROM "UserPointOverride" WHERE "userId"=$1', userId).catch(() => []);
   return new Map(rows.map((row) => [row.system, Number(row.points)]));
 }
-async function getQuestBonuses(userId: string) {
-  const rows = await prisma.$queryRawUnsafe<QuestBonusRow[]>('SELECT mode,"bonusPoints" FROM "DailyModeQuestClaim" WHERE "userId"=$1', userId).catch(() => []);
-  const bonuses: ModePoints = { lock: 0, spin: 0, vr: 0 };
-  for (const row of rows) if (row.mode === "lock" || row.mode === "spin" || row.mode === "vr") bonuses[row.mode] += Math.max(0, Number(row.bonusPoints) || 0);
-  return bonuses;
-}
 export async function getUserPointOverrides(userId: string) { return getOverrides(userId); }
 export async function setUserPointOverride(userId: string, system: EditablePointSystem, points: number | null) {
   if (points == null) {
@@ -124,12 +170,11 @@ export async function setUserPointOverride(userId: string, system: EditablePoint
 }
 
 export async function calculateStoredTotals(userId: string) {
-  const [rows, overrides, questBonuses] = await Promise.all([
+  const [rows, overrides] = await Promise.all([
     prisma.rhythiaModeScore.findMany({ where: { userId }, select: { mapKey: true, cameraMode: true, points: true } }),
     getOverrides(userId),
-    getQuestBonuses(userId),
   ]);
-  const raw: ModePoints = { lock: questBonuses.lock, spin: questBonuses.spin, vr: questBonuses.vr };
+  const raw: ModePoints = { lock: 0, spin: 0, vr: 0 };
   const byMap = new Map<string, number[]>();
   for (const row of rows) {
     const mode = row.cameraMode as ModeKey;
@@ -139,15 +184,14 @@ export async function calculateStoredTotals(userId: string) {
     values.push(points);
     byMap.set(row.mapKey, values);
   }
-  let passRhp = 0;
+  let earnedRhp = 0;
   for (const values of byMap.values()) {
     values.sort((a, b) => b - a);
-    passRhp += values.slice(0, 3).reduce((sum, value, index) => sum + value * RHP_MULTI_CLEAR_WEIGHTS[index], 0);
+    earnedRhp += values.slice(0, 3).reduce((sum, value, index) => sum + value * RHP_MULTI_CLEAR_WEIGHTS[index], 0);
   }
-  const questRhp = questBonuses.lock + questBonuses.spin + questBonuses.vr;
-  const earnedRhp = Math.round(passRhp + questRhp);
+  earnedRhp = Math.round(earnedRhp);
   const totals: ModePoints = { lock: overrides.get("rpl") ?? raw.lock, spin: overrides.get("rps") ?? raw.spin, vr: overrides.get("rpv") ?? raw.vr };
-  return { rpl: totals.lock, rps: totals.spin, rpv: totals.vr, rhp: overrides.get("rhp") ?? earnedRhp, raw, earnedRhp, questBonuses };
+  return { rpl: totals.lock, rps: totals.spin, rpv: totals.vr, rhp: overrides.get("rhp") ?? earnedRhp, raw, earnedRhp };
 }
 
 export async function reconcileUserRankPoints(userId: string) {
@@ -193,15 +237,19 @@ export async function syncUserModeScores(userId: string) {
   const candidates = new Map<string, { score: ScorePayload; mode: ModeKey; map: AnalyzedMapRow; points: number }>();
   for (const entry of scores) {
     if (entry.score.passed !== true) continue;
-    const sourceId = entry.score.beatmapId ?? entry.score.mapId ?? null;
+    const sourceId = scoreSourceId(entry.score);
     const normalizedId = sourceId == null ? null : normalizeSourceId(sourceId);
-    const map = normalizedId != null ? byBeatmapId.get(normalizedId) ?? byTitle.get(normalize(entry.score.beatmapTitle)) : byTitle.get(normalize(entry.score.beatmapTitle));
+    const map = normalizedId != null ? byBeatmapId.get(normalizedId) ?? byTitle.get(normalize(scoreTitle(entry.score))) : byTitle.get(normalize(scoreTitle(entry.score)));
     if (!map) continue;
     const points = rewardFor(map, entry.mode, entry.score.speed);
     const key = `${mapKey(map)}:${entry.mode}`;
     const candidate = { score: entry.score, mode: entry.mode, map, points };
     const old = candidates.get(key);
-    if (!old || points > old.points || points === old.points && (entry.score.awarded_sp ?? 0) > (old.score.awarded_sp ?? 0) || points === old.points && (entry.score.awarded_sp ?? 0) === (old.score.awarded_sp ?? 0) && String(entry.score.created_at ?? "") > String(old.score.created_at ?? "")) candidates.set(key, candidate);
+    const awarded = scoreAwardedSp(entry.score) ?? 0;
+    const oldAwarded = old ? scoreAwardedSp(old.score) ?? 0 : 0;
+    const created = scoreCreatedAt(entry.score) ?? "";
+    const oldCreated = old ? scoreCreatedAt(old.score) ?? "" : "";
+    if (!old || points > old.points || points === old.points && awarded > oldAwarded || points === old.points && awarded === oldAwarded && created > oldCreated) candidates.set(key, candidate);
   }
   const previous = await prisma.rhythiaModeScore.findMany({ where: { userId }, select: { mapKey: true, cameraMode: true, scoreId: true, points: true } });
   const previousKeys = new Set(previous.map((row) => `${row.mapKey}:${row.cameraMode}:${row.scoreId}`));
@@ -213,8 +261,8 @@ export async function syncUserModeScores(userId: string) {
     if (!previousKeys.has(`${key}:${candidate.mode}:${candidate.score.id}`)) added += 1;
     await prisma.rhythiaModeScore.upsert({
       where: { userId_mapKey_cameraMode: { userId, mapKey: key, cameraMode: candidate.mode } },
-      create: { userId, mapKey: key, mapTitle: candidate.map.title, scoreId: candidate.score.id, cameraMode: candidate.mode, points: candidate.points, accuracy: accuracyFromScore(candidate.score), awardedSp: candidate.score.awarded_sp ?? null, speed: candidate.score.speed ?? 1 },
-      update: { mapTitle: candidate.map.title, scoreId: candidate.score.id, points: candidate.points, accuracy: accuracyFromScore(candidate.score), awardedSp: candidate.score.awarded_sp ?? null, speed: candidate.score.speed ?? 1 },
+      create: { userId, mapKey: key, mapTitle: candidate.map.title, scoreId: candidate.score.id, cameraMode: candidate.mode, points: candidate.points, accuracy: accuracyFromScore(candidate.score), awardedSp: scoreAwardedSp(candidate.score), speed: candidate.score.speed ?? 1 },
+      update: { mapTitle: candidate.map.title, scoreId: candidate.score.id, points: candidate.points, accuracy: accuracyFromScore(candidate.score), awardedSp: scoreAwardedSp(candidate.score), speed: candidate.score.speed ?? 1 },
     });
   }
   const stored = await prisma.rhythiaModeScore.findMany({ where: { userId }, orderBy: { points: "desc" } });
@@ -276,26 +324,13 @@ export async function getModeScoreMap(userId: string) {
 export async function getModeLeaderboard(mode: ModeKey, limit = 100) {
   const system = mode === "lock" ? "rpl" : mode === "spin" ? "rps" : "rpv";
   const safeLimit = Math.max(1, Math.min(500, limit));
-  try {
-    return await prisma.$queryRawUnsafe<Array<{ userId: string; username: string; displayName: string | null; profileHandle: string; avatar: string | null; points: number }>>(`
-      SELECT u.id AS "userId",u.username,u."displayName",u."profileHandle",u.avatar,
-        COALESCE(o.points,COALESCE(SUM(r.points),0)+COALESCE(MAX(q.points),0))::int AS points
-      FROM "User" u
-      LEFT JOIN "RhythiaModeScore" r ON r."userId"=u.id AND r."cameraMode"=$1::"CameraMode"
-      LEFT JOIN "UserPointOverride" o ON o."userId"=u.id AND o.system=$2
-      LEFT JOIN (SELECT "userId",SUM("bonusPoints")::int AS points FROM "DailyModeQuestClaim" WHERE mode=$1 GROUP BY "userId") q ON q."userId"=u.id
-      WHERE u."profileHandle" <> 'rhythia-imports'
-      GROUP BY u.id,u.username,u."displayName",u."profileHandle",u.avatar,o.points
-      ORDER BY points DESC,u.username ASC LIMIT $3`, mode, system, safeLimit);
-  } catch {
-    return prisma.$queryRawUnsafe<Array<{ userId: string; username: string; displayName: string | null; profileHandle: string; avatar: string | null; points: number }>>(`
-      SELECT u.id AS "userId",u.username,u."displayName",u."profileHandle",u.avatar,
-        COALESCE(o.points,COALESCE(SUM(r.points),0))::int AS points
-      FROM "User" u
-      LEFT JOIN "RhythiaModeScore" r ON r."userId"=u.id AND r."cameraMode"=$1::"CameraMode"
-      LEFT JOIN "UserPointOverride" o ON o."userId"=u.id AND o.system=$2
-      WHERE u."profileHandle" <> 'rhythia-imports'
-      GROUP BY u.id,u.username,u."displayName",u."profileHandle",u.avatar,o.points
-      ORDER BY points DESC,u.username ASC LIMIT $3`, mode, system, safeLimit);
-  }
+  return prisma.$queryRawUnsafe<Array<{ userId: string; username: string; displayName: string | null; profileHandle: string; avatar: string | null; points: number }>>(`
+    SELECT u.id AS "userId",u.username,u."displayName",u."profileHandle",u.avatar,
+      COALESCE(o.points,COALESCE(SUM(r.points),0))::int AS points
+    FROM "User" u
+    LEFT JOIN "RhythiaModeScore" r ON r."userId"=u.id AND r."cameraMode"=$1::"CameraMode"
+    LEFT JOIN "UserPointOverride" o ON o."userId"=u.id AND o.system=$2
+    WHERE u."profileHandle" <> 'rhythia-imports'
+    GROUP BY u.id,u.username,u."displayName",u."profileHandle",u.avatar,o.points
+    ORDER BY points DESC,u.username ASC LIMIT $3`, mode, system, safeLimit);
 }
