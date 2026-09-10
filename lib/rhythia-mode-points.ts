@@ -14,6 +14,7 @@ type ScorePayload = {
   id: number;
   beatmapTitle?: string | null;
   beatmap_title?: string | null;
+  title?: string | null;
   beatmapId?: number | null;
   beatmap_id?: number | null;
   mapId?: number | null;
@@ -52,7 +53,9 @@ type ScorePayload = {
   modifiers_json?: unknown;
   settings?: unknown;
 };
-type ScoreBucket = { name: "lastDay" | "top" | "vrTop" | "vrRecent"; scores: ScorePayload[] };
+type ScoreBucketName = "lastDay" | "top" | "vrTop" | "vrRecent" | "recent" | "scores" | "passed" | "items" | "results" | "data";
+type ScoreBucket = { name: ScoreBucketName; scores: ScorePayload[] };
+type ScoreResponse = Partial<Record<Exclude<ScoreBucketName, "items" | "results" | "data">, ScorePayload[]>> & { items?: ScorePayload[]; results?: ScorePayload[]; data?: ScorePayload[] | { scores?: ScorePayload[] } };
 type AnalyzedMapRow = { id: string; title: string; sourceBeatmapId: number | null; rating: number; rpl: number; rpv: number; rps: number; speedProfiles: unknown };
 
 const RHP_MULTI_CLEAR_WEIGHTS = [1, 0.55, 0.35] as const;
@@ -69,7 +72,7 @@ function enabled(value: unknown) {
   if (typeof value !== "string") return false;
   return ["1", "true", "yes", "on", "enabled", "spin", "vr"].includes(value.trim().toLowerCase());
 }
-function scoreTitle(score: ScorePayload) { return score.beatmapTitle ?? score.beatmap_title ?? ""; }
+function scoreTitle(score: ScorePayload) { return score.beatmapTitle ?? score.beatmap_title ?? score.title ?? ""; }
 function scoreSourceId(score: ScorePayload) { return score.beatmapId ?? score.beatmap_id ?? score.mapId ?? score.map_id ?? null; }
 function scoreCreatedAt(score: ScorePayload) { return score.created_at ?? score.createdAt ?? null; }
 function scoreAwardedSp(score: ScorePayload) { return score.awarded_sp ?? score.awardedSp ?? null; }
@@ -84,7 +87,7 @@ function parseProfiles(value: unknown): MapSpeedProfile[] {
   if (typeof value === "string") { try { const parsed = JSON.parse(value); return Array.isArray(parsed) ? parsed as MapSpeedProfile[] : []; } catch { return []; } }
   return [];
 }
-function modeDetails(score: ScorePayload, sourceBucket: ScoreBucket["name"]) {
+function modeDetails(score: ScorePayload, sourceBucket: ScoreBucketName) {
   const explicit = [score.cameraMode, score.camera_mode, score.gameMode, score.game_mode, score.mode, score.playMode, score.play_mode, score.camera, score.camera_mode_name, score.play_mode_name].map(text).join(" ").toLowerCase();
   const modifiers = [score.mods, score.modifiers, score.modifiers_json, score.settings].map(text).join(" ").toLowerCase();
   if (explicit.includes("vr") || explicit.includes("virtual reality")) return { mode: "vr" as const, confidence: 3 };
@@ -96,7 +99,7 @@ function modeDetails(score: ScorePayload, sourceBucket: ScoreBucket["name"]) {
   return { mode: "lock" as const, confidence: 0 };
 }
 
-export function scoreCameraMode(score: ScorePayload, sourceBucket: ScoreBucket["name"]): ModeKey { return modeDetails(score, sourceBucket).mode; }
+export function scoreCameraMode(score: ScorePayload, sourceBucket: ScoreBucketName): ModeKey { return modeDetails(score, sourceBucket).mode; }
 export function modeDifficultyMultiplier(rating: number | null | undefined) { return rating == null || !Number.isFinite(rating) ? 0 : Math.max(0, rating); }
 export function pointsForModeScore(score: ScorePayload, mode: ModeKey, rating?: number | null) {
   if (score.passed !== true || rating == null || !Number.isFinite(rating)) return 0;
@@ -104,11 +107,23 @@ export function pointsForModeScore(score: ScorePayload, mode: ModeKey, rating?: 
   return Math.max(1, Math.round((12 + 8 * r + 1.5 * r * r) * MODE_RULES[mode].rewardMultiplier));
 }
 
+function scoreBuckets(data: ScoreResponse): ScoreBucket[] {
+  const buckets: ScoreBucket[] = [];
+  for (const name of ["lastDay", "top", "vrTop", "vrRecent", "recent", "scores", "passed"] as const) {
+    const scores = data[name];
+    if (Array.isArray(scores)) buckets.push({ name, scores });
+  }
+  if (Array.isArray(data.items)) buckets.push({ name: "items", scores: data.items });
+  if (Array.isArray(data.results)) buckets.push({ name: "results", scores: data.results });
+  if (Array.isArray(data.data)) buckets.push({ name: "data", scores: data.data });
+  else if (data.data && typeof data.data === "object" && Array.isArray(data.data.scores)) buckets.push({ name: "data", scores: data.data.scores });
+  return buckets;
+}
+
 async function fetchModeScores(profileId: number) {
-  const data = await rhythiaRequest<Partial<Record<ScoreBucket["name"], ScorePayload[]>>>("getUserScores", { id: profileId, limit: 500 });
-  const buckets: ScoreBucket[] = [{ name: "lastDay", scores: data.lastDay ?? [] }, { name: "top", scores: data.top ?? [] }, { name: "vrTop", scores: data.vrTop ?? [] }, { name: "vrRecent", scores: data.vrRecent ?? [] }];
+  const data = await rhythiaRequest<ScoreResponse>("getUserScores", { id: profileId, limit: 10000 });
   const byId = new Map<number, { score: ScorePayload; mode: ModeKey; confidence: number }>();
-  for (const bucket of buckets) for (const score of bucket.scores) {
+  for (const bucket of scoreBuckets(data)) for (const score of bucket.scores) {
     if (!score || typeof score.id !== "number") continue;
     const details = modeDetails(score, bucket.name);
     const existing = byId.get(score.id);
