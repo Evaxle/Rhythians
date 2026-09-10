@@ -5,11 +5,11 @@ import { checkAllRankedMaps as syncAllRankedMaps } from "@/lib/ranked-map-check"
 import { getRankedMapLeaderboard } from "@/lib/ranked-map-leaderboard";
 
 function normalizeTitle(value: string | null | undefined) { return (value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
-type AnalysisRow = { mapId: string; pointEligible: boolean; sourceStatus: string };
+type AnalysisRow = { mapId: string; pointEligible: boolean; sourceStatus: string; rpl: number; rpv: number; rps: number };
 
 async function currentAnalyses() {
   await ensureMapAnalysisTable();
-  return prisma.$queryRawUnsafe<AnalysisRow[]>(`SELECT "mapId","pointEligible","sourceStatus" FROM "MapDifficultyAnalysis" WHERE status='analyzed' AND "analyzerVersion"=$1`, MAP_ANALYZER_VERSION);
+  return prisma.$queryRawUnsafe<AnalysisRow[]>(`SELECT "mapId","pointEligible","sourceStatus","rpl","rpv","rps" FROM "MapDifficultyAnalysis" WHERE status='analyzed' AND "analyzerVersion"=$1`, MAP_ANALYZER_VERSION);
 }
 
 export async function getUserGlobalRank(userId: string): Promise<number | null> {
@@ -52,7 +52,8 @@ export async function getApprovedMaps(_includeAll: boolean, userId: string | nul
     const isLegacy = sourceStatus === "legacy" || map.status === "legacy";
     const isRanked = !isLegacy && Boolean(analysis?.pointEligible);
     const rank = RANKS[mapRankIndex] ?? RANKS[RANKS.length - 1];
-    return { id: map.id, title: map.title, artist: map.artist, description: map.description, mapFileUrl: map.mapFileUrl, imageUrl: map.imageUrl, rating: map.rating, rankIndex: mapRankIndex, rankName: isLegacy ? `${rank.name} Legacy` : isRanked ? rank.name : "Unranked", rankColor: isLegacy ? rank.color : isRanked ? rank.color : "#f59e0b", mapperName: map.mapperName, noteCount: map.noteCount, length: map.length, submittedBy: map.submittedBy, reviewedBy: map.reviewedBy, completion: stateMap.get(map.id) ?? null, hasScore: scoredTitles.has(normalizeTitle(map.title)), isAutoImported: map.isAutoImported, isRanked, isLegacy, sourceStatus };
+    const maxRewards = isRanked && analysis ? { lock: Number(analysis.rpl) || 0, spin: Number(analysis.rps) || 0, vr: Number(analysis.rpv) || 0 } : null;
+    return { id: map.id, title: map.title, artist: map.artist, description: map.description, mapFileUrl: map.mapFileUrl, imageUrl: map.imageUrl, rating: map.rating, rankIndex: mapRankIndex, rankName: isLegacy ? `${rank.name} Legacy` : isRanked ? rank.name : "Unranked", rankColor: isLegacy ? rank.color : isRanked ? rank.color : "#f59e0b", mapperName: map.mapperName, noteCount: map.noteCount, length: map.length, submittedBy: map.submittedBy, reviewedBy: map.reviewedBy, completion: stateMap.get(map.id) ?? null, hasScore: scoredTitles.has(normalizeTitle(map.title)), isAutoImported: map.isAutoImported, isRanked, isLegacy, sourceStatus, maxRewards };
   }) };
 }
 
