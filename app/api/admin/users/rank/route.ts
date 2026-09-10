@@ -22,8 +22,8 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ ok: true, changed: result.changed, seasonNumber: result.season.seasonNumber });
   }
 
-  if (!["sync-passes", "rebuild-rp", "use-rp", "sync-rp"].includes(action)) {
-    return NextResponse.json({ error: "Manual RHP/rank assignment is disabled. Ranking points are earned from passing analyzed maps only." }, { status: 400 });
+  if (action !== "sync-passes") {
+    return NextResponse.json({ error: "Legacy RP/manual rank actions are disabled. Ranking points are earned from passing analyzed maps only." }, { status: 400 });
   }
 
   const userIds = Array.isArray(body?.userIds) ? [...new Set(body.userIds.filter((value): value is string => typeof value === "string" && value.length > 0))] : [];
