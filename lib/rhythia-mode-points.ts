@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 import { rhythiaRequest } from "@/lib/rhythia";
 import { speedProfileAt, MAP_ANALYZER_VERSION, type MapSpeedProfile } from "@/lib/map-difficulty";
-import { ensureMapAnalysisTable } from "@/lib/map-analysis-store";
+import { ensureMapAnalysisTable, MAP_RANKABILITY_VERSION, MIN_POINT_RANKABILITY } from "@/lib/map-analysis-store";
 import { MODE_RULES, type ModeKey, type ModePoints } from "@/lib/rhythia-mode-rules";
 
 export { MODE_RULES } from "@/lib/rhythia-mode-rules";
@@ -149,7 +149,14 @@ async function analyzedMaps() {
     SELECT c.id,c.title,c."sourceBeatmapId",a.rating,a.rpl,a.rpv,a.rps,a."speedProfiles"
     FROM "ChallengeMap" c
     JOIN "MapDifficultyAnalysis" a ON a."mapId"=c.id
-    WHERE c.status='approved' AND a.status='analyzed' AND a."pointEligible"=TRUE AND a."analyzerVersion"=$1 AND a.rating IS NOT NULL`, MAP_ANALYZER_VERSION);
+    WHERE c.status IN ('approved','legacy')
+      AND a."sourceStatus" IN ('ranked','legacy')
+      AND a.status='analyzed'
+      AND a."pointEligible"=TRUE
+      AND a."analyzerVersion"=$1
+      AND a."rankabilityVersion"=$2
+      AND a."rankabilityScore">=$3
+      AND a.rating IS NOT NULL`, MAP_ANALYZER_VERSION, MAP_RANKABILITY_VERSION, MIN_POINT_RANKABILITY);
 }
 function mapKey(map: Pick<AnalyzedMapRow, "id" | "sourceBeatmapId">) { return map.sourceBeatmapId != null ? `rhythia:${map.sourceBeatmapId}` : `map:${map.id}`; }
 function rewardFor(map: AnalyzedMapRow, mode: ModeKey, speed: number | null | undefined) {
@@ -275,7 +282,15 @@ export async function recalculateUsersForMapAnalysis(mapId: string) {
   const maps = await prisma.$queryRawUnsafe<AnalyzedMapRow[]>(`
     SELECT c.id,c.title,c."sourceBeatmapId",a.rating,a.rpl,a.rpv,a.rps,a."speedProfiles"
     FROM "ChallengeMap" c JOIN "MapDifficultyAnalysis" a ON a."mapId"=c.id
-    WHERE c.id=$1 AND a.status='analyzed' AND a."pointEligible"=TRUE AND a."analyzerVersion"=$2 LIMIT 1`, mapId, MAP_ANALYZER_VERSION);
+    WHERE c.id=$1
+      AND c.status IN ('approved','legacy')
+      AND a."sourceStatus" IN ('ranked','legacy')
+      AND a.status='analyzed'
+      AND a."pointEligible"=TRUE
+      AND a."analyzerVersion"=$2
+      AND a."rankabilityVersion"=$3
+      AND a."rankabilityScore">=$4
+      LIMIT 1`, mapId, MAP_ANALYZER_VERSION, MAP_RANKABILITY_VERSION, MIN_POINT_RANKABILITY);
   const map = maps[0] ?? null;
   const mapRow = await prisma.challengeMap.findUnique({ where: { id: mapId }, select: { id: true, sourceBeatmapId: true } });
   if (!mapRow) return { users: 0 };
