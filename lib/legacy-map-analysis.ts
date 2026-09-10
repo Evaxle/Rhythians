@@ -1,10 +1,13 @@
 import { prisma } from "@/lib/db";
 import { analyzeMapNotes, MAP_ANALYZER_VERSION, type MapDifficultyAnalysis, type MapNote } from "@/lib/map-difficulty";
+import { analyzeMapRankability, type MapRankabilityAnalysis } from "@/lib/map-rankability";
 import { analyzeChallengeMap, markMapAnalysisFailed, saveMapAnalysis } from "@/lib/map-analysis-store";
 
 const MAX_MAP_BYTES = 64 * 1024 * 1024;
 const MAX_NOTE_BYTES = 64 * 1024 * 1024;
 const INITIAL_HEADER_BYTES = 64 * 1024;
+
+type LegacyAnalysisBundle = { analysis: MapDifficultyAnalysis; rankability: MapRankabilityAnalysis };
 
 function readLine(buffer: Buffer, cursor: number) {
   const end = buffer.indexOf(0x0a, cursor);
@@ -74,21 +77,22 @@ export function parseSspmV1Notes(data: Uint8Array): MapNote[] {
   return parseV1NoteData(buffer.subarray(cursor), header.noteCount);
 }
 
+function analyzeLegacyNotes(notes: MapNote[]): LegacyAnalysisBundle {
+  const analysis = analyzeMapNotes(notes);
+  return { analysis, rankability: analyzeMapRankability(notes, analysis.topSections) };
+}
+
 async function fetchRange(url: string, start: number, end: number) {
   const response = await fetch(url, {
     cache: "no-store",
     redirect: "follow",
-    headers: {
-      range: `bytes=${start}-${end}`,
-      accept: "application/octet-stream,*/*;q=0.1",
-      "user-agent": `Rhythians-LegacyMapAnalyzer/${MAP_ANALYZER_VERSION}.0`,
-    },
+    headers: { range: `bytes=${start}-${end}`, accept: "application/octet-stream,*/*;q=0.1", "user-agent": `Rhythians-LegacyMapAnalyzer/${MAP_ANALYZER_VERSION}.0` },
   });
   if (response.status !== 206) throw new Error("Legacy map source does not support safe ranged analysis.");
   return new Uint8Array(await response.arrayBuffer());
 }
 
-async function analyzeRangedV1(url: string) {
+async function analyzeRangedV1(url: string): Promise<LegacyAnalysisBundle> {
   const initial = Buffer.from(await fetchRange(url, 0, INITIAL_HEADER_BYTES - 1));
   const header = parseV1Header(initial);
   const audioMeta = Buffer.from(await fetchRange(url, header.audioOffset, header.audioOffset + 8));
@@ -104,22 +108,14 @@ async function analyzeRangedV1(url: string) {
   const maximumLength = header.noteCount * 13;
   if (!Number.isSafeInteger(maximumLength) || maximumLength <= 0 || maximumLength > MAX_NOTE_BYTES) throw new Error("SSPM v1 note data is too large to analyze safely.");
   const noteBytes = Buffer.from(await fetchRange(url, noteOffset, noteOffset + maximumLength - 1));
-  return analyzeMapNotes(parseV1NoteData(noteBytes, header.noteCount));
+  return analyzeLegacyNotes(parseV1NoteData(noteBytes, header.noteCount));
 }
 
-export async function analyzeLegacyMapUrl(url: string): Promise<MapDifficultyAnalysis> {
+export async function analyzeLegacyMapUrl(url: string): Promise<LegacyAnalysisBundle> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
   try {
-    const response = await fetch(url, {
-      cache: "no-store",
-      redirect: "follow",
-      signal: controller.signal,
-      headers: {
-        accept: "application/octet-stream,*/*;q=0.1",
-        "user-agent": `Rhythians-LegacyMapAnalyzer/${MAP_ANALYZER_VERSION}.0`,
-      },
-    });
+    const response = await fetch(url, { cache: "no-store", redirect: "follow", signal: controller.signal, headers: { accept: "application/octet-stream,*/*;q=0.1", "user-agent": `Rhythians-LegacyMapAnalyzer/${MAP_ANALYZER_VERSION}.0` } });
     if (!response.ok) throw new Error(`Legacy map download returned HTTP ${response.status}.`);
     const declared = Number(response.headers.get("content-length") ?? 0);
     if (Number.isFinite(declared) && declared > MAX_MAP_BYTES) {
@@ -131,10 +127,8 @@ export async function analyzeLegacyMapUrl(url: string): Promise<MapDifficultyAna
     if (bytes.byteLength > MAX_MAP_BYTES) return analyzeRangedV1(url);
     const buffer = Buffer.from(bytes);
     if (buffer.length < 6 || buffer.readUInt32LE(0) !== 0x6d2b5353 || buffer.readUInt16LE(4) !== 1) throw new Error("Legacy map is not SSPM v1.");
-    return analyzeMapNotes(parseSspmV1Notes(bytes));
-  } finally {
-    clearTimeout(timeout);
-  }
+    return analyzeLegacyNotes(parseSspmV1Notes(bytes));
+  } finally { clearTimeout(timeout); }
 }
 
 export async function analyzeLegacyChallengeMap(mapId: string) {
@@ -142,8 +136,8 @@ export async function analyzeLegacyChallengeMap(mapId: string) {
   if (!map) throw new Error("Map not found.");
   if (map.status !== "legacy") return analyzeChallengeMap(mapId);
   try {
-    const analysis = await analyzeLegacyMapUrl(map.mapFileUrl);
-    return await saveMapAnalysis(map.id, "legacy", analysis);
+    const { analysis, rankability } = await analyzeLegacyMapUrl(map.mapFileUrl);
+    return await saveMapAnalysis(map.id, "legacy", analysis, rankability);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Legacy map analysis failed.";
     await markMapAnalysisFailed(map.id, "legacy", message);
