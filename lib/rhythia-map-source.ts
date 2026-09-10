@@ -69,11 +69,10 @@ function htmlJsonString(html: string, keys: string[]) {
 }
 async function pageAssets(id: number) {
   const pageUrl = `https://www.rhythia.com/maps/${id}`;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000);
-    const response = await fetch(pageUrl, { cache: "no-store", redirect: "follow", signal: controller.signal, headers: { accept: "text/html", "user-agent": "Rhythians-MapAnalyzer/2.0" } });
-    clearTimeout(timeout);
+    const response = await fetch(pageUrl, { cache: "no-store", redirect: "follow", signal: controller.signal, headers: { accept: "text/html", "user-agent": "Rhythians-MapAnalyzer/3.0" } });
     if (!response.ok) return { imageUrl: null, mapFileUrl: null };
     const html = await response.text();
     const image = htmlMeta(html, "og:image") ?? htmlMeta(html, "twitter:image") ?? htmlJsonString(html, ["imageUrl", "image", "coverUrl", "cover", "thumbnailUrl"]);
@@ -81,7 +80,11 @@ async function pageAssets(id: number) {
       ?? html.match(/https?:\\?\/\\?\/[^"'<>\s]+\.(?:sspm|rhm)(?:\?[^"'<>\s]*)?/i)?.[0]
       ?? null;
     return { imageUrl: absoluteUrl(image, pageUrl), mapFileUrl: absoluteUrl(direct, pageUrl) };
-  } catch { return { imageUrl: null, mapFileUrl: null }; }
+  } catch {
+    return { imageUrl: null, mapFileUrl: null };
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 export async function resolveRhythiaMapSource(id: number): Promise<ResolvedRhythiaMapSource> {
