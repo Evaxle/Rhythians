@@ -8,15 +8,15 @@ export type RankDefinition = {
 };
 
 export const RANKS: RankDefinition[] = [
-  { index: 0, name: "Copper", minRhp: 0, color: "#b87333", rangeMin: 0, rangeMax: 1.49 },
-  { index: 1, name: "Bronze", minRhp: 600, color: "#cd7f32", rangeMin: 1.5, rangeMax: 2.49 },
-  { index: 2, name: "Silver", minRhp: 1600, color: "#c0c0c0", rangeMin: 2.5, rangeMax: 3.49 },
-  { index: 3, name: "Gold", minRhp: 3100, color: "#ffd700", rangeMin: 3.5, rangeMax: 4.49 },
-  { index: 4, name: "Platinum", minRhp: 5150, color: "#7fd4ff", rangeMin: 4.5, rangeMax: 5.49 },
-  { index: 5, name: "Emerald", minRhp: 7850, color: "#50c878", rangeMin: 5.5, rangeMax: 6.49 },
-  { index: 6, name: "Diamond", minRhp: 11300, color: "#b9f2ff", rangeMin: 6.5, rangeMax: 7.49 },
-  { index: 7, name: "Master", minRhp: 15550, color: "#a855f7", rangeMin: 7.5, rangeMax: 8.49 },
-  { index: 8, name: "Expert", minRhp: 20750, color: "#f43f5e", rangeMin: 8.5, rangeMax: 99 },
+  { index: 0, name: "Copper", minRhp: 0, color: "#b87333", rangeMin: 0, rangeMax: 2.49 },
+  { index: 1, name: "Bronze", minRhp: 600, color: "#cd7f32", rangeMin: 2.5, rangeMax: 3.19 },
+  { index: 2, name: "Silver", minRhp: 1600, color: "#c0c0c0", rangeMin: 3.2, rangeMax: 3.69 },
+  { index: 3, name: "Gold", minRhp: 3100, color: "#ffd700", rangeMin: 3.7, rangeMax: 4.19 },
+  { index: 4, name: "Platinum", minRhp: 5150, color: "#7fd4ff", rangeMin: 4.2, rangeMax: 4.69 },
+  { index: 5, name: "Emerald", minRhp: 7850, color: "#50c878", rangeMin: 4.7, rangeMax: 5.19 },
+  { index: 6, name: "Diamond", minRhp: 11300, color: "#b9f2ff", rangeMin: 5.2, rangeMax: 5.69 },
+  { index: 7, name: "Master", minRhp: 15550, color: "#a855f7", rangeMin: 5.7, rangeMax: 6.19 },
+  { index: 8, name: "Expert", minRhp: 20750, color: "#f43f5e", rangeMin: 6.2, rangeMax: 99 },
 ];
 
 export const RANK_TIERS = 5;
@@ -84,6 +84,15 @@ export function rankIndexForRating(rating: number) {
   const safe = Math.max(0, rating);
   const index = RANKS.findIndex((rank) => safe >= rank.rangeMin && safe <= rank.rangeMax);
   return index === -1 ? RANKS.length - 1 : index;
+}
+
+export function mapTierForRating(rating: number) {
+  const index = rankIndexForRating(rating);
+  if (index === RANKS.length - 1) return 1;
+  const rank = RANKS[index];
+  const width = Math.max(0.01, rank.rangeMax - rank.rangeMin + 0.01);
+  const progress = Math.min(0.999999, Math.max(0, (rating - rank.rangeMin) / width));
+  return Math.min(RANK_TIERS, Math.floor(progress * RANK_TIERS) + 1);
 }
 
 export function roundRating(value: number) { return Math.round(value * 100) / 100; }
