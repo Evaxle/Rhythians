@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Archive, Download, ExternalLink, Trophy } from "lucide-react";
-import { getRankInfo, RANKS, type RankInfo } from "@/lib/ranks";
+import { getRankInfo, mapTierForRating, RANKS, type RankInfo } from "@/lib/ranks";
 import { RankIcon } from "@/components/rank-icon";
 import { MapAnalysisTimeline } from "@/components/maps/map-analysis-timeline";
 import type { RankedMapLeaderboard } from "@/lib/ranked-map-leaderboard";
@@ -43,6 +43,8 @@ export function MapDetail({ map, userRank: _userRank, currentUserId }: Props) {
   const length = useMemo(() => lengthLabel(data.length), [data.length]);
   const downloadUrl = `/api/maps/download?id=${encodeURIComponent(data.mapId)}`;
   const rank = getRankInfo(RANKS[data.rankIndex]?.minRhp ?? 0);
+  const mapTier = mapTierForRating(data.rating);
+  const mapDifficulty = data.rankIndex === RANKS.length - 1 ? "Expert" : `${data.rankName} ${mapTier}`;
 
   return <div className="space-y-8">
     <section className="overflow-hidden rounded-3xl border border-border bg-surface/95 shadow-glow">
@@ -50,7 +52,7 @@ export function MapDetail({ map, userRank: _userRank, currentUserId }: Props) {
       <div className="p-6 sm:p-8">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
-            <div className="flex items-center gap-3"><RankIcon rank={rank} size={44} /><p className="text-sm uppercase tracking-[0.2em]" style={{ color: data.rankColor }}>{data.rankName}{data.isLegacy ? " · Legacy" : ""}</p></div>
+            <div className="flex items-center gap-3"><RankIcon rank={rank} size={44} /><p className="text-sm uppercase tracking-[0.2em]" style={{ color: data.rankColor }}>{mapDifficulty}{data.isLegacy ? " · Legacy" : ""}</p></div>
             <h1 className="mt-2 text-3xl font-semibold text-white sm:text-4xl">{data.title}</h1>
             <p className="mt-2 text-sm text-muted">{data.artist ?? "Unknown artist"} · Mapped by {data.mapperName ?? "Unknown"}</p>
           </div>
@@ -68,6 +70,7 @@ export function MapDetail({ map, userRank: _userRank, currentUserId }: Props) {
         </div>
 
         <div className="mt-6 flex flex-wrap gap-2 text-xs text-muted">
+          <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">{mapDifficulty}</span>
           <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">Rank range {data.rangeMin.toFixed(2)}–{data.rankIndex === RANKS.length - 1 ? `${data.rangeMin.toFixed(2)}+` : data.rangeMax.toFixed(2)}</span>
           {data.noteCount != null && <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">{data.noteCount.toLocaleString()} notes</span>}
           {data.sourceBeatmapId != null && <span className="rounded-full border border-border bg-background/60 px-3 py-1.5">Rhythia map #{data.sourceBeatmapId}</span>}
@@ -81,7 +84,7 @@ export function MapDetail({ map, userRank: _userRank, currentUserId }: Props) {
 
     {data.isRanked ? <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow sm:p-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div><p className="flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-accent"><Trophy size={16} /> Map leaderboard</p><h2 className="mt-1 flex items-center gap-3 text-2xl font-semibold text-white"><RankIcon rank={rank} size={40} />{data.rankName} leaderboard</h2><p className="mt-2 text-sm text-muted">Only players currently in this map&apos;s rank appear. Moving ranks hides the leaderboard entry while preserving the score and completion.</p></div>
+        <div><p className="flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-accent"><Trophy size={16} /> Map leaderboard</p><h2 className="mt-1 flex items-center gap-3 text-2xl font-semibold text-white"><RankIcon rank={rank} size={40} />{mapDifficulty} leaderboard</h2><p className="mt-2 text-sm text-muted">Only players currently in this map&apos;s rank appear. Moving ranks hides the leaderboard entry while preserving the score and completion.</p></div>
         <Link href="/maps" className="text-sm font-semibold text-accent hover:text-white">Back to ranked maps</Link>
       </div>
       <div className="mt-4 overflow-hidden rounded-2xl border border-border">
