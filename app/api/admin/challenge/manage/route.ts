@@ -36,25 +36,64 @@ export async function GET(request: Request) {
 export async function PATCH(request: Request) {
   const admin = await authorize();
   if (!admin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  const body = await request.json().catch(() => null) as { tab?: string; mapId?: string; level?: number } | null;
-  const tab = body?.tab as Tab;
+  const body = await request.json().catch(() => null) as { fromTab?: string; tab?: string; mapId?: string; level?: number } | null;
+  const fromTab = body?.fromTab as Tab;
+  const targetTab = body?.tab as Tab;
   const level = Number(body?.level);
-  if (!tabs.includes(tab) || !body?.mapId || !Number.isInteger(level) || level < 1 || level > 10) return NextResponse.json({ error: "Choose a valid category and level 1-10." }, { status: 400 });
+  if (!tabs.includes(fromTab) || !tabs.includes(targetTab) || !body?.mapId || !Number.isInteger(level) || level < 1 || level > 10) return NextResponse.json({ error: "Choose a valid category and level 1-10." }, { status: 400 });
+
   await ensureCompletionClipTables();
+  await ensureChallengeLevelTable();
+
+  if (fromTab === "challenge") {
+    const map = await prisma.challengeMap.findUnique({ where: { id: body.mapId } });
+    if (!map) return NextResponse.json({ error: "Challenge map not found." }, { status: 404 });
+
+    if (targetTab === "challenge") {
+      await prisma.$executeRawUnsafe(`INSERT INTO "ChallengeMapLevel" ("id","challengeMapId","level","createdAt","updatedAt") VALUES ($1,$2,$3,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) ON CONFLICT ("challengeMapId") DO UPDATE SET "level" = EXCLUDED."level", "updatedAt" = CURRENT_TIMESTAMP`, randomUUID(), map.id, level);
+      return NextResponse.json({ ok: true, category: targetTab, level });
+    }
+
+    const existing = map.sourceBeatmapId != null ? await prisma.categoryMap.findUnique({ where: { sourceBeatmapId: map.sourceBeatmapId } }) : null;
+    if (existing) {
+      await prisma.categoryMap.update({ where: { id: existing.id }, data: { category: targetTab as never, level, status: "approved", reviewedById: admin.id, reviewedAt: new Date() } });
+    } else {
+      await prisma.categoryMap.create({ data: { category: targetTab as never, level, title: map.title, artist: map.artist, description: map.description, mapFileUrl: map.mapFileUrl, imageUrl: map.imageUrl, mapperName: map.mapperName, noteCount: map.noteCount, length: map.length, sourceBeatmapId: map.sourceBeatmapId, sourceUrl: map.sourceUrl, submittedById: admin.id, status: "approved", reviewedById: admin.id, reviewedAt: new Date() } });
+    }
+    await prisma.$executeRawUnsafe(`DELETE FROM "ChallengeMapLevel" WHERE "challengeMapId"=$1`, map.id);
+    return NextResponse.json({ ok: true, category: targetTab, level });
+  }
+
+  const map = await prisma.categoryMap.findUnique({ where: { id: body.mapId } });
+  if (!map) return NextResponse.json({ error: "Category map not found." }, { status: 404 });
+
+  if (targetTab !== "challenge") {
+    await prisma.categoryMap.update({ where: { id: map.id }, data: { category: targetTab as never, level, status: "approved", reviewedById: admin.id, reviewedAt: new Date() } });
+    return NextResponse.json({ ok: true, category: targetTab, level });
+  }
+
+  const challenge = map.sourceBeatmapId != null ? await prisma.challengeMap.findFirst({ where: { sourceBeatmapId: map.sourceBeatmapId } }) : null;
+  if (!challenge) return NextResponse.json({ error: "This category map has no matching Challenge source map, so it cannot be moved to Challenge safely." }, { status: 400 });
+  await prisma.$executeRawUnsafe(`INSERT INTO "ChallengeMapLevel" ("id","challengeMapId","level","createdAt","updatedAt") VALUES ($1,$2,$3,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) ON CONFLICT ("challengeMapId") DO UPDATE SET "level" = EXCLUDED."level", "updatedAt" = CURRENT_TIMESTAMP`, randomUUID(), challenge.id, level);
+  await prisma.categoryMap.update({ where: { id: map.id }, data: { status: "hidden", reviewedById: admin.id, reviewedAt: new Date() } });
+  return NextResponse.json({ ok: true, category: targetTab, level });
+}
+
+export async function DELETE(request: Request) {
+  const admin = await authorize();
+  if (!admin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const body = await request.json().catch(() => null) as { tab?: string; mapId?: string } | null;
+  const tab = body?.tab as Tab;
+  if (!tabs.includes(tab) || !body?.mapId) return NextResponse.json({ error: "Choose a valid map." }, { status: 400 });
+
   if (tab === "challenge") {
-    const map = await prisma.$queryRawUnsafe<Array<{ id: string }>>(`SELECT "id" FROM "ChallengeMap" WHERE "id" = $1 LIMIT 1`, body.mapId);
-    if (!map[0]) return NextResponse.json({ error: "Map not found." }, { status: 404 });
     await ensureChallengeLevelTable();
-    await prisma.$executeRawUnsafe(`INSERT INTO "ChallengeMapLevel" ("id","challengeMapId","level","createdAt","updatedAt") VALUES ($1,$2,$3,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) ON CONFLICT ("challengeMapId") DO UPDATE SET "level" = EXCLUDED."level", "updatedAt" = CURRENT_TIMESTAMP`, randomUUID(), body.mapId, level);
-    return NextResponse.json({ ok: true, level });
+    await prisma.$executeRawUnsafe(`DELETE FROM "ChallengeMapLevel" WHERE "challengeMapId"=$1`, body.mapId);
+    return NextResponse.json({ ok: true, removed: true });
   }
-  const map = await prisma.$queryRawUnsafe<Array<{ id: string; title: string; artist: string | null; description: string | null; mapFileUrl: string; imageUrl: string | null; mapperName: string | null; noteCount: number | null; length: number | null; sourceBeatmapId: number | null }>>(`SELECT "id","title","artist","description","mapFileUrl","imageUrl","mapperName","noteCount","length","sourceBeatmapId" FROM "CategoryMap" WHERE "id" = $1 LIMIT 1`, body.mapId);
-  if (!map[0]) {
-    const challenge = await prisma.$queryRawUnsafe<Array<{ id: string; title: string; artist: string | null; description: string | null; mapFileUrl: string; imageUrl: string | null; mapperName: string | null; noteCount: number | null; length: number | null; sourceBeatmapId: number | null }>>(`SELECT "id","title","artist","description","mapFileUrl","imageUrl","mapperName","noteCount","length","sourceBeatmapId" FROM "ChallengeMap" WHERE "id" = $1 LIMIT 1`, body.mapId);
-    if (!challenge[0]) return NextResponse.json({ error: "Map not found." }, { status: 404 });
-    await prisma.$executeRawUnsafe(`INSERT INTO "CategoryMap" ("id","category","level","title","artist","description","mapFileUrl","imageUrl","mapperName","noteCount","length","sourceBeatmapId","sourceUrl","submittedById","status","createdAt","updatedAt") VALUES ($1,$2::"CategoryType",$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,NULL,$13,'approved',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)`, randomUUID(), tab, level, challenge[0].title, challenge[0].artist, challenge[0].description, challenge[0].mapFileUrl, challenge[0].imageUrl, challenge[0].mapperName, challenge[0].noteCount, challenge[0].length, challenge[0].sourceBeatmapId, admin.id);
-  } else {
-    await prisma.$executeRawUnsafe(`UPDATE "CategoryMap" SET "category" = $1::"CategoryType", "level" = $2, "updatedAt" = CURRENT_TIMESTAMP WHERE "id" = $3`, tab, level, body.mapId);
-  }
-  return NextResponse.json({ ok: true, category: tab, level });
+
+  const map = await prisma.categoryMap.findUnique({ where: { id: body.mapId } });
+  if (!map) return NextResponse.json({ error: "Category map not found." }, { status: 404 });
+  await prisma.categoryMap.update({ where: { id: map.id }, data: { status: "hidden", reviewedById: admin.id, reviewedAt: new Date() } });
+  return NextResponse.json({ ok: true, removed: true });
 }
