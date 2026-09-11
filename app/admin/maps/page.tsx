@@ -1,4 +1,5 @@
 import { RankabilityV5Manager } from "@/components/admin/rankability-v5-manager";
+import { AutoMapAnalyzer } from "@/components/admin/auto-map-analyzer";
 import { ChallengeCategoryManager } from "@/components/admin/challenge-category-manager";
 import { MapAdminSearch } from "@/components/map-admin-search";
 import { MapCreator } from "@/components/admin/map-creator";
@@ -26,6 +27,7 @@ export default async function AdminManageMapsPage() {
       </div>
     </section>
 
+    <AutoMapAnalyzer />
     <RankabilityV5Manager />
 
     <section className="space-y-4">

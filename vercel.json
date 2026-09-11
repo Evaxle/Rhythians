@@ -22,7 +22,7 @@
     },
     {
       "path": "/api/internal/map-analysis",
-      "schedule": "*/10 * * * *"
+      "schedule": "30 4 * * *"
     }
   ]
 }
