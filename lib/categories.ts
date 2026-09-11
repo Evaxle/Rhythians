@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
-import { fetchRhythiaScores, findScoreForMap } from "@/lib/daily";
 import { CATEGORIES, CATEGORY_LABELS, MAX_CATEGORY_LEVEL, isCategory, type Category } from "@/lib/category-constants";
+import { fetchChallengeScores, findChallengeScore, challengeScoreAccuracy } from "@/lib/challenge-score-match";
 
 export { CATEGORIES, CATEGORY_LABELS, MAX_CATEGORY_LEVEL, isCategory };
 export type { Category };
@@ -40,11 +40,11 @@ export async function checkAndAwardCategoryMap(userId: string, categoryMapId: st
   if (map.level > currentLevel + 1) return { status: "locked", currentLevel, requiredLevel: currentLevel + 1 };
   const existing = await prisma.categoryMapCompletion.findUnique({ where: { categoryMapId_userId: { categoryMapId: map.id, userId } } });
   if (existing?.passed) return { status: "already" };
-  let scores: Awaited<ReturnType<typeof fetchRhythiaScores>>;
-  try { scores = await fetchRhythiaScores(profile.profileId); } catch { return { status: "not_beat" }; }
-  const hit = findScoreForMap(scores.recent, map.title) ?? findScoreForMap(scores.top, map.title);
+  let scores: Awaited<ReturnType<typeof fetchChallengeScores>>;
+  try { scores = await fetchChallengeScores(profile.profileId); } catch { return { status: "not_beat" }; }
+  const hit = findChallengeScore(scores, map.title, map.sourceBeatmapId);
   if (!hit) return { status: "not_beat" };
-  const accuracy = hit.accuracy ?? null;
+  const accuracy = challengeScoreAccuracy(hit);
   const levelsUp = map.level === currentLevel + 1;
   await prisma.$transaction([
     prisma.categoryMapCompletion.upsert({ where: { categoryMapId_userId: { categoryMapId: map.id, userId } }, create: { categoryMapId: map.id, userId, passed: true, accuracy, scoreId: hit.id }, update: { passed: true, accuracy, scoreId: hit.id } }),
