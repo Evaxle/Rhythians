@@ -28,8 +28,9 @@ export async function PATCH(request: Request) {
   const reviewer = await authorize();
   if (!reviewer) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   await ensureCompletionClipTables();
-  const body = await request.json().catch(() => null) as { kind?: string; id?: string; decision?: string; note?: string } | null;
+  const body = await request.json().catch(() => null) as { kind?: string; id?: string; decision?: string; note?: string; identityVerified?: boolean } | null;
   if (!body?.id || !["approved", "rejected"].includes(body.decision ?? "")) return NextResponse.json({ error: "Invalid review request." }, { status: 400 });
+  if (body.decision === "approved" && body.identityVerified !== true) return NextResponse.json({ error: "Verify that the clip shows the matching Rhythia username after the player presses Tab before approving." }, { status: 400 });
   const kind = body.kind === "challenge" ? "challenge" : "category";
   const table = kind === "challenge" ? "ChallengeCompletionClip" : "CompletionClip";
   const row = await prisma.$queryRawUnsafe<Array<{ id: string; userId: string; category?: string; level: number; status: string }>>(`SELECT "id","userId","category"::text AS "category","level","status"::text AS "status" FROM "${table}" WHERE "id" = $1 LIMIT 1`, body.id);
@@ -49,6 +50,8 @@ export async function PATCH(request: Request) {
       await prisma.$executeRawUnsafe(`INSERT INTO "UserChallengeLevelOverride" ("id","userId","level","createdAt","updatedAt") VALUES ($1,$2,$3,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)`, randomUUID(), row[0].userId, row[0].level);
     }
   }
-  await prisma.$executeRawUnsafe(`UPDATE "${table}" SET "status" = $1::"CompletionClipStatus", "reviewedById" = $2, "reviewedAt" = CURRENT_TIMESTAMP, "reviewerNote" = $3, "updatedAt" = CURRENT_TIMESTAMP WHERE "id" = $4`, body.decision, reviewer.id, body.note?.trim() || null, body.id);
-  return NextResponse.json({ ok: true, status: body.decision });
+  const reviewerNote = [body.note?.trim(), body.decision === "approved" ? "Tab username identity verified." : null].filter(Boolean).join(" ") || null;
+  await prisma.$executeRawUnsafe(`UPDATE "${table}" SET "status" = $1::"CompletionClipStatus", "reviewedById" = $2, "reviewedAt" = CURRENT_TIMESTAMP, "reviewerNote" = $3, "updatedAt" = CURRENT_TIMESTAMP WHERE "id" = $4`, body.decision, reviewer.id, reviewerNote, body.id);
+  await prisma.moderationAction.create({ data: { actorId: reviewer.id, action: body.decision === "approved" ? "completion_clip_approved" : "completion_clip_rejected", targetType: kind === "challenge" ? "challenge_completion_clip" : "category_completion_clip", targetId: body.id, metadata: { userId: row[0].userId, category: row[0].category ?? "challenge", level: row[0].level, identityVerified: body.decision === "approved" } } });
+  return NextResponse.json({ ok: true, status: body.decision, level: row[0].level });
 }
