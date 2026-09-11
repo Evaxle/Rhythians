@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
-import { fetchRhythiaScores, findScoreForMap } from "@/lib/daily";
-import { accuracyFromMisses } from "@/lib/ranks";
 import { CATEGORIES, CATEGORY_LABELS, MAX_CATEGORY_LEVEL, getUserCategoryLevels } from "@/lib/categories";
 import { MAX_CHALLENGE_LEVEL, ensureChallengeLevelTable, getUserChallengeLevel } from "@/lib/challenge";
+import { fetchChallengeScores, findChallengeScore, challengeScoreAccuracy } from "@/lib/challenge-score-match";
 
 export const dynamic = "force-dynamic";
 
@@ -15,8 +14,8 @@ export async function POST(request: Request) {
   if (!profile) return NextResponse.json({ error: "Link your Rhythia profile first." }, { status: 400 });
   const body = await request.json().catch(() => null) as { scope?: string } | null;
   const challengeOnly = body?.scope === "challenge";
-  let scores: Awaited<ReturnType<typeof fetchRhythiaScores>>;
-  try { scores = await fetchRhythiaScores(profile.profileId); } catch { return NextResponse.json({ error: "Rhythia scores could not be loaded right now." }, { status: 502 }); }
+  let scores: Awaited<ReturnType<typeof fetchChallengeScores>>;
+  try { scores = await fetchChallengeScores(profile.profileId); } catch { return NextResponse.json({ error: "Rhythia scores could not be loaded right now." }, { status: 502 }); }
 
   await ensureChallengeLevelTable();
   const challengeBefore = await getUserChallengeLevel(user.id);
@@ -25,16 +24,16 @@ export async function POST(request: Request) {
   let challengePasses = 0;
 
   if (challengeTarget != null) {
-    const maps = await prisma.$queryRawUnsafe<Array<{ id: string; title: string; rating: number | null }>>(`SELECT m."id",m."title",m."rating" FROM "ChallengeMap" m JOIN "ChallengeMapLevel" l ON l."challengeMapId"=m."id" WHERE m."status"='approved' AND l."level"=$1 ORDER BY m."rating" ASC`, challengeTarget);
+    const maps = await prisma.$queryRawUnsafe<Array<{ id: string; title: string; rating: number | null; requestedRating: number; sourceBeatmapId: number | null }>>(`SELECT m."id",m."title",m."rating",m."requestedRating",m."sourceBeatmapId" FROM "ChallengeMap" m JOIN "ChallengeMapLevel" l ON l."challengeMapId"=m."id" WHERE m."status" IN ('approved','legacy') AND l."level"=$1 ORDER BY m."rating" ASC NULLS LAST, m."createdAt" ASC`, challengeTarget);
     challengeChecked = maps.length;
     for (const map of maps) {
-      const hit = findScoreForMap(scores.recent, map.title) ?? findScoreForMap(scores.top, map.title);
+      const hit = findChallengeScore(scores, map.title, map.sourceBeatmapId);
       if (!hit) continue;
-      const accuracy = hit.accuracy ?? accuracyFromMisses(hit.beatmapNotes, hit.misses);
+      const accuracy = challengeScoreAccuracy(hit);
       await prisma.challengeMapCompletion.upsert({
         where: { challengeMapId_userId: { challengeMapId: map.id, userId: user.id } },
-        create: { challengeMapId: map.id, userId: user.id, rating: map.rating ?? 0, accuracy, passed: true, points: 0, scoreId: hit.id },
-        update: { rating: map.rating ?? 0, accuracy, passed: true, points: 0, scoreId: hit.id },
+        create: { challengeMapId: map.id, userId: user.id, rating: map.rating ?? map.requestedRating ?? 0, accuracy, passed: true, points: 0, scoreId: hit.id },
+        update: { rating: map.rating ?? map.requestedRating ?? 0, accuracy, passed: true, points: 0, scoreId: hit.id },
       });
       challengePasses += 1;
     }
@@ -45,7 +44,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       challenge: { levelBefore: challengeBefore, targetLevel: challengeTarget, levelAfter: challengeAfter, checked: challengeChecked, passes: challengePasses },
       categories: [],
-      note: "Only the currently eligible regular Challenge level was scanned.",
+      note: "Only the currently eligible regular Challenge level was scanned across ranked, unranked, and legacy maps.",
     });
   }
 
@@ -58,12 +57,12 @@ export async function POST(request: Request) {
     let checked = 0;
     let passes = 0;
     if (target != null) {
-      const maps = await prisma.categoryMap.findMany({ where: { category, level: target, status: "approved" }, select: { id: true, title: true } });
+      const maps = await prisma.categoryMap.findMany({ where: { category, level: target, status: "approved" }, select: { id: true, title: true, sourceBeatmapId: true } });
       checked = maps.length;
       for (const map of maps) {
-        const hit = findScoreForMap(scores.recent, map.title) ?? findScoreForMap(scores.top, map.title);
+        const hit = findChallengeScore(scores, map.title, map.sourceBeatmapId);
         if (!hit) continue;
-        await prisma.categoryMapCompletion.upsert({ where: { categoryMapId_userId: { categoryMapId: map.id, userId: user.id } }, create: { categoryMapId: map.id, userId: user.id, passed: true, accuracy: hit.accuracy ?? null, scoreId: hit.id }, update: { passed: true, accuracy: hit.accuracy ?? null, scoreId: hit.id } });
+        await prisma.categoryMapCompletion.upsert({ where: { categoryMapId_userId: { categoryMapId: map.id, userId: user.id } }, create: { categoryMapId: map.id, userId: user.id, passed: true, accuracy: challengeScoreAccuracy(hit), scoreId: hit.id }, update: { passed: true, accuracy: challengeScoreAccuracy(hit), scoreId: hit.id } });
         passes += 1;
       }
       if (passes > 0) await prisma.userCategoryLevel.upsert({ where: { userId_category: { userId: user.id, category } }, create: { userId: user.id, category, level: target }, update: { level: target } });
@@ -71,5 +70,5 @@ export async function POST(request: Request) {
     categories.push({ category, label: CATEGORY_LABELS[category], levelBefore: before, targetLevel: target, levelAfter: passes > 0 && target != null ? target : before, checked, passes });
   }
 
-  return NextResponse.json({ challenge: { levelBefore: challengeBefore, targetLevel: challengeTarget, levelAfter: challengeAfter, checked: challengeChecked, passes: challengePasses }, categories, note: "Only the level that was eligible when this check started was scanned. This action never chains into a higher level." });
+  return NextResponse.json({ challenge: { levelBefore: challengeBefore, targetLevel: challengeTarget, levelAfter: challengeAfter, checked: challengeChecked, passes: challengePasses }, categories, note: "Only the level that was eligible when this check started was scanned. Ranked, unranked, and legacy source maps can all count toward Challenge/category progression." });
 }
