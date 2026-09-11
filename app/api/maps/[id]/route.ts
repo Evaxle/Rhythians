@@ -6,7 +6,7 @@ import { prisma } from "@/lib/db";
 import { reviewChallengeMap } from "@/lib/maps";
 import { setMapSubmissionMetadata, getMapSubmissionMetadata, type ChallengePlacement } from "@/lib/map-submission-metadata";
 
-const VALID_CHALLENGE_PLACEMENTS: ChallengePlacement[] = ["main", "jumps", "stream", "tech", "off_grid"];
+const VALID_CHALLENGE_PLACEMENTS: ChallengePlacement[] = ["main", "jumps", "stream", "tech", "off_grid", "vibro"];
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const user = await getSessionUser();
@@ -37,7 +37,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       if (challengePlacement === "main") {
         await prisma.$executeRawUnsafe('INSERT INTO "ChallengeMapLevel" ("id","challengeMapId","level","createdAt","updatedAt") VALUES ($1,$2,$3,NOW(),NOW()) ON CONFLICT ("challengeMapId") DO UPDATE SET "level"=EXCLUDED."level","updatedAt"=NOW()', randomUUID(), id, challengeLevel);
       } else {
-        await prisma.categoryMap.create({ data: { category: challengePlacement, level: challengeLevel, title: map.title, artist: map.artist, description: map.description, mapFileUrl: map.mapFileUrl, imageUrl: map.imageUrl, mapperName: map.mapperName, noteCount: map.noteCount, length: map.length, sourceBeatmapId: map.sourceBeatmapId, sourceUrl: map.sourceUrl, submittedById: map.submittedById, status: "approved", reviewerNote: note, reviewedById: user.id, reviewedAt: new Date() } });
+        await prisma.categoryMap.create({ data: { category: challengePlacement as never, level: challengeLevel, title: map.title, artist: map.artist, description: map.description, mapFileUrl: map.mapFileUrl, imageUrl: map.imageUrl, mapperName: map.mapperName, noteCount: map.noteCount, length: map.length, sourceBeatmapId: map.sourceBeatmapId, sourceUrl: map.sourceUrl, submittedById: map.submittedById, status: "approved", reviewerNote: note, reviewedById: user.id, reviewedAt: new Date() } });
       }
       await setMapSubmissionMetadata(id, "challenge", challengePlacement, challengeLevel);
       const updated = await reviewChallengeMap(id, user.id, status, null, note);
