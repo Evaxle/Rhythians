@@ -10,7 +10,7 @@ const INITIAL_MAP_COUNT = 10;
 export default async function AdminChallengePage() {
   await ensureChallengeLevelTable();
   const user = await getSessionUser();
-  const maps = await prisma.challengeMap.findMany({ orderBy: [{ status: "asc" }, { createdAt: "desc" }], take: INITIAL_MAP_COUNT + 1, select: { id: true, title: true, artist: true, mapFileUrl: true, rating: true, status: true } });
+  const maps = await prisma.challengeMap.findMany({ orderBy: [{ createdAt: "desc" }, { id: "asc" }], take: INITIAL_MAP_COUNT + 1, select: { id: true, title: true, artist: true, mapFileUrl: true, rating: true, status: true } });
   const visibleMaps = maps.slice(0, INITIAL_MAP_COUNT);
   const mapIds = visibleMaps.map((map) => map.id);
   const assignments = mapIds.length ? await prisma.$queryRawUnsafe<Array<{ challengeMapId: string; level: number }>>('SELECT "challengeMapId", "level" FROM "ChallengeMapLevel" WHERE "challengeMapId" = ANY($1::text[]) AND "level" BETWEEN 1 AND 10', mapIds) : [];
