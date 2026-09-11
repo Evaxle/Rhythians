@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { canAccessAdmin } from "@/lib/admin-access";
 import { getMapAnalysis, MAP_ANALYZER_VERSION, UNRANKED_MAP_MARKER } from "@/lib/map-analysis-store";
+import { mapRankabilityBreakdown, RANKABILITY_ANALYZER_VERSION } from "@/lib/map-rankability";
 import type { Prisma } from "@/generated/prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -30,7 +31,16 @@ export async function GET(request: Request) {
     const analysis = await getMapAnalysis(map.id);
     const sourceStatus = map.reviewerNote === UNRANKED_MAP_MARKER ? "unranked" : map.status === "legacy" ? "legacy" : "ranked";
     const analysisStatus = !analysis ? "unanalyzed" : analysis.status === "analyzed" && analysis.analyzerVersion !== MAP_ANALYZER_VERSION ? "stale" : analysis.status;
-    return { ...map, updatedAt: map.updatedAt.toISOString(), sourceStatus, analysisStatus, analysis };
+    const rankability = analysis?.status === "analyzed" ? mapRankabilityBreakdown({
+      noteCount: map.noteCount,
+      activeDurationMs: analysis.activeDurationMs ?? 0,
+      patternSegments: analysis.patternSegments,
+      directionScore: analysis.directionScore ?? 0,
+      distanceScore: analysis.distanceScore ?? 0,
+      npsScore: analysis.npsScore ?? 0,
+      sourceStatus,
+    }) : null;
+    return { ...map, updatedAt: map.updatedAt.toISOString(), sourceStatus, analysisStatus, analysis, rankability };
   }));
-  return NextResponse.json({ maps: rows, page, pageSize: 10, total, pages: Math.max(1, Math.ceil(total / 10)), analyzerVersion: MAP_ANALYZER_VERSION });
+  return NextResponse.json({ maps: rows, page, pageSize: 10, total, pages: Math.max(1, Math.ceil(total / 10)), analyzerVersion: MAP_ANALYZER_VERSION, rankabilityVersion: RANKABILITY_ANALYZER_VERSION });
 }

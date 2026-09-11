@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { canAccessAdmin } from "@/lib/admin-access";
-import { analyzePendingMaps, getAllMapAnalysisStats } from "@/lib/map-analysis-refresh";
+import { analyzePendingMaps, getAllMapAnalysisStats, type AnalysisSource } from "@/lib/map-analysis-refresh";
 import { recalculateUsersForMapAnalysis } from "@/lib/rhythia-mode-points";
 
 export const runtime = "nodejs";
@@ -15,19 +15,25 @@ async function authorize() {
   return { user, response: null };
 }
 
-export async function GET() {
+function parseSource(value: unknown): AnalysisSource {
+  return value === "all" || value === "unranked" || value === "legacy" ? value : "ranked";
+}
+
+export async function GET(request: Request) {
   const auth = await authorize();
   if (auth.response) return auth.response;
-  return NextResponse.json({ stats: await getAllMapAnalysisStats() }, { headers: { "Cache-Control": "no-store" } });
+  const source = parseSource(new URL(request.url).searchParams.get("source"));
+  return NextResponse.json({ stats: await getAllMapAnalysisStats(source) }, { headers: { "Cache-Control": "no-store" } });
 }
 
 export async function POST(request: Request) {
   const auth = await authorize();
   if (auth.response) return auth.response;
-  const body = await request.json().catch(() => null) as { limit?: unknown } | null;
+  const body = await request.json().catch(() => null) as { limit?: unknown; source?: unknown } | null;
   const limit = Math.max(1, Math.min(2, Number(body?.limit) || 2));
+  const source = parseSource(body?.source);
   try {
-    const result = await analyzePendingMaps(limit);
+    const result = await analyzePendingMaps(limit, source);
     let recalculatedUsers = 0;
     for (const mapId of [...result.succeededMapIds, ...result.failedMapIds]) {
       const recalculated = await recalculateUsersForMapAnalysis(mapId);

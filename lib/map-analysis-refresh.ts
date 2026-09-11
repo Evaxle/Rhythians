@@ -1,24 +1,36 @@
 import { prisma } from "@/lib/db";
-import { analyzeChallengeMap, ensureMapAnalysisTable, MAP_ANALYZER_VERSION } from "@/lib/map-analysis-store";
+import { analyzeChallengeMap, ensureMapAnalysisTable, MAP_ANALYZER_VERSION, UNRANKED_MAP_MARKER } from "@/lib/map-analysis-store";
 
+export type AnalysisSource = "all" | "ranked" | "unranked" | "legacy";
 type Candidate = { id: string };
 
-async function pendingMaps(limit: number) {
+function sourceClause() {
+  return `(
+    $2 = 'all'
+    OR ($2 = 'ranked' AND c.status='approved' AND COALESCE(c."reviewerNote", '') <> $3)
+    OR ($2 = 'unranked' AND c.status='approved' AND c."reviewerNote" = $3)
+    OR ($2 = 'legacy' AND c.status='legacy')
+  )`;
+}
+
+async function pendingMaps(limit: number, source: AnalysisSource) {
   await ensureMapAnalysisTable();
   return prisma.$queryRawUnsafe<Candidate[]>(`
     SELECT c.id
     FROM "ChallengeMap" c
     LEFT JOIN "MapDifficultyAnalysis" a ON a."mapId"=c.id
-    WHERE c.status IN ('approved','legacy')
+    WHERE ${sourceClause()}
       AND (a."mapId" IS NULL OR a."analyzerVersion" <> $1 OR a.status='unanalyzed')
     ORDER BY c."updatedAt" ASC,c.id ASC
-    LIMIT $2`,
+    LIMIT $4`,
     MAP_ANALYZER_VERSION,
+    source,
+    UNRANKED_MAP_MARKER,
     Math.max(1, Math.min(10, limit)),
   );
 }
 
-export async function getAllMapAnalysisStats() {
+export async function getAllMapAnalysisStats(source: AnalysisSource = "all") {
   await ensureMapAnalysisTable();
   const rows = await prisma.$queryRawUnsafe<Array<{ total: bigint; analyzed: bigint; failed: bigint; pending: bigint }>>(`
     SELECT
@@ -28,15 +40,17 @@ export async function getAllMapAnalysisStats() {
       COUNT(*) FILTER (WHERE a."mapId" IS NULL OR a."analyzerVersion" <> $1 OR a.status='unanalyzed')::bigint AS pending
     FROM "ChallengeMap" c
     LEFT JOIN "MapDifficultyAnalysis" a ON a."mapId"=c.id
-    WHERE c.status IN ('approved','legacy')`,
+    WHERE ${sourceClause()}`,
     MAP_ANALYZER_VERSION,
+    source,
+    UNRANKED_MAP_MARKER,
   );
   const row = rows[0] ?? { total: 0n, analyzed: 0n, failed: 0n, pending: 0n };
-  return { total: Number(row.total), analyzed: Number(row.analyzed), failed: Number(row.failed), pending: Number(row.pending), analyzerVersion: MAP_ANALYZER_VERSION };
+  return { total: Number(row.total), analyzed: Number(row.analyzed), failed: Number(row.failed), pending: Number(row.pending), analyzerVersion: MAP_ANALYZER_VERSION, source };
 }
 
-export async function analyzePendingMaps(limit = 2) {
-  const queue = await pendingMaps(limit);
+export async function analyzePendingMaps(limit = 2, source: AnalysisSource = "all") {
+  const queue = await pendingMaps(limit, source);
   let succeeded = 0;
   let failed = 0;
   const succeededMapIds: string[] = [];
@@ -53,5 +67,5 @@ export async function analyzePendingMaps(limit = 2) {
       errors.push({ mapId: map.id, error: error instanceof Error ? error.message : "Analysis failed." });
     }
   }
-  return { processed: queue.length, succeeded, failed, succeededMapIds, failedMapIds, errors: errors.slice(0, 5), stats: await getAllMapAnalysisStats() };
+  return { processed: queue.length, succeeded, failed, succeededMapIds, failedMapIds, errors: errors.slice(0, 5), stats: await getAllMapAnalysisStats(source), source };
 }
