@@ -18,6 +18,15 @@ function sourceClause() {
   )`;
 }
 
+function pendingClause() {
+  return `(
+    a."mapId" IS NULL
+    OR a."analyzerVersion" <> $1
+    OR a.status='unanalyzed'
+    OR (a.status='failed' AND a."updatedAt" < CURRENT_TIMESTAMP - INTERVAL '6 hours')
+  )`;
+}
+
 async function pendingMaps(limit: number, source: AnalysisSource) {
   await ensureMapAnalysisTable();
   return prisma.$queryRawUnsafe<Candidate[]>(`
@@ -25,8 +34,11 @@ async function pendingMaps(limit: number, source: AnalysisSource) {
     FROM "ChallengeMap" c
     LEFT JOIN "MapDifficultyAnalysis" a ON a."mapId"=c.id
     WHERE ${sourceClause()}
-      AND (a."mapId" IS NULL OR a."analyzerVersion" <> $1 OR a.status='unanalyzed')
-    ORDER BY c."updatedAt" ASC,c.id ASC
+      AND ${pendingClause()}
+    ORDER BY
+      CASE WHEN a."mapId" IS NULL THEN 0 WHEN a."analyzerVersion" <> $1 THEN 1 WHEN a.status='unanalyzed' THEN 2 ELSE 3 END,
+      c."updatedAt" ASC,
+      c.id ASC
     LIMIT $4`,
     MAP_ANALYZER_VERSION,
     source,
@@ -65,9 +77,7 @@ export async function getAllMapAnalysisStats(source: AnalysisSource = "all") {
       COUNT(*)::bigint AS total,
       COUNT(*) FILTER (WHERE a.status='analyzed' AND a."analyzerVersion"=$1)::bigint AS analyzed,
       COUNT(*) FILTER (WHERE a.status='failed' AND a."analyzerVersion"=$1)::bigint AS failed,
-      COUNT(*) FILTER (
-        WHERE a."mapId" IS NULL OR a."analyzerVersion" <> $1 OR a.status='unanalyzed'
-      )::bigint AS pending
+      COUNT(*) FILTER (WHERE ${pendingClause()})::bigint AS pending
     FROM "ChallengeMap" c
     LEFT JOIN "MapDifficultyAnalysis" a ON a."mapId"=c.id
     WHERE ${sourceClause()}`,
@@ -94,9 +104,10 @@ export async function analyzeMaps(
 ) {
   const force = Boolean(options?.force);
   const cursor = options?.cursor ?? null;
+  const safeLimit = Math.max(1, Math.min(10, limit));
   const queue = force
-    ? await forcedMaps(limit, source, cursor)
-    : await pendingMaps(limit, source);
+    ? await forcedMaps(safeLimit, source, cursor)
+    : await pendingMaps(safeLimit, source);
 
   let succeeded = 0;
   let failed = 0;
@@ -131,7 +142,7 @@ export async function analyzeMaps(
     source,
     force,
     nextCursor,
-    done: force ? queue.length < Math.max(1, Math.min(10, limit)) : queue.length === 0,
+    done: force ? queue.length < safeLimit : queue.length === 0,
   };
 }
 
