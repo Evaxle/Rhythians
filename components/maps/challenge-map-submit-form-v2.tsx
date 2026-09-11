@@ -48,7 +48,7 @@ export default function ChallengeMapSubmitForm() {
     setLoading(true);
     try {
       const mapPath = mode === "file" ? await uploadFile(mapFile!) : null;
-      const response = await fetch("/api/maps/submit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ submissionType: "challenge", challengeCategory: category, requestedLevel, title: title.trim() || null, description: description.trim() || null, mapFileUrl: mapPath, rhythiaUrl: mode === "rhythia" ? rhythiaUrl.trim() : null, rhythiansUrl: mode === "rhythians" ? rhythiansUrl.trim() : null }) });
+      const response = await fetch("/api/maps/submit/challenge", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ submissionType: "challenge", challengeCategory: category, requestedLevel, title: title.trim() || null, description: description.trim() || null, mapFileUrl: mapPath, rhythiaUrl: mode === "rhythia" ? rhythiaUrl.trim() : null, rhythiansUrl: mode === "rhythians" ? rhythiansUrl.trim() : null }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Challenge map submission failed.");
       setSuccess(`Challenge map submitted for ${categories.find(([value]) => value === category)?.[1] ?? category}, level ${requestedLevel}.`);
