@@ -4,9 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { Download, Link2, Swords, Star, Trophy, User as UserIcon } from "lucide-react";
 
-type PendingMap = { id: string; title: string; artist: string | null; description: string | null; mapFileUrl: string; imageUrl: string | null; sourceUrl: string | null; requestedRating: number; mapperName: string | null; noteCount: number | null; length: number | null; createdAt: string; submissionType: "ranked" | "challenge"; challengePlacement: "main" | "jumps" | "stream" | "tech" | "off_grid" | null; challengeLevel: number | null; submittedBy: { username: string; displayName: string | null; profileHandle: string; avatar: string | null } };
+type PendingMap = { id: string; title: string; artist: string | null; description: string | null; mapFileUrl: string; imageUrl: string | null; sourceUrl: string | null; requestedRating: number; mapperName: string | null; noteCount: number | null; length: number | null; createdAt: string; submissionType: "ranked" | "challenge"; challengePlacement: "main" | "jumps" | "stream" | "tech" | "off_grid" | "vibro" | null; challengeLevel: number | null; submittedBy: { username: string; displayName: string | null; profileHandle: string; avatar: string | null } };
 type Cursor = { createdAt: string; id: string } | null;
-const placements = [{ value: "main", label: "Main Challenge" }, { value: "jumps", label: "Jumps" }, { value: "stream", label: "Stream" }, { value: "tech", label: "Tech" }, { value: "off_grid", label: "Off-Grid" }] as const;
+const placements = [{ value: "main", label: "Main Challenge" }, { value: "jumps", label: "Jumps" }, { value: "stream", label: "Stream" }, { value: "tech", label: "Tech" }, { value: "off_grid", label: "Off-Grid" }, { value: "vibro", label: "Vibro" }] as const;
 
 export function MapReviewQueueV2({ initialMaps, initialHasMore, initialCursor }: { initialMaps: PendingMap[]; initialHasMore: boolean; initialCursor: Cursor }) {
   const [maps, setMaps] = useState(initialMaps);
