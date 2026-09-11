@@ -71,7 +71,7 @@ async function ensureSeasonMaps(seasonId: string) {
   return prisma.$queryRawUnsafe<Array<{ id: string; rankIndex: number; challengeMapId: string }>>('SELECT "id", "rankIndex", "challengeMapId" FROM "SeasonalPathMap" WHERE "seasonId" = $1 ORDER BY "rankIndex" ASC', seasonId);
 }
 
-async function syncUserCompletions(userId: string, seasonId: string, seasonStartsAt: Date, maps: Array<{ id: string; rankIndex: number; challengeMapId: string }>, maxPlayableRank: number) {
+async function syncUserCompletions(userId: string, seasonId: string, seasonStartsAt: Date, maps: Array<{ id: string; rankIndex: number; challengeMapId: string }>) {
   const profile = await prisma.rhythiaProfile.findUnique({ where: { userId }, select: { profileId: true } });
   if (!profile) return;
   let scores: Awaited<ReturnType<typeof fetchRhythiaScores>>;
@@ -80,7 +80,7 @@ async function syncUserCompletions(userId: string, seasonId: string, seasonStart
   const completed = new Set(existing.map((entry) => entry.rankIndex));
   const completedAtByRank = new Map(existing.map((entry) => [entry.rankIndex, entry.completedAt]));
   for (const pathMap of [...maps].sort((a, b) => a.rankIndex - b.rankIndex)) {
-    if (pathMap.rankIndex > maxPlayableRank || completed.has(pathMap.rankIndex)) continue;
+    if (completed.has(pathMap.rankIndex)) continue;
     if (pathMap.rankIndex > 0 && !completed.has(pathMap.rankIndex - 1)) break;
     const map = await prisma.challengeMap.findUnique({ where: { id: pathMap.challengeMapId }, select: { title: true, status: true } });
     if (!map || map.status !== "approved") break;
@@ -99,10 +99,6 @@ export async function checkRecentPathScore(userId: string, rankIndex: number) {
   const maps = await ensureSeasonMaps(season.id);
   const pathMap = maps.find((entry) => entry.rankIndex === rankIndex);
   if (!pathMap) return { status: "map_unavailable" as const };
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } });
-  const regularRankIndex = user ? getRankInfo(user.rhp).index : 0;
-  const maxPlayableRank = Math.min(RANKS.length - 1, regularRankIndex + 1);
-  if (rankIndex > maxPlayableRank) return { status: "locked" as const };
   const existing = await prisma.$queryRawUnsafe<Array<{ rankIndex: number }>>('SELECT "rankIndex" FROM "SeasonalPathCompletion" WHERE "seasonId" = $1 AND "userId" = $2 AND "rankIndex" = $3 LIMIT 1', season.id, userId, rankIndex);
   if (existing[0]) return { status: "completed" as const };
   let notBefore = season.startsAt;
@@ -129,15 +125,15 @@ export async function getSeasonalPath(userId?: string) {
   const maps = await ensureSeasonMaps(season.id);
   const user = userId ? await prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } }) : null;
   const regularRankIndex = user ? getRankInfo(user.rhp).index : RANKS.length - 1;
-  const maxPlayableRank = Math.min(RANKS.length - 1, regularRankIndex + 1);
-  if (userId) await syncUserCompletions(userId, season.id, season.startsAt, maps, maxPlayableRank);
+  const maxPlayableRank = RANKS.length - 1;
+  if (userId) await syncUserCompletions(userId, season.id, season.startsAt, maps);
   const completions = userId ? await prisma.$queryRawUnsafe<Array<{ rankIndex: number }>>('SELECT "rankIndex" FROM "SeasonalPathCompletion" WHERE "seasonId" = $1 AND "userId" = $2 ORDER BY "rankIndex" ASC', season.id, userId) : [];
   const completedRanks = new Set(completions.map((entry) => entry.rankIndex));
   const completedRank = completions.length ? Math.max(...completions.map((entry) => entry.rankIndex)) : -1;
   const ranks = await Promise.all(RANKS.map(async (rank, index) => {
     const pathMap = maps.find((entry) => entry.rankIndex === index);
     const map = pathMap ? await prisma.challengeMap.findUnique({ where: { id: pathMap.challengeMapId }, select: { id: true, title: true, artist: true, rating: true, imageUrl: true, mapperName: true, length: true, mapFileUrl: true, status: true, isAutoImported: true } }) : null;
-    const unlocked = index <= completedRank + 1 && index <= maxPlayableRank;
+    const unlocked = index <= completedRank + 1;
     return { index, name: rank.name, color: rank.color, map: pathMap ? { ...pathMap, map, ranked: map?.status === "approved" && map.isAutoImported, completed: completedRanks.has(index), unlocked } : null };
   }));
   return { season, ranks, completedRank, regularRankIndex, maxPlayableRank };
