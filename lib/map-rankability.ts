@@ -1,11 +1,13 @@
-import type { MapPatternSegment } from "@/lib/map-difficulty";
+import type { MapDifficultyDetails, MapPatternSegment, MapSectionAnalysis } from "@/lib/map-difficulty";
 
-export const RANKABILITY_ANALYZER_VERSION = 4;
+export const RANKABILITY_ANALYZER_VERSION = 5;
 
 export type RankabilityInput = {
   noteCount: number | null;
   activeDurationMs: number;
   patternSegments: MapPatternSegment[];
+  topSections?: MapSectionAnalysis[];
+  details?: MapDifficultyDetails | null;
   directionScore: number;
   distanceScore: number;
   npsScore: number;
@@ -51,28 +53,15 @@ function weightedAverage(items: MapPatternSegment[], value: (segment: MapPattern
     total += v * w;
     weight += w;
   }
-  return weight > 0 ? total / weight : 0;
-}
-
-function weightedDeviation(items: MapPatternSegment[], value: (segment: MapPatternSegment) => number) {
-  const mean = weightedAverage(items, value);
-  let total = 0;
-  let weight = 0;
-  for (const item of items) {
-    const w = Math.max(1, duration(item));
-    const v = value(item);
-    if (!Number.isFinite(v)) continue;
-    total += (v - mean) ** 2 * w;
-    weight += w;
-  }
-  return weight > 0 ? Math.sqrt(total / weight) : 0;
+  return weight ? total / weight : 0;
 }
 
 function weightedPercentile(items: MapPatternSegment[], value: (segment: MapPatternSegment) => number, p: number) {
   const rows = items
     .map((segment) => ({ value: value(segment), weight: Math.max(1, duration(segment)) }))
-    .filter((row) => Number.isFinite(row.value) && row.weight > 0)
+    .filter((row) => Number.isFinite(row.value))
     .sort((a, b) => a.value - b.value);
+
   if (!rows.length) return 0;
   const totalWeight = rows.reduce((sum, row) => sum + row.weight, 0);
   const target = clamp(p) * totalWeight;
@@ -93,9 +82,10 @@ function patternEntropy(items: MapPatternSegment[]) {
     total += w;
   }
   if (!total || totals.size <= 1) return 0;
+
   let entropy = 0;
-  for (const weight of totals.values()) {
-    const p = weight / total;
+  for (const amount of totals.values()) {
+    const p = amount / total;
     entropy -= p * Math.log(Math.max(p, 1e-9));
   }
   return clamp(entropy / Math.log(5));
@@ -103,35 +93,45 @@ function patternEntropy(items: MapPatternSegment[]) {
 
 function transitionQuality(items: MapPatternSegment[]) {
   if (items.length < 2) return 1;
+
   let penalty = 0;
   let compared = 0;
   for (let i = 1; i < items.length; i += 1) {
     const previous = items[i - 1];
     const current = items[i];
     const gap = current.startMs - previous.endMs;
-    if (gap > 3000) continue;
-    const npsJump = Math.max(0, Math.abs(Math.min(30, current.averageNps) - Math.min(30, previous.averageNps)) - 10) / 20;
-    const directionJump = Math.max(0, Math.abs(clamp(current.direction) - clamp(previous.direction)) - 0.35) / 0.65;
-    const distanceJump = Math.max(0, Math.abs(clamp(current.distance) - clamp(previous.distance)) - 0.4) / 0.6;
-    penalty += 0.45 * npsJump + 0.3 * directionJump + 0.25 * distanceJump;
+    if (gap > 4000) continue;
+
+    const npsJump = Math.max(0, Math.abs(Math.min(32, current.averageNps) - Math.min(32, previous.averageNps)) - 11) / 21;
+    const directionJump = Math.max(0, Math.abs(clamp(current.direction) - clamp(previous.direction)) - 0.42) / 0.58;
+    const distanceJump = Math.max(0, Math.abs(clamp(current.distance) - clamp(previous.distance)) - 0.45) / 0.55;
+    const strainJump = Math.max(0, Math.abs(current.averageStrain - previous.averageStrain) - 1.15) / 2.5;
+
+    penalty += 0.34 * npsJump + 0.24 * directionJump + 0.2 * distanceJump + 0.22 * strainJump;
     compared += 1;
   }
+
   return compared ? clamp(1 - penalty / compared) : 1;
 }
 
-function antiCheeseQuality(items: MapPatternSegment[]) {
-  let suspicious = 0;
-  let total = 0;
-  for (const item of items) {
-    const w = Math.max(1, duration(item));
-    total += w;
-    const fast = Math.min(30, Math.max(0, item.averageNps));
-    const lowMovement = clamp((0.24 - clamp(item.distance)) / 0.24);
-    const lowDirection = clamp((0.18 - clamp(item.direction)) / 0.18);
-    const speedPressure = clamp((fast - 10) / 12);
-    suspicious += w * speedPressure * lowMovement * (0.55 + 0.45 * lowDirection);
-  }
-  return total ? clamp(1 - 1.35 * suspicious / total) : 0;
+function motifQuality(items: MapPatternSegment[]) {
+  if (items.length < 3) return 0.6;
+
+  const signatures = items.map((item) => [
+    item.pattern,
+    Math.round(clamp(item.distance) * 4),
+    Math.round(clamp(item.direction) * 4),
+    Math.round(Math.min(30, Math.max(0, item.averageNps)) / 5),
+  ].join(":"));
+
+  const counts = new Map<string, number>();
+  for (const signature of signatures) counts.set(signature, (counts.get(signature) ?? 0) + 1);
+
+  const recurring = [...counts.values()].filter((count) => count >= 2).reduce((sum, count) => sum + count, 0);
+  const recurrence = recurring / signatures.length;
+  const unique = counts.size / signatures.length;
+
+  return clamp(0.58 * recurrence + 0.42 * Math.min(1, unique * 1.8));
 }
 
 function factor(key: string, label: string, quality: number, weight: number, reason: string): RankabilityFactor {
@@ -147,11 +147,11 @@ function factor(key: string, label: string, quality: number, weight: number, rea
 }
 
 function verdict(score: number) {
-  if (score >= 4.65) return "Elite competitive mapping";
-  if (score >= 4.25) return "Highly rankable";
-  if (score >= 3.75) return "Strong rankability";
-  if (score >= 3.1) return "Moderate rankability";
-  if (score >= 2.3) return "Inconsistent competitive quality";
+  if (score >= 4.7) return "Elite competitive mapping";
+  if (score >= 4.3) return "Highly rankable";
+  if (score >= 3.8) return "Strong rankability";
+  if (score >= 3.2) return "Moderate rankability";
+  if (score >= 2.4) return "Inconsistent competitive quality";
   return "Weak rankability";
 }
 
@@ -159,8 +159,8 @@ export function mapRankabilityBreakdown(input: RankabilityInput): RankabilityBre
   const segments = input.patternSegments
     .filter((segment) => Number.isFinite(segment.startMs) && Number.isFinite(segment.endMs) && segment.endMs > segment.startMs)
     .sort((a, b) => a.startMs - b.startMs);
-  const active = segments.filter((segment) => segment.pattern !== "rest");
 
+  const active = segments.filter((segment) => segment.pattern !== "rest");
   if (!active.length) {
     return {
       version: RANKABILITY_ANALYZER_VERSION,
@@ -168,7 +168,7 @@ export function mapRankabilityBreakdown(input: RankabilityInput): RankabilityBre
       rawScore: 1,
       confidence: 0,
       verdict: "Weak rankability",
-      summary: "No usable active pattern sections were available for Rankability v4.",
+      summary: "No usable active pattern data was available for Rankability v5.",
       factors: [],
       strengths: [],
       limitations: ["No active pattern data was available."],
@@ -176,79 +176,165 @@ export function mapRankabilityBreakdown(input: RankabilityInput): RankabilityBre
     };
   }
 
+  const details = input.details ?? null;
   const activeMs = active.reduce((sum, segment) => sum + duration(segment), 0);
   const spanStart = Math.min(...segments.map((segment) => segment.startMs));
   const spanEnd = Math.max(...segments.map((segment) => segment.endMs));
   const spanMs = Math.max(1, spanEnd - spanStart);
   const duty = clamp(activeMs / spanMs);
 
-  const avgStrain = weightedAverage(active, (segment) => Math.max(0, segment.averageStrain));
-  const p50Strain = weightedPercentile(active, (segment) => Math.max(0, segment.averageStrain), 0.5);
-  const p80Strain = weightedPercentile(active, (segment) => Math.max(0, segment.averageStrain), 0.8);
-  const p95Strain = weightedPercentile(active, (segment) => Math.max(0, segment.averageStrain), 0.95);
-  const avgNps = weightedAverage(active, (segment) => Math.min(30, Math.max(0, segment.averageNps)));
-  const npsDeviation = weightedDeviation(active, (segment) => Math.min(30, Math.max(0, segment.averageNps)));
-  const avgDirection = weightedAverage(active, (segment) => clamp(segment.direction));
   const avgDistance = weightedAverage(active, (segment) => clamp(segment.distance));
+  const avgDirection = weightedAverage(active, (segment) => clamp(segment.direction));
   const avgJumpness = weightedAverage(active, (segment) => clamp(segment.jumpness));
-  const kinds = new Set(active.map((segment) => segment.pattern)).size;
+  const avgStrain = weightedAverage(active, (segment) => Math.max(0, segment.averageStrain));
+  const p80Strain = weightedPercentile(active, (segment) => Math.max(0, segment.averageStrain), 0.8);
+  const p95Strain = weightedPercentile(active, (segment) => Math.max(0, segment.peakStrain), 0.95);
+  const avgCheese = weightedAverage(active, (segment) => clamp(segment.cheeseRatio ?? 0));
   const entropy = patternEntropy(active);
+  const patternKinds = new Set(active.map((segment) => segment.pattern)).size;
   const flow = transitionQuality(active);
-  const integrity = antiCheeseQuality(active);
+  const motifs = motifQuality(active);
 
   const movementQuality = clamp(
-    0.45 * clamp(avgDistance / 0.78) +
-    0.35 * clamp(avgDirection / 0.52) +
-    0.20 * clamp(avgJumpness / 0.75),
+    0.42 * clamp((details?.movementPressure ?? avgDistance) / 0.72) +
+    0.33 * clamp((details?.directionPressure ?? avgDirection) / 0.62) +
+    0.25 * clamp(avgJumpness / 0.72),
   );
 
-  const sustainedChallenge = p95Strain > 0
+  const sustainedQuality = details
     ? clamp(
-      0.50 * clamp(p80Strain / p95Strain) +
-      0.30 * clamp(p50Strain / Math.max(0.01, p80Strain)) +
-      0.20 * clamp(avgStrain / Math.max(0.01, p80Strain)),
+      0.4 * clamp(details.sustainedDifficulty / Math.max(0.15, details.peakDifficulty)) +
+      0.25 * clamp(details.coreDifficulty / Math.max(0.15, details.sustainedDifficulty)) +
+      0.2 * details.difficultyConsistency +
+      0.15 * clamp(1 - details.coverage.easy),
     )
-    : 0;
+    : clamp(
+      0.58 * clamp(avgStrain / Math.max(0.1, p80Strain)) +
+      0.42 * clamp(p80Strain / Math.max(0.1, p95Strain)),
+    );
 
-  const structuredVariety = clamp(
-    0.70 * entropy +
-    0.30 * clamp((kinds - 1) / 3),
+  const varietyQuality = clamp(
+    0.5 * entropy +
+    0.2 * clamp((patternKinds - 1) / 3) +
+    0.3 * motifs,
   );
 
-  const pacingCraft = clamp(
-    0.55 * clamp(avgNps / 14) +
-    0.45 * clamp(npsDeviation / 8),
+  const pacingQuality = details
+    ? clamp(
+      0.34 * clamp(details.timingPressure / 2.8) +
+      0.28 * clamp(details.windows.medium / Math.max(0.1, details.windows.micro)) +
+      0.22 * clamp(details.windows.long / Math.max(0.1, details.windows.medium)) +
+      0.16 * (1 - clamp(details.recoveryRatio / 0.8)),
+    )
+    : clamp(weightedAverage(active, (segment) => Math.min(30, segment.averageNps)) / 16);
+
+  const antiCheese = clamp(1 - Math.max(avgCheese, details?.cheeseRatio ?? 0));
+  const consistency = details?.difficultyConsistency ?? clamp(
+    1 - Math.abs(p95Strain - p80Strain) / Math.max(0.4, p95Strain * 1.6),
   );
 
-  const sampleConfidence = clamp(
-    0.45 * clamp(activeMs / 90000) +
-    0.30 * clamp(Math.max(0, input.noteCount ?? 0) / 500) +
-    0.15 * clamp(active.length / 24) +
-    0.10 * duty,
+  const confidence = clamp(
+    0.42 * clamp(activeMs / 90000) +
+    0.28 * clamp(Math.max(0, input.noteCount ?? 0) / 450) +
+    0.18 * clamp(active.length / 22) +
+    0.12 * duty,
   );
 
   const factors = [
-    factor("movement", "Movement quality", movementQuality, 0.23, `Average movement is ${(avgDistance * 100).toFixed(0)}% spacing, ${(avgDirection * 100).toFixed(0)}% direction change, and ${(avgJumpness * 100).toFixed(0)}% jump character. V4 rewards deliberate movement and skill expression instead of requiring every section to look the same.`),
-    factor("sustain", "Sustained challenge", sustainedChallenge, 0.18, `Strain distribution is ${p50Strain.toFixed(2)} median / ${p80Strain.toFixed(2)} sustained / ${p95Strain.toFixed(2)} peak. Peaks score well when the surrounding map supports them instead of being isolated difficulty spikes.`),
-    factor("variety", "Structured pattern variety", structuredVariety, 0.16, `${kinds} pattern types are represented with ${(entropy * 100).toFixed(0)}% duration-weighted pattern entropy. Purposeful jump/stream/mixed variety is rewarded; random one-off changes are handled by the transition factor instead.`),
-    factor("pacing", "Rhythmic pacing", pacingCraft, 0.14, `Active sections average ${avgNps.toFixed(1)} NPS with ${npsDeviation.toFixed(1)} NPS dynamic spread. V4 rewards readable intensity arcs and meaningful density changes rather than simply rewarding flat NPS.`),
-    factor("flow", "Pattern transitions", flow, 0.12, `${(flow * 100).toFixed(0)}% transition coherence after allowing normal pattern and tempo changes. Only unusually abrupt speed/movement discontinuities are penalized.`),
-    factor("integrity", "Anti-cheese integrity", integrity, 0.10, `${(integrity * 100).toFixed(0)}% anti-cheese integrity. Very fast sections with almost no spacing or directional demand are discounted so raw note density cannot carry rankability by itself.`),
-    factor("sample", "Analysis confidence", sampleConfidence, 0.07, `${Math.round(activeMs / 1000)}s of active mapping, ${active.length} active segments, ${Math.max(0, input.noteCount ?? 0).toLocaleString()} notes, and ${(duty * 100).toFixed(0)}% active duty provide the evidence behind this score.`),
+    factor(
+      "movement",
+      "Movement quality",
+      movementQuality,
+      0.2,
+      `Uses raw spacing and three-note direction mechanics across the full map. Average section movement is ${(avgDistance * 100).toFixed(0)}% spacing and ${(avgDirection * 100).toFixed(0)}% direction pressure.`,
+    ),
+    factor(
+      "sustain",
+      "Sustained competitive challenge",
+      sustainedQuality,
+      0.18,
+      details
+        ? `Whole-map core ${details.coreDifficulty.toFixed(2)}, sustained ${details.sustainedDifficulty.toFixed(2)}, and peak ${details.peakDifficulty.toFixed(2)} difficulty are compared so isolated spikes cannot carry rankability.`
+        : "Compares average, sustained, and peak section strain so isolated spikes do not carry the score.",
+    ),
+    factor(
+      "variety",
+      "Structured pattern design",
+      varietyQuality,
+      0.16,
+      `${patternKinds} pattern families, ${(entropy * 100).toFixed(0)}% duration-weighted variety, and recurring motifs are used to distinguish purposeful pattern design from random changes.`,
+    ),
+    factor(
+      "pacing",
+      "Rhythmic pacing",
+      pacingQuality,
+      0.13,
+      details
+        ? `Micro/short/medium/long pressure is ${details.windows.micro.toFixed(2)} / ${details.windows.short.toFixed(2)} / ${details.windows.medium.toFixed(2)} / ${details.windows.long.toFixed(2)}.`
+        : "Uses local note density and section flow to reward readable intensity changes.",
+    ),
+    factor(
+      "flow",
+      "Pattern transitions",
+      flow,
+      0.11,
+      `${Math.round(flow * 100)}% transition coherence after allowing normal changes in speed, spacing, direction, and pattern family.`,
+    ),
+    factor(
+      "integrity",
+      "Anti-cheese integrity",
+      antiCheese,
+      0.1,
+      `${Math.round(antiCheese * 100)}% integrity after discounting very fast low-movement or low-direction sections that inflate density without equivalent mechanical demand.`,
+    ),
+    factor(
+      "consistency",
+      "Difficulty readability",
+      consistency,
+      0.07,
+      `${Math.round(consistency * 100)}% whole-map difficulty consistency. This does not require flat difficulty; it penalizes unexplained one-off spikes more than intentional difficulty arcs.`,
+    ),
+    factor(
+      "sample",
+      "Analysis confidence",
+      confidence,
+      0.05,
+      `${Math.round(activeMs / 1000)}s active, ${active.length} pattern segments, ${Math.max(0, input.noteCount ?? 0).toLocaleString()} notes, and ${Math.round(duty * 100)}% active duty support the result.`,
+    ),
   ];
 
-  const quality = clamp(factors.reduce((sum, item) => sum + ((item.score - 1) / 4) * item.weight, 0));
+  const quality = clamp(
+    factors.reduce((sum, item) => sum + ((item.score - 1) / 4) * item.weight, 0),
+  );
   const rawScore = round(1 + 4 * quality);
   const score = rawScore;
-  const sorted = [...factors].sort((a, b) => b.score - a.score);
-  const strongest = sorted.slice(0, 4);
-  const weakest = [...sorted].reverse().slice(0, 3);
-  const strengths = strongest.filter((item) => item.score >= 4).map((item) => `${item.label}: ${item.score.toFixed(2)}/5.00 — ${item.reason}`);
-  const limitations = weakest.filter((item) => item.score < 4).map((item) => `${item.label}: ${item.score.toFixed(2)}/5.00 — ${item.reason}`);
-  const sourceLabel = input.sourceStatus ? `${input.sourceStatus} map` : "map";
-  const summary = `${verdict(score)}. Rankability v${RANKABILITY_ANALYZER_VERSION} scores this ${sourceLabel} at ${score.toFixed(2)}/5.00 from movement quality, sustained challenge, structured variety, pacing, transitions, anti-cheese integrity, and analysis confidence.`;
 
-  return { version: RANKABILITY_ANALYZER_VERSION, score, rawScore, confidence: round(sampleConfidence), verdict: verdict(score), summary, factors, strengths, limitations, rankedFloorApplied: false };
+  const sorted = [...factors].sort((a, b) => b.score - a.score);
+  const strengths = sorted
+    .slice(0, 4)
+    .filter((item) => item.score >= 4)
+    .map((item) => `${item.label}: ${item.score.toFixed(2)}/5.00 — ${item.reason}`);
+  const limitations = [...sorted]
+    .reverse()
+    .slice(0, 3)
+    .filter((item) => item.score < 4)
+    .map((item) => `${item.label}: ${item.score.toFixed(2)}/5.00 — ${item.reason}`);
+
+  const sourceLabel = input.sourceStatus ? `${input.sourceStatus} map` : "map";
+  const summary = `${verdict(score)}. Rankability v${RANKABILITY_ANALYZER_VERSION} scores this ${sourceLabel} at ${score.toFixed(2)}/5.00 using the same raw-map mechanics as Difficulty v5, including whole-map pattern structure, sustained challenge, pacing, transitions, and anti-cheese integrity.`;
+
+  return {
+    version: RANKABILITY_ANALYZER_VERSION,
+    score,
+    rawScore,
+    confidence: round(confidence),
+    verdict: verdict(score),
+    summary,
+    factors,
+    strengths,
+    limitations,
+    rankedFloorApplied: false,
+  };
 }
 
 export function mapRankability(input: RankabilityInput) {

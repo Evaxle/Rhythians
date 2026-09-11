@@ -1,5 +1,12 @@
 import { prisma } from "@/lib/db";
-import { analyzeMapBytes, MAP_ANALYZER_VERSION, type MapDifficultyAnalysis, type MapPatternSegment, type MapSpeedProfile } from "@/lib/map-difficulty";
+import {
+  analyzeMapBytes,
+  MAP_ANALYZER_VERSION,
+  type MapDifficultyAnalysis,
+  type MapDifficultyDetails,
+  type MapPatternSegment,
+  type MapSpeedProfile,
+} from "@/lib/map-difficulty";
 import { resolveRhythiaMapSource } from "@/lib/rhythia-map-source";
 
 export { MAP_ANALYZER_VERSION };
@@ -29,13 +36,21 @@ export type StoredMapAnalysis = {
   speedProfiles: MapSpeedProfile[];
   topSections: unknown[];
   patternSegments: MapPatternSegment[];
+  analysisDetails: MapDifficultyDetails | null;
   error: string | null;
   analyzedAt: Date | null;
   updatedAt: Date;
 };
 
-type RawAnalysisRow = Omit<StoredMapAnalysis, "speedProfiles" | "topSections" | "patternSegments"> & { speedProfiles: unknown; topSections: unknown; patternSegments: unknown };
-type RankedCandidate = { id: string };
+type RawAnalysisRow = Omit<
+  StoredMapAnalysis,
+  "speedProfiles" | "topSections" | "patternSegments" | "analysisDetails"
+> & {
+  speedProfiles: unknown;
+  topSections: unknown;
+  patternSegments: unknown;
+  analysisDetails: unknown;
+};
 
 export async function ensureMapAnalysisTable() {
   await prisma.$executeRawUnsafe(`
@@ -63,13 +78,23 @@ export async function ensureMapAnalysisTable() {
       "speedProfiles" JSONB NOT NULL DEFAULT '[]'::jsonb,
       "topSections" JSONB NOT NULL DEFAULT '[]'::jsonb,
       "patternSegments" JSONB NOT NULL DEFAULT '[]'::jsonb,
+      "analysisDetails" JSONB NOT NULL DEFAULT '{}'::jsonb,
       "error" TEXT,
       "analyzedAt" TIMESTAMP(3),
       "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
     )`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "MapDifficultyAnalysis" ADD COLUMN IF NOT EXISTS "patternSegments" JSONB NOT NULL DEFAULT '[]'::jsonb`);
-  await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "MapDifficultyAnalysis_status_idx" ON "MapDifficultyAnalysis"("status")');
-  await prisma.$executeRawUnsafe('CREATE INDEX IF NOT EXISTS "MapDifficultyAnalysis_pointEligible_idx" ON "MapDifficultyAnalysis"("pointEligible")');
+  await prisma.$executeRawUnsafe(
+    `ALTER TABLE "MapDifficultyAnalysis" ADD COLUMN IF NOT EXISTS "patternSegments" JSONB NOT NULL DEFAULT '[]'::jsonb`,
+  );
+  await prisma.$executeRawUnsafe(
+    `ALTER TABLE "MapDifficultyAnalysis" ADD COLUMN IF NOT EXISTS "analysisDetails" JSONB NOT NULL DEFAULT '{}'::jsonb`,
+  );
+  await prisma.$executeRawUnsafe(
+    'CREATE INDEX IF NOT EXISTS "MapDifficultyAnalysis_status_idx" ON "MapDifficultyAnalysis"("status")',
+  );
+  await prisma.$executeRawUnsafe(
+    'CREATE INDEX IF NOT EXISTS "MapDifficultyAnalysis_pointEligible_idx" ON "MapDifficultyAnalysis"("pointEligible")',
+  );
 }
 
 function parseJsonArray<T>(value: unknown): T[] {
@@ -85,34 +110,104 @@ function parseJsonArray<T>(value: unknown): T[] {
   return [];
 }
 
+function parseJsonObject<T extends object>(value: unknown): T | null {
+  if (value && typeof value === "object" && !Array.isArray(value)) return value as T;
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed as T : null;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
 function normalizeRow(row: RawAnalysisRow): StoredMapAnalysis {
   return {
     ...row,
     speedProfiles: parseJsonArray<MapSpeedProfile>(row.speedProfiles),
     topSections: parseJsonArray<unknown>(row.topSections),
     patternSegments: parseJsonArray<MapPatternSegment>(row.patternSegments),
+    analysisDetails: parseJsonObject<MapDifficultyDetails>(row.analysisDetails),
   };
 }
 
-function sourceApiId(value: number) { return value < 0 ? value + 0x100000000 : value; }
-function looksLikeMapPage(url: string) { return /^https?:\/\/(?:www\.)?rhythia\.com\/maps\/\d+\/?(?:[?#].*)?$/i.test(url); }
+function sourceApiId(value: number) {
+  return value < 0 ? value + 0x100000000 : value;
+}
+
+function looksLikeMapPage(url: string) {
+  return /^https?:\/\/(?:www\.)?rhythia\.com\/maps\/\d+\/?(?:[?#].*)?$/i.test(url);
+}
 
 export async function getMapAnalysis(mapId: string) {
   await ensureMapAnalysisTable();
-  const rows = await prisma.$queryRawUnsafe<RawAnalysisRow[]>('SELECT * FROM "MapDifficultyAnalysis" WHERE "mapId"=$1 LIMIT 1', mapId);
+  const rows = await prisma.$queryRawUnsafe<RawAnalysisRow[]>(
+    'SELECT * FROM "MapDifficultyAnalysis" WHERE "mapId"=$1 LIMIT 1',
+    mapId,
+  );
   return rows[0] ? normalizeRow(rows[0]) : null;
 }
 
-export async function saveMapAnalysis(mapId: string, sourceStatus: string, analysis: MapDifficultyAnalysis) {
+export function analysisIsCurrent(
+  analysis: Pick<StoredMapAnalysis, "status" | "analyzerVersion"> | null | undefined,
+) {
+  return Boolean(
+    analysis &&
+    analysis.status === "analyzed" &&
+    analysis.analyzerVersion === MAP_ANALYZER_VERSION,
+  );
+}
+
+export async function saveMapAnalysis(
+  mapId: string,
+  sourceStatus: string,
+  analysis: MapDifficultyAnalysis,
+) {
   await ensureMapAnalysisTable();
-  const previous = await getMapAnalysis(mapId);
-  const eligible = sourceStatus === "ranked" ? true : sourceStatus === "unranked" ? previous?.pointEligible ?? false : false;
-  await prisma.$executeRawUnsafe(`
+  const eligible = sourceStatus === "ranked";
+
+  await prisma.$executeRawUnsafe(
+    `
     INSERT INTO "MapDifficultyAnalysis" (
-      "mapId","analyzerVersion","status","sourceStatus","pointEligible","rating","directionScore","distanceScore","npsScore","staminaIndex","activeDurationMs","longestHardSectionMs","peakJumpNps","peakStreamNps","peakJumpStrain","peakStreamStrain","jumpRatio","rpl","rpv","rps","speedProfiles","topSections","patternSegments","error","analyzedAt","updatedAt"
-    ) VALUES ($1,$2,'analyzed',$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20::jsonb,$21::jsonb,$22::jsonb,NULL,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)
+      "mapId","analyzerVersion","status","sourceStatus","pointEligible","rating",
+      "directionScore","distanceScore","npsScore","staminaIndex","activeDurationMs",
+      "longestHardSectionMs","peakJumpNps","peakStreamNps","peakJumpStrain",
+      "peakStreamStrain","jumpRatio","rpl","rpv","rps","speedProfiles","topSections",
+      "patternSegments","analysisDetails","error","analyzedAt","updatedAt"
+    ) VALUES (
+      $1,$2,'analyzed',$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,
+      $20::jsonb,$21::jsonb,$22::jsonb,$23::jsonb,NULL,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP
+    )
     ON CONFLICT ("mapId") DO UPDATE SET
-      "analyzerVersion"=EXCLUDED."analyzerVersion","status"='analyzed',"sourceStatus"=EXCLUDED."sourceStatus","pointEligible"=EXCLUDED."pointEligible","rating"=EXCLUDED."rating","directionScore"=EXCLUDED."directionScore","distanceScore"=EXCLUDED."distanceScore","npsScore"=EXCLUDED."npsScore","staminaIndex"=EXCLUDED."staminaIndex","activeDurationMs"=EXCLUDED."activeDurationMs","longestHardSectionMs"=EXCLUDED."longestHardSectionMs","peakJumpNps"=EXCLUDED."peakJumpNps","peakStreamNps"=EXCLUDED."peakStreamNps","peakJumpStrain"=EXCLUDED."peakJumpStrain","peakStreamStrain"=EXCLUDED."peakStreamStrain","jumpRatio"=EXCLUDED."jumpRatio","rpl"=EXCLUDED."rpl","rpv"=EXCLUDED."rpv","rps"=EXCLUDED."rps","speedProfiles"=EXCLUDED."speedProfiles","topSections"=EXCLUDED."topSections","patternSegments"=EXCLUDED."patternSegments","error"=NULL,"analyzedAt"=CURRENT_TIMESTAMP,"updatedAt"=CURRENT_TIMESTAMP`,
+      "analyzerVersion"=EXCLUDED."analyzerVersion",
+      "status"='analyzed',
+      "sourceStatus"=EXCLUDED."sourceStatus",
+      "pointEligible"=EXCLUDED."pointEligible",
+      "rating"=EXCLUDED."rating",
+      "directionScore"=EXCLUDED."directionScore",
+      "distanceScore"=EXCLUDED."distanceScore",
+      "npsScore"=EXCLUDED."npsScore",
+      "staminaIndex"=EXCLUDED."staminaIndex",
+      "activeDurationMs"=EXCLUDED."activeDurationMs",
+      "longestHardSectionMs"=EXCLUDED."longestHardSectionMs",
+      "peakJumpNps"=EXCLUDED."peakJumpNps",
+      "peakStreamNps"=EXCLUDED."peakStreamNps",
+      "peakJumpStrain"=EXCLUDED."peakJumpStrain",
+      "peakStreamStrain"=EXCLUDED."peakStreamStrain",
+      "jumpRatio"=EXCLUDED."jumpRatio",
+      "rpl"=EXCLUDED."rpl",
+      "rpv"=EXCLUDED."rpv",
+      "rps"=EXCLUDED."rps",
+      "speedProfiles"=EXCLUDED."speedProfiles",
+      "topSections"=EXCLUDED."topSections",
+      "patternSegments"=EXCLUDED."patternSegments",
+      "analysisDetails"=EXCLUDED."analysisDetails",
+      "error"=NULL,
+      "analyzedAt"=CURRENT_TIMESTAMP,
+      "updatedAt"=CURRENT_TIMESTAMP
+    `,
     mapId,
     analysis.version,
     sourceStatus,
@@ -135,95 +230,202 @@ export async function saveMapAnalysis(mapId: string, sourceStatus: string, analy
     JSON.stringify(analysis.speedProfiles),
     JSON.stringify(analysis.topSections),
     JSON.stringify(analysis.patternSegments),
+    JSON.stringify(analysis.details),
   );
-  await prisma.challengeMap.update({ where: { id: mapId }, data: { rating: analysis.rating, requestedRating: analysis.rating, noteCount: analysis.noteCount } });
+
+  await prisma.challengeMap.update({
+    where: { id: mapId },
+    data: {
+      rating: analysis.rating,
+      requestedRating: analysis.rating,
+      noteCount: analysis.noteCount,
+    },
+  });
+
   return getMapAnalysis(mapId);
 }
 
 export async function markMapAnalysisFailed(mapId: string, sourceStatus: string, error: string) {
   await ensureMapAnalysisTable();
-  await prisma.$executeRawUnsafe(`
-    INSERT INTO "MapDifficultyAnalysis" ("mapId","analyzerVersion","status","sourceStatus","pointEligible","error","updatedAt")
+  await prisma.$executeRawUnsafe(
+    `
+    INSERT INTO "MapDifficultyAnalysis" (
+      "mapId","analyzerVersion","status","sourceStatus","pointEligible","error","updatedAt"
+    )
     VALUES ($1,$2,'failed',$3,FALSE,$4,CURRENT_TIMESTAMP)
     ON CONFLICT ("mapId") DO UPDATE SET
-      "analyzerVersion"=EXCLUDED."analyzerVersion","status"='failed',"sourceStatus"=EXCLUDED."sourceStatus","pointEligible"=FALSE,
-      "rating"=NULL,"directionScore"=NULL,"distanceScore"=NULL,"npsScore"=NULL,"staminaIndex"=NULL,"activeDurationMs"=NULL,"longestHardSectionMs"=NULL,
-      "peakJumpNps"=NULL,"peakStreamNps"=NULL,"peakJumpStrain"=NULL,"peakStreamStrain"=NULL,"jumpRatio"=NULL,"rpl"=NULL,"rpv"=NULL,"rps"=NULL,
-      "speedProfiles"='[]'::jsonb,"topSections"='[]'::jsonb,"patternSegments"='[]'::jsonb,"error"=EXCLUDED."error","analyzedAt"=NULL,"updatedAt"=CURRENT_TIMESTAMP`,
+      "analyzerVersion"=EXCLUDED."analyzerVersion",
+      "status"='failed',
+      "sourceStatus"=EXCLUDED."sourceStatus",
+      "pointEligible"=FALSE,
+      "rating"=NULL,
+      "directionScore"=NULL,
+      "distanceScore"=NULL,
+      "npsScore"=NULL,
+      "staminaIndex"=NULL,
+      "activeDurationMs"=NULL,
+      "longestHardSectionMs"=NULL,
+      "peakJumpNps"=NULL,
+      "peakStreamNps"=NULL,
+      "peakJumpStrain"=NULL,
+      "peakStreamStrain"=NULL,
+      "jumpRatio"=NULL,
+      "rpl"=NULL,
+      "rpv"=NULL,
+      "rps"=NULL,
+      "speedProfiles"='[]'::jsonb,
+      "topSections"='[]'::jsonb,
+      "patternSegments"='[]'::jsonb,
+      "analysisDetails"='{}'::jsonb,
+      "error"=EXCLUDED."error",
+      "analyzedAt"=NULL,
+      "updatedAt"=CURRENT_TIMESTAMP
+    `,
     mapId,
     MAP_ANALYZER_VERSION,
     sourceStatus,
     error.slice(0, 1000),
   );
-  await prisma.challengeMap.update({ where: { id: mapId }, data: { rating: null, requestedRating: 0 } }).catch(() => null);
+
+  await prisma.challengeMap
+    .update({ where: { id: mapId }, data: { rating: null, requestedRating: 0 } })
+    .catch(() => null);
 }
 
 export async function setMapPointEligibility(mapId: string, pointEligible: boolean) {
   await ensureMapAnalysisTable();
   const analysis = await getMapAnalysis(mapId);
-  if (!analysis || analysis.status !== "analyzed" || analysis.analyzerVersion !== MAP_ANALYZER_VERSION) throw new Error("Analyze this map with the current analyzer before changing rank-point eligibility.");
-  if (pointEligible && analysis.sourceStatus === "legacy") throw new Error("Legacy maps cannot award RPL, RPV, RPS, or RHP.");
-  await prisma.$executeRawUnsafe('UPDATE "MapDifficultyAnalysis" SET "pointEligible"=$2,"updatedAt"=CURRENT_TIMESTAMP WHERE "mapId"=$1', mapId, pointEligible);
+  if (!analysisIsCurrent(analysis)) {
+    throw new Error("Analyze this map with the current analyzer before changing rank-point eligibility.");
+  }
+  if (pointEligible && analysis?.sourceStatus !== "ranked") {
+    throw new Error("Only ranked maps can award RPL, RPV, RPS, or RHP.");
+  }
+
+  await prisma.$executeRawUnsafe(
+    'UPDATE "MapDifficultyAnalysis" SET "pointEligible"=$2,"updatedAt"=CURRENT_TIMESTAMP WHERE "mapId"=$1',
+    mapId,
+    pointEligible,
+  );
   return getMapAnalysis(mapId);
 }
 
 async function downloadMap(url: string) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
+
   try {
     const response = await fetch(url, {
       cache: "no-store",
       redirect: "follow",
       signal: controller.signal,
       headers: {
-        accept: "application/octet-stream,application/zip,application/json;q=0.9,*/*;q=0.1",
+        accept: "application/octet-stream,application/zip,application/json,text/plain;q=0.95,*/*;q=0.1",
         "user-agent": `Rhythians-MapAnalyzer/${MAP_ANALYZER_VERSION}.0`,
       },
     });
+
     if (!response.ok) throw new Error(`Map download returned HTTP ${response.status}.`);
     const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
-    if (contentType.includes("text/html")) throw new Error("Map source returned an HTML page instead of the map file.");
+    if (contentType.includes("text/html")) {
+      throw new Error("Map source returned an HTML page instead of raw map data.");
+    }
+
     const length = Number(response.headers.get("content-length") ?? 0);
-    if (Number.isFinite(length) && length > 64 * 1024 * 1024) throw new Error("Map file is too large to analyze safely.");
+    if (Number.isFinite(length) && length > 64 * 1024 * 1024) {
+      throw new Error("Map file is too large to analyze safely.");
+    }
+
     const bytes = new Uint8Array(await response.arrayBuffer());
-    if (bytes.byteLength === 0) throw new Error("Map source returned an empty file.");
-    if (bytes.byteLength > 64 * 1024 * 1024) throw new Error("Map file is too large to analyze safely.");
-    const prefix = new TextDecoder().decode(bytes.slice(0, Math.min(128, bytes.length))).trimStart().toLowerCase();
-    if (prefix.startsWith("<!doctype html") || prefix.startsWith("<html")) throw new Error("Map source returned an HTML page instead of the map file.");
+    if (!bytes.byteLength) throw new Error("Map source returned an empty file.");
+    if (bytes.byteLength > 64 * 1024 * 1024) {
+      throw new Error("Map file is too large to analyze safely.");
+    }
+
+    const prefix = new TextDecoder()
+      .decode(bytes.slice(0, Math.min(128, bytes.length)))
+      .trimStart()
+      .toLowerCase();
+    if (prefix.startsWith("<!doctype html") || prefix.startsWith("<html")) {
+      throw new Error("Map source returned an HTML page instead of raw map data.");
+    }
+
     return bytes;
   } finally {
     clearTimeout(timeout);
   }
 }
 
-async function resolveMapAssets(map: { id: string; mapFileUrl: string; imageUrl: string | null; mapperName: string | null; noteCount: number | null; length: number | null; sourceBeatmapId: number | null }) {
+async function resolveMapAssets(map: {
+  id: string;
+  mapFileUrl: string;
+  imageUrl: string | null;
+  mapperName: string | null;
+  noteCount: number | null;
+  length: number | null;
+  sourceBeatmapId: number | null;
+}) {
   if (map.sourceBeatmapId == null) return map;
+
   let resolved: Awaited<ReturnType<typeof resolveRhythiaMapSource>> | null = null;
   try {
     resolved = await resolveRhythiaMapSource(sourceApiId(map.sourceBeatmapId));
   } catch {}
+
   if (!resolved) return map;
+
   const mapFileUrl = resolved.mapFileUrl ?? map.mapFileUrl;
   const imageUrl = resolved.imageUrl ?? map.imageUrl;
   const mapperName = resolved.mapperName ?? map.mapperName;
   const noteCount = resolved.noteCount ?? map.noteCount;
   const length = resolved.length ?? map.length;
-  if (mapFileUrl !== map.mapFileUrl || imageUrl !== map.imageUrl || mapperName !== map.mapperName || noteCount !== map.noteCount || length !== map.length) {
-    await prisma.challengeMap.update({ where: { id: map.id }, data: { mapFileUrl, imageUrl, mapperName, noteCount, length } });
+
+  if (
+    mapFileUrl !== map.mapFileUrl ||
+    imageUrl !== map.imageUrl ||
+    mapperName !== map.mapperName ||
+    noteCount !== map.noteCount ||
+    length !== map.length
+  ) {
+    await prisma.challengeMap.update({
+      where: { id: map.id },
+      data: { mapFileUrl, imageUrl, mapperName, noteCount, length },
+    });
   }
+
   return { ...map, mapFileUrl, imageUrl, mapperName, noteCount, length };
 }
 
 export async function analyzeChallengeMap(mapId: string) {
   const map = await prisma.challengeMap.findUnique({
     where: { id: mapId },
-    select: { id: true, mapFileUrl: true, imageUrl: true, mapperName: true, noteCount: true, length: true, sourceBeatmapId: true, reviewerNote: true, status: true },
+    select: {
+      id: true,
+      mapFileUrl: true,
+      imageUrl: true,
+      mapperName: true,
+      noteCount: true,
+      length: true,
+      sourceBeatmapId: true,
+      reviewerNote: true,
+      status: true,
+    },
   });
   if (!map) throw new Error("Map not found.");
-  const sourceStatus = map.reviewerNote === UNRANKED_MAP_MARKER ? "unranked" : map.status === "legacy" ? "legacy" : "ranked";
+
+  const sourceStatus =
+    map.reviewerNote === UNRANKED_MAP_MARKER
+      ? "unranked"
+      : map.status === "legacy"
+        ? "legacy"
+        : "ranked";
+
   try {
     const resolved = await resolveMapAssets(map);
-    if (looksLikeMapPage(resolved.mapFileUrl)) throw new Error("Rhythia did not expose a downloadable SSPM/RHM map file for this map.");
+    if (looksLikeMapPage(resolved.mapFileUrl)) {
+      throw new Error("Rhythia did not expose downloadable SSPM/RHM/text map data for this map.");
+    }
+
     const bytes = await downloadMap(resolved.mapFileUrl);
     const analysis = analyzeMapBytes(bytes);
     return await saveMapAnalysis(map.id, sourceStatus, analysis);
@@ -232,70 +434,4 @@ export async function analyzeChallengeMap(mapId: string) {
     await markMapAnalysisFailed(map.id, sourceStatus, message);
     throw new Error(message);
   }
-}
-
-async function rankedAnalysisQueue(limit: number) {
-  await ensureMapAnalysisTable();
-  return prisma.$queryRawUnsafe<RankedCandidate[]>(`
-    SELECT c.id FROM "ChallengeMap" c
-    LEFT JOIN "MapDifficultyAnalysis" a ON a."mapId"=c.id
-    WHERE c.status='approved'
-      AND c."reviewerNote" IS DISTINCT FROM $1
-      AND (a."mapId" IS NULL OR a."analyzerVersion" <> $2 OR a.status='unanalyzed')
-    ORDER BY c."updatedAt" ASC,c.id ASC
-    LIMIT $3`,
-    UNRANKED_MAP_MARKER,
-    MAP_ANALYZER_VERSION,
-    Math.max(1, Math.min(10, limit)),
-  );
-}
-
-export async function getRankedAnalysisStats() {
-  await ensureMapAnalysisTable();
-  const rows = await prisma.$queryRawUnsafe<Array<{ total: bigint; analyzed: bigint; failed: bigint; pending: bigint }>>(`
-    SELECT
-      COUNT(*)::bigint AS total,
-      COUNT(*) FILTER (WHERE a.status='analyzed' AND a."analyzerVersion"=$2)::bigint AS analyzed,
-      COUNT(*) FILTER (WHERE a.status='failed' AND a."analyzerVersion"=$2)::bigint AS failed,
-      COUNT(*) FILTER (WHERE a."mapId" IS NULL OR a."analyzerVersion" <> $2 OR a.status='unanalyzed')::bigint AS pending
-    FROM "ChallengeMap" c LEFT JOIN "MapDifficultyAnalysis" a ON a."mapId"=c.id
-    WHERE c.status='approved' AND c."reviewerNote" IS DISTINCT FROM $1`,
-    UNRANKED_MAP_MARKER,
-    MAP_ANALYZER_VERSION,
-  );
-  const row = rows[0] ?? { total: 0n, analyzed: 0n, failed: 0n, pending: 0n };
-  return { total: Number(row.total), analyzed: Number(row.analyzed), failed: Number(row.failed), pending: Number(row.pending) };
-}
-
-export async function analyzePendingRankedMaps(limit = 2) {
-  const queue = await rankedAnalysisQueue(limit);
-  let succeeded = 0;
-  let failed = 0;
-  const succeededMapIds: string[] = [];
-  const failedMapIds: string[] = [];
-  const errors: Array<{ mapId: string; error: string }> = [];
-  for (const map of queue) {
-    try {
-      await analyzeChallengeMap(map.id);
-      succeeded += 1;
-      succeededMapIds.push(map.id);
-    } catch (error) {
-      failed += 1;
-      failedMapIds.push(map.id);
-      errors.push({ mapId: map.id, error: error instanceof Error ? error.message : "Analysis failed." });
-    }
-  }
-  return {
-    processed: queue.length,
-    succeeded,
-    failed,
-    succeededMapIds,
-    failedMapIds,
-    errors: errors.slice(0, 5),
-    stats: await getRankedAnalysisStats(),
-  };
-}
-
-export function analysisIsCurrent(analysis: Pick<StoredMapAnalysis, "status" | "analyzerVersion"> | null | undefined) {
-  return Boolean(analysis && analysis.status === "analyzed" && analysis.analyzerVersion === MAP_ANALYZER_VERSION);
 }
