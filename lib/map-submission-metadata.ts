@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 
 export type MapSubmissionType = "ranked" | "challenge";
-export type ChallengePlacement = "main" | "jumps" | "stream" | "tech" | "off_grid";
+export type ChallengePlacement = "main" | "jumps" | "stream" | "tech" | "off_grid" | "vibro";
 
 type MetadataRow = {
   mapId: string;
@@ -10,7 +10,7 @@ type MetadataRow = {
   challengeLevel: number | null;
 };
 
-const categoryPlacements = new Set<ChallengePlacement>(["jumps", "stream", "tech", "off_grid"]);
+const categoryPlacements = new Set<ChallengePlacement>(["jumps", "stream", "tech", "off_grid", "vibro"]);
 
 export async function setMapSubmissionMetadata(
   mapId: string,
