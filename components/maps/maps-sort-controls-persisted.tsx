@@ -13,7 +13,7 @@ type ScoreFilter = "all" | "scored" | "unscored";
 type SavedMapFilters = { sortKey: SortKey; direction: Direction; scoreFilter: ScoreFilter; showUnranked: boolean; showLegacy: boolean; modeTab: MapModeTab };
 export type ModeScoreMap = Record<string, { lock: number; spin: number; vr: number }>;
 
-const FILTER_STORAGE_KEY = "rhythians:maps:filters:v2";
+const FILTER_STORAGE_KEY = "rhythians:maps:filters:v3";
 const tabs = [
   { key: "all", label: "All maps", icon: Layers3 },
   { key: "lock", label: "RPL", icon: LockKeyhole },
@@ -37,8 +37,8 @@ export function MapsSortControlsPersisted({ maps, rankInfo, userRhp, currentUser
   const [sortKey, setSortKey] = useState<SortKey>("rating");
   const [direction, setDirection] = useState<Direction>("asc");
   const [scoreFilter, setScoreFilter] = useState<ScoreFilter>("all");
-  const [showUnranked, setShowUnranked] = useState(false);
-  const [showLegacy, setShowLegacy] = useState(false);
+  const [showUnranked, setShowUnranked] = useState(true);
+  const [showLegacy, setShowLegacy] = useState(true);
   const [modeTab, setModeTab] = useState<MapModeTab>("all");
 
   useEffect(() => { try { const raw = localStorage.getItem(FILTER_STORAGE_KEY); if (!raw) return; const saved: unknown = JSON.parse(raw); if (!isSavedMapFilters(saved)) return; setSortKey(saved.sortKey); setDirection(saved.direction); setScoreFilter(saved.scoreFilter); setShowUnranked(saved.showUnranked); setShowLegacy(saved.showLegacy); setModeTab(saved.modeTab); } catch {} }, []);
@@ -55,8 +55,9 @@ export function MapsSortControlsPersisted({ maps, rankInfo, userRhp, currentUser
   };
 
   const filteredMaps = useMemo(() => maps.filter((map) => {
+    if (modeTab === "legacy") return map.isLegacy;
     if (!map.isLegacy && !map.isRanked && !showUnranked) return false;
-    if (modeTab === "legacy" && !map.isLegacy) return false;
+    if (map.isLegacy && !showLegacy) return false;
     const scoreKey = map.title.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
     const score = modeScores[scoreKey];
     const selectedModeScore = modeTab === "lock" || modeTab === "spin" || modeTab === "vr" ? Number(score?.[modeTab] ?? 0) : null;
@@ -74,10 +75,10 @@ export function MapsSortControlsPersisted({ maps, rankInfo, userRhp, currentUser
     if (sortKey === "length") result = (a.length ?? -Infinity) - (b.length ?? -Infinity);
     if (sortKey === "notes") result = (a.noteCount ?? -Infinity) - (b.noteCount ?? -Infinity);
     return direction === "asc" ? result : -result;
-  }), [maps, modeScores, modeTab, sortKey, direction, scoreFilter, showUnranked]);
+  }), [maps, modeScores, modeTab, sortKey, direction, scoreFilter, showUnranked, showLegacy]);
 
   return <div className="space-y-4">
-    <nav className="grid grid-cols-2 gap-2 rounded-[1.75rem] border border-white/10 bg-black/15 p-2 sm:grid-cols-5" aria-label="Map point systems">{tabs.map(({ key, label, icon: Icon }) => { const active = modeTab === key; return <button key={key} type="button" onClick={() => { setModeTab(key); if (key === "legacy") setShowLegacy(true); }} className={`group rounded-2xl border px-3 py-3 text-left transition ${active ? "border-accent/45 bg-accent/12" : "border-transparent bg-white/[0.025] hover:border-white/10"}`}><div className="flex items-center gap-2"><Icon size={15} className={active ? "text-accent" : "text-muted"} /><span className="text-sm font-bold text-white">{label}</span></div><span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.08em] text-muted">{rankText(key)}</span></button>; })}</nav>
+    <nav className="grid grid-cols-2 gap-2 rounded-[1.75rem] border border-white/10 bg-black/15 p-2 sm:grid-cols-5" aria-label="Map point systems">{tabs.map(({ key, label, icon: Icon }) => { const active = modeTab === key; return <button key={key} type="button" onClick={() => { setModeTab(key); if (key === "all") { setShowUnranked(true); setShowLegacy(true); } if (key === "legacy") setShowLegacy(true); }} className={`group rounded-2xl border px-3 py-3 text-left transition ${active ? "border-accent/45 bg-accent/12" : "border-transparent bg-white/[0.025] hover:border-white/10"}`}><div className="flex items-center gap-2"><Icon size={15} className={active ? "text-accent" : "text-muted"} /><span className="text-sm font-bold text-white">{label}</span></div><span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.08em] text-muted">{rankText(key)}</span></button>; })}</nav>
     <div className="rounded-[1.75rem] border border-white/10 bg-surface/80 p-4 shadow-glow">
       <div className="flex flex-wrap items-center justify-between gap-3"><div className="flex items-center gap-2 text-sm font-semibold text-white"><SlidersHorizontal size={16} className="text-accent" /> Refine maps</div><div className="flex gap-2"><label className="flex items-center gap-2 rounded-xl border border-white/10 bg-black/15 px-3 py-2"><input type="checkbox" checked={showUnranked} onChange={(e) => setShowUnranked(e.target.checked)} /><span className="text-xs font-semibold text-white">Unranked</span></label><label className="flex items-center gap-2 rounded-xl border border-white/10 bg-black/15 px-3 py-2"><input type="checkbox" checked={showLegacy} onChange={(e) => setShowLegacy(e.target.checked)} /><span className="text-xs font-semibold text-white">Legacy</span></label></div></div>
       <div className="mt-3 grid gap-3 sm:grid-cols-3">
