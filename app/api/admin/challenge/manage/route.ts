@@ -8,6 +8,7 @@ import { ensureCompletionClipTables } from "@/lib/completion-clips";
 
 const tabs = ["challenge", "jumps", "stream", "tech", "off_grid", "vibro"] as const;
 type Tab = typeof tabs[number];
+const PAGE_SIZE = 10;
 
 async function authorize() {
   const user = await getSessionUser();
@@ -23,14 +24,22 @@ export async function GET(request: Request) {
   const q = (url.searchParams.get("q") ?? "").trim();
   const levelValue = url.searchParams.get("level");
   const level = levelValue ? Number(levelValue) : null;
+  const rawOffset = Number(url.searchParams.get("offset") ?? "0");
+  const offset = Number.isInteger(rawOffset) && rawOffset >= 0 ? Math.min(rawOffset, 100000) : 0;
   if (!tabs.includes(tab)) return NextResponse.json({ error: "Invalid tab." }, { status: 400 });
   if (level != null && (!Number.isInteger(level) || level < 1 || level > 10)) return NextResponse.json({ error: "Invalid level." }, { status: 400 });
+
   if (tab === "challenge") {
     await ensureChallengeLevelTable();
-    return NextResponse.json(await prisma.$queryRawUnsafe(`SELECT m."id", m."title", m."artist", m."mapperName", m."mapFileUrl", m."rating", m."status", l."level" FROM "ChallengeMap" m LEFT JOIN "ChallengeMapLevel" l ON l."challengeMapId" = m."id" WHERE ($1 = '' OR m."title" ILIKE '%' || $1 || '%' OR COALESCE(m."artist",'') ILIKE '%' || $1 || '%' OR COALESCE(m."mapperName",'') ILIKE '%' || $1 || '%') AND ($2::integer IS NULL OR l."level" = $2) ORDER BY m."createdAt" DESC LIMIT 100`, q, level));
+    const rows = await prisma.$queryRawUnsafe<Array<Record<string, unknown>>>(`SELECT m."id", m."title", m."artist", m."mapperName", m."mapFileUrl", m."rating", m."status", l."level" FROM "ChallengeMap" m LEFT JOIN "ChallengeMapLevel" l ON l."challengeMapId" = m."id" WHERE ($1 = '' OR m."title" ILIKE '%' || $1 || '%' OR COALESCE(m."artist",'') ILIKE '%' || $1 || '%' OR COALESCE(m."mapperName",'') ILIKE '%' || $1 || '%') AND ($2::integer IS NULL OR l."level" = $2) ORDER BY m."createdAt" DESC LIMIT $3 OFFSET $4`, q, level, PAGE_SIZE + 1, offset);
+    const hasMore = rows.length > PAGE_SIZE;
+    return NextResponse.json({ maps: rows.slice(0, PAGE_SIZE), hasMore, nextOffset: hasMore ? offset + PAGE_SIZE : null });
   }
+
   await ensureCompletionClipTables();
-  return NextResponse.json(await prisma.$queryRawUnsafe(`SELECT m."id", m."title", m."artist", m."mapperName", m."mapFileUrl", m."status", m."level", m."category"::text AS "category" FROM "CategoryMap" m WHERE m."category"::text = $1 AND ($2 = '' OR m."title" ILIKE '%' || $2 || '%' OR COALESCE(m."artist",'') ILIKE '%' || $2 || '%' OR COALESCE(m."mapperName",'') ILIKE '%' || $2 || '%') AND ($3::integer IS NULL OR m."level" = $3) ORDER BY m."createdAt" DESC LIMIT 100`, tab, q, level));
+  const rows = await prisma.$queryRawUnsafe<Array<Record<string, unknown>>>(`SELECT m."id", m."title", m."artist", m."mapperName", m."mapFileUrl", m."status", m."level", m."category"::text AS "category" FROM "CategoryMap" m WHERE m."category"::text = $1 AND ($2 = '' OR m."title" ILIKE '%' || $2 || '%' OR COALESCE(m."artist",'') ILIKE '%' || $2 || '%' OR COALESCE(m."mapperName",'') ILIKE '%' || $2 || '%') AND ($3::integer IS NULL OR m."level" = $3) ORDER BY m."createdAt" DESC LIMIT $4 OFFSET $5`, tab, q, level, PAGE_SIZE + 1, offset);
+  const hasMore = rows.length > PAGE_SIZE;
+  return NextResponse.json({ maps: rows.slice(0, PAGE_SIZE), hasMore, nextOffset: hasMore ? offset + PAGE_SIZE : null });
 }
 
 export async function PATCH(request: Request) {
