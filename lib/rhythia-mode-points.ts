@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 import { rhythiaRequest } from "@/lib/rhythia";
-import { speedProfileAt, MAP_ANALYZER_VERSION, type MapPatternSegment, type MapSpeedProfile } from "@/lib/map-difficulty";
-import { ensureMapAnalysisTable } from "@/lib/map-analysis-store";
+import { speedProfileAt, type MapPatternSegment, type MapSpeedProfile } from "@/lib/map-difficulty";
+import { ensureMapAnalysisTable, UNRANKED_MAP_MARKER } from "@/lib/map-analysis-store";
 import { MODE_RULES, type ModeKey, type ModePoints } from "@/lib/rhythia-mode-rules";
 
 export { MODE_RULES } from "@/lib/rhythia-mode-rules";
@@ -56,6 +56,7 @@ type ScorePayload = {
 };
 type ScoreBucket = { name: string; scores: ScorePayload[] };
 type AnalyzedMapRow = { id: string; title: string; sourceBeatmapId: number | null; rating: number; rpl: number; rpv: number; rps: number; speedProfiles: unknown; patternSegments: unknown };
+type RankedMapIdentity = { id: string; sourceBeatmapId: number | null };
 
 function clamp(value: number, min = 0, max = 1) { return Math.min(max, Math.max(min, value)); }
 function normalize(value: string | null | undefined) { return (value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
@@ -237,9 +238,16 @@ async function analyzedMaps() {
     SELECT c.id,c.title,c."sourceBeatmapId",a.rating,a.rpl,a.rpv,a.rps,a."speedProfiles",a."patternSegments"
     FROM "ChallengeMap" c
     JOIN "MapDifficultyAnalysis" a ON a."mapId"=c.id
-    WHERE c.status='approved' AND a.status='analyzed' AND a."pointEligible"=TRUE AND a."analyzerVersion"=$1 AND a.rating IS NOT NULL`, MAP_ANALYZER_VERSION);
+    WHERE c.status='approved'
+      AND COALESCE(c."reviewerNote", '') <> $1
+      AND a.status='analyzed'
+      AND a."pointEligible"=TRUE
+      AND a.rating IS NOT NULL`,
+    UNRANKED_MAP_MARKER,
+  );
 }
 function mapKey(map: Pick<AnalyzedMapRow, "id" | "sourceBeatmapId">) { return map.sourceBeatmapId != null ? `rhythia:${map.sourceBeatmapId}` : `map:${map.id}`; }
+function identityKey(map: RankedMapIdentity) { return map.sourceBeatmapId != null ? `rhythia:${map.sourceBeatmapId}` : `map:${map.id}`; }
 function rewardFor(map: AnalyzedMapRow, mode: ModeKey, speed: number | null | undefined) {
   const profile = speedProfileAt(parseProfiles(map.speedProfiles), speed);
   if (profile) return profile.rewards[mode];
@@ -285,24 +293,52 @@ export async function reconcileUserRankPoints(userId: string) {
   return { ...totals, changed: current?.rhp !== totals.rhp };
 }
 
-async function removeIneligibleRows(userId: string, maps: AnalyzedMapRow[]) {
-  const keys = maps.map(mapKey);
-  if (!keys.length) {
-    await prisma.rhythiaModeScore.deleteMany({ where: { userId } });
-    return;
-  }
-  await prisma.rhythiaModeScore.deleteMany({ where: { userId, mapKey: { notIn: keys } } });
+async function removableRankKeys() {
+  await ensureMapAnalysisTable();
+  const ranked = await prisma.$queryRawUnsafe<RankedMapIdentity[]>(`
+    SELECT c.id,c."sourceBeatmapId"
+    FROM "ChallengeMap" c
+    LEFT JOIN "MapDifficultyAnalysis" a ON a."mapId"=c.id
+    WHERE c.status='approved'
+      AND COALESCE(c."reviewerNote", '') <> $1
+      AND (a."pointEligible"=TRUE OR a.status='failed')`,
+    UNRANKED_MAP_MARKER,
+  );
+  return new Set(ranked.map(identityKey));
+}
+
+async function removeIneligibleRows(userId: string) {
+  const keepKeys = await removableRankKeys();
+  // Never mass-delete score history when the catalog/analysis table is temporarily empty.
+  if (!keepKeys.size) return;
+  const rows = await prisma.rhythiaModeScore.findMany({ where: { userId }, select: { id: true, mapKey: true } });
+  const removeIds = rows.filter((row) => !keepKeys.has(row.mapKey)).map((row) => row.id);
+  if (removeIds.length) await prisma.rhythiaModeScore.deleteMany({ where: { id: { in: removeIds } } });
+}
+
+function mappedRows(rows: Awaited<ReturnType<typeof prisma.rhythiaModeScore.findMany>>) {
+  return rows.map((row) => ({ id: row.id, mapKey: row.mapKey, mapTitle: row.mapTitle, scoreId: row.scoreId, cameraMode: row.cameraMode as ModeKey, points: row.points, accuracy: row.accuracy, awardedSp: row.awardedSp, speed: row.speed }));
 }
 
 export async function syncUserModeScores(userId: string) {
-  const [profile, user, maps] = await Promise.all([
+  const [profile, user, maps, previous] = await Promise.all([
     prisma.rhythiaProfile.findUnique({ where: { userId }, select: { profileId: true } }),
     prisma.user.findUnique({ where: { id: userId }, select: { rhp: true } }),
     analyzedMaps(),
+    prisma.rhythiaModeScore.findMany({ where: { userId }, orderBy: { points: "desc" } }),
   ]);
   if (!profile || !user) return { rpl: 0, rps: 0, rpv: 0, rhp: user?.rhp ?? 0, rows: [] as RhythiaModeScoreRow[], foundModes: { lock: 0, spin: 0, vr: 0 }, added: 0, rankIndex: 0 };
-  await removeIneligibleRows(userId, maps);
+
+  // Fetch before mutating anything. A Rhythia outage must never erase a user's last known good ranks.
   const scores = await fetchModeScores(profile.profileId);
+  if (!scores.length && previous.length) {
+    const totals = await reconcileUserRankPoints(userId);
+    const rows = mappedRows(previous);
+    return { rpl: totals.rpl, rps: totals.rps, rpv: totals.rpv, rhp: totals.rhp, rows, foundModes: { lock: rows.filter((row) => row.cameraMode === "lock").length, spin: rows.filter((row) => row.cameraMode === "spin").length, vr: rows.filter((row) => row.cameraMode === "vr").length }, added: 0, raw: totals.raw, preserved: true };
+  }
+
+  await removeIneligibleRows(userId);
+
   const byBeatmapId = new Map<number, AnalyzedMapRow>();
   const byTitle = new Map<string, AnalyzedMapRow>();
   for (const map of maps) {
@@ -328,12 +364,13 @@ export async function syncUserModeScores(userId: string) {
     const oldCreated = old ? scoreCreatedAt(old.score) ?? "" : "";
     if (!old || points > old.points || points === old.points && accuracy > oldAccuracy || points === old.points && accuracy === oldAccuracy && awarded > oldAwarded || points === old.points && accuracy === oldAccuracy && awarded === oldAwarded && created > oldCreated) candidates.set(key, candidate);
   }
-  const previous = await prisma.rhythiaModeScore.findMany({ where: { userId }, select: { mapKey: true, cameraMode: true, scoreId: true } });
+
   const previousKeys = new Set(previous.map((row) => `${row.mapKey}:${row.cameraMode}:${row.scoreId}`));
   const candidateKeys = new Set(candidates.keys());
   const analyzedKeys = new Set(maps.map(mapKey));
-  const staleIds = previous.filter(row => analyzedKeys.has(row.mapKey) && !candidateKeys.has(`${row.mapKey}:${row.cameraMode}`));
-  if (staleIds.length) await prisma.rhythiaModeScore.deleteMany({ where: { userId, OR: staleIds.map(row => ({ mapKey: row.mapKey, cameraMode: row.cameraMode })) } });
+  const staleIds = previous.filter((row) => analyzedKeys.has(row.mapKey) && !candidateKeys.has(`${row.mapKey}:${row.cameraMode}`));
+  if (staleIds.length) await prisma.rhythiaModeScore.deleteMany({ where: { userId, OR: staleIds.map((row) => ({ mapKey: row.mapKey, cameraMode: row.cameraMode })) } });
+
   let added = 0;
   for (const candidate of candidates.values()) {
     const key = mapKey(candidate.map);
@@ -344,6 +381,7 @@ export async function syncUserModeScores(userId: string) {
       update: { mapTitle: candidate.map.title, scoreId: candidate.score.id, points: candidate.points, accuracy: accuracyFromScore(candidate.score), awardedSp: scoreAwardedSp(candidate.score), speed: candidate.score.speed ?? 1 },
     });
   }
+
   const stored = await prisma.rhythiaModeScore.findMany({ where: { userId }, orderBy: { points: "desc" } });
   const mapByKey = new Map(maps.map((map) => [mapKey(map), map]));
   const completionBest = new Map<string, typeof stored[number]>();
@@ -362,7 +400,7 @@ export async function syncUserModeScores(userId: string) {
   }
   const totals = await reconcileUserRankPoints(userId);
   await prisma.user.update({ where: { id: userId }, data: { scoreImportDone: true, lastRhythiaRpCheckAt: new Date() } });
-  const rows: RhythiaModeScoreRow[] = stored.map((row) => ({ id: row.id, mapKey: row.mapKey, mapTitle: row.mapTitle, scoreId: row.scoreId, cameraMode: row.cameraMode as ModeKey, points: row.points, accuracy: row.accuracy, awardedSp: row.awardedSp, speed: row.speed }));
+  const rows: RhythiaModeScoreRow[] = mappedRows(stored);
   return { rpl: totals.rpl, rps: totals.rps, rpv: totals.rpv, rhp: totals.rhp, rows, foundModes: { lock: rows.filter((row) => row.cameraMode === "lock").length, spin: rows.filter((row) => row.cameraMode === "spin").length, vr: rows.filter((row) => row.cameraMode === "vr").length }, added, raw: totals.raw };
 }
 
@@ -371,16 +409,19 @@ export async function recalculateUsersForMapAnalysis(mapId: string) {
   const maps = await prisma.$queryRawUnsafe<AnalyzedMapRow[]>(`
     SELECT c.id,c.title,c."sourceBeatmapId",a.rating,a.rpl,a.rpv,a.rps,a."speedProfiles",a."patternSegments"
     FROM "ChallengeMap" c JOIN "MapDifficultyAnalysis" a ON a."mapId"=c.id
-    WHERE c.id=$1 AND a.status='analyzed' AND a."pointEligible"=TRUE AND a."analyzerVersion"=$2 LIMIT 1`, mapId, MAP_ANALYZER_VERSION);
+    WHERE c.id=$1 AND a.status='analyzed' AND a."pointEligible"=TRUE LIMIT 1`,
+    mapId,
+  );
   const map = maps[0] ?? null;
-  const mapRow = await prisma.challengeMap.findUnique({ where: { id: mapId }, select: { id: true, sourceBeatmapId: true } });
+  const mapRow = await prisma.challengeMap.findUnique({ where: { id: mapId }, select: { id: true, sourceBeatmapId: true, status: true, reviewerNote: true } });
   if (!mapRow) return { users: 0 };
   const key = mapRow.sourceBeatmapId != null ? `rhythia:${mapRow.sourceBeatmapId}` : `map:${mapRow.id}`;
   const rows = await prisma.rhythiaModeScore.findMany({ where: { mapKey: key }, select: { userId: true } });
   const userIds = [...new Set(rows.map((row) => row.userId))];
-  if (!map) await prisma.rhythiaModeScore.deleteMany({ where: { mapKey: key } });
-  else for (const userId of userIds) await syncUserModeScores(userId);
-  for (const userId of userIds) await reconcileUserRankPoints(userId);
+  const explicitlyIneligible = mapRow.status !== "approved" || mapRow.reviewerNote === UNRANKED_MAP_MARKER;
+  if (!map && explicitlyIneligible) await prisma.rhythiaModeScore.deleteMany({ where: { mapKey: key } });
+  else if (map) for (const affectedUserId of userIds) await syncUserModeScores(affectedUserId);
+  for (const affectedUserId of userIds) await reconcileUserRankPoints(affectedUserId);
   return { users: userIds.length };
 }
 
