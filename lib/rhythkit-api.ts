@@ -1,5 +1,5 @@
 import { hashToken } from "@/lib/rhythkit";
-import { RANKS, isMapInRankRange } from "@/lib/ranks";
+import { RANKS } from "@/lib/ranks";
 import { prisma } from "@/lib/db";
 
 export type RhythKitInstallation = {
@@ -40,10 +40,8 @@ export function isRankedMap(rating: number | null, reviewerNote: string | null, 
   return status === "approved" && rating != null && reviewerNote !== "rhythia-unranked";
 }
 
-export function isMapAllowed(rating: number | null, reviewerNote: string | null, status: string, rankIndex: number) {
-  if (status === "legacy") return true;
-  if (!isRankedMap(rating, reviewerNote, status)) return true;
-  return rating != null && isMapInRankRange(rating, rankIndex);
+export function isMapAllowed(_rating: number | null, _reviewerNote: string | null, _status: string, _rankIndex: number) {
+  return true;
 }
 
 export function mapLengthSeconds(length: number | null) {
