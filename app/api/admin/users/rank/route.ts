@@ -20,11 +20,16 @@ async function applyPoints(userId:string,rhp:number){
 
 async function rebuildAllRanks(actorId:string){
   const users=await prisma.user.findMany({where:{NOT:{profileHandle:"rhythia-imports"}},select:{id:true,username:true,rhythiaProfile:{select:{profileId:true}}},orderBy:{createdAt:"asc"}});
-  await prisma.$transaction(async tx=>{
-    await tx.rhythiaModeScore.deleteMany({where:{userId:{in:users.map(user=>user.id)}}});
-    await tx.$executeRawUnsafe('DELETE FROM "UserPointOverride" WHERE system IN (\'rhp\',\'rpl\',\'rps\',\'rpv\')');
-    await tx.user.updateMany({where:{id:{in:users.map(user=>user.id)}},data:{rhp:0,scoreImportDone:false}});
+
+  // Remove manual rank overrides, but never erase stored score history or pre-zero users.
+  // Each successful Rhythia sync replaces the derived totals in place; a failed sync keeps
+  // the user's last known good RPL/RPS/RPV/RHP instead of leaving them at zero.
+  await prisma.$executeRawUnsafe('DELETE FROM "UserPointOverride" WHERE system IN (\'rhp\',\'rpl\',\'rps\',\'rpv\')');
+  await prisma.user.updateMany({
+    where:{id:{in:users.map(user=>user.id)}},
+    data:{scoreImportDone:false,lastRhythiaRpCheckAt:null},
   });
+
   const linked=users.filter(user=>user.rhythiaProfile?.profileId!=null);
   const failures:string[]=[];
   let rebuilt=0;
@@ -37,7 +42,7 @@ async function rebuildAllRanks(actorId:string){
     for(const failure of results){if(failure)failures.push(failure);else rebuilt++;}
   }
   const battle=await placeBattleRanks(undefined,true).catch(()=>null);
-  await prisma.moderationAction.create({data:{actorId,action:"all_rankings_rebuilt",targetType:"ranking_system",targetId:"all-users",metadata:{totalUsers:users.length,linkedUsers:linked.length,rebuilt,failed:failures.length,battleRanksChanged:battle?.changed??0}}});
+  await prisma.moderationAction.create({data:{actorId,action:"all_rankings_rebuilt",targetType:"ranking_system",targetId:"all-users",metadata:{totalUsers:users.length,linkedUsers:linked.length,rebuilt,failed:failures.length,battleRanksChanged:battle?.changed??0,nonDestructive:true}}});
   return{totalUsers:users.length,linkedUsers:linked.length,rebuilt,skipped:users.length-linked.length,failed:failures.length,failures:failures.slice(0,10),battleRanksChanged:battle?.changed??0};
 }
 
