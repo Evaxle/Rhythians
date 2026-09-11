@@ -30,13 +30,7 @@ async function getPoints(id: string) {
   const rpl = overrides.get("rpl") ?? mode?.points.lock ?? 0;
   const rps = overrides.get("rps") ?? mode?.points.spin ?? 0;
   const rpv = overrides.get("rpv") ?? mode?.points.vr ?? 0;
-  return {
-    rhp: rpl + rps + rpv,
-    rpl,
-    rps,
-    rpv,
-    rbp: rbp?.player.rbp ?? 0,
-  };
+  return { rhp: rpl + rps + rpv, rpl, rps, rpv, rbp: rbp?.player.rbp ?? 0 };
 }
 
 export async function GET(_request: Request, { params }: Props) {
@@ -94,9 +88,13 @@ export async function PATCH(request: Request, { params }: Props) {
   if (hasLevels) {
     await ensureChallengeLevelTable();
     await prisma.$transaction(async (tx) => {
+      await tx.$executeRawUnsafe('DELETE FROM "ChallengeMapCompletion" c USING "ChallengeMapLevel" l WHERE c."challengeMapId"=l."challengeMapId" AND c."userId"=$1 AND l."level">$2', id, challengeLevel);
       await tx.$executeRawUnsafe('DELETE FROM "UserChallengeLevelOverride" WHERE "userId"=$1', id);
       await tx.$executeRawUnsafe('INSERT INTO "UserChallengeLevelOverride" ("id","userId","level","createdAt","updatedAt") VALUES ($1,$2,$3,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)', randomUUID(), id, challengeLevel);
-      for (const entry of categoryLevels ?? []) await tx.userCategoryLevel.upsert({ where: { userId_category: { userId: id, category: entry.category as never } }, create: { userId: id, category: entry.category as never, level: entry.level }, update: { level: entry.level } });
+      for (const entry of categoryLevels ?? []) {
+        await tx.$executeRawUnsafe('DELETE FROM "CategoryMapCompletion" c USING "CategoryMap" m WHERE c."categoryMapId"=m."id" AND c."userId"=$1 AND m."category"=$2::"CategoryType" AND m."level">$3', id, entry.category, entry.level);
+        await tx.userCategoryLevel.upsert({ where: { userId_category: { userId: id, category: entry.category as never } }, create: { userId: id, category: entry.category as never, level: entry.level }, update: { level: entry.level } });
+      }
     });
   }
 
