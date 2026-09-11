@@ -16,6 +16,18 @@ async function authorize() {
   return user;
 }
 
+async function resolveCategoryMap(mapId: string) {
+  const direct = await prisma.categoryMap.findUnique({ where: { id: mapId } });
+  if (direct) return direct;
+  const source = await prisma.challengeMap.findUnique({ where: { id: mapId }, select: { sourceBeatmapId: true, mapFileUrl: true, title: true } });
+  if (!source) return null;
+  if (source.sourceBeatmapId != null) {
+    const bySource = await prisma.categoryMap.findUnique({ where: { sourceBeatmapId: source.sourceBeatmapId } });
+    if (bySource) return bySource;
+  }
+  return prisma.categoryMap.findFirst({ where: { OR: [{ mapFileUrl: source.mapFileUrl }, { title: { equals: source.title, mode: "insensitive" } }] } });
+}
+
 export async function GET(request: Request) {
   const admin = await authorize();
   if (!admin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -63,7 +75,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ ok: true, category: targetTab, level });
     }
 
-    const existing = map.sourceBeatmapId != null ? await prisma.categoryMap.findUnique({ where: { sourceBeatmapId: map.sourceBeatmapId } }) : null;
+    const existing = map.sourceBeatmapId != null ? await prisma.categoryMap.findUnique({ where: { sourceBeatmapId: map.sourceBeatmapId } }) : await prisma.categoryMap.findFirst({ where: { OR: [{ mapFileUrl: map.mapFileUrl }, { title: { equals: map.title, mode: "insensitive" } }] } });
     if (existing) {
       await prisma.categoryMap.update({ where: { id: existing.id }, data: { category: targetTab as never, level, status: "approved", reviewedById: admin.id, reviewedAt: new Date() } });
     } else {
@@ -73,7 +85,7 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ ok: true, category: targetTab, level });
   }
 
-  const map = await prisma.categoryMap.findUnique({ where: { id: body.mapId } });
+  const map = await resolveCategoryMap(body.mapId);
   if (!map) return NextResponse.json({ error: "Category map not found." }, { status: 404 });
 
   if (targetTab !== "challenge") {
@@ -81,7 +93,7 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ ok: true, category: targetTab, level });
   }
 
-  const challenge = map.sourceBeatmapId != null ? await prisma.challengeMap.findFirst({ where: { sourceBeatmapId: map.sourceBeatmapId } }) : null;
+  const challenge = map.sourceBeatmapId != null ? await prisma.challengeMap.findFirst({ where: { sourceBeatmapId: map.sourceBeatmapId } }) : await prisma.challengeMap.findFirst({ where: { OR: [{ mapFileUrl: map.mapFileUrl }, { title: { equals: map.title, mode: "insensitive" } }] } });
   if (!challenge) return NextResponse.json({ error: "This category map has no matching Challenge source map, so it cannot be moved to Challenge safely." }, { status: 400 });
   await prisma.$executeRawUnsafe(`INSERT INTO "ChallengeMapLevel" ("id","challengeMapId","level","createdAt","updatedAt") VALUES ($1,$2,$3,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) ON CONFLICT ("challengeMapId") DO UPDATE SET "level" = EXCLUDED."level", "updatedAt" = CURRENT_TIMESTAMP`, randomUUID(), challenge.id, level);
   await prisma.categoryMap.update({ where: { id: map.id }, data: { status: "hidden", reviewedById: admin.id, reviewedAt: new Date() } });
@@ -101,7 +113,7 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ ok: true, removed: true });
   }
 
-  const map = await prisma.categoryMap.findUnique({ where: { id: body.mapId } });
+  const map = await resolveCategoryMap(body.mapId);
   if (!map) return NextResponse.json({ error: "Category map not found." }, { status: 404 });
   await prisma.categoryMap.update({ where: { id: map.id }, data: { status: "hidden", reviewedById: admin.id, reviewedAt: new Date() } });
   return NextResponse.json({ ok: true, removed: true });
