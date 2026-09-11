@@ -31,13 +31,13 @@ export async function GET(request: Request) {
 
   if (tab === "challenge") {
     await ensureChallengeLevelTable();
-    const rows = await prisma.$queryRawUnsafe<Array<Record<string, unknown>>>(`SELECT m."id", m."title", m."artist", m."mapperName", m."mapFileUrl", m."rating", m."status", l."level" FROM "ChallengeMap" m LEFT JOIN "ChallengeMapLevel" l ON l."challengeMapId" = m."id" WHERE ($1 = '' OR m."title" ILIKE '%' || $1 || '%' OR COALESCE(m."artist",'') ILIKE '%' || $1 || '%' OR COALESCE(m."mapperName",'') ILIKE '%' || $1 || '%') AND ($2::integer IS NULL OR l."level" = $2) ORDER BY m."createdAt" DESC LIMIT $3 OFFSET $4`, q, level, PAGE_SIZE + 1, offset);
+    const rows = await prisma.$queryRawUnsafe<Array<Record<string, unknown>>>(`SELECT m."id", m."title", m."artist", m."mapperName", m."mapFileUrl", m."rating", m."status", l."level" FROM "ChallengeMap" m LEFT JOIN "ChallengeMapLevel" l ON l."challengeMapId" = m."id" WHERE ($1 = '' OR m."title" ILIKE '%' || $1 || '%' OR COALESCE(m."artist",'') ILIKE '%' || $1 || '%' OR COALESCE(m."mapperName",'') ILIKE '%' || $1 || '%') AND ($2::integer IS NULL OR l."level" = $2) ORDER BY m."createdAt" DESC, m."id" ASC LIMIT $3 OFFSET $4`, q, level, PAGE_SIZE + 1, offset);
     const hasMore = rows.length > PAGE_SIZE;
     return NextResponse.json({ maps: rows.slice(0, PAGE_SIZE), hasMore, nextOffset: hasMore ? offset + PAGE_SIZE : null });
   }
 
   await ensureCompletionClipTables();
-  const rows = await prisma.$queryRawUnsafe<Array<Record<string, unknown>>>(`SELECT m."id", m."title", m."artist", m."mapperName", m."mapFileUrl", m."status", m."level", m."category"::text AS "category" FROM "CategoryMap" m WHERE m."category"::text = $1 AND ($2 = '' OR m."title" ILIKE '%' || $2 || '%' OR COALESCE(m."artist",'') ILIKE '%' || $2 || '%' OR COALESCE(m."mapperName",'') ILIKE '%' || $2 || '%') AND ($3::integer IS NULL OR m."level" = $3) ORDER BY m."createdAt" DESC LIMIT $4 OFFSET $5`, tab, q, level, PAGE_SIZE + 1, offset);
+  const rows = await prisma.$queryRawUnsafe<Array<Record<string, unknown>>>(`SELECT m."id", m."title", m."artist", m."mapperName", m."mapFileUrl", m."status", m."level", m."category"::text AS "category" FROM "CategoryMap" m WHERE m."category"::text = $1 AND ($2 = '' OR m."title" ILIKE '%' || $2 || '%' OR COALESCE(m."artist",'') ILIKE '%' || $2 || '%' OR COALESCE(m."mapperName",'') ILIKE '%' || $2 || '%') AND ($3::integer IS NULL OR m."level" = $3) ORDER BY m."createdAt" DESC, m."id" ASC LIMIT $4 OFFSET $5`, tab, q, level, PAGE_SIZE + 1, offset);
   const hasMore = rows.length > PAGE_SIZE;
   return NextResponse.json({ maps: rows.slice(0, PAGE_SIZE), hasMore, nextOffset: hasMore ? offset + PAGE_SIZE : null });
 }
