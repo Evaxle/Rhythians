@@ -44,9 +44,9 @@ export function RhythiaStats({ profile }: { profile: { profileId: number; profil
         <div className="mt-3 overflow-hidden rounded-2xl border border-border">
           {scores.length === 0 ? <p className="p-5 text-sm text-muted">No top scores available.</p> : scores.map((score, index) => {
             const { accuracy, grade } = scoreDetails(score);
-            return <div key={score.id} className="grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 border-b border-border bg-background/60 px-4 py-3 last:border-0 sm:grid-cols-[2rem_minmax(0,1fr)_5rem_4rem_3rem_4rem]">
+            return <div key={score.id} className="grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 border-b border-border bg-background/60 px-4 py-3 last:border-0 sm:grid-cols-[2rem_minmax(0,1fr)_5rem_6rem]">
               <span className="text-sm text-muted">{index + 1}</span><div className="min-w-0"><p className="truncate text-sm font-semibold text-white">{score.beatmapTitle ?? "Unknown map"}</p><p className="mt-1 text-xs text-muted">{score.speed ? `${score.speed.toFixed(2)}x` : "1.00x"} speed · {score.misses ?? "—"} misses</p></div>
-              <span className="text-right text-sm text-accent">{score.awarded_sp ?? "—"} RP</span><span className="hidden text-right text-sm text-muted sm:block">{score.speed ? `${score.speed.toFixed(2)}x` : "1.00x"}</span><span className="hidden text-right text-sm text-muted sm:block">{score.misses ?? "—"}</span><span className="text-right text-sm font-bold text-white">{grade} <span className="hidden font-normal text-muted sm:inline">{accuracy === null ? "—" : `${accuracy.toFixed(2)}%`}</span></span>
+              <span className="text-right text-sm text-accent">{score.awarded_sp ?? "—"} RP</span><span className="col-start-3 text-right text-sm font-bold text-white sm:col-start-auto">{grade} <span className="hidden font-normal text-muted sm:inline">{accuracy === null ? "—" : `${accuracy.toFixed(2)}%`}</span></span>
             </div>;
           })}
         </div>

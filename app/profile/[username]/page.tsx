@@ -213,7 +213,7 @@ export default async function ProfilePage({ params }: Props) {
     <div className="ui-page profile-page space-y-6">
       <section className="relative overflow-hidden rounded-[2.2rem] border border-accent/15 bg-[radial-gradient(circle_at_8%_0%,rgba(124,143,240,0.17),transparent_32%),radial-gradient(circle_at_92%_100%,rgba(244,63,94,0.08),transparent_28%),linear-gradient(145deg,rgba(20,27,45,0.98),rgba(9,13,23,0.98))] p-5 shadow-glow sm:p-7 lg:p-8">
         <div className="grid gap-6">
-          <div className="profile-identity flex min-w-0 flex-col p-1 sm:p-2">
+          <div className="profile-identity grid min-w-0 items-center gap-6 p-1 sm:p-2 lg:grid-cols-2">
             <div className="flex flex-col items-center gap-5 text-center sm:flex-row sm:text-left">
               {avatarUrl ? (
                 <img
@@ -279,58 +279,60 @@ export default async function ProfilePage({ params }: Props) {
                 </div>
               </div>
             </div>
-            {displayTags.length > 0 && (
-              <div className="mt-5">
-                <UserTags tags={displayTags} size="md" />
-              </div>
-            )}
-            {user.bio ? (
-              <p className="mt-5 whitespace-pre-wrap text-sm leading-7 text-white/70">
-                {user.bio}
-              </p>
-            ) : (
-              <p className="mt-5 text-sm text-muted">
-                No profile bio has been added yet.
-              </p>
-            )}
-            <div className="mt-6 flex flex-wrap justify-center gap-2 sm:justify-start">
-              {user.rhythiaProfile && (
-                <a
-                  href={user.rhythiaProfile.profileUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="ui-button border border-white/10 bg-white/5 text-white"
-                >
-                  <ExternalLink size={16} /> Rhythia profile
-                </a>
+            <div className="min-w-0 text-center sm:text-left">
+              {displayTags.length > 0 && (
+                <div className="flex justify-center sm:justify-start">
+                  <UserTags tags={displayTags} size="md" />
+                </div>
               )}
-              {isOwnProfile && (
-                <RhythiaConnect
-                  connectedUrl={user.rhythiaProfile?.profileUrl}
-                />
+              {user.bio ? (
+                <p className="mt-5 whitespace-pre-wrap text-sm leading-7 text-white/70">
+                  {user.bio}
+                </p>
+              ) : (
+                <p className="mt-5 text-sm text-muted">
+                  No profile bio has been added yet.
+                </p>
               )}
-              {!isOwnProfile && (
-                <>
-                  <FriendButton userId={user.id} />
-                  <ProfileBattleButton userId={user.id} />
-                  <Link
-                    href={`/messages?user=${encodeURIComponent(user.profileHandle)}`}
+              <div className="mt-6 flex flex-wrap justify-center gap-2 sm:justify-start">
+                {user.rhythiaProfile && (
+                  <a
+                    href={user.rhythiaProfile.profileUrl}
+                    target="_blank"
+                    rel="noreferrer"
                     className="ui-button border border-white/10 bg-white/5 text-white"
                   >
-                    <MessageCircle size={16} /> Message
-                  </Link>
-                </>
-              )}
-              {currentUser && !isOwnProfile && (
-                <ReportButton
-                  targetType="user"
-                  targetId={user.id}
-                  targetLabel={user.username}
-                />
-              )}
+                    <ExternalLink size={16} /> Rhythia profile
+                  </a>
+                )}
+                {isOwnProfile && (
+                  <RhythiaConnect
+                    connectedUrl={user.rhythiaProfile?.profileUrl}
+                  />
+                )}
+                {!isOwnProfile && (
+                  <>
+                    <FriendButton userId={user.id} />
+                    <ProfileBattleButton userId={user.id} />
+                    <Link
+                      href={`/messages?user=${encodeURIComponent(user.profileHandle)}`}
+                      className="ui-button border border-white/10 bg-white/5 text-white"
+                    >
+                      <MessageCircle size={16} /> Message
+                    </Link>
+                  </>
+                )}
+                {currentUser && !isOwnProfile && (
+                  <ReportButton
+                    targetType="user"
+                    targetId={user.id}
+                    targetLabel={user.username}
+                  />
+                )}
+              </div>
             </div>
             {isOwnProfile && referralProgress && (
-              <div className="mt-6 border-t border-white/10 pt-5">
+              <div className="border-t border-white/10 pt-5 lg:col-span-2">
                 <ProfileShare
                   userId={user.id}
                   progress={referralProgress.count}
@@ -500,7 +502,7 @@ export default async function ProfilePage({ params }: Props) {
               key={category}
               className={`rounded-2xl border p-4 text-center ${category === favoriteCategory ? "border-violet-400/40 bg-violet-400/10" : "border-white/10 bg-black/15"}`}
             >
-              <p className="text-xs uppercase tracking-[0.18em] text-muted">
+              <p className="min-h-10 text-xs uppercase tracking-[0.18em] text-muted">
                 {CATEGORY_LABELS[category]}
                 {category === favoriteCategory && (
                   <span className="mt-1 block text-violet-300">Favorite</span>
