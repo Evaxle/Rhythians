@@ -47,7 +47,7 @@ export function CompletionClipSubmit({ kind, category, level, username, uploaded
     }
   }
 
-  return <form onSubmit={submit} className="space-y-6 rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+  return <form onSubmit={submit} className="space-y-6 ui-panel">
     <div className="rounded-2xl border border-amber-300/30 bg-amber-300/10 p-4 text-sm leading-6 text-amber-100"><strong>Identity proof required:</strong> during the completion recording, press <strong>Tab</strong> so the in-game player list/overlay visibly shows your Rhythia username <strong>{username}</strong>. Reviewers must be able to read and match that username before Level 7–10 can be approved.</div>
     <div className="grid gap-4 sm:grid-cols-2">
       {kind === "category" ? <label><span className="mb-2 block text-xs uppercase tracking-[0.2em] text-muted">Category</span><select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value as Category)} className={input}>{CATEGORIES.map((value) => <option key={value} value={value}>{CATEGORY_LABELS[value]}</option>)}</select></label> : <div><span className="mb-2 block text-xs uppercase tracking-[0.2em] text-muted">Category</span><div className="rounded-2xl border border-border bg-background px-4 py-3 text-sm text-white">Challenge</div></div>}

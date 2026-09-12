@@ -3,11 +3,11 @@ import { rules } from "@/lib/rules";
 
 export default function RulesPage() {
   return (
-    <div className="space-y-8">
-      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+    <div className="ui-page reading-page space-y-6">
+      <section className="ui-page-header">
         <div>
-          <p className="text-sm uppercase tracking-[0.3em] text-accent">Community Guidelines</p>
-          <h1 className="mt-3 text-3xl font-semibold text-white">Server rules and expectations</h1>
+          <p className="ui-eyebrow">Community Guidelines</p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Server rules and expectations</h1>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
             This community is built on improving each other to get everyone better. These rules
             keep every post, comment, and message a positive place to learn and grow together.
@@ -15,8 +15,8 @@ export default function RulesPage() {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
-        <div className="space-y-6">
+      <section className="ui-panel">
+        <div className="ui-page space-y-6">
           {rules.map((rule, index) => (
             <article key={rule.slug} id={rule.slug} className="scroll-mt-24 rounded-3xl border border-border bg-background/70 p-6">
               <div className="flex items-center gap-4">

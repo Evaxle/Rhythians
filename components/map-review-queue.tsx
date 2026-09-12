@@ -42,7 +42,7 @@ export function MapReviewQueue({ initialMaps }: { initialMaps: PendingMap[] }) {
       const lengthLabel = map.length != null ? `${Math.floor(map.length / 60_000)}:${String(Math.round((map.length % 60_000) / 1000)).padStart(2, "0")}` : null;
       const submitterName = map.submittedBy.displayName ?? map.submittedBy.username;
       const isRhythiaUrl = Boolean(map.sourceUrl);
-      return <article key={map.id} className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+      return <article key={map.id} className="ui-panel ui-panel-compact">
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="min-w-0">
             <div className="flex items-center gap-2"><span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-accent/15 text-accent"><MapIcon size={18} /></span><p className="text-xs uppercase tracking-[0.25em] text-accent">Map submission</p></div>

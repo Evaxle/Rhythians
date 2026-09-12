@@ -64,7 +64,7 @@ export default function ChallengeMapSubmitForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+    <form onSubmit={handleSubmit} className="space-y-6 ui-panel">
       <div className="rounded-2xl border border-accent/20 bg-accent/10 p-4 text-sm leading-6 text-muted">Challenge maps do not award RHP. Reviewers use your requested category and level when deciding where the map belongs.</div>
       <div><label className="block text-sm font-semibold text-white">Requested category</label><select value={category} onChange={event => setCategory(event.target.value)} className="mt-3 w-full rounded-3xl border border-border bg-background/80 px-4 py-3 text-sm text-white">{categories.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></div>
       <div><label className="block text-sm font-semibold text-white">Requested level</label><input type="number" min="1" max="10" value={level} onChange={event => setLevel(event.target.value)} className="mt-3 w-full rounded-3xl border border-border bg-background/80 px-4 py-3 text-sm text-white" /></div>

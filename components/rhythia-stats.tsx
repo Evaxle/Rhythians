@@ -14,10 +14,10 @@ export function RhythiaStats({ profile }: { profile: { profileId: number; profil
   const scores = Array.isArray(profile.scores) ? profile.scores as RhythiaScore[] : [];
   const currentTitle = Math.max(0, titles.indexOf(profile.title));
   return (
-    <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow sm:p-8">
+    <section className="ui-panel ui-panel-compact sm:p-8">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-sm uppercase tracking-[0.3em] text-accent">Rhythia profile</p>
+          <p className="ui-eyebrow">Rhythia profile</p>
           <h2 className="mt-2 text-2xl font-semibold text-white">{profile.username ?? "Connected player"}</h2>
           <Link href={profile.profileUrl} target="_blank" rel="noreferrer" className="mt-1 block text-sm text-muted hover:text-accent">View on Rhythia ↗</Link>
         </div>
@@ -36,7 +36,7 @@ export function RhythiaStats({ profile }: { profile: { profileId: number; profil
       <div className="mt-6 rounded-2xl border border-border bg-background/70 p-4">
         <div className="flex items-center justify-between"><p className="text-xs uppercase tracking-[0.16em] text-muted">Title progression</p><p className="text-sm font-semibold text-accent">{profile.title}</p></div>
         <div className="mt-4 grid grid-cols-6 gap-1.5">{titles.map((title, index) => <div key={title} className={`h-2 rounded-full ${index <= currentTitle ? "bg-accent" : "bg-white/10"}`} title={title} />)}</div>
-        <div className="mt-2 flex justify-between text-[10px] text-muted"><span>Novice</span><span>Grandmaster</span></div>
+        <div className="mt-2 flex justify-between text-xs text-muted"><span>Novice</span><span>Grandmaster</span></div>
       </div>
 
       <div className="mt-8">
@@ -44,9 +44,9 @@ export function RhythiaStats({ profile }: { profile: { profileId: number; profil
         <div className="mt-3 overflow-hidden rounded-2xl border border-border">
           {scores.length === 0 ? <p className="p-5 text-sm text-muted">No top scores available.</p> : scores.map((score, index) => {
             const { accuracy, grade } = scoreDetails(score);
-            return <div key={score.id} className="grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 border-b border-border bg-background/60 px-4 py-3 last:border-0 sm:grid-cols-[2rem_minmax(0,1fr)_5rem_4rem_3rem_4rem]">
+            return <div key={score.id} className="grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 border-b border-border bg-background/60 px-4 py-3 last:border-0 sm:grid-cols-[2rem_minmax(0,1fr)_5rem_6rem]">
               <span className="text-sm text-muted">{index + 1}</span><div className="min-w-0"><p className="truncate text-sm font-semibold text-white">{score.beatmapTitle ?? "Unknown map"}</p><p className="mt-1 text-xs text-muted">{score.speed ? `${score.speed.toFixed(2)}x` : "1.00x"} speed · {score.misses ?? "—"} misses</p></div>
-              <span className="text-right text-sm text-accent">{score.awarded_sp ?? "—"} RP</span><span className="hidden text-right text-sm text-muted sm:block">{score.speed ? `${score.speed.toFixed(2)}x` : "1.00x"}</span><span className="hidden text-right text-sm text-muted sm:block">{score.misses ?? "—"}</span><span className="text-right text-sm font-bold text-white">{grade} <span className="hidden font-normal text-muted sm:inline">{accuracy === null ? "—" : `${accuracy.toFixed(2)}%`}</span></span>
+              <span className="text-right text-sm text-accent">{score.awarded_sp ?? "—"} RP</span><span className="col-start-3 text-right text-sm font-bold text-white sm:col-start-auto">{grade} <span className="hidden font-normal text-muted sm:inline">{accuracy === null ? "—" : `${accuracy.toFixed(2)}%`}</span></span>
             </div>;
           })}
         </div>

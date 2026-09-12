@@ -12,7 +12,7 @@ export async function HomeDailySection() {
 
   if (!user) {
     return (
-      <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+      <section className="ui-panel ui-panel-compact">
         <div className="flex items-center gap-3 text-sm uppercase tracking-[0.24em] text-accent"><CalendarDays size={18} /> Daily map</div>
         <div className="mt-6 flex items-start gap-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent/15 text-accent"><LogIn size={24} /></div>
@@ -29,7 +29,7 @@ export async function HomeDailySection() {
   const profile = await prisma.rhythiaProfile.findUnique({ where: { userId: user.id }, select: { id: true } });
   if (!profile) {
     return (
-      <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+      <section className="ui-panel ui-panel-compact">
         <div className="flex items-center gap-3 text-sm uppercase tracking-[0.24em] text-accent"><CalendarDays size={18} /> Daily map</div>
         <div className="mt-6 flex items-start gap-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent/15 text-accent"><Link2 size={24} /></div>
@@ -49,7 +49,7 @@ export async function HomeDailySection() {
   const status = await getUserDailyStatusAcrossRankChange(user.id);
 
   return (
-    <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+    <section className="ui-panel ui-panel-compact">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 text-sm uppercase tracking-[0.24em] text-accent"><CalendarDays size={18} /> Daily map</div>
         {userRow && <span className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-semibold text-accent"><RankIcon rank={rankInfo} size={26} />{rankInfo.isExpert ? "Expert" : `${rankInfo.name} ${rankInfo.tier}`} · {userRow.rhp.toLocaleString()} RHP</span>}

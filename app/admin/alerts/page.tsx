@@ -10,10 +10,10 @@ export default async function AdminAlertsPage() {
   ]);
 
   return (
-    <div className="space-y-8">
-      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
-        <p className="text-sm uppercase tracking-[0.3em] text-accent">Administration</p>
-        <h1 className="mt-3 text-3xl font-semibold text-white">Alerts</h1>
+    <div className="ui-page space-y-6">
+      <section className="ui-page-header">
+        <p className="ui-eyebrow">Administration</p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Alerts</h1>
         <p className="mt-3 text-sm leading-7 text-muted">Notify all users or send the same alert to multiple selected users.</p>
       </section>
       <SendAlertForm users={users} usersWithoutTags={usersWithoutTags} />

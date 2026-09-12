@@ -129,7 +129,7 @@ export function BattleMatchApp({ matchId }: { matchId: string }) {
         <div className="mb-4 flex items-center justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-accent">{name}</p>
-            <p className="mt-1 text-[11px] text-muted">{team.length} players</p>
+            <p className="mt-1 text-xs text-muted">{team.length} players</p>
           </div>
           <Trophy size={18} className="text-accent" />
         </div>
@@ -139,7 +139,7 @@ export function BattleMatchApp({ matchId }: { matchId: string }) {
             return (
               <Link href={`/profile/${encodeURIComponent(player.profileHandle)}`} key={player.userId} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/10 p-3 transition hover:border-accent/25">
                 <Avatar player={player} />
-                <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-white">{player.displayName ?? player.username}</p><p className="mt-1 text-[11px] font-semibold" style={{ color: rank.color }}>{rankLabel(rank)}</p></div>
+                <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-white">{player.displayName ?? player.username}</p><p className="mt-1 text-xs font-semibold" style={{ color: rank.color }}>{rankLabel(rank)}</p></div>
                 <span className="text-sm font-black text-white">{player.accuracy != null ? `${Number(player.accuracy).toFixed(2)}%` : "—"}</span>
               </Link>
             );

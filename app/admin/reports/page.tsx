@@ -58,11 +58,11 @@ export default async function AdminReportsPage() {
   const challengeMapById = new Map(targetChallengeMaps.map((m) => [m.id, m]));
 
   return (
-    <div className="space-y-8">
-      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+    <div className="ui-page space-y-6">
+      <section className="ui-page-header">
         <div>
-          <p className="text-sm uppercase tracking-[0.3em] text-accent">Reports</p>
-          <h1 className="mt-3 text-3xl font-semibold text-white">User, post, and map reports</h1>
+          <p className="ui-eyebrow">Reports</p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">User, post, and map reports</h1>
           <p className="mt-3 text-sm leading-7 text-muted">
             Review reports submitted by community members. Warn or ban the reported user, manage banned
             users, or resolve and dismiss reports you&apos;ve handled.

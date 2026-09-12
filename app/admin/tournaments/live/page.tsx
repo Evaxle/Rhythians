@@ -4,5 +4,5 @@ import { TournamentSelfTest } from "@/components/admin/tournament-self-test";
 export const dynamic = "force-dynamic";
 
 export default function TournamentLiveOperationsPage() {
-  return <div className="space-y-7"><TournamentAdmin /><TournamentSelfTest /></div>;
+  return <div className="ui-page space-y-6"><TournamentAdmin /><TournamentSelfTest /></div>;
 }

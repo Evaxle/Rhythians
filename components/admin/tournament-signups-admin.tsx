@@ -147,7 +147,7 @@ export function TournamentSignupsAdmin() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow sm:p-7">
+      <section className="ui-panel ui-panel-compact sm:p-7">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div><p className="text-xs font-bold uppercase tracking-[0.22em] text-accent">Tournament signups</p><h1 className="mt-2 text-3xl font-semibold text-white">Entrants, form answers, and placement</h1><p className="mt-2 max-w-3xl text-sm leading-6 text-muted">Review every signup in one place, including livestream answers, Discord/Rhythia identity, rank snapshot, split requests, waitlist state, bracket team, seed, and current match.</p></div>
           <div className="flex min-w-[280px] flex-col gap-2 sm:flex-row lg:flex-col">
@@ -171,7 +171,7 @@ export function TournamentSignupsAdmin() {
             ["Split requests", stats.pending, stats.pending ? "text-amber-200" : "text-white"],
             ["Livestream", stats.stream, "text-fuchsia-200"],
             ["Waitlisted", stats.waitlisted, stats.waitlisted ? "text-amber-200" : "text-white"],
-          ].map(([label, value, color]) => <div key={String(label)} className="rounded-2xl border border-white/10 bg-surface/80 p-4"><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted">{label}</p><p className={`mt-2 text-2xl font-bold ${color}`}>{value}</p></div>)}
+          ].map(([label, value, color]) => <div key={String(label)} className="rounded-2xl border border-white/10 bg-surface/80 p-4"><p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">{label}</p><p className={`mt-2 text-2xl font-bold ${color}`}>{value}</p></div>)}
         </section>
 
         <section className="rounded-3xl border border-border bg-surface/95 p-5 shadow-glow sm:p-6">
@@ -191,24 +191,24 @@ export function TournamentSignupsAdmin() {
                     <div className="flex items-center gap-2"><p className="font-semibold text-white">{signup.displayName ?? signup.username}</p>{signup.priority && <Star size={14} className="fill-accent text-accent" />}</div>
                     <Link href={`/profile/${encodeURIComponent(signup.profileHandle)}`} className="mt-1 inline-block text-xs text-accent hover:underline">@{signup.profileHandle}</Link>
                     <p className="mt-3 text-xs text-muted">Signed up {signup.signedUpAt ? new Date(signup.signedUpAt).toLocaleString() : "—"}</p>
-                    <div className="mt-3 flex flex-wrap gap-2"><span className="rounded-full border border-white/10 px-2.5 py-1 text-[11px] capitalize text-white">{signup.status}</span><span className="rounded-full border border-white/10 px-2.5 py-1 text-[11px] capitalize text-white">{signup.split} split</span></div>
+                    <div className="mt-3 flex flex-wrap gap-2"><span className="rounded-full border border-white/10 px-2.5 py-1 text-xs capitalize text-white">{signup.status}</span><span className="rounded-full border border-white/10 px-2.5 py-1 text-xs capitalize text-white">{signup.split} split</span></div>
                   </div>
 
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted">Rank snapshot</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">Rank snapshot</p>
                     <p className="mt-2 font-semibold text-white">{signup.rankName} {signup.rankTier}</p><p className="text-xs text-muted">{Number(signup.rhpSnapshot).toLocaleString()} RHP at signup</p><p className="mt-1 text-xs text-muted">Current: {Number(signup.currentRhp).toLocaleString()} RHP</p>
-                    <div className="mt-4"><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted">Split request</p>{pending ? <p className="mt-1 text-sm font-semibold text-amber-200">Requests {signup.requestedSplit}</p> : <p className="mt-1 text-sm capitalize text-muted">{signup.splitRequestStatus}</p>}</div>
+                    <div className="mt-4"><p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">Split request</p>{pending ? <p className="mt-1 text-sm font-semibold text-amber-200">Requests {signup.requestedSplit}</p> : <p className="mt-1 text-sm capitalize text-muted">{signup.splitRequestStatus}</p>}</div>
                   </div>
 
                   <div>
-                    <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-muted"><ShieldCheck size={13} /> Signup form</p>
+                    <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-muted"><ShieldCheck size={13} /> Signup form</p>
                     <p className={`mt-2 text-sm font-semibold ${signup.streamOptIn ? "text-fuchsia-200" : "text-muted"}`}>{signup.streamOptIn ? "Wants livestream coverage" : "No livestream request"}</p>
                     <p className="mt-1 text-xs text-muted">{formatIdentity(signup)}</p>
                     <div className="mt-3 space-y-1 text-xs text-muted"><p>Discord: {signup.discordId ?? "not linked"} {signup.discordId ? signup.inGuild ? "· in server" : "· not in server" : ""}</p><p>Rhythia: {signup.rhythiaUsername ?? "not linked"} {signup.rhythiaVerified ? "· verified" : "· not verified"}</p></div>
                   </div>
 
                   <div>
-                    <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-muted"><Users size={13} /> Bracket placement</p>
+                    <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-muted"><Users size={13} /> Bracket placement</p>
                     {team ? <><p className="mt-2 font-semibold text-white">Seed #{team.seed}</p><p className="mt-1 text-xs leading-5 text-muted">{team.members?.map((member: any) => member.displayName ?? member.username).join(" + ")}</p>{match ? <p className="mt-3 text-xs text-accent">Round {match.round} · {String(match.status).replace(/_/g, " ")}</p> : <p className="mt-3 text-xs text-muted">Waiting for next bracket match</p>}</> : <p className="mt-2 text-sm text-muted">Not bracketed yet.</p>}
                   </div>
                 </div>

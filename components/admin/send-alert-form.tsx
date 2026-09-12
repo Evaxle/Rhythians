@@ -73,14 +73,14 @@ export function SendAlertForm({ users, usersWithoutTags }: { users: AlertUser[];
   return (
     <div className="space-y-6">
       <section className="rounded-3xl border border-accent/30 bg-accent/5 p-6 shadow-glow">
-        <p className="text-sm uppercase tracking-[0.3em] text-accent">Quick action</p>
+        <p className="ui-eyebrow">Quick action</p>
         <h2 className="mt-2 text-xl font-semibold text-white">Users who need tags</h2>
         <p className="mt-2 text-sm leading-6 text-muted">Send one alert to every user with no tags. It opens the tag setup flow, checks Discord membership, provides a join button when needed, and shows the tag questions.</p>
         <button type="button" onClick={sendSetupAlert} disabled={sending || usersWithoutTags === 0} className="mt-5 rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent2 disabled:cursor-not-allowed disabled:opacity-50">{sending ? "Sending..." : `Send tag setup alert (${usersWithoutTags})`}</button>
       </section>
 
-      <form onSubmit={submit} className="space-y-6 rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
-        <div><p className="text-sm uppercase tracking-[0.3em] text-accent">User alerts</p><h2 className="mt-2 text-2xl font-semibold text-white">Send an alert</h2><p className="mt-2 text-sm leading-6 text-muted">Send an in-site notification to everyone or selected users.</p></div>
+      <form onSubmit={submit} className="space-y-6 ui-panel ui-panel-compact">
+        <div><p className="ui-eyebrow">User alerts</p><h2 className="mt-2 text-2xl font-semibold text-white">Send an alert</h2><p className="mt-2 text-sm leading-6 text-muted">Send an in-site notification to everyone or selected users.</p></div>
         <div className="grid gap-4 md:grid-cols-2">
           <label className="space-y-2"><span className="text-sm text-muted">Title</span><input required value={title} onChange={(event) => setTitle(event.target.value)} className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-white outline-none focus:border-accent" maxLength={120} /></label>
           <label className="space-y-2"><span className="text-sm text-muted">Link (optional)</span><input value={url} onChange={(event) => setUrl(event.target.value)} placeholder="/wiki or https://..." className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-white outline-none focus:border-accent" maxLength={500} /></label>

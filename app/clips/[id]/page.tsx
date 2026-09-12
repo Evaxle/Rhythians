@@ -67,14 +67,14 @@ export default async function ClipPage({ params }: Props) {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="ui-page space-y-6">
       <div className="rounded-3xl border border-border bg-surface/95 shadow-glow">
         <div className="aspect-video bg-black">
           {videoUrl ? <ClipPlayer src={videoUrl} /> : <div className="flex h-full items-center justify-center text-sm text-muted">Video preview is unavailable.</div>}
         </div>
       </div>
 
-      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+      <section className="ui-page-header">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl">
             <h1 className="text-3xl font-semibold text-white">{clip.title}</h1>
@@ -92,12 +92,12 @@ export default async function ClipPage({ params }: Props) {
               </div>
               {clip.uploader.userTags.length > 0 && <UserTags tags={clip.uploader.userTags} size="sm" />}
             </div>
-            {clip.status === "approved" && clip.reviewedBy && <p className="mt-3 inline-flex flex-wrap items-center gap-2 text-xs text-muted"><span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">Approved</span>Approved by <span className="font-semibold text-white">{clip.reviewedBy.displayName ?? clip.reviewedBy.username}</span></p>}
+            {clip.status === "approved" && clip.reviewedBy && <p className="mt-3 inline-flex flex-wrap items-center gap-2 text-xs text-muted"><span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider text-emerald-300">Approved</span>Approved by <span className="font-semibold text-white">{clip.reviewedBy.displayName ?? clip.reviewedBy.username}</span></p>}
             {clip.status === "rejected" && <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-400/10 p-4"><p className="text-sm font-semibold text-red-200">Denied by {clip.reviewedBy ? (clip.reviewedBy.displayName ?? clip.reviewedBy.username) : "a reviewer"}</p>{clip.rejectionReason && <p className="mt-1 text-sm leading-6 text-red-100/80">{clip.rejectionReason}</p>}</div>}
             <p className="mt-4 text-sm text-muted">{clip.description}</p>
             {clip.songName && <div className="mt-4 flex flex-wrap items-center gap-2"><a href={`/clips?song=${encodeURIComponent(clip.songName)}`} className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-sm font-semibold text-accent transition hover:bg-accent/20" title="View clips for this song"><Music size={15} /> {clip.songName}</a></div>}
             {clip.tags.length > 0 && <div className="mt-3 flex flex-wrap gap-1.5">{clip.tags.map(({ tag }) => <a key={tag.id} href={`/clips?tag=${encodeURIComponent(tag.slug)}`} className="inline-flex items-center gap-1 rounded-full border border-border bg-background/60 px-2.5 py-0.5 text-xs font-medium text-muted transition hover:border-accent/40 hover:text-white"><TagIcon className="h-3 w-3" /> {tag.name}</a>)}</div>}
-            <div className="mt-5 flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.25em] text-accent"><span>{clip.category?.name ?? "Uncategorized"}</span>{cameraModeLabel(clip.cameraMode) && <span className="rounded-full border border-accent/30 bg-accent/10 px-2.5 py-0.5 text-[10px] font-semibold tracking-wider text-accent">{cameraModeEmoji(clip.cameraMode)} {cameraModeLabel(clip.cameraMode)}</span>}</div>
+            <div className="mt-5 flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.25em] text-accent"><span>{clip.category?.name ?? "Uncategorized"}</span>{cameraModeLabel(clip.cameraMode) && <span className="rounded-full border border-accent/30 bg-accent/10 px-2.5 py-0.5 text-xs font-semibold tracking-wider text-accent">{cameraModeEmoji(clip.cameraMode)} {cameraModeLabel(clip.cameraMode)}</span>}</div>
           </div>
 
           <div className="grid gap-3 text-sm text-muted">
@@ -109,7 +109,7 @@ export default async function ClipPage({ params }: Props) {
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
-        <div className="space-y-6"><div className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow"><h2 className="text-xl font-semibold text-white">Comments</h2><ClipComments clipId={clip.id} isAuthenticated={Boolean(sessionUser)} comments={clip.comments.map((comment) => ({ id: comment.id, text: comment.text, createdAt: comment.createdAt.toISOString(), author: { id: comment.author.id, username: comment.author.username, discriminator: comment.author.discriminator, profileHandle: comment.author.profileHandle, avatar: comment.author.avatar, country: comment.author.rhythiaProfile?.country ?? null, flag: comment.author.rhythiaProfile?.flag ?? null, playerRank: comment.author.playerRank ? { name: comment.author.playerRank.name, color: comment.author.playerRank.color } : null, userTags: comment.author.userTags.map((ut) => ({ tag: { name: ut.tag.name, slug: ut.tag.slug } })) } }))} /></div></div>
+        <div className="ui-page space-y-6"><div className="ui-panel"><h2 className="text-xl font-semibold text-white">Comments</h2><ClipComments clipId={clip.id} isAuthenticated={Boolean(sessionUser)} comments={clip.comments.map((comment) => ({ id: comment.id, text: comment.text, createdAt: comment.createdAt.toISOString(), author: { id: comment.author.id, username: comment.author.username, discriminator: comment.author.discriminator, profileHandle: comment.author.profileHandle, avatar: comment.author.avatar, country: comment.author.rhythiaProfile?.country ?? null, flag: comment.author.rhythiaProfile?.flag ?? null, playerRank: comment.author.playerRank ? { name: comment.author.playerRank.name, color: comment.author.playerRank.color } : null, userTags: comment.author.userTags.map((ut) => ({ tag: { name: ut.tag.name, slug: ut.tag.slug } })) } }))} /></div></div>
         <aside className="space-y-6"><div className="rounded-3xl border border-accent/30 bg-accent/5 p-6 shadow-glow"><CoachComments clipId={clip.id} comments={clip.coachComments.map((comment) => ({ id: comment.id, text: comment.text, createdAt: comment.createdAt.toISOString(), author: { id: comment.author.id, username: comment.author.username, discriminator: comment.author.discriminator, profileHandle: comment.author.profileHandle, avatar: comment.author.avatar, country: comment.author.rhythiaProfile?.country ?? null, flag: comment.author.rhythiaProfile?.flag ?? null, userTags: comment.author.userTags.map((ut) => ({ tag: { name: ut.tag.name, slug: ut.tag.slug } })) } }))} isCoach={isCoach} isAuthenticated={Boolean(sessionUser)} /></div></aside>
       </section>
     </div>

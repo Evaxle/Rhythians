@@ -169,7 +169,7 @@ export function MapsSortControlsPersisted({
           setVisibleModeDefaults(key);
         }} className={`group rounded-2xl border px-3 py-3 text-left transition ${active ? "border-accent/45 bg-accent/12" : "border-transparent bg-white/[0.025] hover:border-white/10"}`}>
           <div className="flex items-center gap-2"><Icon size={15} className={active ? "text-accent" : "text-muted"} /><span className="text-sm font-bold text-white">{label}</span></div>
-          <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.08em] text-muted">{rankText(key)}</span>
+          <span className="mt-1 block text-xs font-semibold uppercase tracking-[0.08em] text-muted">{rankText(key)}</span>
         </button>;
       })}
     </nav>
@@ -188,7 +188,7 @@ export function MapsSortControlsPersisted({
       </div>
 
       <div className="mt-3 grid gap-3 sm:grid-cols-3">
-        <label className="grid gap-1 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+        <label className="grid gap-1 text-xs font-bold uppercase tracking-[0.14em] text-muted">
           Sort
           <select value={sortKey} onChange={(e) => setSortKey(e.target.value as SortKey)} className="rounded-xl border border-white/10 bg-[#101629] px-3 py-2.5 text-sm font-normal normal-case text-white">
             <option value="rating">Difficulty rating</option>
@@ -200,14 +200,14 @@ export function MapsSortControlsPersisted({
             <option value="notes">Notes</option>
           </select>
         </label>
-        <label className="grid gap-1 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+        <label className="grid gap-1 text-xs font-bold uppercase tracking-[0.14em] text-muted">
           Order
           <select value={direction} onChange={(e) => setDirection(e.target.value as Direction)} className="rounded-xl border border-white/10 bg-[#101629] px-3 py-2.5 text-sm font-normal normal-case text-white">
             <option value="asc">Ascending</option>
             <option value="desc">Descending</option>
           </select>
         </label>
-        <label className="grid gap-1 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+        <label className="grid gap-1 text-xs font-bold uppercase tracking-[0.14em] text-muted">
           {activePointMode ? "Selected mode progress" : "Map progress"}
           <select value={scoreFilter} onChange={(e) => setScoreFilter(e.target.value as ScoreFilter)} className="rounded-xl border border-white/10 bg-[#101629] px-3 py-2.5 text-sm font-normal normal-case text-white">
             <option value="all">All</option>

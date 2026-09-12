@@ -5,7 +5,7 @@ import { Crown, Swords } from "lucide-react";
 
 function Member({ member }: { member: any }) {
   const name = member?.displayName ?? member?.username ?? "Unknown";
-  const content = <><span className="min-w-0 truncate font-semibold text-white">{name}</span><span className={`shrink-0 font-mono text-[11px] ${member?.accuracy == null ? "text-muted" : "text-accent"}`}>{member?.accuracy == null ? "—" : `${Number(member.accuracy).toFixed(2)}%`}</span></>;
+  const content = <><span className="min-w-0 truncate font-semibold text-white">{name}</span><span className={`shrink-0 font-mono text-xs ${member?.accuracy == null ? "text-muted" : "text-accent"}`}>{member?.accuracy == null ? "—" : `${Number(member.accuracy).toFixed(2)}%`}</span></>;
   return member?.profileHandle ? <Link href={`/profile/${encodeURIComponent(member.profileHandle)}`} className="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 transition hover:bg-white/[0.06]">{content}</Link> : <div className="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5">{content}</div>;
 }
 
@@ -14,7 +14,7 @@ function TeamPanel({ team, winner, score, showCaptainScore }: { team: any; winne
   return (
     <div className={`rounded-xl border px-2 py-2 ${winner ? "border-emerald-400/30 bg-emerald-400/10" : "border-white/10 bg-white/[0.03]"}`}>
       <div className="space-y-0.5">{(team.members ?? []).map((member: any) => <Member key={member.userId ?? member.id} member={member} />)}</div>
-      {showCaptainScore && score != null && <div className="mt-2 flex items-center justify-between border-t border-white/10 px-2 pt-2 text-[10px] font-bold uppercase tracking-[0.12em] text-muted"><span>Captains choice</span><span className={winner ? "text-emerald-200" : "text-white"}>{Number(score).toFixed(2)}%</span></div>}
+      {showCaptainScore && score != null && <div className="mt-2 flex items-center justify-between border-t border-white/10 px-2 pt-2 text-xs font-bold uppercase tracking-[0.12em] text-muted"><span>Captains choice</span><span className={winner ? "text-emerald-200" : "text-white"}>{Number(score).toFixed(2)}%</span></div>}
     </div>
   );
 }
@@ -23,11 +23,11 @@ function MatchCard({ match, mode }: { match: any; mode?: string }) {
   const teamMode = mode === "2v2" || mode === "3v3";
   return (
     <div className="min-w-[250px] rounded-2xl border border-white/10 bg-black/15 p-3">
-      <div className="mb-2 flex items-center justify-between gap-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted"><span>Round {match.round}</span><span>{String(match.status).replace(/_/g, " ")}</span></div>
+      <div className="mb-2 flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-muted"><span>Round {match.round}</span><span>{String(match.status).replace(/_/g, " ")}</span></div>
       <TeamPanel team={match.team1} winner={match.winnerTeamId === match.team1Id} score={match.team1Score} showCaptainScore={teamMode && match.status === "completed"} />
-      <div className="py-1 text-center text-[10px] font-black text-muted">VS</div>
+      <div className="py-1 text-center text-xs font-black text-muted">VS</div>
       <TeamPanel team={match.team2} winner={match.winnerTeamId === match.team2Id} score={match.team2Score} showCaptainScore={teamMode && match.status === "completed"} />
-      {match.map?.title && <div className="mt-2 rounded-xl border border-white/5 bg-black/10 px-3 py-2"><p className="truncate text-[11px] font-semibold text-white">{match.map.title}</p><p className="mt-0.5 text-[10px] text-muted">{match.map.rating != null ? `${Number(match.map.rating).toFixed(2)}★` : ""}{match.map.length != null ? `${match.map.rating != null ? " · " : ""}${Math.floor(Number(match.map.length) / 60)}:${String(Number(match.map.length) % 60).padStart(2, "0")}` : ""}</p></div>}
+      {match.map?.title && <div className="mt-2 rounded-xl border border-white/5 bg-black/10 px-3 py-2"><p className="truncate text-xs font-semibold text-white">{match.map.title}</p><p className="mt-0.5 text-xs text-muted">{match.map.rating != null ? `${Number(match.map.rating).toFixed(2)}★` : ""}{match.map.length != null ? `${match.map.rating != null ? " · " : ""}${Math.floor(Number(match.map.length) / 60)}:${String(Number(match.map.length) % 60).padStart(2, "0")}` : ""}</p></div>}
     </div>
   );
 }

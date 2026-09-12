@@ -91,7 +91,7 @@ export function CategoryAdmin({ initialMaps }: { initialMaps: AdminMap[] }) {
     <div className="space-y-6">
       {error && <p className="rounded-2xl border border-red-400/30 bg-red-400/10 p-4 text-sm text-red-200">{error}</p>}
       {message && <p className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm text-emerald-200">{message}</p>}
-      <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+      <section className="ui-panel ui-panel-compact">
         <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent/15 text-accent"><Plus size={20} /></div><div><p className="font-semibold text-white">Add a category map</p><p className="text-sm text-muted">Upload the actual SSPM file and place it directly into any category and level.</p></div></div>
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <label><span className="mb-1 block text-xs text-muted">Category</span><select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value as Category })} className={inputClass}>{CATEGORIES.map((category) => <option key={category} value={category}>{CATEGORY_LABELS[category]}</option>)}</select></label>
@@ -107,7 +107,7 @@ export function CategoryAdmin({ initialMaps }: { initialMaps: AdminMap[] }) {
         </div>
         <button onClick={() => void addMap()} disabled={busy || !form.title.trim() || !mapFile} className="mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent2 disabled:opacity-50"><Upload size={16} /> {busy ? "Uploading..." : "Upload and add map"}</button>
       </section>
-      <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+      <section className="ui-panel ui-panel-compact">
         <p className="font-semibold text-white">All category maps ({maps.length})</p>
         <div className="mt-4 space-y-3">
           {maps.length === 0 ? <p className="rounded-2xl border border-dashed border-border bg-background/50 p-6 text-sm text-muted">No category maps yet.</p> : maps.map((map) => (

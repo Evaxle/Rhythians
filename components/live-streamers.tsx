@@ -98,25 +98,25 @@ export function LiveStreamers({ title = "Live streamers" }: { title?: string }) 
                   <span className="block h-16 w-16 overflow-hidden rounded-2xl border-2 border-rose-500 shadow-[0_0_20px_rgba(244,63,94,.22)]">
                     <UserAvatar src={user.avatar} username={user.rhythiansUsername} displayName={user.displayName} className="h-full w-full object-cover" fallbackClassName="h-full w-full" />
                   </span>
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-rose-500 px-2 py-0.5 text-[9px] font-black text-white">LIVE</span>
+                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-rose-500 px-2 py-0.5 text-xs font-black text-white">LIVE</span>
                 </Link>
 
                 <div className="min-w-0 flex-1">
                   <Link href={`/profile/${encodeURIComponent(user.profileHandle)}`} className="block truncate text-sm font-semibold text-white transition hover:text-accent">
                     {displayName}
                   </Link>
-                  <p className="mt-0.5 truncate text-[11px] text-muted">@{user.profileHandle}</p>
-                  {user.rhythiaUsername ? <p className="mt-1 truncate text-[11px] text-muted">Rhythia: {user.rhythiaUsername}</p> : null}
+                  <p className="mt-0.5 truncate text-xs text-muted">@{user.profileHandle}</p>
+                  {user.rhythiaUsername ? <p className="mt-1 truncate text-xs text-muted">Rhythia: {user.rhythiaUsername}</p> : null}
                 </div>
               </div>
 
               <div className="mt-4 grid grid-cols-2 gap-2">
                 <div className="rounded-xl border border-border bg-background/45 px-3 py-2">
-                  <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-muted">Rhythians global</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">Rhythians global</p>
                   <p className="mt-1 text-sm font-bold text-white">#{Number(user.rhythiansGlobalRank).toLocaleString()}</p>
                 </div>
                 <div className="rounded-xl border border-border bg-background/45 px-3 py-2">
-                  <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-muted">Rhythia global</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">Rhythia global</p>
                   <p className="mt-1 text-sm font-bold text-white">{user.rhythiaGlobalRank ? `#${user.rhythiaGlobalRank.toLocaleString()}` : "Unranked"}</p>
                 </div>
               </div>
@@ -124,22 +124,22 @@ export function LiveStreamers({ title = "Live streamers" }: { title?: string }) 
               <div className="mt-2 flex items-center gap-2 rounded-xl border border-border bg-background/45 px-3 py-2">
                 <RankIcon rank={rhpRank} size={28} />
                 <div className="min-w-0">
-                  <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-muted">Rhythians classification</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">Rhythians classification</p>
                   <p className="truncate text-xs font-semibold" style={{ color: user.playerRankColor || rhpRank.color }}>
                     {user.playerRankName || (rhpRank.isExpert ? "Expert" : `${rhpRank.name} ${rhpRank.tier}`)}
                   </p>
                 </div>
-                <span className="ml-auto text-[10px] font-semibold text-muted">{Number(user.rhp).toLocaleString()} RHP</span>
+                <span className="ml-auto text-xs font-semibold text-muted">{Number(user.rhp).toLocaleString()} RHP</span>
               </div>
 
               <div className="mt-3 flex flex-wrap gap-2">
                 {destinations.map((item) => (
-                  <a key={item.platform} href={item.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-full bg-rose-500/15 px-3 py-1.5 text-[10px] font-semibold capitalize text-rose-200 transition hover:bg-rose-500/25 hover:text-white">
+                  <a key={item.platform} href={item.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-full bg-rose-500/15 px-3 py-1.5 text-xs font-semibold capitalize text-rose-200 transition hover:bg-rose-500/25 hover:text-white">
                     {item.platform} <ExternalLink size={10} />
                   </a>
                 ))}
                 {user.rhythiaProfileUrl ? (
-                  <a href={user.rhythiaProfileUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-[10px] font-semibold text-muted transition hover:text-white">
+                  <a href={user.rhythiaProfileUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-xs font-semibold text-muted transition hover:text-white">
                     Rhythia profile <ExternalLink size={10} />
                   </a>
                 ) : null}

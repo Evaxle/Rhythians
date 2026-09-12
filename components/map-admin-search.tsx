@@ -180,7 +180,7 @@ export function MapAdminSearch() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+      <section className="ui-panel">
         <form onSubmit={(event) => { event.preventDefault(); search(); }} className="flex flex-col gap-3 sm:flex-row">
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by map name or ID…" className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-white outline-none transition focus:border-accent" />
           <button type="submit" disabled={loading || query.trim().length === 0} className="shrink-0 inline-flex items-center justify-center gap-2 rounded-2xl bg-accent px-6 py-3 text-sm font-semibold text-white transition hover:bg-accent2 disabled:opacity-50">
@@ -191,14 +191,14 @@ export function MapAdminSearch() {
       </section>
 
       {results.length > 1 && !map ? (
-        <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+        <section className="ui-panel ui-panel-compact">
           <p className="text-sm font-semibold text-white">{results.length} maps found</p>
           <div className="mt-4 space-y-2">
             {results.map((result) => (
               <button key={result.id} onClick={() => loadMap(result.id)} className="w-full rounded-2xl border border-border bg-background/60 p-4 text-left transition hover:border-accent/50">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-semibold text-white">{result.title}</span>
-                  <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase ${STATUS_STYLES[result.status] ?? "border-border text-muted"}`}>{result.status}</span>
+                  <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold uppercase ${STATUS_STYLES[result.status] ?? "border-border text-muted"}`}>{result.status}</span>
                 </div>
                 <p className="mt-1 text-xs text-muted">{result.artist ?? "Unknown artist"} · ID: {result.id}</p>
               </button>
@@ -214,7 +214,7 @@ export function MapAdminSearch() {
 
       {map ? (
         <div className="space-y-6">
-          <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+          <section className="ui-panel">
             <div className="flex flex-wrap items-center gap-3">
               <h2 className="text-2xl font-semibold text-white">{map.title}</h2>
               <span className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wider ${STATUS_STYLES[map.status] ?? "border-border bg-white/5 text-muted"}`}>{map.status}</span>
@@ -246,7 +246,7 @@ export function MapAdminSearch() {
               {map.reviewerNote && <p className="break-all text-sm text-muted">Reviewer note: <span className="text-white">{map.reviewerNote}</span></p>}
             </div>
           </section>
-          <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow"><p className="text-sm font-semibold text-white">Scores ({map.completions.length})</p><p className="mt-1 text-sm text-muted">Remove a player&apos;s score to claw back the RHP they earned from this map.</p>{map.completions.length === 0 ? <p className="mt-4 text-sm text-muted">No scores recorded for this map.</p> : <div className="mt-4 overflow-hidden rounded-2xl border border-border">{map.completions.map((completion) => <div key={completion.id} className="flex flex-wrap items-center gap-3 border-b border-border bg-background/60 px-4 py-3 last:border-0 sm:flex-nowrap"><div className="min-w-0 flex-1"><Link href={`/profile/${completion.user.profileHandle}`} className="truncate text-sm font-semibold text-white hover:text-accent">{completion.user.displayName ?? completion.user.username}</Link><p className="text-xs text-muted">{completion.passed ? "Passed" : "Failed"} · {completion.points} RHP{completion.accuracy != null ? ` · ${completion.accuracy.toFixed(2)}%` : ""} · {formatDate(completion.createdAt)}</p></div><button disabled={removingId === completion.id} onClick={() => removeCompletion(completion.id, completion.user.username)} className="inline-flex items-center gap-2 rounded-full border border-red-400/40 px-3 py-1.5 text-xs font-semibold text-red-200 transition hover:bg-red-400/10 disabled:opacity-50"><Trash2 size={13} /> {removingId === completion.id ? "Removing..." : "Remove score"}</button></div>)}</div>}</section>
+          <section className="ui-panel"><p className="text-sm font-semibold text-white">Scores ({map.completions.length})</p><p className="mt-1 text-sm text-muted">Remove a player&apos;s score to claw back the RHP they earned from this map.</p>{map.completions.length === 0 ? <p className="mt-4 text-sm text-muted">No scores recorded for this map.</p> : <div className="mt-4 overflow-hidden rounded-2xl border border-border">{map.completions.map((completion) => <div key={completion.id} className="flex flex-wrap items-center gap-3 border-b border-border bg-background/60 px-4 py-3 last:border-0 sm:flex-nowrap"><div className="min-w-0 flex-1"><Link href={`/profile/${completion.user.profileHandle}`} className="truncate text-sm font-semibold text-white hover:text-accent">{completion.user.displayName ?? completion.user.username}</Link><p className="text-xs text-muted">{completion.passed ? "Passed" : "Failed"} · {completion.points} RHP{completion.accuracy != null ? ` · ${completion.accuracy.toFixed(2)}%` : ""} · {formatDate(completion.createdAt)}</p></div><button disabled={removingId === completion.id} onClick={() => removeCompletion(completion.id, completion.user.username)} className="inline-flex items-center gap-2 rounded-full border border-red-400/40 px-3 py-1.5 text-xs font-semibold text-red-200 transition hover:bg-red-400/10 disabled:opacity-50"><Trash2 size={13} /> {removingId === completion.id ? "Removing..." : "Remove score"}</button></div>)}</div>}</section>
           <section className="rounded-3xl border border-red-400/20 bg-red-400/5 p-6 shadow-glow"><p className="text-sm font-semibold text-white">Delete this map</p><p className="mt-1 text-sm text-muted">This permanently removes the map and all its scores. This cannot be undone.</p><button disabled={deleting} onClick={deleteMap} className="mt-4 inline-flex items-center gap-2 rounded-full bg-red-500 px-5 py-2 text-sm font-semibold text-white transition hover:bg-red-400 disabled:opacity-50"><Trash2 size={15} /> {deleting ? "Deleting..." : "Delete map"}</button></section>
         </div>
       ) : null}

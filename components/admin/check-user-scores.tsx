@@ -55,8 +55,8 @@ export function AdminCheckUserScores() {
   }
 
   return (
-    <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
-      <p className="text-sm uppercase tracking-[0.3em] text-accent">Ranked score tools</p>
+    <section className="ui-panel ui-panel-compact">
+      <p className="ui-eyebrow">Ranked score tools</p>
       <h2 className="mt-2 text-xl font-semibold text-white">Recheck completed maps</h2>
       <p className="mt-2 max-w-3xl text-sm leading-7 text-muted">For every analyzed ranked map, this uses each player&apos;s best passing score in Lock, Spin, and VR. The scorer starts from the map&apos;s analyzed reward, uses exact replay or judgement miss timing when Rhythia supplies it to compare misses with the map&apos;s analyzed pattern sections, and falls back to the score&apos;s total miss rate when detailed replay timing is unavailable.</p>
       <div className="mt-5 flex flex-col gap-3 lg:flex-row">

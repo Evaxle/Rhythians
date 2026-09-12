@@ -55,13 +55,13 @@ function UserResult({ user }: { user: UserLite }) {
   }
 
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-border bg-background/70 px-4 py-3">
+    <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-background/70 px-4 py-3">
       <UserAvatar user={user} />
       <Link href={`/profile/${user.profileHandle}`} className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-white hover:text-accent">{user.username}</p>
         <p className="truncate text-xs text-muted">@{user.profileHandle}</p>
       </Link>
-      <div className="flex shrink-0 gap-2">
+      <div className="flex shrink-0 flex-wrap gap-2">
         <Link
           href={`/messages?user=${encodeURIComponent(user.profileHandle)}`}
           className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-accent2"
@@ -160,8 +160,8 @@ export function SearchPage() {
   const total = results.users.length + results.articles.length + results.clips.length + results.announcements.length + results.rules.length;
 
   return (
-    <div className="space-y-6">
-      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+    <div className="ui-page max-w-4xl space-y-6">
+      <section className="ui-page-header">
         <h1 className="text-3xl font-semibold text-white">Search</h1>
         <p className="mt-3 text-sm leading-7 text-muted">Search users, articles, clips, announcements, and rules across the community platform.</p>
         <div className="mt-6">

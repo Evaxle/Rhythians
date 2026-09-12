@@ -55,7 +55,7 @@ export function MapDeleteSearch() {
   }
 
   return (
-    <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+    <section className="ui-panel">
       <div>
         <p className="text-sm uppercase tracking-[0.3em] text-red-300">Delete maps</p>
         <h2 className="mt-3 text-2xl font-semibold text-white">Search maps to delete</h2>

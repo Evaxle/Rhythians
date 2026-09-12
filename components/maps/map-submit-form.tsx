@@ -34,7 +34,7 @@ export default function MapSubmitForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+    <form onSubmit={handleSubmit} className="space-y-6 ui-panel">
       <div className="rounded-2xl border border-accent/20 bg-accent/10 p-5">
         <p className="font-semibold text-white">Rhythia map URL</p>
         <p className="mt-1 text-sm leading-6 text-muted">Submit the original Rhythia map URL. Rhythians will fetch the map information, download, mapper, cover, and rating automatically.</p>

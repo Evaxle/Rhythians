@@ -118,7 +118,7 @@ export function DiscordIntegration() {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+      <section className="ui-panel">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
             {data?.guild?.icon ? (
@@ -133,7 +133,7 @@ export function DiscordIntegration() {
               </div>
             )}
             <div>
-              <p className="text-sm uppercase tracking-[0.3em] text-accent">Guild status</p>
+              <p className="ui-eyebrow">Guild status</p>
               <h2 className="mt-1 text-2xl font-semibold text-white">
                 {data?.guild?.name ?? "Discord bot not configured"}
               </h2>
@@ -166,9 +166,9 @@ export function DiscordIntegration() {
         )}
       </section>
 
-      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+      <section className="ui-panel">
         <div>
-          <p className="text-sm uppercase tracking-[0.3em] text-accent">Role to tag mapping</p>
+          <p className="ui-eyebrow">Role to tag mapping</p>
           <h2 className="mt-3 text-2xl font-semibold text-white">Sync Discord roles to website tags</h2>
           <p className="mt-2 text-sm leading-7 text-muted">
             When a member picks roles in the Discord server, the roles they hold are mapped to the tag
@@ -196,7 +196,7 @@ export function DiscordIntegration() {
                   />
                   <span className="text-sm font-medium text-white">{role.name}</span>
                   {role.managed && (
-                    <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted">
+                    <span className="rounded-full bg-white/5 px-2 py-0.5 text-xs uppercase tracking-wider text-muted">
                       Managed
                     </span>
                   )}

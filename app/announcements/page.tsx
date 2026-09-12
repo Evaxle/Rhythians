@@ -15,12 +15,12 @@ export default async function AnnouncementsPage() {
   const canManage = sessionUser ? await canAccessAdmin(sessionUser) : false;
 
   return (
-    <div className="space-y-8">
-      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+    <div className="ui-page space-y-6">
+      <section className="ui-page-header">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-accent">Announcements</p>
-            <h1 className="mt-3 text-3xl font-semibold text-white">Latest community updates</h1>
+            <p className="ui-eyebrow">Announcements</p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Latest community updates</h1>
           </div>
           {canManage ? (
             <Link href="/admin/announcements" className="inline-flex items-center rounded-full border border-border bg-white/5 px-4 py-2 text-sm text-muted transition hover:border-accent/40 hover:text-white">Create announcement</Link>
@@ -29,7 +29,7 @@ export default async function AnnouncementsPage() {
       </section>
       <div className="grid gap-5">
         {announcements.length === 0 ? (
-          <div className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+          <div className="ui-panel">
             <p className="text-sm text-muted">Published announcements will appear here once created by an administrator.</p>
           </div>
         ) : (
@@ -37,7 +37,7 @@ export default async function AnnouncementsPage() {
             <Link
               key={announcement.id}
               href={`/announcements/${announcement.slug}`}
-              className="group rounded-3xl border border-border bg-surface/95 p-6 shadow-glow transition hover:border-accent/40 hover:bg-surface/90"
+              className="group ui-panel ui-panel-compact transition hover:border-accent/40 hover:bg-surface/90"
             >
               <div className="flex items-center gap-2">
                 {announcement.pinned ? (

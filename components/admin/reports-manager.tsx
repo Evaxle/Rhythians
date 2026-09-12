@@ -214,7 +214,7 @@ export function ReportsManager({
         ) : (
           <div className="space-y-3">
             {filteredBanned.map((user) => (
-              <article key={user.id} className="flex flex-col gap-4 rounded-3xl border border-border bg-surface/95 p-6 shadow-glow sm:flex-row sm:items-center sm:justify-between">
+              <article key={user.id} className="flex flex-col gap-4 ui-panel ui-panel-compact sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10 text-lg font-semibold text-red-300">
                     {user.username.charAt(0).toUpperCase()}
@@ -257,7 +257,7 @@ export function ReportsManager({
                   : "deleted content";
             const isMapReport = report.targetType === "daily_map" || report.targetType === "challenge_map";
             return (
-              <article key={report.id} className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+              <article key={report.id} className="ui-panel ui-panel-compact">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
