@@ -30,7 +30,18 @@ const STATE_CHANGING = new Set(["POST", "PATCH", "PUT", "DELETE"]);
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (pathname.startsWith("/api/") && STATE_CHANGING.has(request.method)) {
+  const browserClient = request.headers.get("origin") === "https://evaxle.github.io" && pathname.startsWith("/api/rhythkit/");
+  if (browserClient && request.method === "OPTIONS") {
+    return new NextResponse(null, { status: 204, headers: {
+      "Access-Control-Allow-Origin": "https://evaxle.github.io",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Authorization, Content-Type",
+      "Access-Control-Max-Age": "600",
+      "Vary": "Origin",
+    } });
+  }
+
+  if (!browserClient && pathname.startsWith("/api/") && STATE_CHANGING.has(request.method)) {
     const origin = request.headers.get("origin");
     const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
     if (origin && host) {
@@ -52,6 +63,11 @@ export function proxy(request: NextRequest) {
 
   const response = NextResponse.next();
   for (const [key, value] of Object.entries(SECURITY_HEADERS)) response.headers.set(key, value);
+  if (browserClient) {
+    response.headers.set("Access-Control-Allow-Origin", "https://evaxle.github.io");
+    response.headers.set("Access-Control-Expose-Headers", "Content-Length, Retry-After");
+    response.headers.append("Vary", "Origin");
+  }
   return response;
 }
 

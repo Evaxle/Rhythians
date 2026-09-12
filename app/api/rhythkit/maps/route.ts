@@ -16,6 +16,7 @@ export async function GET(request: Request) {
   const rows = await prisma.$queryRawUnsafe<Array<{
     id: string;
     title: string;
+    imageUrl: string | null;
     artist: string | null;
     mapper: string | null;
     submitter: string | null;
@@ -31,6 +32,7 @@ export async function GET(request: Request) {
     SELECT
       cm."id",
       cm."title",
+      cm."imageUrl",
       cm."artist",
       cm."mapperName" AS "mapper",
       u."username" AS "submitter",
@@ -48,15 +50,16 @@ export async function GET(request: Request) {
     WHERE cm."status" IN ('approved', 'legacy') OR (cm."status" = 'pending' AND cm."isAutoImported" = true)
     ORDER BY cm."rating" ASC NULLS LAST, cm."createdAt" DESC, cm."id" ASC
     LIMIT $2 OFFSET $3
-  `, installation.userId, limit, offset);
+  `, installation.userId, limit + 1, offset);
 
-  const maps = rows.map((map) => {
+  const maps = rows.slice(0, limit).map((map) => {
     const ranked = isRankedMap(map.rating, map.reviewerNote, map.status);
     const rating = safeMapRating(map.rating);
     const rankMeta = getMapRankMeta(rating);
     return {
       id: map.id,
       title: map.title,
+      imageUrl: map.imageUrl,
       artist: map.artist ?? "Unknown Artist",
       mapper: map.mapper ?? map.submitter ?? "Unknown",
       curatedBy: map.mapper ?? map.submitter ?? "Unknown",
@@ -76,5 +79,5 @@ export async function GET(request: Request) {
     };
   });
 
-  return NextResponse.json({ ok: true, maps });
+  return NextResponse.json({ ok: true, maps, offset, hasMore: rows.length > limit });
 }

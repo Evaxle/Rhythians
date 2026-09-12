@@ -40,7 +40,7 @@ async function profilePayload(userId: string, currentId: string) {
     website: user.website,
     joinedAt: user.joinedAt.toISOString(),
     rhp: user.rhp,
-    rank: { name: rank.name, tier: rank.tier, color: rank.color, isExpert: rank.isExpert },
+    rank,
     globalRank,
     challengeLevel,
     online: Boolean(user.rhythiaProfile?.isOnline),
@@ -75,7 +75,7 @@ export async function GET(request: Request) {
   const page = url.searchParams.get("page") ?? "home";
   if (page === "profile") {
     const handle = url.searchParams.get("handle") ?? user.profileHandle;
-    const profile = await prisma.user.findFirst({ where: { profileHandle: handle }, select: { id: true } });
+    const profile = await prisma.user.findFirst({ where: { OR: [{ profileHandle: handle }, { username: handle }] }, select: { id: true } });
     if (!profile) return NextResponse.json({ error: "Profile not found." }, { status: 404 });
     return NextResponse.json({ profile: await profilePayload(profile.id, user.id) });
   }

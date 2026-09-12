@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import { NextRequest } from 'next/server';
+import { proxy } from '../../proxy';
+const make = (origin:string,path='/api/rhythkit/device/start',method='POST') => new NextRequest('https://rhythians.vercel.app'+path,{method,headers:{origin,host:'rhythians.vercel.app'}});
+assert.equal(proxy(make('https://evaxle.github.io')).headers.get('Access-Control-Allow-Origin'),'https://evaxle.github.io');
+assert.equal(proxy(make('https://evaxle.github.io','/api/rhythkit/maps','OPTIONS')).status,204);
+assert.equal(proxy(make('https://evil.example')).status,403);
+assert.equal(proxy(make('https://evaxle.github.io','/api/admin/users')).status,403);
+assert.equal(proxy(make('https://rhythians.vercel.app')).status,200);
+console.log('CORS_CHECKS=5');

@@ -14,6 +14,8 @@ type ScoreBody = {
   completedAt?: unknown;
   gameVersion?: unknown;
   integrationVersion?: unknown;
+  cameraMode?: unknown;
+  modifiers?: unknown;
 };
 
 function isUuidV4(value: string) {
@@ -27,8 +29,8 @@ export async function GET(request: Request) {
   if (!installation) return NextResponse.json({ ok: false, error: "Unauthorized." }, { status: 401 });
   const rawLimit = Number(new URL(request.url).searchParams.get("limit"));
   const limit = Math.min(100, Math.max(1, Number.isInteger(rawLimit) ? rawLimit : 25));
-  const rows = await prisma.$queryRawUnsafe<Array<{ title: string; rating: number | null; accuracy: number | null; misses: number | null; points: number; submittedAt: Date }>>(
-    `SELECT cm."title", cm."rating", rs."accuracy", rs."misses", rs."points", rs."submittedAt" FROM "RhythKitScore" rs INNER JOIN "ChallengeMap" cm ON cm."id" = rs."challengeMapId" WHERE rs."userId" = $1 ORDER BY rs."submittedAt" DESC LIMIT $2`,
+  const rows = await prisma.$queryRawUnsafe<Array<{ title: string; rating: number | null; accuracy: number | null; misses: number | null; points: number; cameraMode: string; submittedAt: Date }>>(
+    `SELECT cm."title", cm."rating", rs."accuracy", rs."misses", rs."points", rs."cameraMode", rs."submittedAt" FROM "RhythKitScore" rs INNER JOIN "ChallengeMap" cm ON cm."id" = rs."challengeMapId" WHERE rs."userId" = $1 ORDER BY rs."submittedAt" DESC LIMIT $2`,
     installation.userId,
     limit
   );
@@ -36,6 +38,7 @@ export async function GET(request: Request) {
     ok: true,
     scores: rows.map((score) => ({
       title: score.title,
+      cameraMode: score.cameraMode,
       rating: Math.max(0, Math.min(12, score.rating ?? 0)),
       accuracy: score.accuracy ?? 0,
       misses: Math.max(0, Math.trunc(score.misses ?? 0)),
@@ -54,6 +57,9 @@ export async function POST(request: Request) {
   const accuracy = typeof body?.accuracy === "number" && Number.isFinite(body.accuracy) ? body.accuracy : null;
   const misses = typeof body?.misses === "number" && Number.isInteger(body.misses) ? body.misses : null;
   const speed = typeof body?.speed === "number" && Number.isFinite(body.speed) ? body.speed : 1;
+  const cameraMode = body?.cameraMode === "spin" ? "spin" : "lock";
+  if (body?.cameraMode !== undefined && body.cameraMode !== "spin" && body.cameraMode !== "lock") return NextResponse.json({ ok: false, error: "Unsupported camera mode." }, { status: 400 });
+  const modifiers = typeof body?.modifiers === "string" ? body.modifiers.slice(0, 1000) : "";
   const completedAt = typeof body?.completedAt === "string" ? new Date(body.completedAt) : null;
 
   if (!challengeMapId || !clientScoreId) return NextResponse.json({ ok: false, error: "challengeMapId and clientScoreId are required." }, { status: 400 });
@@ -91,7 +97,7 @@ export async function POST(request: Request) {
 
     const scoreId = crypto.randomUUID();
     const inserted = await tx.$queryRawUnsafe<Array<{ id: string }>>(
-      `INSERT INTO "RhythKitScore" ("id", "userId", "installationId", "challengeMapId", "clientScoreId", "accuracy", "misses", "speed", "points", "rhpAwarded", "submittedAt") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 0, 0, NOW()) ON CONFLICT ("installationId", "clientScoreId") DO NOTHING RETURNING "id"`,
+      `INSERT INTO "RhythKitScore" ("id", "userId", "installationId", "challengeMapId", "clientScoreId", "accuracy", "misses", "speed", "points", "rhpAwarded", "submittedAt", "cameraMode", "modifiers") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 0, 0, NOW(), $9, $10) ON CONFLICT ("installationId", "clientScoreId") DO NOTHING RETURNING "id"`,
       scoreId,
       installation.userId,
       installation.installationId,
@@ -99,7 +105,9 @@ export async function POST(request: Request) {
       clientScoreId,
       accuracy,
       misses,
-      speed
+      speed,
+      cameraMode,
+      modifiers
     );
     if (inserted.length === 0) return { kind: "duplicate" as const };
     return { kind: "success" as const, beforeRhp: user.rhp };
@@ -112,8 +120,8 @@ export async function POST(request: Request) {
 
   try {
     const synced = await syncUserModeScores(installation.userId);
-    return NextResponse.json({ ok: true, points: Math.max(0, synced.rhp - result.beforeRhp), rhp: synced.rhp, rpl: synced.rpl, rps: synced.rps, rpv: synced.rpv, verifiedByRhythia: true });
+    return NextResponse.json({ ok: true, points: Math.max(0, synced.rhp - result.beforeRhp), rhp: synced.rhp, rpl: synced.rpl, rps: synced.rps, rpv: synced.rpv, pendingRhythiaVerification: true, cameraMode });
   } catch {
-    return NextResponse.json({ ok: true, points: 0, pendingRhythiaVerification: true });
+    return NextResponse.json({ ok: true, points: 0, pendingRhythiaVerification: true, cameraMode });
   }
 }
