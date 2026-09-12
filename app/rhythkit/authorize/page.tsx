@@ -28,9 +28,9 @@ export default async function RhythKitAuthorizePage({ searchParams }: { searchPa
   const expired = !device || device.expiresAt <= new Date() || device.status === "revoked";
 
   return (
-    <main className="mx-auto max-w-xl rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
-      <p className="text-sm uppercase tracking-[0.3em] text-accent">RhythKit</p>
-      <h1 className="mt-3 text-3xl font-semibold text-white">{authorized ? "Rhythians connected" : "Confirm login for RhythKit"}</h1>
+    <main className="mx-auto max-w-xl ui-panel">
+      <p className="ui-eyebrow">RhythKit</p>
+      <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">{authorized ? "Rhythians connected" : "Confirm login for RhythKit"}</h1>
       <p className="mt-4 text-sm leading-7 text-muted">
         {authorized ? "RhythKit is connected to your Rhythians account. Return to Rhythia and continue playing." : expired ? "This authorization request is invalid or expired. Start RhythKit again to create a new request." : "RhythKit is asking to connect this computer to your Rhythians account so it can submit eligible completed scores."}
       </p>

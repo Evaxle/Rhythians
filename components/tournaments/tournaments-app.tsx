@@ -133,7 +133,7 @@ export function TournamentsApp() {
       {scheduled ? <section className="rounded-[2rem] border border-white/10 bg-surface/95 p-6 shadow-glow sm:p-7">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div><p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-accent"><CalendarClock size={15} /> Next tournament</p><h2 className="mt-2 text-3xl font-bold text-white">{scheduled.tournament.name}</h2><p className="mt-2 text-sm text-muted">{scheduled.mode} · scheduled {new Date(scheduled.tournament.scheduledAt).toLocaleString()}</p></div>
-          <div className="rounded-2xl border border-accent/20 bg-accent/[0.06] px-6 py-4 text-center"><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted">Scheduled countdown</p><p className="mt-1 text-2xl font-black text-white"><Countdown date={scheduled.tournament.scheduledAt} /></p></div>
+          <div className="rounded-2xl border border-accent/20 bg-accent/[0.06] px-6 py-4 text-center"><p className="text-xs font-bold uppercase tracking-[0.2em] text-muted">Scheduled countdown</p><p className="mt-1 text-2xl font-black text-white"><Countdown date={scheduled.tournament.scheduledAt} /></p></div>
         </div>
         <div className="mt-6 grid gap-3 md:grid-cols-2"><CapCard label="Lower split" state={scheduled.caps.lower} teamSize={teamSize} /><CapCard label="Higher split" state={scheduled.caps.higher} teamSize={teamSize} /></div>
         <div className="mt-6 rounded-3xl border border-white/10 bg-black/10 p-5 sm:p-6">

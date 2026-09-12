@@ -50,9 +50,9 @@ export default async function AdminCategoriesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="ui-page space-y-6">
       <div>
-        <p className="text-sm uppercase tracking-[0.3em] text-accent">Categories</p>
+        <p className="ui-eyebrow">Categories</p>
         <h1 className="mt-2 text-2xl font-semibold text-white">Category map management</h1>
         <p className="mt-2 text-sm text-muted">
           Add maps to skill categories (Jumps, Stream, Tech, Off Grid) and levels 1-10, then approve them so players

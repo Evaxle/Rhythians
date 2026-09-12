@@ -29,7 +29,7 @@ export function AdminDailyRefresh() {
   }
 
   return (
-    <div className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+    <div className="ui-panel ui-panel-compact">
       <p className="text-sm font-semibold text-white">Daily map</p>
       <p className="mt-1 text-sm text-muted">Force a new daily map pick for today if the current one is broken or unpopular.</p>
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">

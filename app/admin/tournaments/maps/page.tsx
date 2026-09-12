@@ -4,5 +4,5 @@ import { TournamentRuntimeSettings } from "@/components/admin/tournament-runtime
 export const dynamic = "force-dynamic";
 
 export default function TournamentMapPoolsPage() {
-  return <div className="space-y-6"><TournamentRuntimeSettings /><TournamentMapPoolAdmin /></div>;
+  return <div className="ui-page space-y-6"><TournamentRuntimeSettings /><TournamentMapPoolAdmin /></div>;
 }

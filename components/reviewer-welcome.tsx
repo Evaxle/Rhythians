@@ -46,7 +46,7 @@ export function ReviewerWelcome() {
           <X size={18} />
         </button>
 
-        <p className="text-sm uppercase tracking-[0.3em] text-accent">Review team</p>
+        <p className="ui-eyebrow">Review team</p>
         <h1 className="mt-2 text-2xl font-semibold text-white">Welcome, post reviewer!</h1>
         <p className="mt-3 text-sm leading-7 text-muted">
           You&apos;re now part of the review team. Here&apos;s how reviewing works and what&apos;s expected of you.

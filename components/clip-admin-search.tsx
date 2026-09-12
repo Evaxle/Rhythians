@@ -91,7 +91,7 @@ export function ClipAdminSearch() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+      <section className="ui-panel">
         <form
           onSubmit={(event) => {
             event.preventDefault();
@@ -127,7 +127,7 @@ export function ClipAdminSearch() {
 
       {clip ? (
         <section className="space-y-6">
-          <div className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+          <div className="ui-panel">
             <div className="flex flex-wrap items-center gap-3">
               <h2 className="text-2xl font-semibold text-white">{clip.title}</h2>
               <span className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wider ${STATUS_STYLES[clip.status] ?? "border-border bg-white/5 text-muted"}`}>

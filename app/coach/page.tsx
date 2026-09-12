@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function CoachPage() {
   return (
     <main className="mx-auto max-w-2xl px-4 py-10">
-      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+      <section className="ui-page-header">
         <div className="flex items-center gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-accent/30 bg-accent/10 text-2xl">👤</div>
           <div>

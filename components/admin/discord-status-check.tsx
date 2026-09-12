@@ -34,7 +34,7 @@ export function AdminDiscordStatusCheck() {
   }
 
   return (
-    <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+    <section className="ui-panel ui-panel-compact">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-accent/15 text-accent">

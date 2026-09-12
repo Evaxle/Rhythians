@@ -14,11 +14,11 @@ export default async function AdminManageMapsPage() {
   const user = await getSessionUser();
   const owner = Boolean(user && isOwner(user));
 
-  return <div className="space-y-8">
-    <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+  return <div className="ui-page space-y-6">
+    <section className="ui-page-header">
       <div>
-        <p className="text-sm uppercase tracking-[0.3em] text-accent">Map management</p>
-        <h1 className="mt-3 text-3xl font-semibold text-white">Manage maps</h1>
+        <p className="ui-eyebrow">Map management</p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Manage maps</h1>
         <p className="mt-3 text-sm leading-7 text-muted">
           One place for Rhythia synchronization, raw-map analysis, Rankability v5, Difficulty v5,
           Challenge Fit v2, category/level assignment, point eligibility, manual map creation, and cleanup.
@@ -32,7 +32,7 @@ export default async function AdminManageMapsPage() {
 
     <section className="space-y-4">
       <div>
-        <p className="text-sm uppercase tracking-[0.3em] text-accent">Challenge and category maps</p>
+        <p className="ui-eyebrow">Challenge and category maps</p>
         <h2 className="mt-2 text-2xl font-semibold text-white">Assign categories and Levels 1–10</h2>
         <p className="mt-2 text-sm leading-6 text-muted">
           This is the same unified assignment system used by the Challenge admin page. Move any synchronized ranked,

@@ -17,10 +17,10 @@ export default async function AdminUsersPage() {
   const rankPlayers = users.map((user) => ({ id: user.id, username: user.username, displayName: user.displayName, profileHandle: user.profileHandle, rhp: user.rhp, rankIndex: getRankInfo(user.rhp).index }));
 
   return (
-    <div className="space-y-8">
-      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
-        <p className="text-sm uppercase tracking-[0.3em] text-accent">User management</p>
-        <h1 className="mt-3 text-3xl font-semibold text-white">Manage users and their profiles</h1>
+    <div className="ui-page space-y-6">
+      <section className="ui-page-header">
+        <p className="ui-eyebrow">User management</p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Manage users and their profiles</h1>
         <p className="mt-3 text-sm leading-7 text-muted">Search for a user to view full details, punish accounts, or assign tags. Use the profile editor on any user to change their challenge levels and, for the site owner, their profile title.</p>
       </section>
 
@@ -30,15 +30,15 @@ export default async function AdminUsersPage() {
       <ResetRatingSystem />
       <AdminRankManager players={rankPlayers} />
 
-      <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
-        <p className="text-sm uppercase tracking-[0.3em] text-accent">All users</p>
+      <section className="ui-panel ui-panel-compact">
+        <p className="ui-eyebrow">All users</p>
         <h2 className="mt-2 text-2xl font-semibold text-white">User profiles</h2>
         <p className="mt-2 text-sm leading-7 text-muted">Edit tags, challenge progression, and owner-only profile titles directly from each user.</p>
       </section>
 
       <div className="space-y-4">
         {users.length === 0 ? <div className="rounded-3xl border border-border bg-surface/95 p-8 text-center text-sm text-muted">No users have signed in yet.</div> : users.map((user) => (
-          <div key={user.id} className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+          <div key={user.id} className="ui-panel ui-panel-compact">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex items-center gap-4">
                 {getAvatarUrl(user, 64) ? <img src={getAvatarUrl(user, 64)!} alt="" className="h-12 w-12 rounded-full" /> : <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/20 text-lg font-semibold text-accent">{user.username.charAt(0).toUpperCase()}</div>}

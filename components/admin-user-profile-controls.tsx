@@ -97,7 +97,7 @@ export function AdminUserProfileControls({ userId }: { userId: string }) {
       <div className="rounded-2xl border border-border bg-background/60 p-4">
         <p className="text-xs uppercase tracking-[0.2em] text-accent">Point systems</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          <div className="rounded-xl border border-accent/30 bg-accent/10 px-3 py-2"><span className="mb-1 block text-xs text-muted">RHP · Total</span><p className="text-sm font-semibold text-white">{derivedRhp.toLocaleString()}</p><p className="mt-1 text-[11px] text-muted">RPL + RPS + RPV</p></div>
+          <div className="rounded-xl border border-accent/30 bg-accent/10 px-3 py-2"><span className="mb-1 block text-xs text-muted">RHP · Total</span><p className="text-sm font-semibold text-white">{derivedRhp.toLocaleString()}</p><p className="mt-1 text-xs text-muted">RPL + RPS + RPV</p></div>
           {editablePointSystems.map(([key, label]) => <label key={key} className="block"><span className="mb-1 block text-xs text-muted">{label}</span><input type="number" min={0} max={1000000} value={points[key] ?? "0"} onChange={(event) => setPoints((current) => ({ ...current, [key]: event.target.value }))} className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-white outline-none focus:border-accent" /></label>)}
         </div>
         <p className="mt-3 text-xs leading-5 text-muted">RHP is calculated automatically from RPL + RPS + RPV when you save. RBP is battle-only and never contributes to RHP.</p>

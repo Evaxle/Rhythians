@@ -34,9 +34,9 @@ export function RhythiaRequestManager({ initialRequests }: { initialRequests: Rh
     setRequests((current) => current.filter((request) => request.id !== id));
   }
 
-  return <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+  return <section className="ui-panel ui-panel-compact">
     <div className="flex items-start justify-between gap-4">
-      <div><p className="text-sm uppercase tracking-[0.3em] text-accent">Rhythia verification</p><h2 className="mt-2 text-2xl font-semibold text-white">Manual requests</h2><p className="mt-2 text-sm leading-7 text-muted">Players appear here when automatic bio verification fails and they request manual approval.</p></div>
+      <div><p className="ui-eyebrow">Rhythia verification</p><h2 className="mt-2 text-2xl font-semibold text-white">Manual requests</h2><p className="mt-2 text-sm leading-7 text-muted">Players appear here when automatic bio verification fails and they request manual approval.</p></div>
       <span className="rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-semibold text-accent">{requests.length} pending</span>
     </div>
     {error && <p className="mt-5 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">{error}</p>}

@@ -49,8 +49,8 @@ export function RhythiaManualLinker() {
     setMessage(`${selected.username}'s Rhythia profile was unlinked and linked-profile ranking data was reset.`);
   }
 
-  return <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
-    <p className="text-sm uppercase tracking-[0.3em] text-accent">Admin override</p>
+  return <section className="ui-panel ui-panel-compact">
+    <p className="ui-eyebrow">Admin override</p>
     <h2 className="mt-2 text-2xl font-semibold text-white">Link or unlink a Rhythia profile</h2>
     <p className="mt-2 text-sm leading-7 text-muted">Search any Rhythians user to manually approve a Rhythia profile or remove their current link. Unlinking clears linked-profile rank baselines and imported mode points so a future link starts cleanly.</p>
     <div className="relative mt-5"><label className="text-xs uppercase tracking-[0.18em] text-muted">Search user</label><input value={query} onChange={(event) => { setQuery(event.target.value); setSelected(null); }} placeholder="Username, display name, profile handle, or Discord ID" className="mt-2 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-white outline-none placeholder:text-muted focus:border-accent/50" />{users.length > 0 && <div className="absolute left-0 right-0 top-full z-20 mt-2 overflow-hidden rounded-2xl border border-border bg-surface shadow-glow">{users.map((user) => <button key={user.id} onClick={() => choose(user)} className="flex w-full items-center justify-between border-b border-border px-4 py-3 text-left last:border-0 hover:bg-white/5"><span><span className="block font-semibold text-white">{user.displayName ?? user.username}</span><span className="text-xs text-muted">@{user.profileHandle} · {user.username}</span></span><span className="text-xs text-accent">{user.rhythiaVerified ? "Verified" : "Not verified"}</span></button>)}</div>}</div>

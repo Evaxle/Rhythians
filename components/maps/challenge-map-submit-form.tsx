@@ -84,7 +84,7 @@ export default function ChallengeMapSubmitForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+    <form onSubmit={handleSubmit} className="space-y-6 ui-panel">
       <div className="rounded-2xl border border-accent/20 bg-accent/10 p-4 text-sm leading-6 text-muted">
         Challenge maps do not award RHP. A pass counts only toward the challenge level where the reviewer places the map.
       </div>

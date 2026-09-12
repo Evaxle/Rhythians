@@ -4,11 +4,11 @@ import { RatingCalculators } from "@/components/admin/rating-calculators";
 
 export default function AdminDashboardPage() {
   return (
-    <div className="space-y-8">
-      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+    <div className="ui-page space-y-6">
+      <section className="ui-panel">
         <div className="grid gap-6 lg:grid-cols-4">
           {[{ title: "Users", value: "—" }, { title: "Clips", value: "—" }, { title: "Pending", value: "—" }, { title: "Reports", value: "—" }].map((card) => (
-            <div key={card.title} className="rounded-3xl border border-border bg-background/70 p-6"><p className="text-sm text-muted">{card.title}</p><p className="mt-3 text-3xl font-semibold text-white">{card.value}</p></div>
+            <div key={card.title} className="rounded-3xl border border-border bg-background/70 p-6"><p className="text-sm text-muted">{card.title}</p><p className="mt-2 text-3xl font-semibold tracking-tight text-white">{card.value}</p></div>
           ))}
         </div>
       </section>

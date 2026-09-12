@@ -62,7 +62,7 @@ export function AnnouncementList({ initialAnnouncements }: { initialAnnouncement
         </div>
       ) : (
         initialAnnouncements.map((announcement) => (
-          <article key={announcement.id} className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+          <article key={announcement.id} className="ui-panel ui-panel-compact">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <div className="flex flex-wrap items-center gap-2">

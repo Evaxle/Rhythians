@@ -64,7 +64,7 @@ export function AdminMapControls({ mapId, currentTab, currentLevel }: { mapId: s
   const higher = Math.min(10, targetLevel + 1);
 
   return <div className="mt-4 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] p-3">
-    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-200">Admin map controls</p>
+    <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-200">Admin map controls</p>
     <div className="mt-2 flex flex-wrap items-center gap-2">
       <select value={targetTab} onChange={(event) => setTargetTab(event.target.value as ChallengeAdminTab)} disabled={busy} className="rounded-xl border border-white/10 bg-background px-3 py-2 text-xs text-white outline-none focus:border-accent/60">
         <option value="challenge">Challenge</option>

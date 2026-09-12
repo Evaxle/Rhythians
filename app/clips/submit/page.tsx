@@ -8,12 +8,12 @@ export default async function ClipSubmitPage() {
   const user = await getSessionUser();
 
   return (
-    <div className="space-y-8">
-      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+    <div className="ui-page space-y-6">
+      <section className="ui-page-header">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-accent">Submit a clip</p>
-            <h1 className="mt-3 text-3xl font-semibold text-white">Share your best community moment</h1>
+            <p className="ui-eyebrow">Submit a clip</p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Share your best community moment</h1>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-muted">Upload a clip and submit it for review. Approved clips appear publicly on the community feed.</p>
           </div>
         </div>

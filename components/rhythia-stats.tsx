@@ -14,10 +14,10 @@ export function RhythiaStats({ profile }: { profile: { profileId: number; profil
   const scores = Array.isArray(profile.scores) ? profile.scores as RhythiaScore[] : [];
   const currentTitle = Math.max(0, titles.indexOf(profile.title));
   return (
-    <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow sm:p-8">
+    <section className="ui-panel ui-panel-compact sm:p-8">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-sm uppercase tracking-[0.3em] text-accent">Rhythia profile</p>
+          <p className="ui-eyebrow">Rhythia profile</p>
           <h2 className="mt-2 text-2xl font-semibold text-white">{profile.username ?? "Connected player"}</h2>
           <Link href={profile.profileUrl} target="_blank" rel="noreferrer" className="mt-1 block text-sm text-muted hover:text-accent">View on Rhythia ↗</Link>
         </div>
@@ -36,7 +36,7 @@ export function RhythiaStats({ profile }: { profile: { profileId: number; profil
       <div className="mt-6 rounded-2xl border border-border bg-background/70 p-4">
         <div className="flex items-center justify-between"><p className="text-xs uppercase tracking-[0.16em] text-muted">Title progression</p><p className="text-sm font-semibold text-accent">{profile.title}</p></div>
         <div className="mt-4 grid grid-cols-6 gap-1.5">{titles.map((title, index) => <div key={title} className={`h-2 rounded-full ${index <= currentTitle ? "bg-accent" : "bg-white/10"}`} title={title} />)}</div>
-        <div className="mt-2 flex justify-between text-[10px] text-muted"><span>Novice</span><span>Grandmaster</span></div>
+        <div className="mt-2 flex justify-between text-xs text-muted"><span>Novice</span><span>Grandmaster</span></div>
       </div>
 
       <div className="mt-8">

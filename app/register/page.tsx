@@ -10,9 +10,9 @@ export default async function RegisterPage() {
   if (user) redirect("/");
 
   return (
-    <div className="mx-auto max-w-xl rounded-3xl border border-border bg-surface/95 p-8 shadow-glow sm:p-10">
-      <p className="text-sm uppercase tracking-[0.28em] text-accent">Join Rhythians</p>
-      <h1 className="mt-3 text-3xl font-semibold text-white">Create your account</h1>
+    <div className="mx-auto max-w-xl ui-panel sm:p-10">
+      <p className="ui-eyebrow">Join Rhythians</p>
+      <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Create your account</h1>
       <p className="mt-3 text-sm leading-7 text-muted">Create a Rhythians account with Google or use an email, username, and password. Your player classification is assigned automatically after you link Rhythia.</p>
 
       <a href="/api/auth/google" className="mt-7 inline-flex w-full items-center justify-center gap-3 rounded-full border border-white/15 bg-white px-6 py-3 text-sm font-semibold text-[#1f1f1f] transition hover:bg-white/90">

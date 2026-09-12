@@ -21,8 +21,8 @@ export function RatingCalculators() {
   const spin = Math.max(lock, Math.round(lock * 1.12));
 
   return (
-    <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
-      <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent/15 text-accent"><Calculator size={20} /></div><div><p className="text-sm uppercase tracking-[0.3em] text-accent">Calculation tools</p><h2 className="mt-1 text-2xl font-semibold text-white">Analyzed rating and rank reference</h2></div></div>
+    <section className="ui-panel ui-panel-compact">
+      <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent/15 text-accent"><Calculator size={20} /></div><div><p className="ui-eyebrow">Calculation tools</p><h2 className="mt-1 text-2xl font-semibold text-white">Analyzed rating and rank reference</h2></div></div>
       <p className="mt-3 max-w-4xl text-sm leading-6 text-muted">Rhythia stars are not converted into Rhythians ratings. The map analyzer determines rating from raw note direction, distance, relative NPS, sustained strain and speed-sensitive pattern difficulty. This reference shows the base point curve after a rating has been analyzed.</p>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">

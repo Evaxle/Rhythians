@@ -23,7 +23,7 @@ export function CategoryStatsTab({ stats }: { stats: Stats[] }) {
           const isMax = stat.level >= MAX_CATEGORY_LEVEL;
           const progress = isMax ? 1 : stat.mapsAtNextLevel > 0 ? Math.min(1, stat.mapsCompletedAtNextLevel / stat.mapsAtNextLevel) : 0;
           return (
-            <div key={stat.category} className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+            <div key={stat.category} className="ui-panel ui-panel-compact">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-sm uppercase tracking-[0.24em] text-accent">{stat.label}</p>
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-sm font-semibold text-white">

@@ -17,13 +17,13 @@ export function RatingConversionCalculators() {
   const starsFromRating = useMemo(() => Math.max(0, number(rating) / 0.41), [rating]);
 
   return (
-    <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+    <section className="ui-panel ui-panel-compact">
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent/15 text-accent">
           <Calculator size={20} />
         </div>
         <div>
-          <p className="text-sm uppercase tracking-[0.3em] text-accent">Rating tools</p>
+          <p className="ui-eyebrow">Rating tools</p>
           <h2 className="mt-1 text-2xl font-semibold text-white">Star ↔ rating calculator</h2>
         </div>
       </div>

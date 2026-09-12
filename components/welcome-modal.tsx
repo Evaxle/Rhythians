@@ -29,7 +29,7 @@ export function WelcomeModal({ user, hasLinkedProfile, profileHandle }: { user: 
       <div className="animate-modal-in relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-border bg-surface p-6 shadow-glow sm:p-8" onClick={(event) => event.stopPropagation()}>
         <button type="button" onClick={dismiss} aria-label="Close welcome" className="absolute right-4 top-4 rounded-full p-1.5 text-muted transition hover:bg-white/5 hover:text-white"><X size={18} /></button>
 
-        <p className="text-sm uppercase tracking-[0.3em] text-accent">Welcome</p>
+        <p className="ui-eyebrow">Welcome</p>
         <h1 className="mt-2 text-2xl font-semibold text-white">Welcome to Rhythians</h1>
         <p className="mt-3 max-w-xl text-sm leading-7 text-muted">Track your Rhythia progress, compete, discover maps, share clips, compare player settings, and take part in community events from one account.</p>
 

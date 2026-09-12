@@ -85,7 +85,7 @@ export function NotificationsBell() {
       >
         <Bell className="h-4 w-4" />
         {unread > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-white">
+          <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-xs font-bold text-white">
             {unread > 9 ? "9+" : unread}
           </span>
         )}
@@ -116,7 +116,7 @@ export function NotificationsBell() {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <p className="text-sm font-medium text-white">{notification.title}</p>
-                    <span className="shrink-0 text-[11px] text-muted">{timeAgo(notification.createdAt)}</span>
+                    <span className="shrink-0 text-xs text-muted">{timeAgo(notification.createdAt)}</span>
                   </div>
                   <p className="mt-1 line-clamp-2 text-xs leading-5 text-muted">{notification.message}</p>
                 </Link>

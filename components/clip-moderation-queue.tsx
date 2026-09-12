@@ -62,13 +62,13 @@ export function ClipModerationQueue({
       {clips.map((clip) => {
         const isRejecting = rejectingId === clip.id;
         return (
-          <article key={clip.id} className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+          <article key={clip.id} className="ui-panel ui-panel-compact">
             <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
               <div>
                 <div className="flex items-center gap-2">
                   <p className="text-xs uppercase tracking-[0.25em] text-accent">{clip.category?.name ?? "Uncategorized"}</p>
                   {cameraModeLabel(clip.cameraMode) && (
-                    <span className="rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-accent">
+                    <span className="rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 text-xs font-semibold uppercase tracking-wider text-accent">
                       {cameraModeEmoji(clip.cameraMode)} {cameraModeLabel(clip.cameraMode)}
                     </span>
                   )}

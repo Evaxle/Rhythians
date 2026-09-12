@@ -14,13 +14,13 @@ export default async function ApprovalPage() {
   const clips = await getPendingClips();
 
   return (
-    <div className="space-y-8">
+    <div className="ui-page space-y-6">
       <ReviewerWelcome />
-      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+      <section className="ui-page-header">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-accent">Approval team</p>
-            <h1 className="mt-3 text-3xl font-semibold text-white">Review pending submissions</h1>
+            <p className="ui-eyebrow">Approval team</p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Review pending submissions</h1>
             <p className="mt-3 text-sm leading-7 text-muted">
               Approve clips or deny them with feedback. The uploader is notified either way, and the
               feedback you give on a denial is sent to them so they can fix it and resubmit.

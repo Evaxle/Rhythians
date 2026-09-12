@@ -47,7 +47,7 @@ export function TournamentSelfTest() {
   }
 
   return (
-    <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+    <section className="ui-panel ui-panel-compact">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.22em] text-accent"><ShieldCheck size={15} /> Tournament diagnostics</p>
@@ -67,10 +67,10 @@ export function TournamentSelfTest() {
 
       {result && <div className="mt-6 space-y-4">
         <div className={`grid gap-3 rounded-2xl border p-4 sm:grid-cols-4 ${result.ok ? "border-emerald-400/20 bg-emerald-400/[0.05]" : "border-rose-400/20 bg-rose-400/[0.05]"}`}>
-          <div><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted">Overall</p><p className={`mt-1 text-lg font-bold ${result.ok ? "text-emerald-200" : "text-rose-200"}`}>{result.ok ? "Passed" : "Needs attention"}</p></div>
-          <div><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted">Passed</p><p className="mt-1 text-lg font-bold text-emerald-200">{result.summary.passed}</p></div>
-          <div><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted">Warnings</p><p className="mt-1 text-lg font-bold text-amber-200">{result.summary.warnings}</p></div>
-          <div><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted">Failed</p><p className="mt-1 text-lg font-bold text-rose-200">{result.summary.failed}</p></div>
+          <div><p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">Overall</p><p className={`mt-1 text-lg font-bold ${result.ok ? "text-emerald-200" : "text-rose-200"}`}>{result.ok ? "Passed" : "Needs attention"}</p></div>
+          <div><p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">Passed</p><p className="mt-1 text-lg font-bold text-emerald-200">{result.summary.passed}</p></div>
+          <div><p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">Warnings</p><p className="mt-1 text-lg font-bold text-amber-200">{result.summary.warnings}</p></div>
+          <div><p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">Failed</p><p className="mt-1 text-lg font-bold text-rose-200">{result.summary.failed}</p></div>
         </div>
         <div className="grid gap-2 md:grid-cols-2">
           {result.checks.map((check) => <div key={check.name} className="flex gap-3 rounded-2xl border border-white/10 bg-black/15 p-4">

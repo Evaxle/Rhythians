@@ -4,10 +4,10 @@ export async function RhythKitRecentScores({ userId }: { userId: string }) {
   const scores = await prisma.$queryRawUnsafe<Array<{ id: string; challengeMapId: string; title: string; rating: number; accuracy: number | null; points: number; submittedAt: Date }>>(`SELECT s."id", s."challengeMapId", m."title", m."rating", s."accuracy", s."points", s."submittedAt" FROM "RhythKitScore" s JOIN "ChallengeMap" m ON m."id" = s."challengeMapId" WHERE s."userId" = $1 ORDER BY s."submittedAt" DESC LIMIT 10`, userId);
 
   return (
-    <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+    <section className="ui-panel">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <p className="text-sm uppercase tracking-[0.3em] text-accent">RhythKit</p>
+          <p className="ui-eyebrow">RhythKit</p>
           <h2 className="mt-2 text-2xl font-semibold text-white">Recent scores</h2>
         </div>
         <p className="text-sm text-muted">Mod scores only</p>

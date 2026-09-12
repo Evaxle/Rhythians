@@ -63,7 +63,7 @@ export function RhythiaMapSync() {
     }
   }
 
-  return <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+  return <section className="ui-panel ui-panel-compact">
     <div>
       <p className="text-sm uppercase tracking-[0.24em] text-accent">Rhythia synchronization</p>
       <h2 className="mt-2 text-xl font-semibold text-white">Sync Rhythia maps</h2>

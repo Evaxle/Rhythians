@@ -3,10 +3,10 @@ import { patterns } from "@/lib/knowledge";
 
 export default function PatternsWikiPage() {
   return (
-    <div className="space-y-8">
-      <section className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
-        <p className="text-sm uppercase tracking-[0.3em] text-accent">Patterns Wiki</p>
-        <h1 className="mt-3 text-3xl font-semibold text-white">Every main pattern in Rhythia!</h1>
+    <div className="ui-page space-y-6">
+      <section className="ui-page-header">
+        <p className="ui-eyebrow">Patterns Wiki</p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Every main pattern in Rhythia!</h1>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
           A pattern is a recognizable sequence of notes. Names describe movement, not a mandatory
           recipe — the same shape changes difficulty with timing and spacing. Each grid below
@@ -19,7 +19,7 @@ export default function PatternsWikiPage() {
         <section
           key={pattern.slug}
           id={pattern.slug}
-          className="scroll-mt-24 rounded-3xl border border-border bg-surface/95 p-8 shadow-glow"
+          className="scroll-mt-24 ui-panel"
         >
           <div className="grid gap-8 lg:grid-cols-[340px_1fr] lg:items-start">
             <div className="lg:sticky lg:top-8">

@@ -12,7 +12,7 @@ export function RankBadge({
   size?: "sm" | "md" | "lg";
   showTier?: boolean;
 }) {
-  const sizeClass = size === "lg" ? "px-4 py-1.5 text-base gap-2" : size === "sm" ? "px-2 py-0.5 text-[11px] gap-1" : "px-3 py-1 text-sm gap-1.5";
+  const sizeClass = size === "lg" ? "px-4 py-1.5 text-base gap-2" : size === "sm" ? "px-2 py-0.5 text-xs gap-1" : "px-3 py-1 text-sm gap-1.5";
   const iconSize = size === "lg" ? 34 : size === "sm" ? 22 : 28;
   const label = rank.isExpert ? "Expert" : `${rank.name} ${rank.tier}`;
   const sub = rank.isExpert && globalRank != null ? ` #${globalRank.toLocaleString()}` : "";

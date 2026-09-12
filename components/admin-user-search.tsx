@@ -226,7 +226,7 @@ export function AdminUserSearch() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+      <section className="ui-panel ui-panel-compact">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent/15 text-accent">
             <User size={20} />
@@ -247,7 +247,7 @@ export function AdminUserSearch() {
 
       {user ? (
         <section className="space-y-6">
-          <div className="rounded-3xl border border-border bg-surface/95 p-8 shadow-glow">
+          <div className="ui-panel">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <div className="flex items-center gap-3">

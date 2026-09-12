@@ -99,7 +99,7 @@ export default async function ProfilePage({ params }: Props) {
   const titleStyle = profileTitle?.neon ? { color: profileTitle.color, textShadow: `0 0 5px ${profileTitle.color}, 0 0 14px ${profileTitle.color}, 0 0 28px ${profileTitle.color}` } : profileTitle ? { color: profileTitle.color } : undefined;
   const mainRank = getRankInfo(displayRhp);
 
-  return <div className="space-y-7">
+  return <div className="ui-page space-y-6">
     <section className="relative overflow-hidden rounded-[2.2rem] border border-accent/15 bg-[radial-gradient(circle_at_8%_0%,rgba(124,143,240,0.17),transparent_32%),radial-gradient(circle_at_92%_100%,rgba(244,63,94,0.08),transparent_28%),linear-gradient(145deg,rgba(20,27,45,0.98),rgba(9,13,23,0.98))] p-5 shadow-glow sm:p-7 lg:p-8">
       <div className="grid gap-7 lg:grid-cols-[minmax(300px,0.72fr)_minmax(0,1.28fr)] lg:items-stretch">
         <div className="flex flex-col rounded-[1.75rem] border border-white/10 bg-black/15 p-5 sm:p-6">
@@ -111,7 +111,7 @@ export default async function ProfilePage({ params }: Props) {
               <p className="mt-1 text-sm text-muted">@{user.profileHandle}</p>
               {user.playerRank && <p className="mt-2 text-sm font-semibold" style={{ color: user.playerRank.color ?? "#7289da" }}>{user.playerRank.name}</p>}
               {profileTitle && <p className="mt-2 text-sm font-semibold" style={titleStyle}>{profileTitle.title}</p>}
-              <div className="mt-3 flex flex-wrap gap-2">{user.rhythiaProfile && <span title={presenceLabel} className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${presence?.isOnline ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300" : "border-white/10 bg-white/5 text-muted"}`}><span className={`h-1.5 w-1.5 rounded-full ${presence?.isOnline ? "bg-emerald-400" : "bg-white/30"}`} />{presence?.isOnline ? "Online" : presenceLabel}</span>}<span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-muted"><CalendarDays size={12} /> Joined {user.joinedAt.toLocaleDateString()}</span></div>
+              <div className="mt-3 flex flex-wrap gap-2">{user.rhythiaProfile && <span title={presenceLabel} className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${presence?.isOnline ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300" : "border-white/10 bg-white/5 text-muted"}`}><span className={`h-1.5 w-1.5 rounded-full ${presence?.isOnline ? "bg-emerald-400" : "bg-white/30"}`} />{presence?.isOnline ? "Online" : presenceLabel}</span>}<span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-muted"><CalendarDays size={12} /> Joined {user.joinedAt.toLocaleDateString()}</span></div>
             </div>
           </div>
           {displayTags.length > 0 && <div className="mt-5"><UserTags tags={displayTags} size="md" /></div>}

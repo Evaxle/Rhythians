@@ -24,7 +24,7 @@ function FeaturedSlot({
 }) {
   const clip = clips.find((item) => item.id === value) ?? null;
   return (
-    <div className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+    <div className="ui-panel ui-panel-compact">
       <p className="text-xs uppercase tracking-[0.24em] text-accent">{label}</p>
       {clip ? (
         <div className="mt-4">
@@ -124,7 +124,7 @@ export function FeaturedClipsManager({
         </button>
       </div>
 
-      <div className="rounded-3xl border border-border bg-surface/95 p-6 shadow-glow">
+      <div className="ui-panel ui-panel-compact">
         <p className="text-xs uppercase tracking-[0.24em] text-accent">Available approved clips ({initialClips.length})</p>
         <div className="mt-4 grid gap-3">
           {initialClips.length === 0 ? (

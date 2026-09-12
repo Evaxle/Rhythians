@@ -64,11 +64,11 @@ export function RichText({ text, content, className = "" }: { text?: string; con
     <p className={`whitespace-pre-wrap break-words ${className}`}>
       {tokens.map((token, index) => {
         if (token.type === "clip") {
-          return <Link key={index} href={`/clips/${token.id}`} className="mx-0.5 inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 text-[11px] font-semibold text-accent transition hover:bg-accent/20 hover:text-white" title={`Open clip ${token.id}`}><Film size={11} /> clip:{token.id.slice(0, 8)}</Link>;
+          return <Link key={index} href={`/clips/${token.id}`} className="mx-0.5 inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 text-xs font-semibold text-accent transition hover:bg-accent/20 hover:text-white" title={`Open clip ${token.id}`}><Film size={11} /> clip:{token.id.slice(0, 8)}</Link>;
         }
         if (token.type === "map") {
           const map = maps[token.id];
-          return <Link key={index} href={`/maps/${encodeURIComponent(map?.id ?? token.id)}`} className="mx-0.5 inline-flex items-center gap-1 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-2 py-0.5 text-[11px] font-semibold text-cyan-300 transition hover:bg-cyan-400/20 hover:text-white" title={`Open map ${map?.title ?? token.id}`}><MapIcon size={11} /> {map?.title ?? `map:${token.id.slice(0, 8)}`}</Link>;
+          return <Link key={index} href={`/maps/${encodeURIComponent(map?.id ?? token.id)}`} className="mx-0.5 inline-flex items-center gap-1 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-2 py-0.5 text-xs font-semibold text-cyan-300 transition hover:bg-cyan-400/20 hover:text-white" title={`Open map ${map?.title ?? token.id}`}><MapIcon size={11} /> {map?.title ?? `map:${token.id.slice(0, 8)}`}</Link>;
         }
         if (token.type === "url") return <span key={index} className="text-muted" title="Off-site links are shown as plain text and are not clickable">{token.value}</span>;
         return <span key={index}>{token.value}</span>;
