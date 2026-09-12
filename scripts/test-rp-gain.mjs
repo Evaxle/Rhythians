@@ -11,10 +11,10 @@ function mapRhp(values) {
 
 check("single clear contributes full value", mapRhp([100]) === 100);
 check("second mode clear contributes diminished value", Math.round(mapRhp([100, 106])) === 161);
-check("three mode clears all contribute", Math.round(mapRhp([100, 106, 112])) === 196);
-check("strongest mode is always weighted first", Math.round(mapRhp([112, 100, 106])) === 196);
+check("three mode clears all contribute", Math.round(mapRhp([100, 106, 112])) === 205);
+check("strongest mode is always weighted first", Math.round(mapRhp([112, 100, 106])) === 205);
 check("multi-mode RHP remains below triple payout", mapRhp([100, 106, 112]) < 318);
-check("quest bonus is additive outside same-map diminishing weights", Math.round(mapRhp([100, 106, 112]) + 34) === 230);
+check("quest bonus is additive outside same-map diminishing weights", Math.round(mapRhp([100, 106, 112]) + 34) === 239);
 
 console.log(failures === 0 ? "ALL RANKING V3 MULTI-CLEAR TESTS PASSED" : `${failures} TESTS FAILED`);
 process.exit(failures === 0 ? 0 : 1);

@@ -130,9 +130,6 @@ summary:focus-visible {
   outline-offset: 3px;
 }
 
-main {
-  isolation: isolate;
-}
 
 table {
   border-collapse: separate;
